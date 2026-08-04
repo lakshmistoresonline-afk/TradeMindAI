@@ -1,0 +1,52 @@
+services:
+  # 1. The API Server
+  - type: web
+    name: trademind-api
+    env: docker
+    region: singapore # Choose region closest to India (NSE)
+    plan: free
+    dockerContext: backend
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: com-webcraft-trademindai-c8f75
+      - key: GROQ_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+
+  # 2. The Background Worker (Analysis Engine)
+  - type: worker
+    name: trademind-worker
+    env: docker
+    region: singapore
+    plan: free
+    dockerContext: backend
+    dockerfilePath: Dockerfile
+    dockerCommand: python -m celery -A backend.workers.tasks.celery_app worker --loglevel=info -P solo
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: com-webcraft-trademindai-c8f75
+      - key: GROQ_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+
+  # 3. The Scheduler (The Clock)
+  - type: worker
+    name: trademind-beat
+    env: docker
+    region: singapore
+    plan: free
+    dockerContext: backend
+    dockerfilePath: Dockerfile
+    dockerCommand: python -m celery -A backend.workers.tasks.celery_app beat --loglevel=info
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: com-webcraft-trademindai-c8f75
+      - key: REDIS_URL
+        sync: false

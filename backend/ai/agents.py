@@ -1,6 +1,7 @@
 from typing import Annotated, TypedDict, List
-from langchain_community.llms import Ollama
+from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
+from backend.core.config import settings
 
 class AgentState(TypedDict):
     symbol: str
@@ -13,7 +14,12 @@ class AgentState(TypedDict):
 class BaseAgent:
     def __init__(self, name: str):
         self.name = name
-        self.llm = Ollama(model="llama3") # Default to llama3 via Ollama
+        # Using Llama 3 70B on Groq for institutional-grade speed and intelligence
+        self.llm = ChatGroq(
+            groq_api_key=settings.GROQ_API_KEY,
+            model_name="llama3-70b-8192",
+            temperature=0.1
+        )
 
 class TechnicalAgent(BaseAgent):
     def analyze(self, state: AgentState):

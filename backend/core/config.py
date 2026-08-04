@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
     FIREBASE_PROJECT_ID: str = "com-webcraft-trademindai-c8f75"
+    GROQ_API_KEY: str = "YOUR_GROQ_API_KEY"
 
     SECRET_KEY: str = "SECRET"
     ALGORITHM: str = "HS256"
