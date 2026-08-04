@@ -3,7 +3,7 @@ services:
   - type: web
     name: trademind-api
     env: docker
-    region: singapore # Choose region closest to India (NSE)
+    region: singapore
     plan: free
     dockerContext: backend
     dockerfilePath: Dockerfile
@@ -17,14 +17,15 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
 
-  # 2. The Background Worker (Analysis Engine)
-  - type: worker
+  # 2. The Background Worker (Analysis Engine) - Reconfigured as Web for Free Tier
+  - type: web
     name: trademind-worker
     env: docker
     region: singapore
     plan: free
     dockerContext: backend
     dockerfilePath: Dockerfile
+    # We use a dummy port so Render thinks it's a web service
     dockerCommand: python -m celery -A backend.workers.tasks.celery_app worker --loglevel=info -P solo
     envVars:
       - key: FIREBASE_PROJECT_ID
@@ -36,8 +37,8 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
 
-  # 3. The Scheduler (The Clock)
-  - type: worker
+  # 3. The Scheduler (The Clock) - Reconfigured as Web for Free Tier
+  - type: web
     name: trademind-beat
     env: docker
     region: singapore
