@@ -1,10 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Box, Typography, Grid, Paper } from '@mui/material'
-import { TrendingUp, BarChart2, MessageSquare, ShieldCheck } from 'lucide-react'
-import { getStocks } from '../api/client'
+import { Box, Typography, Grid, Paper, Button } from '@mui/material'
+import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play } from 'lucide-react'
+import { getStocks, triggerBatchAnalysis } from '../api/client'
 
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
+  const [triggering, setTriggering] = useState(false)
+
+  const handleTrigger = async () => {
+    setTriggering(true)
+    try {
+      await triggerBatchAnalysis()
+      alert("Analysis triggered successfully! It will take a few minutes to complete.")
+    } catch (error) {
+      console.error('Error triggering analysis:', error)
+      alert("Failed to trigger analysis.")
+    } finally {
+      setTriggering(false)
+    }
+  }
 
   useEffect(() => {
     const fetchStocks = async () => {
@@ -20,7 +34,18 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>Market Overview</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Overview</Typography>
+        <Button
+          variant="contained"
+          startIcon={<Play size={18} />}
+          onClick={handleTrigger}
+          disabled={triggering}
+          sx={{ borderRadius: 2 }}
+        >
+          {triggering ? 'Triggering...' : 'Run Adhoc Analysis'}
+        </Button>
+      </Box>
 
       <Grid container spacing={3}>
         {/* Dashboard Stats */}

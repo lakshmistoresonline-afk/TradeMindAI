@@ -18,3 +18,8 @@ export const getStockDetail = async (symbol: string) => {
   const response = await apiClient.get(`/stocks/${symbol}`);
   return response.data;
 };
+
+export const triggerBatchAnalysis = async () => {
+  const response = await apiClient.post('/analysis/trigger');
+  return response.data;
+};
