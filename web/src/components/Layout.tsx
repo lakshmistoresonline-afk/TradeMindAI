@@ -1,4 +1,3 @@
-import React from 'react';
 import React, { useState, createContext, useContext } from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert } from '@mui/material';
 import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase } from 'lucide-react';
@@ -8,7 +7,7 @@ const drawerWidth = 240;
 
 // Notification Context
 export const NotificationContext = createContext({
-  showNotification: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {}
+  showNotification: (_message: string, _severity: 'success' | 'error' | 'info' | 'warning') => {}
 });
 
 export const useNotification = () => useContext(NotificationContext);

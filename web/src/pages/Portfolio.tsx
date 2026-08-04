@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Grid, Button, TextField, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, Divider } from '@mui/material';
-import { Plus, Trash2, TrendingUp, TrendingDown, Briefcase } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Button, TextField, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { Plus, Trash2, TrendingUp, Briefcase } from 'lucide-react';
 import { getStocks } from '../api/client';
 
 export default function Portfolio() {
