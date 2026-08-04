@@ -1,6 +1,5 @@
-import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+import { Box, Typography, ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Market from './pages/Market'
@@ -53,8 +52,5 @@ function App() {
     </ThemeProvider>
   )
 }
-
-// Small Box component for settings placeholder
-import { Box } from '@mui/material'
 
 export default App

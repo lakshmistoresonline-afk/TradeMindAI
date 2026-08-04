@@ -14,7 +14,7 @@ export const getStocks = async () => {
   return response.data;
 };
 
-export const getStockDetail = async (symbol: str) => {
+export const getStockDetail = async (symbol: string) => {
   const response = await apiClient.get(`/stocks/${symbol}`);
   return response.data;
 };

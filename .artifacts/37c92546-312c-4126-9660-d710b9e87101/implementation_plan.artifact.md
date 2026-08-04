@@ -1,35 +1,40 @@
-# Migration from PostgreSQL to Firebase Firestore
+# Detailed AI Analysis Engine for NSE Stocks
 
-This plan outlines the steps to replace the existing PostgreSQL/SQLAlchemy database layer with Firebase Firestore to avoid local database installations.
+This plan covers enhancing the AI multi-agent workflow to provide institutional-grade analysis for all NSE stocks, including Smart Money Concepts (SMC) and batch processing.
 
 ## Proposed Changes
 
-### Configuration
-#### [MODIFY] [.env](file:///D:/TradeMindAI/backend/.env)
-- Remove `DATABASE_URL`.
-- Ensure `FIREBASE_PROJECT_ID` is set to `com-webcraft-trademindai-c8f75`.
-- (Optional) Add `GOOGLE_APPLICATION_CREDENTIALS` path if not using default auth.
+### AI Agents & Workflow
+#### [MODIFY] [agents.py](file:///D:/TradeMindAI/backend/ai/agents.py)
+- Enhance `TechnicalAgent` to interpret RSI, EMA crossovers, MACD, and Smart Money Concepts (Order Blocks, FVG).
+- Enhance `FundamentalAgent` to analyze P/E, P/B, and Market Cap context.
+- [NEW] `SentimentAgent` to incorporate news sentiment data.
+- Update `AgentState` to hold more granular analysis data.
 
-### Core Database Layer
-#### [MODIFY] [database.py](file:///D:/TradeMindAI/backend/core/database.py)
-- Replace SQLAlchemy setup with `firebase_admin` and `firestore` initialization.
-- Update `get_db` to return a Firestore client instance.
+#### [MODIFY] [workflow.py](file:///D:/TradeMindAI/backend/ai/workflow.py)
+- Add the `SentimentAgent` to the LangGraph workflow.
+- Update the sequence: Technical -> Fundamental -> Sentiment -> Consensus.
 
-### Data Models
-#### [MODIFY] [models.py](file:///D:/TradeMindAI/backend/data/models.py)
-- Remove `Base` and SQLAlchemy column definitions.
-- Implement Pydantic models for `Stock` and `StockPrice` to handle serialization/deserialization for Firestore.
-
-### Data Collection
-#### [MODIFY] [collector.py](file:///D:/TradeMindAI/backend/data/collector.py)
-- Rewrite `fetch_stock_info` to use Firestore's `document().set()` and `document().get()`.
-- Rewrite `fetch_historical_data` to store historical prices as sub-collections or individual documents in a `prices` collection.
-
-### Background Tasks
+### Data Processing
 #### [MODIFY] [tasks.py](file:///D:/TradeMindAI/backend/workers/tasks.py)
-- Update `analyze_stock_task` to work with the Firestore client instead of SQLAlchemy `Session`.
+- Add a new task `analyze_all_nse_stocks` that fetches a list of NSE symbols and triggers `analyze_stock_task` for each.
+- Update `analyze_stock_task` to include SMC analysis before invoking the AI.
+- Store the full detailed analysis JSON in Firestore.
+
+### Web Frontend
+#### [MODIFY] [client.ts](file:///D:/TradeMindAI/web/src/api/client.ts)
+- Add endpoint to fetch detailed analysis for a specific symbol.
+
+#### [NEW] [AnalysisReport.tsx](file:///D:/TradeMindAI/web/src/components/AnalysisReport.tsx)
+- Create a component to render the detailed multi-agent report.
+
+#### [MODIFY] [Analysis.tsx](file:///D:/TradeMindAI/web/src/pages/Analysis.tsx)
+- Connect to the detailed analysis data and allow searching for specific stock reports.
 
 ## Verification Plan
-- Run `analyze_file` on modified files to check for syntax and import errors.
-- Manual verification of API endpoints (stocks, analysis) once the backend is running.
-- Ensure `celery` worker can still connect to Redis (using Memurai or Cloud Redis).
+### Automated Tests
+- Run `analyze_file` on updated backend modules.
+- Check Celery logs for successful batch processing.
+
+### Manual Verification
+- Verify that "Analysis" page in the web app shows detailed breakdowns from different agents.
