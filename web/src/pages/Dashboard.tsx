@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Box, Typography, Grid, Paper, Button } from '@mui/material'
+import { Box, Typography, Grid, Paper, Button, CircularProgress } from '@mui/material'
 import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play } from 'lucide-react'
-import { getStocks, triggerBatchAnalysis } from '../api/client'
+import { getStocks, triggerBatchAnalysis, getMarketStats } from '../api/client'
 
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
+  const [marketStats, setMarketStats] = useState<any>(null)
   const [triggering, setTriggering] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const handleTrigger = async () => {
     setTriggering(true)
@@ -21,16 +23,28 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    const fetchStocks = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getStocks()
-        setStocks(data)
+        const [stocksData, statsData] = await Promise.all([
+          getStocks(),
+          getMarketStats()
+        ])
+        setStocks(stocksData)
+        setMarketStats(statsData)
       } catch (error) {
-        console.error('Error fetching stocks:', error)
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
       }
     }
-    fetchStocks()
+    fetchData()
   }, [])
+
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}><CircularProgress /></Box>
+
+  // Calculate Aggregate AI Signal
+  const buySignals = stocks.filter(s => s.analysis?.consensus?.toUpperCase().includes('BUY')).length;
+  const signalStrength = stocks.length > 0 ? Math.round((buySignals / stocks.length) * 100) : 0;
 
   return (
     <Box>
@@ -50,43 +64,68 @@ export default function Dashboard() {
       <Grid container spacing={3}>
         {/* Dashboard Stats */}
         <Grid item xs={12} md={3}>
-          <StatCard title="NIFTY 50" value="23,542.10" change="+1.2%" icon={<BarChart2 />} />
+          <StatCard
+            title="NIFTY 50"
+            value={marketStats?.['NIFTY 50']?.value.toLocaleString()}
+            change={`${marketStats?.['NIFTY 50']?.change}%`}
+            icon={<BarChart2 />}
+          />
         </Grid>
         <Grid item xs={12} md={3}>
-          <StatCard title="BANK NIFTY" value="51,280.45" change="-0.4%" icon={<TrendingUp />} />
+          <StatCard
+            title="BANK NIFTY"
+            value={marketStats?.['BANK NIFTY']?.value.toLocaleString()}
+            change={`${marketStats?.['BANK NIFTY']?.change}%`}
+            icon={<TrendingUp />}
+          />
         </Grid>
         <Grid item xs={12} md={3}>
-          <StatCard title="India VIX" value="14.25" change="-2.1%" icon={<ShieldCheck />} />
+          <StatCard
+            title="India VIX"
+            value={marketStats?.['India VIX']?.value.toString()}
+            change={`${marketStats?.['India VIX']?.change}%`}
+            icon={<ShieldCheck />}
+          />
         </Grid>
         <Grid item xs={12} md={3}>
-          <StatCard title="AI Signal" value="Strong Buy" change="85% Conf." icon={<MessageSquare />} />
+          <StatCard
+            title="AI Sentiment"
+            value={signalStrength > 60 ? 'Bullish' : signalStrength < 40 ? 'Bearish' : 'Neutral'}
+            change={`${signalStrength}% Conf.`}
+            icon={<MessageSquare />}
+          />
         </Grid>
 
-        {/* Main Content Area */}
+        {/* TradingView Chart */}
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography variant="h5" color="textSecondary">
-              TradingView Charts Integration Coming Soon
-            </Typography>
+          <Paper sx={{ p: 0, height: '500px', overflow: 'hidden' }}>
+            <iframe
+              src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=NSE%3ANIFTY&interval=D&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=localhost&utm_medium=widget&utm_campaign=chart&utm_term=NSE%3ANIFTY"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allowTransparency
+              allowFullScreen
+            ></iframe>
           </Paper>
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, height: '400px', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6" gutterBottom>AI Consensus Feed</Typography>
+          <Paper sx={{ p: 3, height: '500px', display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h6" gutterBottom>Live AI Signals</Typography>
             <Box sx={{ overflowY: 'auto' }}>
-              {stocks.length > 0 ? (
-                stocks.map((stock) => (
+              {stocks.filter(s => s.analysis).length > 0 ? (
+                stocks.filter(s => s.analysis).map((stock) => (
                   <FeedItem
                     key={stock.symbol}
                     symbol={stock.symbol}
-                    action={stock.last_price > 0 ? 'BUY' : 'HOLD'}
-                    reason={`Price: ${stock.last_price} | Sector: ${stock.sector}`}
+                    action={stock.analysis.consensus.includes('BUY') ? 'BUY' : 'HOLD'}
+                    reason={stock.analysis.recommendations[0]?.analysis.substring(0, 100) + '...'}
                   />
                 ))
               ) : (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                  <Typography color="textSecondary">No stocks analyzed yet.</Typography>
+                  <Typography color="textSecondary">No live signals. Run analysis to start.</Typography>
                 </Box>
               )}
             </Box>

@@ -1,8 +1,27 @@
 from fastapi import APIRouter, Depends
 from backend.core.database import get_db
 from google.cloud import firestore
+import yfinance as yf
 
 router = APIRouter()
+
+@router.get("/market-stats")
+async def get_market_stats():
+    # Fetch real-time major indices
+    indices = {
+        "^NSEI": "NIFTY 50",
+        "^NSEBANK": "BANK NIFTY",
+        "^INDIAVIX": "India VIX"
+    }
+    stats = {}
+    for symbol, name in indices.items():
+        ticker = yf.Ticker(symbol)
+        info = ticker.fast_info
+        stats[name] = {
+            "value": round(info.last_price, 2),
+            "change": round(((info.last_price - info.previous_close) / info.previous_close) * 100, 2)
+        }
+    return stats
 
 @router.get("/")
 async def get_stocks(db: firestore.Client = Depends(get_db)):

@@ -1,21 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, IconButton, TextField, InputAdornment } from '@mui/material';
-import { Search, Info, TrendingUp, TrendingDown } from 'lucide-react';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, IconButton, TextField, InputAdornment, Button } from '@mui/material';
+import { Search, Info, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 import { getStocks } from '../api/client';
 
 export default function Market() {
   const [stocks, setStocks] = useState<any[]>([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const fetchStocks = async () => {
+    setLoading(true);
+    try {
+      const data = await getStocks();
+      setStocks(data);
+    } catch (error) {
+      console.error('Error fetching stocks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStocks = async () => {
-      try {
-        const data = await getStocks();
-        setStocks(data);
-      } catch (error) {
-        console.error('Error fetching stocks:', error);
-      }
-    };
     fetchStocks();
   }, []);
 
@@ -27,7 +32,18 @@ export default function Market() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Data</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Data</Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<RefreshCw size={16} className={loading ? 'animate-spin' : ''} />}
+            onClick={fetchStocks}
+            disabled={loading}
+          >
+            Refresh
+          </Button>
+        </Box>
         <TextField
           size="small"
           placeholder="Search stocks..."

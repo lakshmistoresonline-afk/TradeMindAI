@@ -14,6 +14,11 @@ export const getStocks = async () => {
   return response.data;
 };
 
+export const getMarketStats = async () => {
+  const response = await apiClient.get('/stocks/market-stats');
+  return response.data;
+};
+
 export const getStockDetail = async (symbol: string) => {
   const response = await apiClient.get(`/stocks/${symbol}`);
   return response.data;
@@ -21,5 +26,20 @@ export const getStockDetail = async (symbol: string) => {
 
 export const triggerBatchAnalysis = async () => {
   const response = await apiClient.post('/analysis/trigger');
+  return response.data;
+};
+
+export const triggerBacktest = async (symbol: string) => {
+  const response = await apiClient.post(`/analysis/backtest/${symbol}`);
+  return response.data;
+};
+
+export const getBacktestResults = async (symbol: string) => {
+  const response = await apiClient.get(`/analysis/backtest/${symbol}`);
+  return response.data;
+};
+
+export const getBacktestSignals = async (symbol: string) => {
+  const response = await apiClient.get(`/analysis/backtest/${symbol}/signals`);
   return response.data;
 };

@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Box, Typography, ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Market from './pages/Market'
 import Analysis from './pages/Analysis'
+import Settings from './pages/Settings'
+import Portfolio from './pages/Portfolio'
+import Login from './pages/Login'
 
 const darkTheme = createTheme({
   palette: {
@@ -40,14 +43,20 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/market" element={<Market />} />
-            <Route path="/analysis" element={<Analysis />} />
-            <Route path="/settings" element={<Box p={4}><Typography>Settings coming soon...</Typography></Box>} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/*" element={
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/market" element={<Market />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/analysis" element={<Analysis />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
+            </Layout>
+          } />
+        </Routes>
       </Router>
     </ThemeProvider>
   )

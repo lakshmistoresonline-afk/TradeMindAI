@@ -8,6 +8,7 @@ from backend.ai.workflow import create_ai_workflow
 import datetime
 
 from backend.analysis.smc import SMCAnalysis
+from backend.analysis.backtester import BacktestEngine
 
 celery_app = Celery("tasks", broker=settings.REDIS_URL)
 
@@ -89,3 +90,9 @@ def analyze_nifty_50():
         analyze_stock_task.delay(symbol)
 
     return f"Automated analysis triggered for {len(symbols)} stocks."
+
+@celery_app.task
+def run_adhoc_backtest(symbol: str):
+    db = db_client
+    engine = BacktestEngine(db)
+    return engine.run_10y_backtest(symbol)

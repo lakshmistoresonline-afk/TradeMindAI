@@ -32,6 +32,9 @@ class DataCollector:
         ticker = yf.Ticker(f"{symbol}.NS")
         df = ticker.history(period=period)
 
+        if df.empty:
+            return df
+
         # Store in a subcollection 'prices' under the stock document
         stock_ref = self.db.collection("stocks").document(symbol)
         prices_ref = stock_ref.collection("prices")
