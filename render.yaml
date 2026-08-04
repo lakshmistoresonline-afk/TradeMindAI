@@ -6,7 +6,7 @@ services:
     region: singapore
     plan: free
     dockerContext: backend
-    dockerfilePath: Dockerfile
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: FIREBASE_PROJECT_ID
         value: com-webcraft-trademindai-c8f75
@@ -17,15 +17,14 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
 
-  # 2. The Background Worker (Analysis Engine) - Reconfigured as Web for Free Tier
+  # 2. The Background Worker
   - type: web
     name: trademind-worker
     env: docker
     region: singapore
     plan: free
     dockerContext: backend
-    dockerfilePath: Dockerfile
-    # We use a dummy port so Render thinks it's a web service
+    dockerfilePath: backend/Dockerfile
     dockerCommand: python -m celery -A backend.workers.tasks.celery_app worker --loglevel=info -P solo
     envVars:
       - key: FIREBASE_PROJECT_ID
@@ -37,14 +36,14 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
 
-  # 3. The Scheduler (The Clock) - Reconfigured as Web for Free Tier
+  # 3. The Scheduler
   - type: web
     name: trademind-beat
     env: docker
     region: singapore
     plan: free
     dockerContext: backend
-    dockerfilePath: Dockerfile
+    dockerfilePath: backend/Dockerfile
     dockerCommand: python -m celery -A backend.workers.tasks.celery_app beat --loglevel=info
     envVars:
       - key: FIREBASE_PROJECT_ID
