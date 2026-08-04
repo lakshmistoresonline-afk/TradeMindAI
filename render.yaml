@@ -17,7 +17,7 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
 
-  # 2. The Background Worker - Added dummy server to prevent Render timeout
+  # 2. The Background Worker
   - type: web
     name: trademind-worker
     env: docker
@@ -25,7 +25,7 @@ services:
     plan: free
     dockerContext: backend
     dockerfilePath: backend/Dockerfile
-    dockerCommand: sh -c "python -m celery -A backend.workers.tasks.celery_app worker --loglevel=info -P solo & python3 -m http.server $PORT"
+    dockerCommand: "sh -c 'python -m celery -A backend.workers.tasks.celery_app worker --loglevel=info -P solo & python3 -m http.server $PORT'"
     envVars:
       - key: FIREBASE_PROJECT_ID
         value: com-webcraft-trademindai-c8f75
@@ -36,7 +36,7 @@ services:
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
 
-  # 3. The Scheduler - Added dummy server to prevent Render timeout
+  # 3. The Scheduler
   - type: web
     name: trademind-beat
     env: docker
@@ -44,7 +44,7 @@ services:
     plan: free
     dockerContext: backend
     dockerfilePath: backend/Dockerfile
-    dockerCommand: sh -c "python -m celery -A backend.workers.tasks.celery_app beat --loglevel=info & python3 -m http.server $PORT"
+    dockerCommand: "sh -c 'python -m celery -A backend.workers.tasks.celery_app beat --loglevel=info & python3 -m http.server $PORT'"
     envVars:
       - key: FIREBASE_PROJECT_ID
         value: com-webcraft-trademindai-c8f75
