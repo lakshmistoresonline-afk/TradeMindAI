@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Typography, Grid, Paper, Button, CircularProgress, Stack } from '@mui/material'
+import { Box, Typography, Grid, Paper, Button, CircularProgress } from '@mui/material'
 import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play } from 'lucide-react'
 import { getStocks, triggerBatchAnalysis, getMarketStats } from '../api/client'
 
