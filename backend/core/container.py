@@ -5,6 +5,8 @@ from backend.infrastructure.repositories.groq_provider import GroqAIProvider
 from backend.services.stock_service import StockService
 from backend.services.ml_service import MLService
 from backend.services.feature_store import FeatureStoreService
+from backend.services.knowledge_service import KnowledgeService
+from backend.services.strategy_engine import StrategyEngine
 
 # Simple Singleton Container for Service Injection
 class Container:
@@ -15,6 +17,8 @@ class Container:
         self.ai_provider = GroqAIProvider()
         self.ml_service = MLService(self.data_platform_repo)
         self.feature_store = FeatureStoreService(self.data_platform_repo)
+        self.knowledge_service = KnowledgeService(self.data_platform_repo)
+        self.strategy_engine = StrategyEngine()
         self.stock_service = StockService(
             self.repository,
             self.provider,
@@ -35,3 +39,9 @@ def get_ml_service():
 
 def get_feature_store():
     return container.feature_store
+
+def get_knowledge_service():
+    return container.knowledge_service
+
+def get_strategy_engine():
+    return container.strategy_engine

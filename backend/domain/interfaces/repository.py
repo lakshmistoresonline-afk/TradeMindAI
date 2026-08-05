@@ -70,6 +70,22 @@ class IDataPlatformRepository(ABC):
         pass
 
     @abstractmethod
+    async def save_earnings(self, earnings: EarningsData) -> None:
+        pass
+
+    @abstractmethod
+    async def get_latest_earnings(self, symbol: str) -> Optional[EarningsData]:
+        pass
+
+    @abstractmethod
+    async def save_options_chain(self, chain: OptionsChain) -> None:
+        pass
+
+    @abstractmethod
+    async def get_latest_options_chain(self, symbol: str) -> Optional[OptionsChain]:
+        pass
+
+    @abstractmethod
     async def save_feature_definition(self, definition: FeatureDefinition) -> None:
         pass
 

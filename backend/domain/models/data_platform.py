@@ -35,12 +35,34 @@ class MacroIndicator(BaseModel):
 class FeatureDefinition(BaseModel):
     name: str
     description: str
-    category: str # TECHNICAL, FUNDAMENTAL, MACRO, etc.
+    category: str # TECHNICAL, FUNDAMENTAL, MACRO, SMC, ICT, WYCKOFF, ELLIOTT, OPTIONS
     data_type: str # FLOAT, INT, BOOLEAN
     min_value: Optional[float] = None
     max_value: Optional[float] = None
     version: str
-    dependencies: List[str] = [] # Names of other features or raw data needed
+    dependencies: List[str] = []
+    lineage: Dict[str, str] = {} # Map of source data to transformation
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+
+class EarningsData(BaseModel):
+    symbol: str
+    date: datetime
+    eps_actual: float
+    eps_estimate: Optional[float] = None
+    revenue_actual: float
+    revenue_estimate: Optional[float] = None
+    surprise_pct: Optional[float] = None
+
+class OptionsChain(BaseModel):
+    symbol: str
+    expiry: datetime
+    underlying_price: float
+    pcr: float
+    max_pain: float
+    total_oi: int
+    iv_atm: float
+    greeks_aggregate: Dict[str, float]
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
 
 class FeatureVector(BaseModel):
     symbol: str

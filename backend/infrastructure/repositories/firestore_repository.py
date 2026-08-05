@@ -117,6 +117,28 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
             .limit(limit).stream()
         return [Alert(**doc.to_dict()) for doc in docs]
 
+    async def save_earnings(self, earnings: EarningsData) -> None:
+        doc_id = f"{earnings.symbol}_{earnings.date.strftime('%Y-%m-%d')}"
+        self.db.collection("earnings").document(doc_id).set(earnings.model_dump())
+
+    async def get_latest_earnings(self, symbol: str) -> Optional[EarningsData]:
+        docs = self.db.collection("earnings")\
+            .where("symbol", "==", symbol)\
+            .order_by("date", direction=firestore.Query.DESCENDING)\
+            .limit(1).stream()
+        for doc in docs:
+            return EarningsData(**doc.to_dict())
+        return None
+
+    async def save_options_chain(self, chain: OptionsChain) -> None:
+        self.db.collection("options_chains").document(chain.symbol).set(chain.model_dump())
+
+    async def get_latest_options_chain(self, symbol: str) -> Optional[OptionsChain]:
+        doc = self.db.collection("options_chains").document(symbol).get()
+        if doc.exists:
+            return OptionsChain(**doc.to_dict())
+        return None
+
     async def save_model_metadata(self, metadata: ModelMetadata) -> None:
         doc_id = f"{metadata.symbol}_{metadata.version}"
         self.db.collection("model_registry").document(doc_id).set(metadata.model_dump())

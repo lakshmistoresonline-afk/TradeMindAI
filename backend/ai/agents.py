@@ -1,4 +1,4 @@
-from typing import Annotated, TypedDict, List, Dict, Any
+from typing import Annotated, TypedDict, List, Dict, Any, Optional
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
 from backend.core.config import settings
@@ -19,6 +19,8 @@ class AgentState(TypedDict):
     news_sentiment: dict
     macro_data: dict
     institutional_data: dict
+    options_data: dict
+    earnings_data: dict
     feature_vector: dict
     recommendations: List[AgentResponse]
     consensus: str
@@ -53,7 +55,6 @@ class TechnicalAgent(BaseAgent):
     def analyze(self, state: AgentState):
         prompt = self.get_structured_prompt(f"Technical indicators and SMC data for {state['symbol']}: {state['technical_data']}")
         response = self.llm.invoke(prompt)
-        # In enterprise, we'd add JSON parsing logic here
         try:
             import json
             data = json.loads(response.content)
@@ -62,16 +63,79 @@ class TechnicalAgent(BaseAgent):
             state['recommendations'].append(AgentResponse(agent_name="Technical", signal="HOLD", confidence=0, reasons=["Parsing error"], risks=[], supporting_evidence={}))
         return state
 
+class ICTAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("ICT")
+
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"ICT Concepts (Liquidity, Gaps, Killzones) for {state['symbol']}: {state['technical_data'].get('ict', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
+        return state
+
+class WyckoffAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("Wyckoff")
+
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"Wyckoff Phase Analysis for {state['symbol']}: {state['technical_data'].get('wyckoff', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
+        return state
+
+class ElliottWaveAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("ElliottWave")
+
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"Elliott Wave Theory count for {state['symbol']}: {state['technical_data'].get('waves', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
+        return state
+
 class FundamentalAgent(BaseAgent):
     def analyze(self, state: AgentState):
         prompt = self.get_structured_prompt(f"Fundamental ratios for {state['symbol']}: {state['fundamental_data']}")
         response = self.llm.invoke(prompt)
         try:
             import json
-            data = json.loads(response.content)
-            state['recommendations'].append(AgentResponse(**data))
-        except:
-            pass
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
+        return state
+
+class EarningsAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("Earnings")
+
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"Recent Earnings surprises for {state['symbol']}: {state.get('earnings_data', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
+        return state
+
+class OptionsAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("Options")
+
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"Options Chain (PCR, Max Pain, OI) for {state['symbol']}: {state.get('options_data', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
         return state
 
 class SentimentAgent(BaseAgent):
@@ -80,10 +144,8 @@ class SentimentAgent(BaseAgent):
         response = self.llm.invoke(prompt)
         try:
             import json
-            data = json.loads(response.content)
-            state['recommendations'].append(AgentResponse(**data))
-        except:
-            pass
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
         return state
 
 class MacroAgent(BaseAgent):
@@ -92,10 +154,8 @@ class MacroAgent(BaseAgent):
         response = self.llm.invoke(prompt)
         try:
             import json
-            data = json.loads(response.content)
-            state['recommendations'].append(AgentResponse(**data))
-        except:
-            pass
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
         return state
 
 class InstitutionalAgent(BaseAgent):
@@ -104,26 +164,18 @@ class InstitutionalAgent(BaseAgent):
         response = self.llm.invoke(prompt)
         try:
             import json
-            data = json.loads(response.content)
-            state['recommendations'].append(AgentResponse(**data))
-        except:
-            pass
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
         return state
 
 class RiskAgent(BaseAgent):
     def analyze(self, state: AgentState):
-        prompt = f"""
-        Analyze the following agent reports: {state['recommendations']}
-        Identify hidden correlations and provide a risk-adjusted assessment for {state['symbol']}.
-        Return JSON with fields: agent_name, signal, confidence, reasons, risks, supporting_evidence.
-        """
+        prompt = self.get_structured_prompt(f"Multi-Agent Reports for {state['symbol']}: {state['recommendations']}. Assess aggregate risk.")
         response = self.llm.invoke(prompt)
         try:
             import json
-            data = json.loads(response.content)
-            state['recommendations'].append(AgentResponse(**data))
-        except:
-            pass
+            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
+        except: pass
         return state
 
 class ConsensusAgent(BaseAgent):
