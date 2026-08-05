@@ -73,5 +73,3 @@ export default function EconomicCalendar() {
     </Box>
   );
 }
-
-import { Grid } from '@mui/material';

@@ -62,6 +62,7 @@ function App() {
                 <Route path="/treemap" element={<MarketTreemap />} />
                 <Route path="/heatmap" element={<MarketHeatmap />} />
                 <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/stress-test" element={<StressTest />} />
                 <Route path="/analysis" element={<Analysis />} />
                 <Route path="/chat" element={<AIChat />} />
                 <Route path="/options" element={<OptionsVisualizer />} />
