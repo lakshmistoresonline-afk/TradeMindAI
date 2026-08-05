@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Stack, Link, Alert } from '@mui/material';
+import { Box, Paper, Typography, TextField, Button, Stack, Link } from '@mui/material';
 import { TrendingUp, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

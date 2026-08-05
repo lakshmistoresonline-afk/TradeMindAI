@@ -25,6 +25,8 @@ class StockPrice(BaseModel):
     low: float
     close: float
     volume: int
+    indicators: Optional[Dict[str, Any]] = None
+    smc: Optional[Dict[str, Any]] = None
 
     def to_dict(self):
         return self.model_dump()

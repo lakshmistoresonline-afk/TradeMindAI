@@ -1,85 +1,140 @@
-from typing import Annotated, TypedDict, List
+from typing import Annotated, TypedDict, List, Dict, Any
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
 from backend.core.config import settings
+from pydantic import BaseModel, Field
+
+class AgentResponse(BaseModel):
+    agent_name: str
+    signal: str # BUY, SELL, HOLD
+    confidence: float # 0-1
+    reasons: List[str]
+    risks: List[str]
+    supporting_evidence: Dict[str, Any]
 
 class AgentState(TypedDict):
     symbol: str
     technical_data: dict
     fundamental_data: dict
     news_sentiment: dict
-    recommendations: List[dict]
+    macro_data: dict
+    institutional_data: dict
+    feature_vector: dict
+    recommendations: List[AgentResponse]
     consensus: str
 
 class BaseAgent:
     def __init__(self, name: str):
         self.name = name
-        # Using Llama 3 70B on Groq for institutional-grade speed and intelligence
+        # Using Llama 3 70B on Groq
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
             model_name="llama3-70b-8192",
             temperature=0.1
         )
 
+    def get_structured_prompt(self, context: str) -> str:
+        return f"""
+        You are a highly experienced institutional {self.name} analyst.
+        Context: {context}
+
+        Analyze the provided data and return a structured JSON response EXACTLY in this format:
+        {{
+            "agent_name": "{self.name}",
+            "signal": "BUY | SELL | HOLD",
+            "confidence": 0.0 to 1.0,
+            "reasons": ["reason 1", "reason 2"],
+            "risks": ["risk 1", "risk 2"],
+            "supporting_evidence": {{"metric_name": "value"}}
+        }}
+        """
+
 class TechnicalAgent(BaseAgent):
     def analyze(self, state: AgentState):
-        # Implementation of technical analysis logic using LLM
-        smc_data = state.get('technical_data', {}).get('smc', {})
-        indicators = state.get('technical_data', {}).get('indicators', {})
-
-        prompt = f"""
-        Analyze these technical indicators and Smart Money Concepts for {state['symbol']}:
-
-        Indicators: {indicators}
-        SMC Data (Order Blocks & FVG): {smc_data}
-
-        Provide a detailed technical outlook. Focus on trend, momentum, and potential institutional liquidity zones.
-        """
+        prompt = self.get_structured_prompt(f"Technical indicators and SMC data for {state['symbol']}: {state['technical_data']}")
         response = self.llm.invoke(prompt)
-        state['recommendations'].append({"agent": "Technical", "analysis": response})
+        # In enterprise, we'd add JSON parsing logic here
+        try:
+            import json
+            data = json.loads(response.content)
+            state['recommendations'].append(AgentResponse(**data))
+        except:
+            state['recommendations'].append(AgentResponse(agent_name="Technical", signal="HOLD", confidence=0, reasons=["Parsing error"], risks=[], supporting_evidence={}))
         return state
 
 class FundamentalAgent(BaseAgent):
     def analyze(self, state: AgentState):
-        prompt = f"""
-        Analyze these fundamental ratios for {state['symbol']}: {state['fundamental_data']}
-
-        Provide an assessment of the company's valuation and financial health.
-        """
+        prompt = self.get_structured_prompt(f"Fundamental ratios for {state['symbol']}: {state['fundamental_data']}")
         response = self.llm.invoke(prompt)
-        state['recommendations'].append({"agent": "Fundamental", "analysis": response})
+        try:
+            import json
+            data = json.loads(response.content)
+            state['recommendations'].append(AgentResponse(**data))
+        except:
+            pass
         return state
 
 class SentimentAgent(BaseAgent):
-    def __init__(self, name: str):
-        super().__init__(name)
-
     def analyze(self, state: AgentState):
-        sentiment = state.get('news_sentiment', {})
-        prompt = f"Analyze the following market sentiment data for {state['symbol']}: {sentiment}. How does the news impact the short-term outlook?"
+        prompt = self.get_structured_prompt(f"News sentiment for {state['symbol']}: {state['news_sentiment']}")
         response = self.llm.invoke(prompt)
-        state['recommendations'].append({"agent": "Sentiment", "analysis": response})
+        try:
+            import json
+            data = json.loads(response.content)
+            state['recommendations'].append(AgentResponse(**data))
+        except:
+            pass
+        return state
+
+class MacroAgent(BaseAgent):
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"Global macro indicators: {state.get('macro_data', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            data = json.loads(response.content)
+            state['recommendations'].append(AgentResponse(**data))
+        except:
+            pass
+        return state
+
+class InstitutionalAgent(BaseAgent):
+    def analyze(self, state: AgentState):
+        prompt = self.get_structured_prompt(f"FII/DII activity: {state.get('institutional_data', {})}")
+        response = self.llm.invoke(prompt)
+        try:
+            import json
+            data = json.loads(response.content)
+            state['recommendations'].append(AgentResponse(**data))
+        except:
+            pass
         return state
 
 class RiskAgent(BaseAgent):
     def analyze(self, state: AgentState):
-        # Calculate volatility based on historical prices
-        # In a real scenario, this would receive quantitative risk metrics
         prompt = f"""
-        Given the analysis reports: {state['recommendations']},
-        provide a strict risk assessment for {state['symbol']}.
-        Include:
-        - Recommended Stop Loss level.
-        - Position Sizing (Low/Med/High).
-        - Key risk factors.
+        Analyze the following agent reports: {state['recommendations']}
+        Identify hidden correlations and provide a risk-adjusted assessment for {state['symbol']}.
+        Return JSON with fields: agent_name, signal, confidence, reasons, risks, supporting_evidence.
         """
         response = self.llm.invoke(prompt)
-        state['recommendations'].append({"agent": "Risk", "analysis": response})
+        try:
+            import json
+            data = json.loads(response.content)
+            state['recommendations'].append(AgentResponse(**data))
+        except:
+            pass
         return state
 
 class ConsensusAgent(BaseAgent):
     def analyze(self, state: AgentState):
-        prompt = f"Given these reports: {state['recommendations']}, provide a final consensus for {state['symbol']}."
+        prompt = f"""
+        Final synthesis for {state['symbol']}.
+        Reports: {state['recommendations']}
+
+        Provide a final institutional suggestion.
+        Format your response as a professional executive summary.
+        """
         response = self.llm.invoke(prompt)
-        state['consensus'] = response
+        state['consensus'] = response.content
         return state

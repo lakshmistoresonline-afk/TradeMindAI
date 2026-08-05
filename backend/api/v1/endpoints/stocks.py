@@ -1,12 +1,32 @@
 from fastapi import APIRouter, Depends
-from backend.core.container import get_stock_service
+from backend.core.container import get_stock_service, container
 from backend.services.stock_service import StockService
+from backend.services.portfolio_engine import PortfolioEngine
 from backend.core.auth import get_current_user
+from fastapi_cache.decorator import cache
 import yfinance as yf
+from typing import List
 
 router = APIRouter()
 
+@router.post("/portfolio/analyze")
+async def analyze_portfolio(
+    symbols: List[str],
+    current_user: dict = Depends(get_current_user)
+):
+    service = get_stock_service()
+    holdings = []
+    for symbol in symbols:
+        stock = await service.repository.get_stock_by_symbol(symbol)
+        if stock:
+            holdings.append(stock)
+
+    health = PortfolioEngine.analyze_health(current_user["uid"], holdings)
+    await container.data_platform_repo.save_portfolio_health(health)
+    return health
+
 @router.get("/market-stats")
+@cache(expire=300) # Cache indices for 5 minutes
 async def get_market_stats():
     # Keep public for dashboard loading
     indices = {
@@ -35,12 +55,16 @@ async def get_institutional_flow():
     }
 
 @router.get("/")
+@cache(expire=600)
 async def get_stocks(
+    limit: int = 50,
+    offset: int = 0,
     service: StockService = Depends(get_stock_service)
 ):
-    return await service.get_market_overview()
+    return await service.get_market_overview(limit, offset)
 
 @router.get("/{symbol}")
+@cache(expire=600)
 async def get_stock_detail(
     symbol: str,
     service: StockService = Depends(get_stock_service)

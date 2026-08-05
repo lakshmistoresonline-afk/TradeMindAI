@@ -1,16 +1,19 @@
 from typing import List, Optional, Dict, Any
 from google.cloud import firestore
 from backend.domain.models.stock import Stock, StockPrice
-from backend.domain.interfaces.repository import IStockRepository
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert
+from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
 import datetime
 
 class FirestoreStockRepository(IStockRepository):
     def __init__(self, db: firestore.Client):
         self.db = db
 
-    async def get_all_stocks(self) -> List[Stock]:
+    async def get_all_stocks(self, limit: int = 50, offset: int = 0) -> List[Stock]:
         stocks_ref = self.db.collection("stocks")
-        docs = stocks_ref.stream()
+        # Firestore offset pagination is inefficient; using simple limit/stream for now.
+        # Professional implementation would use cursor-based pagination.
+        docs = stocks_ref.order_by("symbol").limit(limit).offset(offset).stream()
         return [Stock(**doc.to_dict()) for doc in docs]
 
     async def get_stock_by_symbol(self, symbol: str) -> Optional[Stock]:
@@ -35,8 +38,116 @@ class FirestoreStockRepository(IStockRepository):
             batch.set(doc_ref, price.model_dump())
         batch.commit()
 
+    async def get_recent_prices(self, symbol: str, limit: int = 250) -> List[StockPrice]:
+        prices_ref = self.db.collection("stocks").document(symbol).collection("prices")
+        # Get last N days by date ID descending
+        docs = prices_ref.order_by("date", direction=firestore.Query.DESCENDING).limit(limit).stream()
+
+        results = []
+        for doc in docs:
+            results.append(StockPrice(**doc.to_dict()))
+
+        # Reverse to get chronological order
+        return sorted(results, key=lambda x: x.date)
+
     async def update_analysis(self, symbol: str, analysis: Dict[str, Any]) -> None:
         self.db.collection("stocks").document(symbol).update({
             "analysis": analysis,
             "updated_at": datetime.datetime.utcnow()
         })
+
+class FirestoreDataPlatformRepository(IDataPlatformRepository):
+    def __init__(self, db: firestore.Client):
+        self.db = db
+
+    async def save_news(self, articles: List[NewsArticle]) -> None:
+        batch = self.db.batch()
+        for article in articles:
+            doc_ref = self.db.collection("news").document(article.id)
+            batch.set(doc_ref, article.model_dump())
+        batch.commit()
+
+    async def get_latest_news(self, symbol: str, limit: int = 10) -> List[NewsArticle]:
+        docs = self.db.collection("news")\
+            .where("symbol", "==", symbol)\
+            .order_by("published_at", direction=firestore.Query.DESCENDING)\
+            .limit(limit)\
+            .stream()
+        return [NewsArticle(**doc.to_dict()) for doc in docs]
+
+    async def save_institutional_flow(self, flow: InstitutionalFlow) -> None:
+        date_id = flow.date.strftime("%Y-%m-%d")
+        self.db.collection("institutional_flow").document(date_id).set(flow.model_dump())
+
+    async def get_latest_institutional_flow(self) -> Optional[InstitutionalFlow]:
+        docs = self.db.collection("institutional_flow")\
+            .order_by("date", direction=firestore.Query.DESCENDING)\
+            .limit(1)\
+            .stream()
+        for doc in docs:
+            return InstitutionalFlow(**doc.to_dict())
+        return None
+
+    async def save_feature_vector(self, vector: FeatureVector) -> None:
+        date_id = vector.date.strftime("%Y-%m-%d")
+        doc_id = f"{vector.symbol}_{date_id}_{vector.version}"
+        self.db.collection("feature_store").document(doc_id).set(vector.model_dump())
+
+    async def save_prediction(self, prediction: Prediction) -> None:
+        date_id = prediction.date.strftime("%Y-%m-%d")
+        doc_id = f"{prediction.symbol}_{date_id}_{prediction.model_version}"
+        self.db.collection("predictions").document(doc_id).set(prediction.model_dump())
+
+    async def save_portfolio_health(self, health: PortfolioHealth) -> None:
+        self.db.collection("portfolio_health").document(health.user_id).set(health.model_dump())
+
+    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]:
+        doc = self.db.collection("portfolio_health").document(user_id).get()
+        if doc.exists:
+            return PortfolioHealth(**doc.to_dict())
+        return None
+
+    async def save_alert(self, alert: Alert) -> None:
+        self.db.collection("alerts").document(alert.id).set(alert.model_dump())
+
+    async def get_active_alerts(self, limit: int = 20) -> List[Alert]:
+        docs = self.db.collection("alerts")\
+            .where("is_read", "==", False)\
+            .order_by("created_at", direction=firestore.Query.DESCENDING)\
+            .limit(limit).stream()
+        return [Alert(**doc.to_dict()) for doc in docs]
+
+    async def save_model_metadata(self, metadata: ModelMetadata) -> None:
+        doc_id = f"{metadata.symbol}_{metadata.version}"
+        self.db.collection("model_registry").document(doc_id).set(metadata.model_dump())
+
+    async def get_champion_model(self, symbol: str) -> Optional[ModelMetadata]:
+        docs = self.db.collection("model_registry")\
+            .where("symbol", "==", symbol)\
+            .where("is_champion", "==", True)\
+            .limit(1).stream()
+        for doc in docs:
+            return ModelMetadata(**doc.to_dict())
+        return None
+
+    async def save_ml_dataset(self, dataset: MLDataset) -> None:
+        self.db.collection("ml_datasets").document(dataset.id).set(dataset.model_dump())
+
+    async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
+        docs = self.db.collection("feature_store")\
+            .where("symbol", "==", symbol)\
+            .where("date", ">=", start_date)\
+            .where("date", "<=", end_date)\
+            .order_by("date").stream()
+        return [FeatureVector(**doc.to_dict()) for doc in docs]
+
+    async def save_feature_definition(self, definition: FeatureDefinition) -> None:
+        doc_id = f"{definition.name}_{definition.version}"
+        self.db.collection("feature_definitions").document(doc_id).set(definition.model_dump())
+
+    async def get_feature_definitions(self, category: Optional[str] = None) -> List[FeatureDefinition]:
+        query = self.db.collection("feature_definitions")
+        if category:
+            query = query.where("category", "==", category)
+        docs = query.stream()
+        return [FeatureDefinition(**doc.to_dict()) for doc in docs]

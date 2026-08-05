@@ -31,6 +31,27 @@ export default function AnalysisReport({ data }: AnalysisReportProps) {
         <Chip label="AI Consensus Active" color="primary" size="small" variant="outlined" />
       </Box>
 
+      {data.technical_data?.ml_prediction && (
+        <Paper sx={{ p: 3, mb: 3, border: '1px solid #2979FF', backgroundColor: 'rgba(41, 121, 255, 0.05)' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, color: '#2979FF' }}>
+            <Cpu size={20} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>ML Predictive Intelligence</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="body2" color="textSecondary">5-Day Price Direction Prediction</Typography>
+              <Typography variant="h5" sx={{ color: data.technical_data.ml_prediction.prediction === 'UP' ? '#10b981' : '#f43f5e', fontWeight: 'bold' }}>
+                {data.technical_data.ml_prediction.prediction}
+              </Typography>
+            </Box>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="body2" color="textSecondary">Model Confidence</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{data.technical_data.ml_prediction.confidence}%</Typography>
+            </Box>
+          </Box>
+        </Paper>
+      )}
+
       <Stack spacing={3}>
         {data.recommendations.map((rec: any, index: number) => (
           <Paper key={index} sx={{ p: 3, backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
