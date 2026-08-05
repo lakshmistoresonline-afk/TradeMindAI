@@ -2,13 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+const meta = import.meta as any;
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: "123456789", // Placeholder
-  appId: "1:123456789:web:abcdef" // Placeholder
+  apiKey: meta.env?.VITE_FIREBASE_API_KEY || "placeholder",
+  authDomain: `${meta.env?.VITE_FIREBASE_PROJECT_ID || "com-webcraft-trademindai-c8f75"}.firebaseapp.com`,
+  projectId: meta.env?.VITE_FIREBASE_PROJECT_ID || "com-webcraft-trademindai-c8f75",
+  storageBucket: `${meta.env?.VITE_FIREBASE_PROJECT_ID || "com-webcraft-trademindai-c8f75"}.appspot.com`,
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
 };
 
 const app = initializeApp(firebaseConfig);

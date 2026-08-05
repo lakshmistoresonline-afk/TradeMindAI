@@ -2,14 +2,10 @@ import { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Stack, Link, Alert } from '@mui/material';
 import { TrendingUp, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../core/firebase';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
