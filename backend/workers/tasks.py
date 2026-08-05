@@ -26,14 +26,14 @@ celery_app.conf.beat_schedule = {
 celery_app.conf.timezone = 'Asia/Kolkata'
 
 @celery_app.task
-def analyze_stock_task(symbol: str):
+def analyze_stock_task(symbol: str, period="10y"):
     # Use the global db_client for Firestore
     db = db_client
     try:
         collector = DataCollector(db)
         # 1. Fetch data
         collector.fetch_stock_info(symbol)
-        df = collector.fetch_historical_data(symbol)
+        df = collector.fetch_historical_data(symbol, period=period)
 
         if df.empty:
             return f"No data found for {symbol}"
@@ -74,22 +74,25 @@ def analyze_stock_task(symbol: str):
         return f"Error analyzing {symbol}: {str(e)}"
 
 @celery_app.task
-def analyze_nifty_50():
-    # Expanded list covering different sectors
+def analyze_nifty_50(period="10y"):
+    # Official Nifty 50 symbols (updated for NSE)
     symbols = [
-        "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK",
-        "HINDUNILVR", "ITC", "SBI", "BHARTIARTL", "L&T",
-        "KOTAKBANK", "AXISBANK", "ADANIENT", "ASIANPAINT", "MARUTI",
-        "TITAN", "BAJFINANCE", "SUNPHARMA", "ULTRACEMCO", "NTPC",
-        "JJSWSTEEL", "TATASTEEL", "M&M", "POWERGRID", "ONGC",
-        "ADANIPORTS", "HCLTECH", "COALINDIA", "BAJAJFINSV", "TATARELI" # Example expansion
+        "ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK",
+        "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BPCL", "BHARTIARTL",
+        "BRITANNIA", "CIPLA", "COALINDIA", "DRREDDY", "EICHERMOT",
+        "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE", "HEROMOTOCO",
+        "HINDALCO", "HINDUNILVR", "ICICIBANK", "ITC", "INDUSINDBK",
+        "INFY", "JSWSTEEL", "KOTAKBANK", "LT", "LTIM",
+        "M&M", "MARUTI", "NTPC", "NESTLEIND", "ONGC",
+        "POWERGRID", "RELIANCE", "SBILIFE", "SBIN", "SUNPHARMA",
+        "TATACONSUM", "TATAMOTORS", "TATASTEEL", "TCS", "TECHM",
+        "TITAN", "ULTRACEMCO", "UPL", "WIPRO", "SHRIRAMFIN"
     ]
-    # In a production environment, you could fetch all 1500+ symbols from a CSV/API here
 
     for symbol in symbols:
-        analyze_stock_task.delay(symbol)
+        analyze_stock_task.delay(symbol, period=period)
 
-    return f"Automated analysis triggered for {len(symbols)} stocks."
+    return f"Automated analysis triggered for the complete Nifty 50 list with {period} history."
 
 @celery_app.task
 def run_adhoc_backtest(symbol: str):
