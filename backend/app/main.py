@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from typing import List
 from backend.api.v1.api import api_router
 from backend.core.config import settings
 from fastapi_cache import FastAPICache

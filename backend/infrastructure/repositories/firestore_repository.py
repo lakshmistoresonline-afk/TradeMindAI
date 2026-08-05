@@ -1,10 +1,10 @@
 from typing import List, Optional, Dict, Any
 from google.cloud import firestore
+from datetime import datetime
 from backend.domain.models.stock import Stock, StockPrice
-from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert, EarningsData, OptionsChain
 from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
-import datetime
 
 class FirestoreStockRepository(IStockRepository):
     def __init__(self, db: firestore.Client):
@@ -54,7 +54,7 @@ class FirestoreStockRepository(IStockRepository):
     async def update_analysis(self, symbol: str, analysis: Dict[str, Any]) -> None:
         self.db.collection("stocks").document(symbol).update({
             "analysis": analysis,
-            "updated_at": datetime.datetime.utcnow()
+            "updated_at": datetime.utcnow()
         })
 
 class FirestoreDataPlatformRepository(IDataPlatformRepository):
@@ -169,7 +169,7 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
         self.db.collection("devices").document(doc_id).set({
             **device_info,
             "user_id": user_id,
-            "last_active": datetime.datetime.utcnow()
+            "last_active": datetime.utcnow()
         })
 
     async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:

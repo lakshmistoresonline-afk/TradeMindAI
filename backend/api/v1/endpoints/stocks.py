@@ -6,6 +6,7 @@ from backend.core.auth import get_current_user
 from fastapi_cache.decorator import cache
 import yfinance as yf
 from typing import List
+import datetime
 
 router = APIRouter()
 

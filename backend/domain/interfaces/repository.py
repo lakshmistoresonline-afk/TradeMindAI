@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from backend.domain.models.stock import Stock, StockPrice
-from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert, EarningsData, OptionsChain
 from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
 
 class IStockRepository(ABC):

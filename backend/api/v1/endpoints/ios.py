@@ -4,6 +4,7 @@ from backend.core.container import container
 from backend.core.auth import get_current_user
 from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport
 import uuid
+import datetime
 
 router = APIRouter()
 

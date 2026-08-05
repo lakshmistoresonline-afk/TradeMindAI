@@ -25,6 +25,10 @@ class DigitalTwinService:
         )
 
         # 2. Synthesize the "DNA" of the stock
+        ema_50 = 0
+        if history and history[-1].indicators:
+            ema_50 = history[-1].indicators.get("EMA_50", 0)
+
         twin = {
             "identity": {
                 "symbol": stock.symbol,
@@ -39,13 +43,13 @@ class DigitalTwinService:
                 "consensus": stock.analysis.get("consensus") if stock.analysis else "N/A"
             },
             "technical_posture": {
-                "trend": "BULLISH" if stock.last_price > (history[-1].indicators.get("EMA_50") if history and history[-1].indicators else 0) else "BEARISH",
+                "trend": "BULLISH" if stock.last_price > ema_50 else "BEARISH" if ema_50 > 0 else "NEUTRAL",
                 "volatility": "HIGH" if stock.beta and stock.beta > 1.2 else "LOW",
-                "momentum": stock.analysis.get("technical_data", {}).get("indicators", {}).get("momentum_rsi", 0.5)
+                "momentum": stock.analysis.get("technical_data", {}).get("indicators", {}).get("momentum_rsi", 0.5) if stock.analysis else 0.5
             },
             "risk_profile": {
                 "beta": stock.beta,
-                "max_drawdown": stock.analysis.get("technical_data", {}).get("quant_metrics", {}).get("max_drawdown", 0),
+                "max_drawdown": stock.analysis.get("technical_data", {}).get("quant_metrics", {}).get("max_drawdown", 0) if stock.analysis else 0,
                 "confidence": stock.confidence_metrics.get("score") if stock.confidence_metrics else 0
             },
             "updated_at": datetime.utcnow()

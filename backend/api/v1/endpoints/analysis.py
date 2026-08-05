@@ -1,7 +1,8 @@
 from fastapi import APIRouter, BackgroundTasks, Depends
-from backend.workers.tasks import analyze_nifty_50, run_adhoc_backtest
+from backend.workers.tasks import analyze_nifty_100, run_adhoc_backtest
 from backend.core.database import get_db
 from backend.core.auth import get_current_user
+from backend.core.rbac.middleware import require_permission
 from google.cloud import firestore
 
 router = APIRouter()
@@ -11,7 +12,7 @@ async def trigger_full_analysis(
     period: str = "10y"
 ):
     # Trigger the Celery task with 10y period
-    task = analyze_nifty_50.delay(period=period)
+    task = analyze_nifty_100.delay(period=period)
     return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
 
 @router.post("/backtest/{symbol}", dependencies=[Depends(require_permission("run_backtest"))])

@@ -68,35 +68,44 @@ export default function Market() {
           <TableHead>
             <TableRow>
               <TableCell>Symbol</TableCell>
-              <TableCell>Name</TableCell>
               <TableCell>Sector</TableCell>
+              <TableCell align="right">AI Score</TableCell>
+              <TableCell align="center">Grade</TableCell>
               <TableCell align="right">Last Price</TableCell>
-              <TableCell align="right">Market Cap</TableCell>
-              <TableCell align="center">Action</TableCell>
+              <TableCell align="right">Change %</TableCell>
+              <TableCell align="center">Research</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredStocks.map((stock) => (
               <TableRow key={stock.symbol} hover>
                 <TableCell sx={{ fontWeight: 'bold' }}>{stock.symbol}</TableCell>
-                <TableCell>{stock.name || 'N/A'}</TableCell>
                 <TableCell>
-                  <Chip label={stock.sector || 'N/A'} size="small" variant="outlined" />
+                  <Chip label={stock.sector || 'N/A'} size="small" variant="outlined" sx={{ fontSize: '0.65rem' }} />
                 </TableCell>
                 <TableCell align="right">
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    {stock.last_price > 2500 ? <TrendingUp size={16} className="text-emerald-500 mr-1" /> : <TrendingDown size={16} className="text-rose-500 mr-1" />}
-                    ₹{stock.last_price?.toLocaleString()}
-                  </Box>
+                   <Typography color="primary" fontWeight="bold">{stock.ai_investment_score || '--'}</Typography>
                 </TableCell>
-                <TableCell align="right">₹{(stock.market_cap / 1e11).toFixed(2)}T</TableCell>
+                <TableCell align="center">
+                   <Chip
+                    label={stock.ai_investment_grade || 'B'}
+                    size="small"
+                    color="primary"
+                    variant={stock.ai_investment_grade?.includes('A') ? 'filled' : 'outlined'}
+                    sx={{ fontWeight: 'bold', fontSize: '0.7rem' }}
+                   />
+                </TableCell>
+                <TableCell align="right">₹{stock.last_price?.toLocaleString()}</TableCell>
+                <TableCell align="right" sx={{ color: (stock.change_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
+                   {stock.change_pct?.toFixed(2)}%
+                </TableCell>
                 <TableCell align="center">
                   <IconButton
                     size="small"
                     color="primary"
                     onClick={() => navigate('/analysis', { state: { symbol: stock.symbol } })}
                   >
-                    <Info size={18} />
+                    <Search size={18} />
                   </IconButton>
                 </TableCell>
               </TableRow>

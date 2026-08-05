@@ -6,6 +6,7 @@ from backend.data.collector import DataCollector
 from backend.analysis.technical import TechnicalAnalysis
 from backend.ai.workflow import create_ai_workflow
 import datetime
+import yfinance as yf
 
 from backend.analysis.smc import SMCAnalysis
 from backend.analysis.backtester import BacktestEngine
@@ -255,8 +256,17 @@ async def _process_intel_logic():
 
     # 1. Fetch Latest Market State
     stocks = await service.repository.get_all_stocks(limit=100)
-    from backend.api.v1.endpoints.stocks import get_market_stats
-    stats = await get_market_stats()
+
+    # Replicate market stats logic to avoid circular import from endpoints
+    indices = {"^NSEI": "NIFTY 50", "^CNX100": "NIFTY 100", "^NSEBANK": "BANK NIFTY", "^INDIAVIX": "India VIX"}
+    stats = {}
+    for symbol, name in indices.items():
+        ticker = yf.Ticker(symbol)
+        info = ticker.fast_info
+        stats[name] = {
+            "value": round(info.last_price, 2),
+            "change": round(((info.last_price - info.previous_close) / info.previous_close) * 100, 2)
+        }
 
     # 2. Detect Market Regime
     nifty_df = await service.provider.fetch_history("^NSEI", "1mo")
