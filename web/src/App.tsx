@@ -7,6 +7,7 @@ import Analysis from './pages/Analysis'
 import Settings from './pages/Settings'
 import Portfolio from './pages/Portfolio'
 import Login from './pages/Login'
+import SectorRotation from './pages/SectorRotation'
 
 const darkTheme = createTheme({
   palette: {
@@ -52,6 +53,7 @@ function App() {
                 <Route path="/market" element={<Market />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/analysis" element={<Analysis />} />
+                <Route path="/sectors" element={<SectorRotation />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>

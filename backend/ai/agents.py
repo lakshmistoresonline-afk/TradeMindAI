@@ -61,6 +61,22 @@ class SentimentAgent(BaseAgent):
         state['recommendations'].append({"agent": "Sentiment", "analysis": response})
         return state
 
+class RiskAgent(BaseAgent):
+    def analyze(self, state: AgentState):
+        # Calculate volatility based on historical prices
+        # In a real scenario, this would receive quantitative risk metrics
+        prompt = f"""
+        Given the analysis reports: {state['recommendations']},
+        provide a strict risk assessment for {state['symbol']}.
+        Include:
+        - Recommended Stop Loss level.
+        - Position Sizing (Low/Med/High).
+        - Key risk factors.
+        """
+        response = self.llm.invoke(prompt)
+        state['recommendations'].append({"agent": "Risk", "analysis": response})
+        return state
+
 class ConsensusAgent(BaseAgent):
     def analyze(self, state: AgentState):
         prompt = f"Given these reports: {state['recommendations']}, provide a final consensus for {state['symbol']}."

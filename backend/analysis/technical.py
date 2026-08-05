@@ -31,3 +31,21 @@ class TechnicalAnalysis:
         # Candlestick patterns using pandas-ta
         patterns = df.ta.cdl_pattern(name="all")
         return patterns
+
+    @staticmethod
+    def calculate_volume_profile(df: pd.DataFrame, bins=20):
+        # Calculate Volume at Price
+        price_min = df["Low"].min()
+        price_max = df["High"].max()
+        bin_size = (price_max - price_min) / bins
+
+        # Group volume into price bins
+        df["price_bin"] = ((df["Close"] - price_min) // bin_size).clip(0, bins-1)
+        profile = df.groupby("price_bin")["Volume"].sum().to_dict()
+
+        return {
+            "min": price_min,
+            "max": price_max,
+            "bin_size": bin_size,
+            "profile": profile
+        }

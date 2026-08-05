@@ -1,36 +1,33 @@
 package com.webcraft.trademindai.data.remote
 
+import com.webcraft.trademindai.domain.model.Stock
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface ApiService {
-    @GET("stocks")
-    suspend fun getStocks(): List<StockDto>
+    @GET("stocks/")
+    suspend fun getStocks(): List<Stock>
 
     @GET("stocks/{symbol}")
-    suspend fun getStockDetail(@Path("symbol") symbol: String): StockDetailDto
+    suspend fun getStockDetail(@Path("symbol") symbol: String): Stock
 
-    @POST("ai/chat")
-    suspend fun aiChat(@Query("query") query: String): ChatResponseDto
+    @GET("stocks/market-stats")
+    suspend fun getMarketStats(): Map<String, MarketStatsResponse>
+
+    @POST("analysis/trigger")
+    suspend fun triggerAnalysis(): TriggerResponse
+
+    @POST("analysis/backtest/{symbol}")
+    suspend fun triggerBacktest(@Path("symbol") symbol: String): TriggerResponse
 }
 
-data class StockDto(
-    val symbol: String,
-    val name: String,
-    val price: Double,
+data class MarketStatsResponse(
+    val value: Double,
     val change: Double
 )
 
-data class StockDetailDto(
-    val symbol: String,
-    val name: String,
-    val sector: String,
-    val technicals: Map<String, Double>,
-    val consensus: String
-)
-
-data class ChatResponseDto(
-    val response: String
+data class TriggerResponse(
+    val message: String,
+    val task_id: String
 )

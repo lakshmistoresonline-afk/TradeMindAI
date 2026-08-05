@@ -1,17 +1,30 @@
 import { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Stack, Link } from '@mui/material';
+import { Box, Paper, Typography, TextField, Button, Stack, Link, Alert } from '@mui/material';
 import { TrendingUp, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../core/firebase';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login for now - later connect to Firebase Auth
-    navigate('/');
+    setError('');
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,6 +46,8 @@ export default function Login() {
           Login to access your institutional AI insights.
         </Typography>
 
+        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+
         <form onSubmit={handleLogin}>
           <Stack spacing={3}>
             <TextField
@@ -41,6 +56,7 @@ export default function Login() {
               variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
             <TextField
               fullWidth
@@ -49,16 +65,18 @@ export default function Login() {
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
             <Button
               fullWidth
               size="large"
               variant="contained"
               type="submit"
-              startIcon={<LogIn size={18} />}
+              startIcon={loading ? null : <LogIn size={18} />}
               sx={{ py: 1.5, fontWeight: 'bold' }}
+              disabled={loading}
             >
-              Sign In
+              {loading ? 'Authenticating...' : 'Sign In'}
             </Button>
           </Stack>
         </form>

@@ -1,30 +1,45 @@
 from fastapi import APIRouter, BackgroundTasks, Depends
 from backend.workers.tasks import analyze_nifty_50, run_adhoc_backtest
 from backend.core.database import get_db
+from backend.core.auth import get_current_user
 from google.cloud import firestore
 
 router = APIRouter()
 
 @router.post("/trigger")
-async def trigger_full_analysis(period: str = "10y"):
-    # Trigger the Celery task with 10y period
+async def trigger_full_analysis(
+    period: str = "10y",
+    current_user: dict = Depends(get_current_user)
+):
+    # Only authenticated users can trigger expensive batch analysis
     task = analyze_nifty_50.delay(period=period)
     return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
 
 @router.post("/backtest/{symbol}")
-async def trigger_backtest(symbol: str):
+async def trigger_backtest(
+    symbol: str,
+    current_user: dict = Depends(get_current_user)
+):
     task = run_adhoc_backtest.delay(symbol)
     return {"message": "Backtest triggered", "task_id": task.id}
 
 @router.get("/backtest/{symbol}")
-async def get_backtest_results(symbol: str, db: firestore.Client = Depends(get_db)):
+async def get_backtest_results(
+    symbol: str,
+    db: firestore.Client = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
     doc = db.collection("backtests").document(symbol).get()
     if doc.exists:
         return doc.to_dict()
     return {"error": "No backtest report found"}
 
 @router.get("/backtest/{symbol}/signals")
-async def get_backtest_signals(symbol: str, db: firestore.Client = Depends(get_db)):
+async def get_backtest_signals(
+    symbol: str,
+    db: firestore.Client = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
     signals_ref = db.collection("backtests").document(symbol).collection("signals")
     docs = signals_ref.order_by("date", direction=firestore.Query.DESCENDING).limit(100).stream()
     signals = [doc.to_dict() for doc in docs]

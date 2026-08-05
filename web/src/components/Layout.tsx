@@ -1,6 +1,6 @@
 import React, { useState, createContext, useContext } from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert } from '@mui/material';
-import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase } from 'lucide-react';
+import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -17,6 +17,7 @@ const menuItems = [
   { text: 'Market', icon: <LineChart size={20} />, path: '/market' },
   { text: 'Portfolio', icon: <Briefcase size={20} />, path: '/portfolio' },
   { text: 'AI Analysis', icon: <BrainCircuit size={20} />, path: '/analysis' },
+  { text: 'Sector Rotation', icon: <PieChart size={20} />, path: '/sectors' },
   { text: 'Settings', icon: <Settings size={20} />, path: '/settings' },
 ];
 

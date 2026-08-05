@@ -35,7 +35,7 @@ object NetworkModule {
     @Singleton
     fun provideApiService(okHttpClient: OkHttpClient): ApiService {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000/api/v1/") // Android Emulator localhost
+            .baseUrl("https://trademind-api-m8jg.onrender.com/api/v1/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -1,12 +1,23 @@
 import axios from 'axios';
+import { auth } from '../core/firebase';
 
-const API_BASE_URL = 'https://trademind-api-m8jg.onrender.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://trademind-api-m8jg.onrender.com/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Interceptor to add Firebase ID Token to every request
+apiClient.interceptors.request.use(async (config) => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const getStocks = async () => {

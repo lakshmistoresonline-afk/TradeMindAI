@@ -25,49 +25,58 @@ celery_app.conf.beat_schedule = {
 }
 celery_app.conf.timezone = 'Asia/Kolkata'
 
+from backend.core.container import container
+import asyncio
+
 @celery_app.task
 def analyze_stock_task(symbol: str, period="10y"):
-    # Use the global db_client for Firestore
-    db = db_client
+    # Wrapper to run async service in sync celery
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(_analyze_stock_logic(symbol, period))
+
+async def _analyze_stock_logic(symbol: str, period: str):
+    service = container.stock_service
     try:
-        collector = DataCollector(db)
-        # 1. Fetch data
-        collector.fetch_stock_info(symbol)
-        df = collector.fetch_historical_data(symbol, period=period)
+        # 1. Collect Data
+        stock = await service.collect_stock_data(symbol, period)
+
+        # 2. Get history for analysis
+        df = await service.provider.fetch_history(symbol, period)
 
         if df.empty:
             return f"No data found for {symbol}"
 
-        # 2. Technical & SMC Analysis
+        # 3. Technical & SMC Analysis
         df_ta = TechnicalAnalysis.calculate_indicators(df)
         last_ta = df_ta.iloc[-1].to_dict()
 
         smc_obs = SMCAnalysis.detect_order_blocks(df)
         smc_fvgs = SMCAnalysis.detect_fvg(df)
 
-        # 3. AI Consensus
+        # 4. AI Consensus
         workflow = create_ai_workflow()
         initial_state = {
             "symbol": symbol,
             "technical_data": {
                 "indicators": last_ta,
                 "smc": {
-                    "order_blocks": smc_obs[-5:], # Last 5 OBs
-                    "fvgs": smc_fvgs[-5:] # Last 5 FVGs
+                    "order_blocks": smc_obs[-5:],
+                    "fvgs": smc_fvgs[-5:]
                 }
             },
-            "fundamental_data": {},
+            "fundamental_data": {
+                "pe_ratio": stock.pe_ratio,
+                "pb_ratio": stock.pb_ratio,
+                "market_cap": stock.market_cap
+            },
             "news_sentiment": {},
             "recommendations": [],
             "consensus": ""
         }
         result = workflow.invoke(initial_state)
 
-        # Update Firestore with detailed analysis
-        db.collection("stocks").document(symbol).update({
-            "analysis": result,
-            "updated_at": datetime.datetime.utcnow()
-        })
+        # 5. Update Analysis
+        await service.repository.update_analysis(symbol, result)
 
         return result["consensus"]
     except Exception as e:
