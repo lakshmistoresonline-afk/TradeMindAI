@@ -9,6 +9,7 @@ export default function Admin() {
   useEffect(() => {
      getSystemEvaluation().then(setEvaluation);
   }, []);
+
   const usageOption = {
     xAxis: { type: 'category', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] },
     yAxis: { type: 'value' },

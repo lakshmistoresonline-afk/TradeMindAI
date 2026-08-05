@@ -1,7 +1,11 @@
 import { Box, Typography, Paper, Grid, Chip, LinearProgress } from '@mui/material';
 import { ShieldAlert } from 'lucide-react';
 
-export default function RiskDashboard({ stock }: { stock?: any }) {
+interface RiskDashboardProps {
+  stock?: any;
+}
+
+export default function RiskDashboard({ stock }: RiskDashboardProps) {
   const risks = [
     { label: 'Market Risk', score: 65, level: 'MEDIUM', desc: 'Sensitivity to broader Nifty 100 volatility.' },
     { label: 'Company Risk', score: 25, level: 'LOW', desc: 'Financial stability and management quality.' },

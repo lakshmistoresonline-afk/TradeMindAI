@@ -1,5 +1,5 @@
 import yfinance as yf
-from typing import Dict, Any
+from typing import Dict, Any, List
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow
 from backend.domain.interfaces.repository import IMarketDataProvider, INewsProvider, IInstitutionalDataProvider
 import datetime
