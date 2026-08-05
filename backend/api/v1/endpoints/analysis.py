@@ -14,7 +14,7 @@ async def trigger_full_analysis(
     task = analyze_nifty_50.delay(period=period)
     return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
 
-@router.post("/backtest/{symbol}")
+@router.post("/backtest/{symbol}", dependencies=[Depends(require_permission("run_backtest"))])
 async def trigger_backtest(
     symbol: str
 ):

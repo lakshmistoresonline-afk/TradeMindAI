@@ -2,6 +2,7 @@ from typing import List, Optional, Dict, Any
 from google.cloud import firestore
 from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert
+from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
 import datetime
 
@@ -163,6 +164,18 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
             .order_by("date").stream()
         return [FeatureVector(**doc.to_dict()) for doc in docs]
 
+    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None:
+        doc_id = f"{user_id}_{device_info['device_id']}"
+        self.db.collection("devices").document(doc_id).set({
+            **device_info,
+            "user_id": user_id,
+            "last_active": datetime.datetime.utcnow()
+        })
+
+    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:
+        docs = self.db.collection("devices").where("user_id", "==", user_id).stream()
+        return [doc.to_dict() for doc in docs]
+
     async def save_feature_definition(self, definition: FeatureDefinition) -> None:
         doc_id = f"{definition.name}_{definition.version}"
         self.db.collection("feature_definitions").document(doc_id).set(definition.model_dump())
@@ -173,3 +186,22 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
             query = query.where("category", "==", category)
         docs = query.stream()
         return [FeatureDefinition(**doc.to_dict()) for doc in docs]
+
+    async def save_strategy(self, strategy: UserStrategy) -> None:
+        self.db.collection("strategies").document(strategy.id).set(strategy.model_dump())
+
+    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]:
+        docs = self.db.collection("strategies").where("user_id", "==", user_id).stream()
+        return [UserStrategy(**doc.to_dict()) for doc in docs]
+
+    async def save_paper_order(self, order: PaperOrder) -> None:
+        self.db.collection("paper_orders").document(order.id).set(order.model_dump())
+
+    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]:
+        doc = self.db.collection("virtual_portfolios").document(user_id).get()
+        if doc.exists:
+            return VirtualPortfolio(**doc.to_dict())
+        return None
+
+    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None:
+        self.db.collection("virtual_portfolios").document(portfolio.user_id).set(portfolio.model_dump())

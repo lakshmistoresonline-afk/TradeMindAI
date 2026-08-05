@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert
+from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
 
 class IStockRepository(ABC):
     @abstractmethod
@@ -94,6 +95,26 @@ class IDataPlatformRepository(ABC):
         pass
 
     @abstractmethod
+    async def save_strategy(self, strategy: UserStrategy) -> None:
+        pass
+
+    @abstractmethod
+    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]:
+        pass
+
+    @abstractmethod
+    async def save_paper_order(self, order: PaperOrder) -> None:
+        pass
+
+    @abstractmethod
+    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]:
+        pass
+
+    @abstractmethod
+    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None:
+        pass
+
+    @abstractmethod
     async def save_model_metadata(self, metadata: ModelMetadata) -> None:
         pass
 
@@ -107,6 +128,14 @@ class IDataPlatformRepository(ABC):
 
     @abstractmethod
     async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
+        pass
+
+    @abstractmethod
+    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None:
+        pass
+
+    @abstractmethod
+    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:
         pass
 
 class IMarketDataProvider(ABC):

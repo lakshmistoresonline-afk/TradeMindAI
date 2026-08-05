@@ -1,6 +1,6 @@
 import React, { useState, createContext, useContext } from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert } from '@mui/material';
-import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot } from 'lucide-react';
+import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot, Wallet, Calendar, ShieldAlert } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -15,9 +15,16 @@ export const useNotification = () => useContext(NotificationContext);
 const menuItems = [
   { text: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
   { text: 'Market', icon: <LineChart size={20} />, path: '/market' },
+  { text: 'Options', icon: <Box sx={{ width: 20, height: 20, border: '2px solid currentColor', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Box sx={{ width: 10, height: 10, bgcolor: 'currentColor', borderRadius: '50%' }} /></Box>, path: '/options' },
+  { text: 'Treemap', icon: <Box sx={{ width: 20, height: 20, border: '1px solid currentColor', display: 'flex' }}><Box sx={{ flex: 1, borderRight: '1px solid currentColor' }} /><Box sx={{ flex: 1 }} /></Box>, path: '/treemap' },
+  { text: 'Heatmap', icon: <Box sx={{ width: 20, height: 20, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2px' }}><Box sx={{ bgcolor: 'currentColor', opacity: 0.8 }} /><Box sx={{ border: '1px solid currentColor' }} /><Box sx={{ border: '1px solid currentColor' }} /><Box sx={{ bgcolor: 'currentColor', opacity: 0.5 }} /></Box>, path: '/heatmap' },
   { text: 'Portfolio', icon: <Briefcase size={20} />, path: '/portfolio' },
+  { text: 'Stress Test', icon: <ShieldAlert size={20} />, path: '/stress-test' },
   { text: 'AI Analysis', icon: <BrainCircuit size={20} />, path: '/analysis' },
   { text: 'AI Chat', icon: <Bot size={20} />, path: '/chat' },
+  { text: 'Strategy', icon: <Box sx={{ width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Code size={20} /></Box>, path: '/strategy' },
+  { text: 'Paper Trading', icon: <Wallet size={20} />, path: '/paper-trading' },
+  { text: 'Calendar', icon: <Calendar size={20} />, path: '/calendar' },
   { text: 'Sector Rotation', icon: <PieChart size={20} />, path: '/sectors' },
   { text: 'Settings', icon: <Settings size={20} />, path: '/settings' },
 ];
@@ -29,7 +36,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setNotification({ open: true, message, severity });
+
+    // Browser Native Notification
+    if (Notification.permission === 'granted') {
+      new Notification('TradeMind AI Alert', { body: message });
+    }
   };
+
+  useEffect(() => {
+    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const handleClose = () => setNotification({ ...notification, open: false });
 

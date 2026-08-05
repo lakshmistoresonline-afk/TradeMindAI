@@ -48,8 +48,9 @@ fun MainScreen() {
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem("Dashboard", "dashboard", Icons.Default.Dashboard),
-        BottomNavItem("Market", "market", Icons.Default.List),
-        BottomNavItem("Portfolio", "portfolio", Icons.Default.PieChart),
+        BottomNavItem("Intelligence", "treemap", Icons.Default.GridView),
+        BottomNavItem("Paper", "paper_trading", Icons.Default.AccountBalanceWallet),
+        BottomNavItem("Events", "calendar", Icons.Default.CalendarMonth),
         BottomNavItem("AI", "analysis", Icons.Default.AutoAwesome)
     )
     NavigationBar {

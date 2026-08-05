@@ -9,6 +9,12 @@ import Portfolio from './pages/Portfolio'
 import Login from './pages/Login'
 import SectorRotation from './pages/SectorRotation'
 import AIChat from './pages/AIChat'
+import MarketTreemap from './pages/MarketIntel/MarketTreemap'
+import MarketHeatmap from './pages/MarketIntel/MarketHeatmap'
+import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilder'
+import PaperTrading from './pages/StrategyBuilder/PaperTrading'
+import EconomicCalendar from './pages/Calendar/EconomicCalendar'
+import StressTest from './pages/MarketIntel/StressTest'
 
 const darkTheme = createTheme({
   palette: {
@@ -52,9 +58,15 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/market" element={<Market />} />
+                <Route path="/treemap" element={<MarketTreemap />} />
+                <Route path="/heatmap" element={<MarketHeatmap />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/analysis" element={<Analysis />} />
                 <Route path="/chat" element={<AIChat />} />
+                <Route path="/options" element={<OptionsVisualizer />} />
+                <Route path="/strategy" element={<StrategyBuilder />} />
+                <Route path="/paper-trading" element={<PaperTrading />} />
+                <Route path="/calendar" element={<EconomicCalendar />} />
                 <Route path="/sectors" element={<SectorRotation />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
