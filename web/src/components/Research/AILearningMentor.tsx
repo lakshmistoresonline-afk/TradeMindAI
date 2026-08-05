@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Accordion, AccordionSummary, AccordionDetails, Chip } from '@mui/material';
-import { BookOpen, ChevronDown, Info, Zap } from 'lucide-react';
+import { BookOpen, ChevronDown, Zap } from 'lucide-react';
 
 export default function AILearningMentor() {
   const concepts = [

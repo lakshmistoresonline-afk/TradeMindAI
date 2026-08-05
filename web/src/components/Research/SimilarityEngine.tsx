@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Grid, Chip, Divider, LinearProgress } from '@mui/material';
-import { Layers, History, ArrowRight } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Chip, LinearProgress } from '@mui/material';
+import { Layers } from 'lucide-react';
 
 export default function SimilarityEngine({ symbol }: { symbol: string }) {
   const matches = [

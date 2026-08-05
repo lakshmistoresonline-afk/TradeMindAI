@@ -1,7 +1,7 @@
 import { Box, Typography, Paper, Grid, Chip, LinearProgress } from '@mui/material';
 import { ShieldAlert } from 'lucide-react';
 
-export default function RiskDashboard() {
+export default function RiskDashboard({ stock }: { stock?: any }) {
   const risks = [
     { label: 'Market Risk', score: 65, level: 'MEDIUM', desc: 'Sensitivity to broader Nifty 100 volatility.' },
     { label: 'Company Risk', score: 25, level: 'LOW', desc: 'Financial stability and management quality.' },
@@ -12,7 +12,7 @@ export default function RiskDashboard() {
   return (
     <Box sx={{ mb: 4 }}>
       <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <ShieldAlert size={20} className="text-rose-500" /> Enterprise Risk Dashboard
+        <ShieldAlert size={20} className="text-rose-500" /> Enterprise Risk Dashboard {stock?.symbol}
       </Typography>
 
       <Grid container spacing={3}>

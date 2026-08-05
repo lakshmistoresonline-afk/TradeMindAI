@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, List, ListItem, Chip, Button, TextField, InputAdornment, Stack, Divider } from '@mui/material';
+import { Box, Typography, Paper, Grid, List, ListItem, ListItemText, Chip, Button, TextField, InputAdornment, Stack, Divider } from '@mui/material';
 import { Search, FileText } from 'lucide-react';
 
 export default function ResearchWorkspace() {
@@ -31,9 +31,9 @@ export default function ResearchWorkspace() {
           <Paper sx={{ p: 3 }}>
              <Typography variant="subtitle2" color="textSecondary" gutterBottom>RECENT REPORTS</Typography>
              <List dense>
-                <ListItem button><ListItemText primary="Nifty 100 Mid-Year Audit" /></ListItem>
-                <ListItem button><ListItemText primary="IT Sector Outlook Q3" /></ListItem>
-                <ListItem button><ListItemText primary="Banking Liquidity Report" /></ListItem>
+                <ListItem><ListItemText primary="Nifty 100 Mid-Year Audit" /></ListItem>
+                <ListItem><ListItemText primary="IT Sector Outlook Q3" /></ListItem>
+                <ListItem><ListItemText primary="Banking Liquidity Report" /></ListItem>
              </List>
           </Paper>
         </Grid>
@@ -73,5 +73,3 @@ export default function ResearchWorkspace() {
     </Box>
   );
 }
-
-import { Stack, Divider } from '@mui/material';

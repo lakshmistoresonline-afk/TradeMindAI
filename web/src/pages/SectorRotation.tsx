@@ -4,12 +4,10 @@ import ReactECharts from 'echarts-for-react';
 import { getStocks } from '../api/client';
 
 export default function SectorRotation() {
-  const [stocks, setStocks] = useState<any[]>([]);
   const [sectorPerformance, setSectorPerformance] = useState<any>({});
 
   useEffect(() => {
     getStocks().then(data => {
-      setStocks(data);
       const sectors: any = {};
       data.forEach((stock: any) => {
         if (!stock.sector) return;

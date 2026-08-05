@@ -2,7 +2,7 @@ import { Box, Typography, Paper, Grid, Chip } from '@mui/material';
 import { Activity } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
-export default function OptionsAnalytics() {
+export default function OptionsAnalytics({ data }: { data?: any }) {
   const oiOption = {
     xAxis: { type: 'category', data: ['2400', '2450', '2500', '2550', '2600', '2650', '2700'] },
     yAxis: { type: 'value' },
@@ -17,7 +17,7 @@ export default function OptionsAnalytics() {
   return (
     <Box sx={{ mb: 4 }}>
       <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Activity size={20} className="text-purple-500" /> Options & Derivatives Intel
+        <Activity size={20} className="text-purple-500" /> Options & Derivatives Intel {data?.symbol}
       </Typography>
 
       <Grid container spacing={3}>

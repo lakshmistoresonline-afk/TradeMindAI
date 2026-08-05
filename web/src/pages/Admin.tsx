@@ -70,14 +70,14 @@ export default function Admin() {
                </TableHead>
                <TableBody>
                   <TableRow>
-                     <TableCell variant="caption">19:42:01</TableCell>
+                     <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>19:42:01</TableCell>
                      <TableCell>admin@trademind.ai</TableCell>
                      <TableCell>BATCH_ANALYSIS_TRIGGER</TableCell>
                      <TableCell>106.213.12.42</TableCell>
                      <TableCell align="right"><Chip label="SUCCESS" size="small" color="success" sx={{ fontSize: '0.6rem' }} /></TableCell>
                   </TableRow>
                   <TableRow>
-                     <TableCell variant="caption">18:15:34</TableCell>
+                     <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>18:15:34</TableCell>
                      <TableCell>system_worker</TableCell>
                      <TableCell>ML_MODEL_RETRAIN</TableCell>
                      <TableCell>internal_ip</TableCell>

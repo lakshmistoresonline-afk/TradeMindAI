@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
 import { History, CheckCircle, XCircle } from 'lucide-react';
 
 export default function RecommendationHistory({ history }: { history: any[] }) {

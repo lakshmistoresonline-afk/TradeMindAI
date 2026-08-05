@@ -92,19 +92,6 @@ function FundamentalMetric({ label, value, trend }: any) {
   );
 }
 
-function OwnershipItem({ label, value, trend }: any) {
-  return (
-    <Box>
-       <Typography variant="caption" color="textSecondary">{label}</Typography>
-       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography variant="body2" fontWeight="bold">{value}</Typography>
-          {trend === 'up' && <Box sx={{ width: 6, height: 6, bgcolor: '#10b981', borderRadius: '50%' }} />}
-          {trend === 'down' && <Box sx={{ width: 6, height: 6, bgcolor: '#f43f5e', borderRadius: '50%' }} />}
-       </Box>
-    </Box>
-  );
-}
-
 function ValuationRow({ label, value }: any) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>

@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Grid, Chip, List, ListItem, ListItemIcon, Divider } from '@mui/material';
+import { Box, Typography, Paper, Grid, Chip, List, ListItem, Divider } from '@mui/material';
 import { Book, Lightbulb } from 'lucide-react';
 
 const mockJournal = [

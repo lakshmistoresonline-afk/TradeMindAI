@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Button, List, ListItem, ListItemSecondaryAction, IconButton, TextField, MenuItem, Select, FormControl, Divider } from '@mui/material';
+import { Box, Typography, Paper, Grid, Button, List, ListItem, ListItemSecondaryAction, IconButton, TextField, MenuItem, Select, FormControl, Divider, Chip } from '@mui/material';
 import { Plus, Trash2, Save, Play, Code, Zap } from 'lucide-react';
 
 export default function StrategyBuilder() {
@@ -135,5 +135,3 @@ export default function StrategyBuilder() {
     </Box>
   );
 }
-
-import { Chip } from '@mui/material';

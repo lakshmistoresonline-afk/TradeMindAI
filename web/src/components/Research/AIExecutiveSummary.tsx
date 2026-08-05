@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Grid, LinearProgress } from '@mui/material';
+import { Box, Typography, Paper, Grid, LinearProgress, Divider } from '@mui/material';
 import { Brain, Target, ShieldCheck, Clock, Zap } from 'lucide-react';
 
 export default function AIExecutiveSummary({ analysis }: { analysis: any }) {
@@ -51,8 +51,6 @@ export default function AIExecutiveSummary({ analysis }: { analysis: any }) {
     </Box>
   );
 }
-
-import { Divider } from '@mui/material';
 
 function SummaryStat({ icon, label, value, color }: any) {
   return (

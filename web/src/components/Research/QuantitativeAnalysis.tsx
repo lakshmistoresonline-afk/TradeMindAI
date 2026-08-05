@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Tooltip } from '@mui/material';
-import { BarChart3, Info, TrendingUp, ShieldAlert } from 'lucide-react';
+import { Info, TrendingUp } from 'lucide-react';
 
 export default function QuantitativeAnalysis({ metrics }: { metrics: any }) {
   if (!metrics) return null;
@@ -7,7 +7,7 @@ export default function QuantitativeAnalysis({ metrics }: { metrics: any }) {
   return (
     <Box sx={{ mb: 4 }}>
       <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <BarChart3 size={20} className="text-blue-400" /> Quantitative Risk Metrics
+        <TrendingUp size={20} className="text-blue-400" /> Quantitative Risk Metrics
       </Typography>
 
       <Grid container spacing={2}>
@@ -15,37 +15,31 @@ export default function QuantitativeAnalysis({ metrics }: { metrics: any }) {
           label="Sharpe Ratio"
           value={metrics.sharpe_ratio?.toFixed(2)}
           desc="Risk-adjusted return vs Risk-free rate. > 1.0 is good."
-          icon={<TrendingUp size={16} />}
         />
         <MetricBox
           label="Sortino Ratio"
           value={metrics.sortino_ratio?.toFixed(2)}
           desc="Risk-adjusted return focusing on downside volatility."
-          icon={<TrendingUp size={16} />}
         />
         <MetricBox
           label="Alpha (Annual)"
           value={`${(metrics.alpha * 100).toFixed(1)}%`}
           desc="Excess return relative to the Nifty 100 benchmark."
-          icon={<TrendingUp size={16} />}
         />
         <MetricBox
           label="Beta (1Y)"
           value={metrics.beta?.toFixed(2)}
           desc="Volatility relative to the market. 1.0 = moves with market."
-          icon={<ShieldAlert size={16} />}
         />
         <MetricBox
           label="Max Drawdown"
           value={`${(metrics.max_drawdown * 100).toFixed(1)}%`}
           desc="The largest peak-to-trough decline in price."
-          icon={<ShieldAlert size={16} />}
         />
         <MetricBox
           label="Annual Volatility"
           value={`${(metrics.volatility * 100).toFixed(1)}%`}
           desc="The annualized standard deviation of daily returns."
-          icon={<Info size={16} />}
         />
       </Grid>
     </Box>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Slider, Stack, Chip } from '@mui/material';
+import { Box, Typography, Paper, Slider, Stack, Chip, IconButton } from '@mui/material';
 import { Play, Pause, FastForward, Rewind, Clock } from 'lucide-react';
 
 export default function MarketReplay() {
@@ -51,5 +51,3 @@ export default function MarketReplay() {
     </Box>
   );
 }
-
-import { IconButton } from '@mui/material';
