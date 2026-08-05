@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Box, Typography, Grid, Paper, Button, CircularProgress, Divider, Chip } from '@mui/material'
-import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play, ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react'
 import { getStocks, triggerBatchAnalysis, getMarketStats, getInstitutionalFlow } from '../api/client'
+import MarketBrief from '../components/Research/MarketBrief'
+import OpportunityEngine from '../components/Research/OpportunityEngine'
 
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
@@ -68,13 +70,16 @@ export default function Dashboard() {
           <Typography color="textSecondary">Connecting to institutional agents...</Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Box>
+          <MarketBrief />
+          <OpportunityEngine />
+          <Grid container spacing={3}>
           {/* Dashboard Stats */}
           <Grid item xs={12} md={3}>
             <StatCard
-              title="NIFTY 50"
-              value={marketStats?.['NIFTY 50']?.value?.toLocaleString() || '---'}
-              change={marketStats?.['NIFTY 50'] ? `${marketStats?.['NIFTY 50'].change}%` : '0%'}
+              title="NIFTY 100"
+              value={marketStats?.['NIFTY 100']?.value?.toLocaleString() || '---'}
+              change={marketStats?.['NIFTY 100'] ? `${marketStats?.['NIFTY 100'].change}%` : '0%'}
               icon={<BarChart2 />}
             />
           </Grid>
@@ -101,6 +106,35 @@ export default function Dashboard() {
               change={`${signalStrength}% Conf.`}
               icon={<MessageSquare />}
             />
+          </Grid>
+
+          {/* Vision 2.0: Market Breadth */}
+          <Grid item xs={12} md={12}>
+             <Paper sx={{ p: 3, bgcolor: 'rgba(16, 185, 129, 0.05)', border: '1px solid #10b981' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                   <Box>
+                      <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>MARKET BREADTH (ADVANCE/DECLINE)</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, mt: 1 }}>
+                         <Box>
+                            <Typography variant="h4" fontWeight="bold" color="primary">{marketStats?.Breadth?.advancing || 0}</Typography>
+                            <Typography variant="caption" color="textSecondary">ADVANCING</Typography>
+                         </Box>
+                         <Box>
+                            <Typography variant="h4" fontWeight="bold" color="error">{marketStats?.Breadth?.declining || 0}</Typography>
+                            <Typography variant="caption" color="textSecondary">DECLINING</Typography>
+                         </Box>
+                         <Divider orientation="vertical" flexItem />
+                         <Box>
+                            <Typography variant="h4" fontWeight="bold">{marketStats?.Breadth?.ratio || 0}</Typography>
+                            <Typography variant="caption" color="textSecondary">A/D RATIO</Typography>
+                         </Box>
+                      </Box>
+                   </Box>
+                   <Box sx={{ textAlign: 'right' }}>
+                      <Chip label={marketStats?.Breadth?.ratio > 1 ? "HEALTHY BREADTH" : "WEAK BREADTH"} color={marketStats?.Breadth?.ratio > 1 ? "primary" : "warning"} variant="outlined" />
+                   </Box>
+                </Box>
+             </Paper>
           </Grid>
 
           {/* Institutional Flow Section */}

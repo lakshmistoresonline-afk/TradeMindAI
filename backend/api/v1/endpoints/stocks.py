@@ -31,6 +31,7 @@ async def get_market_stats():
     # Keep public for dashboard loading
     indices = {
         "^NSEI": "NIFTY 50",
+        "^CNX100": "NIFTY 100",
         "^NSEBANK": "BANK NIFTY",
         "^INDIAVIX": "India VIX"
     }
@@ -42,6 +43,23 @@ async def get_market_stats():
             "value": round(info.last_price, 2),
             "change": round(((info.last_price - info.previous_close) / info.previous_close) * 100, 2)
         }
+
+    # Vision 2.0: Market Breadth Calculation
+    from backend.core.database import db_client
+    stocks_ref = db_client.collection("stocks").limit(100).stream()
+    advancing, declining = 0, 0
+    for doc in stocks_ref:
+        data = doc.to_dict()
+        change = data.get("change_pct", 0)
+        if change > 0: advancing += 1
+        elif change < 0: declining += 1
+
+    stats["Breadth"] = {
+        "advancing": advancing,
+        "declining": declining,
+        "ratio": round(advancing/declining, 2) if declining > 0 else advancing
+    }
+
     return stats
 
 @router.get("/fii-dii")

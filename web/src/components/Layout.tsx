@@ -1,9 +1,15 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert } from '@mui/material';
-import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot, Wallet, Calendar, ShieldAlert, Code } from 'lucide-react';
+import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot, Wallet, Calendar, ShieldAlert, Code, Monitor, Trophy, Pin, Star, Book, ShieldCheck } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import CommandPalette from './CommandPalette';
 
 const drawerWidth = 240;
+const workspaces = [
+  { id: '1', name: 'AI Research', type: 'INSTITUTIONAL' },
+  { id: '2', name: 'Intraday Feed', type: 'TRADING' },
+  { id: '3', name: 'Quant Engine', type: 'ANALYTICS' },
+];
 
 // Notification Context
 export const NotificationContext = createContext({
@@ -21,10 +27,14 @@ const menuItems = [
   { text: 'Portfolio', icon: <Briefcase size={20} />, path: '/portfolio' },
   { text: 'Stress Test', icon: <ShieldAlert size={20} />, path: '/stress-test' },
   { text: 'AI Analysis', icon: <BrainCircuit size={20} />, path: '/analysis' },
+  { text: 'Research Lab', icon: <Book size={20} />, path: '/research' },
   { text: 'AI Chat', icon: <Bot size={20} />, path: '/chat' },
   { text: 'Strategy', icon: <Box sx={{ width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Code size={20} /></Box>, path: '/strategy' },
   { text: 'Paper Trading', icon: <Wallet size={20} />, path: '/paper-trading' },
+  { text: 'Trade Journal', icon: <Book size={20} />, path: '/journal' },
   { text: 'Calendar', icon: <Calendar size={20} />, path: '/calendar' },
+  { text: 'Top Picks', icon: <Trophy size={20} />, path: '/ranking' },
+  { text: 'Control Center', icon: <ShieldCheck size={20} />, path: '/admin' },
   { text: 'Sector Rotation', icon: <PieChart size={20} />, path: '/sectors' },
   { text: 'Settings', icon: <Settings size={20} />, path: '/settings' },
 ];
@@ -32,7 +42,9 @@ const menuItems = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
+  const [pinnedStocks, setPinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setNotification({ open: true, message, severity });
@@ -44,22 +56,45 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-      Notification.requestPermission();
+    const saved = localStorage.getItem('active_workspace');
+    if (saved) {
+       const ws = workspaces.find(w => w.id === saved);
+       if (ws) setActiveWorkspace(ws);
     }
   }, []);
+
+  const handleWorkspaceChange = (ws: any) => {
+     setActiveWorkspace(ws);
+     localStorage.setItem('active_workspace', ws.id);
+     showNotification(`Switched to ${ws.name} workspace`, 'success');
+  };
 
   const handleClose = () => setNotification({ ...notification, open: false });
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       <Box sx={{ display: 'flex' }}>
+        <CommandPalette />
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#0f172a', borderBottom: '1px solid #334155' }} elevation={0}>
           <Toolbar>
             <TrendingUp className="text-emerald-500 mr-2" />
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', mr: 4 }}>
               TradeMind AI
             </Typography>
+
+            <Stack direction="row" spacing={1} sx={{ ml: 4 }}>
+               {workspaces.map(ws => (
+                 <Chip
+                   key={ws.id}
+                   icon={<Monitor size={14} />}
+                   label={ws.name}
+                   onClick={() => handleWorkspaceChange(ws)}
+                   variant={activeWorkspace.id === ws.id ? 'filled' : 'outlined'}
+                   color={activeWorkspace.id === ws.id ? 'primary' : 'default'}
+                   sx={{ cursor: 'pointer' }}
+                 />
+               ))}
+            </Stack>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -72,7 +107,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         >
           <Toolbar />
           <Box sx={{ overflow: 'auto', mt: 2 }}>
-            <List>
+            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 'bold' }}>MENU</Typography>}>
               {menuItems.map((item) => (
                 <ListItem key={item.text} disablePadding>
                   <ListItemButton
@@ -83,16 +118,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       '&.Mui-selected .MuiListItemIcon-root': { color: '#10b981' },
                       mx: 1,
                       borderRadius: 1,
-                      mb: 1
+                      mb: 0.5
                     }}
                   >
                     <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
                       {item.icon}
                     </ListItemIcon>
-                    <ListItemText primary={item.text} />
+                    <ListItemText primary={item.text} primaryTypographyProps={{ variant: 'body2' }} />
                   </ListItemButton>
                 </ListItem>
               ))}
+            </List>
+
+            <Divider sx={{ mx: 2, my: 1, opacity: 0.1 }} />
+
+            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 'bold' }}>PINNED STOCKS</Typography>}>
+               {pinnedStocks.map(symbol => (
+                 <ListItem key={symbol} disablePadding>
+                    <ListItemButton
+                      onClick={() => navigate('/analysis', { state: { symbol } })}
+                      sx={{ mx: 1, borderRadius: 1, mb: 0.5 }}
+                    >
+                       <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}><Star size={16} /></ListItemIcon>
+                       <ListItemText primary={symbol} primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }} />
+                    </ListItemButton>
+                 </ListItem>
+               ))}
             </List>
           </Box>
         </Drawer>

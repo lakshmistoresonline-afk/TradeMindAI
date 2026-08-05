@@ -1,0 +1,83 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import List, Dict, Any, Optional
+from backend.core.container import container
+from backend.core.auth import get_current_user
+from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport
+import uuid
+
+router = APIRouter()
+
+@router.get("/regime", response_model=MarketRegime)
+async def get_market_regime():
+    regime = await container.ios_repo.get_latest_regime()
+    if not regime:
+        raise HTTPException(status_code=404, detail="Regime data not found")
+    return regime
+
+@router.get("/opportunities", response_model=List[MarketOpportunity])
+async def get_opportunities(limit: int = 10):
+    return await container.ios_repo.get_active_opportunities(limit=limit)
+
+@router.get("/intel", response_model=MarketIntelligenceReport)
+async def get_market_intelligence(type: str = "CLOSING"):
+    report = await container.ios_repo.get_latest_intel_report(type)
+    if not report:
+        raise HTTPException(status_code=404, detail="Intelligence report not found")
+    return report
+
+@router.get("/graph/{symbol}")
+async def get_knowledge_graph(symbol: str):
+    return await container.graph_service.get_stock_relations(symbol)
+
+@router.get("/twin/{symbol}")
+async def get_digital_twin(symbol: str):
+    return await container.twin_service.get_stock_twin(symbol)
+
+@router.get("/alignment/{symbol}")
+async def get_mtf_alignment(symbol: str):
+    return await container.timeframe_service.analyze_alignment(symbol)
+
+@router.get("/notes/{symbol}", response_model=List[ResearchNote])
+async def get_research_notes(symbol: str, current_user: dict = Depends(get_current_user)):
+    return await container.ios_repo.get_stock_notes(current_user["uid"], symbol)
+
+@router.post("/notes")
+async def create_research_note(note_data: Dict[str, Any], current_user: dict = Depends(get_current_user)):
+    note = ResearchNote(
+        id=str(uuid.uuid4()),
+        user_id=current_user["uid"],
+        symbol=note_data["symbol"],
+        content=note_data["content"],
+        tags=note_data.get("tags", [])
+    )
+    await container.ios_repo.save_research_note(note)
+    return note
+
+@router.get("/workspaces", response_model=List[WorkspaceState])
+async def get_workspaces(current_user: dict = Depends(get_current_user)):
+    return await container.ios_repo.get_user_workspaces(current_user["uid"])
+
+@router.post("/workspaces")
+async def save_workspace(workspace: WorkspaceState, current_user: dict = Depends(get_current_user)):
+    workspace.user_id = current_user["uid"]
+    await container.ios_repo.save_workspace(workspace)
+    return workspace
+
+@router.get("/api-keys")
+async def get_api_keys(current_user: dict = Depends(get_current_user)):
+    docs = container.ios_repo.db.collection("api_keys").where("user_id", "==", current_user["uid"]).stream()
+    return [doc.to_dict() for doc in docs]
+
+@router.post("/api-keys")
+async def generate_api_key(current_user: dict = Depends(get_current_user)):
+    key = f"tm_{uuid.uuid4().hex}"
+    key_data = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user["uid"],
+        "key_prefix": key[:8] + "...",
+        "full_key": key, # In real prod, hash this!
+        "created_at": datetime.datetime.utcnow(),
+        "name": "Default API Key"
+    }
+    container.ios_repo.db.collection("api_keys").document(key_data["id"]).set(key_data)
+    return key_data

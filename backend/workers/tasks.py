@@ -10,17 +10,18 @@ import datetime
 from backend.analysis.smc import SMCAnalysis
 from backend.analysis.backtester import BacktestEngine
 from backend.services.quant_engine import QuantEngine
+from backend.services.scoring_service import ScoringService
 
 celery_app = Celery("tasks", broker=settings.REDIS_URL)
 
 # Automated Schedule
 celery_app.conf.beat_schedule = {
-    "analyze-nifty-50-morning": {
-        "task": "backend.workers.tasks.analyze_nifty_50",
+    "analyze-nifty-100-morning": {
+        "task": "backend.workers.tasks.analyze_nifty_100",
         "schedule": crontab(hour=9, minute=30, day_of_week="mon-fri"),
     },
-    "analyze-nifty-50-evening": {
-        "task": "backend.workers.tasks.analyze_nifty_50",
+    "analyze-nifty-100-evening": {
+        "task": "backend.workers.tasks.analyze_nifty_100",
         "schedule": crontab(hour=16, minute=0, day_of_week="mon-fri"),
     },
     "retrain-models-weekly": {
@@ -30,6 +31,14 @@ celery_app.conf.beat_schedule = {
     "generate-labels-daily": {
         "task": "backend.workers.tasks.update_training_labels",
         "schedule": crontab(hour=18, minute=0, day_of_week="mon-fri"),
+    },
+    "market-intel-closing": {
+        "task": "backend.workers.tasks.process_market_intelligence",
+        "schedule": crontab(hour=16, minute=30, day_of_week="mon-fri"),
+    },
+    "refresh-rankings-daily": {
+        "task": "backend.workers.tasks.refresh_ai_rankings",
+        "schedule": crontab(hour=17, minute=0, day_of_week="mon-fri"),
     },
 }
 celery_app.conf.timezone = 'Asia/Kolkata'
@@ -91,13 +100,18 @@ async def _analyze_stock_logic(symbol: str, period: str):
 
         # 7. AI Consensus (Reading from Precomputed Features)
         workflow = create_ai_workflow()
+
+        # Vision 2.0: Multi-Timeframe Alignment
+        mtf_results = await container.timeframe_service.analyze_alignment(symbol)
+
         initial_state = {
             "symbol": symbol,
             "technical_data": {
                 "indicators": ai_features,
                 "smc": smc_data,
                 "ml_prediction": ml_prediction,
-                "quant_metrics": quant_metrics.model_dump()
+                "quant_metrics": quant_metrics.model_dump(),
+                "mtf_alignment": mtf_results
             },
             "fundamental_data": {
                 "pe_ratio": stock.pe_ratio,
@@ -110,10 +124,20 @@ async def _analyze_stock_logic(symbol: str, period: str):
         }
         result = workflow.invoke(initial_state)
 
-        # 7. Persist Global Source of Truth
-        await service.repository.update_analysis(symbol, result)
+        # 8. Unified AI Investment Score
+        scoring_results = ScoringService.calculate_unified_score(ai_features, ml_prediction, result)
 
-        # 8. Broadcast Real-time Alert (Enterprise Integration)
+        # 9. Persist Global Source of Truth
+        await service.repository.db.collection("stocks").document(symbol).update({
+            "analysis": result,
+            "ai_investment_score": scoring_results["score"],
+            "ai_investment_grade": scoring_results["grade"],
+            "health_metrics": scoring_results["health"],
+            "confidence_metrics": scoring_results["confidence"],
+            "updated_at": datetime.datetime.utcnow()
+        })
+
+        # 10. Broadcast Real-time Alert (Enterprise Integration)
         from backend.app.main import manager
         alert_msg = {
             "type": "ANALYSIS_COMPLETE",
@@ -128,19 +152,24 @@ async def _analyze_stock_logic(symbol: str, period: str):
         return f"Error analyzing {symbol}: {str(e)}"
 
 @celery_app.task
-def analyze_nifty_50(period="10y"):
-    # Official Nifty 50 symbols (updated for NSE)
+def analyze_nifty_100(period="10y"):
+    # Official Nifty 100 symbols (updated for NSE)
     symbols = [
-        "ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK",
-        "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BPCL", "BHARTIARTL",
-        "BRITANNIA", "CIPLA", "COALINDIA", "DRREDDY", "EICHERMOT",
-        "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE", "HEROMOTOCO",
-        "HINDALCO", "HINDUNILVR", "ICICIBANK", "ITC", "INDUSINDBK",
-        "INFY", "JSWSTEEL", "KOTAKBANK", "LT", "LTIM",
-        "M&M", "MARUTI", "NTPC", "NESTLEIND", "ONGC",
-        "POWERGRID", "RELIANCE", "SBILIFE", "SBIN", "SUNPHARMA",
-        "TATACONSUM", "TATAMOTORS", "TATASTEEL", "TCS", "TECHM",
-        "TITAN", "ULTRACEMCO", "UPL", "WIPRO", "SHRIRAMFIN"
+        "ABB", "ACC", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", "ADANIPOWER", "ATGL", "AMBUJACEM", "APOLLOHOSP",
+        "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AU SMALL FINANCE BANK", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
+        "BANDHANBNK", "BANKBARODA", "BANKINDIA", "BEL", "BHEL", "BPCL", "BHARTIARTL", "BIOCON", "BOSCHLTD", "BRITANNIA",
+        "CANBK", "CGPOWER", "CHOLAFIN", "CIPLA", "COALINDIA", "COLPAL", "CONCOR", "CUMMINSIND", "DLF", "DABUR",
+        "DALBHARAT", "DEEPAKNTR", "DRREDDY", "EICHERMOT", "ESCORTS", "GAIL", "GMRINFRA", "GLAND", "GODREJCP", "GODREJPROP",
+        "GRASIM", "GUJGASLTD", "HAL", "HCLTECH", "HDFCBANK", "HDFCLIFE", "HAVELLS", "HEROMOTOCO", "HINDALCO", "HINDUNILVR",
+        "ICICIBANK", "ICICIGI", "ICICIPRULI", "IDFCFIRSTB", "ITC", "INDHOTEL", "INDIANB", "INDUSINDBK", "INDUSTOWER", "INFY",
+        "INTERGLOBE", "IOC", "IRCTC", "IRFC", "JSWENERGY", "JSWSTEEL", "JINDALSTEL", "JUBLFOOD", "KOTAKBANK", "LTIM",
+        "LT", "LICHSGFIN", "LICI", "MRF", "M&M", "MARICO", "MARUTI", "MAXHEALTH", "MAHABANK", "MPHASIS",
+        "NHPC", "NMDC", "NTPC", "NESTLEIND", "NYKAA", "ONGC", "PAYTM", "PIIND", "PNB", "PFC",
+        "PAGEIND", "PATANJALI", "PIDILITIND", "POLYCAB", "POWERGRID", "PRESTIGE", "RVNL", "RECLTD", "RELIANCE", "SBICARD",
+        "SBILIFE", "SBIN", "SRF", "SAMVARDHANA", "SHREECEM", "SHRIRAMFIN", "SIEMENS", "SONACOMS", "SUNPHARMA", "SUNTV",
+        "SUPREMEIND", "SYNGENE", "TATACOMM", "TATACONSUM", "TATAMOTORS", "TATAMTRDVR", "TATAPOWER", "TATASTEEL", "TCS", "TECHM",
+        "TITAN", "TORNTPHARM", "TRENT", "TIINDIA", "UPL", "ULTRACEMCO", "UNITDSPR", "VBL", "VEDL", "WIPRO",
+        "YESBANK", "ZOMATO", "ZYDUSLIFE"
     ]
 
     # Use Celery group for parallel execution
@@ -158,22 +187,26 @@ def run_adhoc_backtest(symbol: str):
 @celery_app.task
 def train_models_task():
     """
-    Retrains models for all Nifty 50 stocks using the Feature Store.
+    Retrains models for all Nifty 100 stocks using the Feature Store.
     """
     service = container.stock_service
     ml_service = container.ml_service
 
     symbols = [
-        "ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK",
-        "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BPCL", "BHARTIARTL",
-        "BRITANNIA", "CIPLA", "COALINDIA", "DRREDDY", "EICHERMOT",
-        "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE", "HEROMOTOCO",
-        "HINDALCO", "HINDUNILVR", "ICICIBANK", "ITC", "INDUSINDBK",
-        "INFY", "JSWSTEEL", "KOTAKBANK", "LT", "LTIM",
-        "M&M", "MARUTI", "NTPC", "NESTLEIND", "ONGC",
-        "POWERGRID", "RELIANCE", "SBILIFE", "SBIN", "SUNPHARMA",
-        "TATACONSUM", "TATAMOTORS", "TATASTEEL", "TCS", "TECHM",
-        "TITAN", "ULTRACEMCO", "UPL", "WIPRO", "SHRIRAMFIN"
+        "ABB", "ACC", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", "ADANIPOWER", "ATGL", "AMBUJACEM", "APOLLOHOSP",
+        "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AUBANK", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
+        "BANDHANBNK", "BANKBARODA", "BEL", "BHEL", "BPCL", "BHARTIARTL", "BIOCON", "BOSCHLTD", "BRITANNIA", "CANBK",
+        "CGPOWER", "CHOLAFIN", "CIPLA", "COALINDIA", "COLPAL", "CONCOR", "CUMMINSIND", "DLF", "DABUR", "DALBHARAT",
+        "DEEPAKNTR", "DRREDDY", "EICHERMOT", "GAIL", "GMRINFRA", "GODREJCP", "GODREJPROP", "GRASIM", "HAL", "HCLTECH",
+        "HDFCBANK", "HDFCLIFE", "HAVELLS", "HEROMOTOCO", "HINDALCO", "HINDUNILVR", "ICICIBANK", "ICICIGI", "ICICIPRULI", "IDFCFIRSTB",
+        "ITC", "INDHOTEL", "INDIANB", "INDUSINDBK", "INDUSTOWER", "INFY", "INTERGLOBE", "IOC", "IRCTC", "IRFC",
+        "JSWENERGY", "JSWSTEEL", "JINDALSTEL", "JUBLFOOD", "KOTAKBANK", "LTIM", "LT", "LICHSGFIN", "LICI", "MRF",
+        "M&M", "MARICO", "MARUTI", "MAXHEALTH", "MPHASIS", "NHPC", "NMDC", "NTPC", "NESTLEIND", "NYKAA",
+        "ONGC", "PAYTM", "PIIND", "PNB", "PFC", "PIDILITIND", "POLYCAB", "POWERGRID", "PRESTIGE", "RVNL",
+        "RECLTD", "RELIANCE", "SBICARD", "SBILIFE", "SBIN", "SRF", "MOTHERSON", "SHREECEM", "SHRIRAMFIN", "SIEMENS",
+        "SONACOMS", "SUNPHARMA", "SUNTV", "SUPREMEIND", "SYNGENE", "TATACOMM", "TATACONSUM", "TATAMOTORS", "TATAPOWER", "TATASTEEL",
+        "TCS", "TECHM", "TITAN", "TORNTPHARM", "TRENT", "TIINDIA", "UPL", "ULTRACEMCO", "UNITDSPR", "VBL",
+        "VEDL", "WIPRO", "YESBANK", "ZOMATO", "ZYDUSLIFE"
     ]
 
     loop = asyncio.get_event_loop()
@@ -198,6 +231,71 @@ def update_training_labels():
     """
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_update_labels_logic())
+
+@celery_app.task
+def process_market_intelligence():
+    """
+    Vision 2.0: Generates Daily Intelligence, Regimes, and Opportunities.
+    """
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(_process_intel_logic())
+
+@celery_app.task
+def refresh_ai_rankings():
+    """
+    Vision 2.0: AI Ranking Engine (Module 13).
+    Recalculates top picks across categories.
+    """
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(_refresh_rankings_logic())
+
+async def _process_intel_logic():
+    service = container.stock_service
+    ios_repo = container.ios_repo
+
+    # 1. Fetch Latest Market State
+    stocks = await service.repository.get_all_stocks(limit=100)
+    from backend.api.v1.endpoints.stocks import get_market_stats
+    stats = await get_market_stats()
+
+    # 2. Detect Market Regime
+    nifty_df = await service.provider.fetch_history("^NSEI", "1mo")
+    vix_data = stats.get("India VIX", {}).get("value", 15.0)
+    regime = container.regime_engine.detect_regime(nifty_df, vix_data)
+    await ios_repo.save_market_regime(regime)
+
+    # 3. Find Opportunities
+    opportunities = container.opportunity_engine.find_opportunities(stocks)
+    for opp in opportunities:
+        await ios_repo.save_opportunity(opp)
+
+    # 4. Generate Closing Report
+    report = container.intel_service.generate_closing_report(stocks, stats)
+    await ios_repo.save_intel_report(report)
+
+    return "Market Intelligence Processed."
+
+async def _refresh_rankings_logic():
+    service = container.stock_service
+    repo = service.repository
+
+    # 1. Fetch All Analyzed Stocks
+    stocks = await repo.get_all_stocks(limit=100)
+
+    # 2. Category Ranking
+    top_ai = sorted([s for s in stocks if s.ai_investment_score], key=lambda x: x.ai_investment_score, reverse=True)[:10]
+    top_momentum = sorted([s for s in stocks if s.change_pct], key=lambda x: x.change_pct, reverse=True)[:10]
+
+    # 3. Save to Global Ranking Collection
+    db = repo.db
+    ranking_ref = db.collection("system_rankings").document("latest")
+    ranking_ref.set({
+        "top_ai_confidence": [{"symbol": s.symbol, "score": s.ai_investment_score} for s in top_ai],
+        "top_momentum": [{"symbol": s.symbol, "change": s.change_pct} for s in top_momentum],
+        "updated_at": datetime.datetime.utcnow()
+    })
+
+    return "AI Rankings Refreshed."
 
 async def _update_labels_logic():
     repo = container.repository

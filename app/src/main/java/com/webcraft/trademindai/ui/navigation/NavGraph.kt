@@ -25,15 +25,17 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Dashboard.route) {
             DashboardScreen(navController)
         }
-        composable(Screen.Treemap.route) {
-            // Placeholder for Android Treemap
-            androidx.compose.material3.Text("Market Treemap coming to mobile")
+        composable(Screen.Opportunities.route) {
+            androidx.compose.material3.Text("Opportunities Feed coming soon")
         }
-        composable(Screen.PaperTrading.route) {
-            androidx.compose.material3.Text("Paper Trading terminal coming to mobile")
+        composable(Screen.Journal.route) {
+            androidx.compose.material3.Text("Trade Journal coming soon")
         }
-        composable(Screen.Calendar.route) {
-            androidx.compose.material3.Text("Economic Calendar coming to mobile")
+        composable(Screen.Portfolio.route) {
+            androidx.compose.material3.Text("Portfolio AI Manager coming soon")
+        }
+        composable(Screen.Analysis.route) {
+            androidx.compose.material3.Text("AI Analysis Hub coming soon")
         }
         composable(Screen.Chat.route) {
             ChatScreen()
@@ -51,8 +53,9 @@ sealed class Screen(val route: String) {
     object Splash : Screen("splash")
     object Login : Screen("login")
     object Dashboard : Screen("dashboard")
-    object Treemap : Screen("treemap")
-    object PaperTrading : Screen("paper_trading")
-    object Calendar : Screen("calendar")
+    object Opportunities : Screen("opportunities")
+    object Journal : Screen("journal")
+    object Portfolio : Screen("portfolio")
+    object Analysis : Screen("analysis")
     object Chat : Screen("chat")
 }

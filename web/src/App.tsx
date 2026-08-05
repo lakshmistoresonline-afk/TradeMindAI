@@ -6,6 +6,7 @@ import Market from './pages/Market'
 import Analysis from './pages/Analysis'
 import Settings from './pages/Settings'
 import Portfolio from './pages/Portfolio'
+import ResearchWorkspace from './pages/ResearchWorkspace'
 import Login from './pages/Login'
 import SectorRotation from './pages/SectorRotation'
 import AIChat from './pages/AIChat'
@@ -14,6 +15,9 @@ import MarketHeatmap from './pages/MarketIntel/MarketHeatmap'
 import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilder'
 import PaperTrading from './pages/StrategyBuilder/PaperTrading'
 import EconomicCalendar from './pages/Calendar/EconomicCalendar'
+import Journal from './pages/Journal'
+import Ranking from './pages/Ranking'
+import Admin from './pages/Admin'
 import StressTest from './pages/MarketIntel/StressTest'
 import OptionsVisualizer from './pages/Options/OptionsVisualizer'
 
@@ -62,13 +66,17 @@ function App() {
                 <Route path="/treemap" element={<MarketTreemap />} />
                 <Route path="/heatmap" element={<MarketHeatmap />} />
                 <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/research" element={<ResearchWorkspace />} />
                 <Route path="/stress-test" element={<StressTest />} />
                 <Route path="/analysis" element={<Analysis />} />
                 <Route path="/chat" element={<AIChat />} />
                 <Route path="/options" element={<OptionsVisualizer />} />
                 <Route path="/strategy" element={<StrategyBuilder />} />
                 <Route path="/paper-trading" element={<PaperTrading />} />
+                <Route path="/journal" element={<Journal />} />
                 <Route path="/calendar" element={<EconomicCalendar />} />
+                <Route path="/ranking" element={<Ranking />} />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="/sectors" element={<SectorRotation />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>

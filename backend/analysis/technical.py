@@ -24,6 +24,18 @@ class TechnicalAnalysis:
         adx = ta.adx(df["High"], df["Low"], df["Close"])
         df = pd.concat([df, adx], axis=1)
 
+        # Support & Resistance (Classic Pivots)
+        last_h = df["High"].iloc[-2]
+        last_l = df["Low"].iloc[-2]
+        last_c = df["Close"].iloc[-2]
+
+        pivot = (last_h + last_l + last_c) / 3
+        df["Pivot"] = pivot
+        df["R1"] = (2 * pivot) - last_l
+        df["S1"] = (2 * pivot) - last_h
+        df["R2"] = pivot + (last_h - last_l)
+        df["S2"] = pivot - (last_h - last_l)
+
         return df
 
     @staticmethod

@@ -2,6 +2,8 @@ package com.webcraft.trademindai.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.List
@@ -47,10 +49,10 @@ fun MainScreen() {
 @Composable
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem("Dashboard", "dashboard", Icons.Default.Dashboard),
-        BottomNavItem("Intelligence", "treemap", Icons.Default.GridView),
-        BottomNavItem("Paper", "paper_trading", Icons.Default.AccountBalanceWallet),
-        BottomNavItem("Events", "calendar", Icons.Default.CalendarMonth),
+        BottomNavItem("Intelligence", "dashboard", Icons.Default.Dashboard),
+        BottomNavItem("Opportunities", "opportunities", Icons.Default.Star),
+        BottomNavItem("Journal", "journal", Icons.Default.MenuBook),
+        BottomNavItem("Portfolio", "portfolio", Icons.Default.AccountBalanceWallet),
         BottomNavItem("AI", "analysis", Icons.Default.AutoAwesome)
     )
     NavigationBar {

@@ -115,6 +115,20 @@ export default function StrategyBuilder() {
                 Run Quick Backtest
               </Button>
             </Box>
+
+            <Divider sx={{ my: 4, opacity: 0.1 }} />
+
+            <Box sx={{ p: 2, bgcolor: 'rgba(41, 121, 255, 0.05)', border: '1px solid #2979FF', borderRadius: 2 }}>
+               <Typography variant="subtitle2" color="#2979FF" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                  <Zap size={16} /> AI STRATEGY OPTIMIZER
+               </Typography>
+               <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                  AI can suggest optimized parameters for your rules to maximize Sharpe Ratio.
+               </Typography>
+               <Button fullWidth variant="contained" sx={{ bgcolor: '#2979FF', color: 'white' }}>
+                  Optimize Logic
+               </Button>
+            </Box>
           </Paper>
         </Grid>
       </Grid>

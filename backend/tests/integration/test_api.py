@@ -15,7 +15,7 @@ def test_market_stats_endpoint(client: TestClient):
     # This endpoint currently talks to yfinance direct
     response = client.get("/api/v1/stocks/market-stats")
     assert response.status_code == 200
-    assert "NIFTY 50" in response.json()
+    assert "NIFTY 100" in response.json()
 
 def test_stocks_list_protected(client: TestClient):
     # This should fail if security is on, but we reverted security to mock for now

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Grid, Button, TextField, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import { Plus, Trash2, TrendingUp, Briefcase } from 'lucide-react';
 import { getStocks } from '../api/client';
+import PortfolioOptimization from '../components/Research/PortfolioOptimization';
 
 export default function Portfolio() {
   const [myStocks, setMyStocks] = useState<string[]>(['RELIANCE', 'TCS', 'INFY']);
@@ -36,6 +37,8 @@ export default function Portfolio() {
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>My Portfolio</Typography>
+
+      <PortfolioOptimization />
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>

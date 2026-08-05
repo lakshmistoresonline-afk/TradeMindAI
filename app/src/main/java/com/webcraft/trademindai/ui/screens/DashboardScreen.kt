@@ -38,11 +38,37 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            item {
+                MarketRegimeBanner()
+            }
             items(stocks) { stock ->
                 StockItem(stock = stock, onClick = {
                     navController.navigate("stock_detail/${stock.symbol}")
                 })
             }
+        }
+    }
+}
+
+@Composable
+fun MarketRegimeBanner() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Market Regime: BULLISH",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = "Institutional bias is positive. High liquidity environment.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            )
         }
     }
 }

@@ -3,7 +3,10 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import { Search, Info, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 import { getStocks } from '../api/client';
 
+import { useNavigate } from 'react-router-dom';
+
 export default function Market() {
+  const navigate = useNavigate();
   const [stocks, setStocks] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -88,7 +91,11 @@ export default function Market() {
                 </TableCell>
                 <TableCell align="right">₹{(stock.market_cap / 1e11).toFixed(2)}T</TableCell>
                 <TableCell align="center">
-                  <IconButton size="small" color="primary">
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => navigate('/analysis', { state: { symbol: stock.symbol } })}
+                  >
                     <Info size={18} />
                   </IconButton>
                 </TableCell>

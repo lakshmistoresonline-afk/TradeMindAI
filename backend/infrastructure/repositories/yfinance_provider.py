@@ -11,10 +11,23 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
         return {
             "name": info.get("longName"),
             "sector": info.get("sector"),
+            "industry": info.get("industry"),
             "last_price": info.get("currentPrice"),
             "market_cap": info.get("marketCap"),
+            "enterprise_value": info.get("enterpriseValue"),
             "pe_ratio": info.get("forwardPE"),
             "pb_ratio": info.get("priceToBook"),
+            "peg_ratio": info.get("pegRatio"),
+            "roe": info.get("returnOnEquity"),
+            "roce": info.get("returnOnAssets"), # ROCE not directly in basic info, using ROA as proxy or need more calcs
+            "eps": info.get("forwardEps"),
+            "debt_to_equity": info.get("debtToEquity"),
+            "book_value": info.get("bookValue"),
+            "dividend_yield": info.get("dividendYield"),
+            "face_value": info.get("faceValue"),
+            "high_52w": info.get("fiftyTwoWeekHigh"),
+            "low_52w": info.get("fiftyTwoWeekLow"),
+            "avg_volume": info.get("averageVolume"),
         }
 
     async def fetch_history(self, symbol: str, period: str) -> Any:

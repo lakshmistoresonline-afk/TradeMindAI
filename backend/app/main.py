@@ -10,8 +10,14 @@ import datetime
 import json
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    title="TradeMind AI-IOS (Vision 2.0)",
+    description="Institutional AI Investment Operating System API. Supports multi-agent consensus, predictive ML, and enterprise risk analytics.",
+    version="2.0.0",
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    contact={
+        "name": "TradeMind AI Enterprise Support",
+        "url": "https://trademindai.com",
+    },
 )
 
 # WebSocket Connection Manager
