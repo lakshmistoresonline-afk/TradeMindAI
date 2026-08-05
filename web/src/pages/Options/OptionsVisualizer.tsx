@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Card, CardContent } from '@mui/material';
+import { Box, Typography, Paper, Grid, Chip, Card, CardContent } from '@mui/material';
 import ReactECharts from 'echarts-for-react';
 
 export default function OptionsVisualizer() {
-  const [symbol, setSymbol] = useState('NIFTY');
 
   const oiOption = {
     xAxis: { type: 'category', data: ['23000', '23100', '23200', '23300', '23400', '23500', '23600'] },

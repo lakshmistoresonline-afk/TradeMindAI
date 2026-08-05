@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Box, Typography, Paper, Grid, Button, List, ListItem, ListItemSecondaryAction, IconButton, TextField, MenuItem, Select, FormControl } from '@mui/material';
 import { Plus, Trash2, Save, Play, Code } from 'lucide-react';
 
 export default function StrategyBuilder() {
@@ -77,9 +77,8 @@ export default function StrategyBuilder() {
             </List>
             <Button
               fullWidth
-              variant="dashed"
               onClick={addBlock}
-              sx={{ border: '2px dashed #334155', py: 2, mt: 2 }}
+              sx={{ border: '2px dashed #334155', py: 2, mt: 2, color: 'text.secondary' }}
               startIcon={<Plus size={18} />}
             >
               Add Condition Block

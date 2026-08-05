@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Card, CardContent } from '@mui/material';
-import { Wallet, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
+import { Wallet, TrendingUp, ArrowUpRight } from 'lucide-react';
 
 export default function PaperTrading() {
-  const [portfolio, setPortfolio] = useState<any>({
+  const [portfolio] = useState<any>({
     cash_balance: 1000000.0,
     holdings: { 'RELIANCE': 10, 'TCS': 5 },
     total_pnl: 12450.50
@@ -65,7 +65,7 @@ export default function PaperTrading() {
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell fontWeight="bold">RELIANCE</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>RELIANCE</TableCell>
                 <TableCell align="right">10</TableCell>
                 <TableCell align="right">₹2,450.00</TableCell>
                 <TableCell align="right">₹2,510.45</TableCell>
@@ -73,7 +73,7 @@ export default function PaperTrading() {
                 <TableCell align="center"><Chip size="small" label="PROFIT" color="success" /></TableCell>
               </TableRow>
               <TableRow>
-                <TableCell fontWeight="bold">TCS</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>TCS</TableCell>
                 <TableCell align="right">5</TableCell>
                 <TableCell align="right">₹3,890.00</TableCell>
                 <TableCell align="right">₹3,920.10</TableCell>

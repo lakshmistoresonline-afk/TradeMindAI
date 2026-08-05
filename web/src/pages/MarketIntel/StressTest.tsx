@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Slider, Button, Alert, List, ListItem, ListItemText } from '@mui/material';
-import { ShieldAlert, Zap, TrendingDown, Info } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Slider, Alert, List, ListItem, ListItemText } from '@mui/material';
+import { ShieldAlert, Zap, TrendingDown } from 'lucide-react';
 
 export default function StressTest() {
   const [marketDrop, setMarketDrop] = useState(10);

@@ -15,6 +15,7 @@ import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilder'
 import PaperTrading from './pages/StrategyBuilder/PaperTrading'
 import EconomicCalendar from './pages/Calendar/EconomicCalendar'
 import StressTest from './pages/MarketIntel/StressTest'
+import OptionsVisualizer from './pages/Options/OptionsVisualizer'
 
 const darkTheme = createTheme({
   palette: {

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Chip, Stack, List, ListItem, ListItemText, Divider, Alert } from '@mui/material';
-import { Calendar, Clock, Globe, Info } from 'lucide-react';
+import { Box, Typography, Paper, Chip, Stack, List, ListItem, Divider, Alert, Grid } from '@mui/material';
+import { Globe, Info } from 'lucide-react';
 
 const mockEvents = [
   { time: '11:00 AM', country: 'IN', event: 'RBI Monetary Policy Meeting', impact: 'CRITICAL', forecast: '6.50%', actual: '---' },
