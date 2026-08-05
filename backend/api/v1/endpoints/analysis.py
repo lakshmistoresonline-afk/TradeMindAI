@@ -6,10 +6,10 @@ from google.cloud import firestore
 router = APIRouter()
 
 @router.post("/trigger")
-async def trigger_full_analysis():
-    # Trigger the Celery task
-    task = analyze_nifty_50.delay()
-    return {"message": "Batch analysis triggered", "task_id": task.id}
+async def trigger_full_analysis(period: str = "10y"):
+    # Trigger the Celery task with 10y period
+    task = analyze_nifty_50.delay(period=period)
+    return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
 
 @router.post("/backtest/{symbol}")
 async def trigger_backtest(symbol: str):

@@ -28,8 +28,9 @@ class DataCollector:
         stock_ref.set(stock_data, merge=True)
         return stock_data
 
-    def fetch_historical_data(self, symbol: str, period="1y"):
+    def fetch_historical_data(self, symbol: str, period="10y"):
         ticker = yf.Ticker(f"{symbol}.NS")
+        # Fetch data with higher resolution for 10y if possible, default to 1d
         df = ticker.history(period=period)
 
         if df.empty:

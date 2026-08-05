@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://trademind-api-euba.onrender.com/api/v1';
+const API_BASE_URL = 'https://trademind-api-m8jg.onrender.com/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
