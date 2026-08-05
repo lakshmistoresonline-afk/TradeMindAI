@@ -33,8 +33,6 @@ export default function Login() {
           Login to access your institutional AI insights.
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-
         <form onSubmit={handleLogin}>
           <Stack spacing={3}>
             <TextField
@@ -43,7 +41,6 @@ export default function Login() {
               variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
             />
             <TextField
               fullWidth
@@ -52,18 +49,16 @@ export default function Login() {
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
             />
             <Button
               fullWidth
               size="large"
               variant="contained"
               type="submit"
-              startIcon={loading ? null : <LogIn size={18} />}
+              startIcon={<LogIn size={18} />}
               sx={{ py: 1.5, fontWeight: 'bold' }}
-              disabled={loading}
             >
-              {loading ? 'Authenticating...' : 'Sign In'}
+              Sign In
             </Button>
           </Stack>
         </form>
