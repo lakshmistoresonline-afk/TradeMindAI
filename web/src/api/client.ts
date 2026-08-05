@@ -54,6 +54,11 @@ export const getMarketRegime = async () => {
   return response.data;
 };
 
+export const getMarketIntelligence = async (type: string = "CLOSING") => {
+  const response = await apiClient.get(`/ios/intel?type=${type}`);
+  return response.data;
+};
+
 export const getOpportunities = async () => {
   const response = await apiClient.get('/ios/opportunities');
   return response.data;

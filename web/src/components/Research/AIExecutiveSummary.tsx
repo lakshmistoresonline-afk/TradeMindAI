@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Grid, Chip, LinearProgress, Stack } from '@mui/material';
+import { Box, Typography, Paper, Grid, LinearProgress } from '@mui/material';
 import { Brain, Target, ShieldCheck, Clock, Zap } from 'lucide-react';
 
 export default function AIExecutiveSummary({ analysis }: { analysis: any }) {

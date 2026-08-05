@@ -52,7 +52,7 @@ export default function QuantitativeAnalysis({ metrics }: { metrics: any }) {
   );
 }
 
-function MetricBox({ label, value, desc, icon }: any) {
+function MetricBox({ label, value, desc }: any) {
   return (
     <Grid item xs={6} md={2}>
       <Paper sx={{ p: 2, textAlign: 'center', height: '100%', border: '1px solid #334155' }}>

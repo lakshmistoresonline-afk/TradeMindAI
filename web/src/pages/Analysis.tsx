@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Grid, Card, CardContent, Autocomplete, TextField, CircularProgress, Stack, Button, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { Brain, Search, History, CheckCircle, XCircle, FileText, BarChart3, Database, Fingerprint } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Autocomplete, TextField, Stack, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from '@mui/material';
+import { Search, History, CheckCircle, XCircle, FileText, Database, Fingerprint } from 'lucide-react';
 import { getStocks, triggerBacktest, getBacktestResults, getBacktestSignals } from '../api/client';
 import ResearchHeader from '../components/Research/ResearchHeader';
 import AIExecutiveSummary from '../components/Research/AIExecutiveSummary';
@@ -29,6 +29,10 @@ import MarketReplay from '../components/Research/MarketReplay';
 import ScenarioSimulator from '../components/Research/ScenarioSimulator';
 import CorrelationEngine from '../components/Research/CorrelationEngine';
 import MultiTimeframeAnalysis from '../components/Research/MultiTimeframeAnalysis';
+import RecommendationHistory from '../components/Research/RecommendationHistory';
+import SimilarityEngine from '../components/Research/SimilarityEngine';
+import AILearningMentor from '../components/Research/AILearningMentor';
+import HistoricalAIPerformance from '../components/Research/HistoricalAIPerformance';
 import AICopilot from '../components/AICopilot';
 
 import { useLocation } from 'react-router-dom';
@@ -237,6 +241,9 @@ The multi-agent consensus indicates a ${selectedStock.analysis?.consensus.toUppe
                       <ManagementMoat />
                    </Grid>
                    <Grid item xs={12}>
+                      <HistoricalAIPerformance />
+                   </Grid>
+                   <Grid item xs={12}>
                       <FundamentalReport stock={selectedStock} />
                    </Grid>
                    <Grid item xs={12}>
@@ -274,6 +281,19 @@ The multi-agent consensus indicates a ${selectedStock.analysis?.consensus.toUppe
                    </Grid>
                    <Grid item xs={12}>
                       <MultiTimeframeAnalysis mtf_data={selectedStock.analysis?.technical_data?.mtf_alignment} />
+                   </Grid>
+                   <Grid item xs={12}>
+                      <SimilarityEngine symbol={selectedStock.symbol} />
+                   </Grid>
+                   <Grid item xs={12}>
+                      <AILearningMentor />
+                   </Grid>
+                   <Grid item xs={12}>
+                      <RecommendationHistory history={[
+                        { date: 'Aug 01', rating: 'BUY', confidence: 88, outcome: 12.4, accuracy: 'HIT' },
+                        { date: 'Jul 15', rating: 'BUY', confidence: 72, outcome: 4.2, accuracy: 'HIT' },
+                        { date: 'Jun 28', rating: 'HOLD', confidence: 65, outcome: -2.1, accuracy: 'HIT' }
+                      ]} />
                    </Grid>
                 </Grid>
               </Grid>
@@ -386,20 +406,6 @@ The multi-agent consensus indicates a ${selectedStock.analysis?.consensus.toUppe
         </Paper>
       )}
       <AICopilot stockContext={selectedStock} />
-    </Box>
-  );
-}
-
-function AnalysisStep({ icon, title, status }: any) {
-  return (
-    <Box sx={{ p: 2, border: '1px solid #334155', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-      <Box sx={{ p: 1, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: '50%' }}>
-        {icon}
-      </Box>
-      <Box>
-        <Typography fontWeight="bold" variant="body2">{title}</Typography>
-        <Typography variant="caption" color="textSecondary">{status}</Typography>
-      </Box>
     </Box>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Slider, Button, Alert, Chip, Divider } from '@mui/material';
-import { Play, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Slider, Chip, Divider } from '@mui/material';
+import { Play, TrendingUp, TrendingDown } from 'lucide-react';
 
 export default function DecisionSimulator({ stock }: { stock: any }) {
   const [positionSize, setPositionSize] = useState(10);

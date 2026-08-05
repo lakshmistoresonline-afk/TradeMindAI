@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Chip, Stack, Divider, Grid, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, Chip, Divider, Grid, CircularProgress, List, ListItem, ListItemText } from '@mui/material';
 import { Zap } from 'lucide-react';
-import { getMarketRegime } from '../../api/client';
+import { getMarketRegime, getMarketIntelligence } from '../../api/client';
 
 export default function MarketBrief() {
   const [regime, setRegime] = useState<any>(null);

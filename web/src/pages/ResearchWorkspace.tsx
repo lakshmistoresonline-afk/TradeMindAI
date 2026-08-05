@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Grid, List, ListItem, ListItemText, Chip, Button, TextField, InputAdornment } from '@mui/material';
-import { Book, Search, Tag, Filter, FileText } from 'lucide-react';
-import { getStocks } from '../api/client';
+import { useState } from 'react';
+import { Box, Typography, Paper, Grid, List, ListItem, Chip, Button, TextField, InputAdornment, Stack, Divider } from '@mui/material';
+import { Search, FileText } from 'lucide-react';
 
 export default function ResearchWorkspace() {
-  const [notes, setNotes] = useState<any[]>([
+  const [notes] = useState<any[]>([
     { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily.', tags: ['SMC', 'BULLISH'], date: 'Aug 04' },
     { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800.', tags: ['FUNDAMENTAL'], date: 'Jul 28' },
     { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter.', tags: ['INSTITUTIONAL'], date: 'Jul 25' },

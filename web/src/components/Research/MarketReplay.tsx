@@ -1,10 +1,20 @@
-import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Slider, Button, Stack, Chip } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Slider, Stack, Chip } from '@mui/material';
 import { Play, Pause, FastForward, Rewind, Clock } from 'lucide-react';
 
 export default function MarketReplay() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [frame, setFrame] = useState(0);
+
+  useEffect(() => {
+    let interval: any;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setFrame((prev) => (prev < 100 ? prev + 1 : 0));
+      }, 500);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   return (
     <Box sx={{ mb: 4 }}>

@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Grid, Chip, Divider } from '@mui/material';
-import { Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Clock, TrendingUp, TrendingDown } from 'lucide-react';
 
 export default function MultiTimeframeAnalysis({ mtf_data }: { mtf_data?: any }) {
   if (!mtf_data) {

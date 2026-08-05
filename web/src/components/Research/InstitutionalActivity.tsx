@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Stack, Divider } from '@mui/material';
-import { Landmark, TrendingUp, TrendingDown, Users } from 'lucide-react';
+import { Landmark } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
 export default function InstitutionalActivity() {

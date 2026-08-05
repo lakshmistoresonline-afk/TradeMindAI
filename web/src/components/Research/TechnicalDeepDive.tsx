@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
-import { LineChart, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { LineChart } from 'lucide-react';
 
 export default function TechnicalDeepDive({ data }: { data: any }) {
   if (!data?.indicators) return null;

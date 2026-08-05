@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, TextField, Button, List, ListItem, Chip, Stack, IconButton, Divider, Grid, CircularProgress } from '@mui/material';
-import { Save, Tag, Paperclip, MessageSquare, Search } from 'lucide-react';
+import { Save, Tag, Paperclip, MessageSquare } from 'lucide-react';
 import { getResearchNotes, saveResearchNote } from '../../api/client';
 
 export default function ResearchNotebook({ symbol }: { symbol: string }) {

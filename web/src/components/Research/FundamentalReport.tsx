@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Grid, Divider, Stack, Table, TableHead, TableBody, TableCell, TableRow } from '@mui/material';
-import { Cpu, TrendingUp, DollarSign, PieChart, ShieldCheck } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Divider, Table, TableHead, TableBody, TableCell, TableRow } from '@mui/material';
+import { Cpu, TrendingUp, ShieldCheck } from 'lucide-react';
 
 export default function FundamentalReport({ stock }: { stock: any }) {
   if (!stock) return null;

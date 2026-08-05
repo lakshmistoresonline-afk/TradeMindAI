@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Grid, Avatar, CircularProgress, Chip } from '@mui/material';
+import { Box, Typography, Paper, Grid, Avatar, CircularProgress } from '@mui/material';
 import { Share2, Users, Building, Globe } from 'lucide-react';
 import { getKnowledgeGraphData } from '../../api/client';
 

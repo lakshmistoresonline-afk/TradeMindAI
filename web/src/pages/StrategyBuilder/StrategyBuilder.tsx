@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Button, List, ListItem, ListItemSecondaryAction, IconButton, TextField, MenuItem, Select, FormControl } from '@mui/material';
-import { Plus, Trash2, Save, Play, Code } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Button, List, ListItem, ListItemSecondaryAction, IconButton, TextField, MenuItem, Select, FormControl, Divider } from '@mui/material';
+import { Plus, Trash2, Save, Play, Code, Zap } from 'lucide-react';
 
 export default function StrategyBuilder() {
   const [blocks, setBlocks] = useState<any[]>([]);

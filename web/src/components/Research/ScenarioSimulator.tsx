@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Button, Stack, Chip, Divider } from '@mui/material';
-import { ShieldAlert, Zap, Globe, DollarSign, CloudLightning } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Chip } from '@mui/material';
+import { Zap, Globe, DollarSign, CloudLightning } from 'lucide-react';
 
 export default function ScenarioSimulator() {
   const [activeScenario, setActiveScenario] = useState<string | null>(null);

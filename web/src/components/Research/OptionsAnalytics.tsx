@@ -1,8 +1,8 @@
 import { Box, Typography, Paper, Grid, Chip } from '@mui/material';
-import { Activity, Zap, Percent } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
-export default function OptionsAnalytics({ data }: { data: any }) {
+export default function OptionsAnalytics() {
   const oiOption = {
     xAxis: { type: 'category', data: ['2400', '2450', '2500', '2550', '2600', '2650', '2700'] },
     yAxis: { type: 'value' },

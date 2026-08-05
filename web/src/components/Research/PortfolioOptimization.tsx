@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Chip, Stack, List, ListItem, ListItemText, ListItemIcon, LinearProgress } from '@mui/material';
-import { Target, RefreshCcw, ShieldCheck, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Target, RefreshCcw } from 'lucide-react';
 
 export default function PortfolioOptimization() {
   const recommendations = [

@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Stepper, Step, StepLabel, StepContent, Chip } from '@mui/material';
-import { Calendar, History, Activity } from 'lucide-react';
+import { History } from 'lucide-react';
 
 const mockTimeline = [
   { date: 'Aug 04, 2026', title: 'Rating Upgrade: BUY', desc: 'AI Investment Score increased from 62 to 78 following FII accumulation.', type: 'RATING' },

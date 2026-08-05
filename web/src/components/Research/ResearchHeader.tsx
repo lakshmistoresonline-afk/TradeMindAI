@@ -1,5 +1,5 @@
 import { Box, Typography, Grid, Paper, Chip, Divider } from '@mui/material';
-import { TrendingUp, TrendingDown, Layers, Activity, DollarSign, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Layers, Activity, DollarSign } from 'lucide-react';
 
 export default function ResearchHeader({ stock }: { stock: any }) {
   const formatCurrency = (val: number) => {

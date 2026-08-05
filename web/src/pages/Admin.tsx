@@ -1,5 +1,4 @@
-import { Box, Typography, Paper, Grid, Chip, LinearProgress, Stack, Divider } from '@mui/material';
-import { ShieldCheck, Cpu, Database, Activity, DollarSign, Zap } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Chip, LinearProgress, Stack, Divider, CircularProgress, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import ReactECharts from 'echarts-for-react';
 import { getSystemEvaluation } from '../api/client';
 import { useState, useEffect } from 'react';

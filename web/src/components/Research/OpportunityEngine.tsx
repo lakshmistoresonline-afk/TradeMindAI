@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Chip, Button, Divider } from '@mui/material';
-import { Target, Zap, TrendingUp, Search, ChevronRight } from 'lucide-react';
+import { Target, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function OpportunityEngine() {

@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Grid, Chip, Stack, List, ListItem, ListItemText, ListItemIcon, Divider } from '@mui/material';
-import { Book, CheckCircle2, AlertTriangle, Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Chip, List, ListItem, ListItemIcon, Divider } from '@mui/material';
+import { Book, Lightbulb } from 'lucide-react';
 
 const mockJournal = [
   {

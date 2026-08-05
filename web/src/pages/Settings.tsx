@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { getAPIKeys, generateAPIKey } from '../api/client';
 
 export default function Settings() {
-  const [devices, setDevices] = useState<any[]>([
+  const [devices] = useState<any[]>([
     { id: 'dev-1', name: 'Windows Workstation', location: 'Mumbai, IN', current: true },
     { id: 'dev-2', name: 'iPhone 15 Pro', location: 'Mumbai, IN', current: false },
   ]);

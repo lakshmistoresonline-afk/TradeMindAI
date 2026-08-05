@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Divider } from '@mui/material';
-import { Calendar, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
 export default function EarningsIntelligence() {

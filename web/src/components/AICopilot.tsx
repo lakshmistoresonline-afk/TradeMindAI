@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Drawer, IconButton, TextField, Typography, Paper, Stack, Fab, CircularProgress, Divider } from '@mui/material';
-import { MessageSquare, X, Send, Bot, Zap, BrainCircuit } from 'lucide-react';
+import { Box, Drawer, IconButton, TextField, Typography, Paper, Fab, CircularProgress, Chip } from '@mui/material';
+import { X, Send, Bot, BrainCircuit } from 'lucide-react';
 import { chatWithAssistant } from '../api/client';
 
 export default function AICopilot({ stockContext }: { stockContext?: any }) {

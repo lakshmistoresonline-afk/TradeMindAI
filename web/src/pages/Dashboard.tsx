@@ -5,6 +5,8 @@ import { getStocks, triggerBatchAnalysis, getMarketStats, getInstitutionalFlow }
 import MarketBrief from '../components/Research/MarketBrief'
 import OpportunityEngine from '../components/Research/OpportunityEngine'
 
+import ReactECharts from 'echarts-for-react';
+
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
   const [marketStats, setMarketStats] = useState<any>(null)
@@ -48,6 +50,17 @@ export default function Dashboard() {
   // Calculate Aggregate AI Signal
   const buySignals = stocks.filter(s => s.analysis?.consensus?.toUpperCase().includes('BUY')).length;
   const signalStrength = stocks.length > 0 ? Math.round((buySignals / stocks.length) * 100) : 0;
+
+  const breadthOption = {
+    xAxis: { type: 'category', data: ['09:15', '10:30', '11:45', '13:00', '14:15', '15:30'] },
+    yAxis: { type: 'value' },
+    series: [
+      { name: 'Advancing', type: 'line', data: [40, 52, 61, 58, 65, 72], color: '#10b981', smooth: true },
+      { name: 'Declining', type: 'line', data: [60, 48, 39, 42, 35, 28], color: '#f43f5e', smooth: true }
+    ],
+    legend: { show: true, textStyle: { color: '#fff' } },
+    grid: { top: 40, bottom: 40, left: 40, right: 20 }
+  };
 
   return (
     <Box>
@@ -133,6 +146,10 @@ export default function Dashboard() {
                   <Box sx={{ textAlign: 'right' }}>
                     <Chip label={(marketStats?.Breadth?.ratio || 0) > 1 ? "HEALTHY BREADTH" : "WEAK BREADTH"} color={(marketStats?.Breadth?.ratio || 0) > 1 ? "primary" : "warning"} variant="outlined" />
                   </Box>
+                </Box>
+                <Divider sx={{ my: 2, opacity: 0.1 }} />
+                <Box sx={{ height: 200 }}>
+                   <ReactECharts option={breadthOption} style={{ height: '100%' }} theme="dark" />
                 </Box>
               </Paper>
             </Grid>

@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Stack, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { Target, AlertTriangle, Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
+import { AlertTriangle, Lightbulb, TrendingUp } from 'lucide-react';
 
 export default function InvestmentThesis({ analysis }: any) {
   if (!analysis) return null;
@@ -14,7 +14,7 @@ export default function InvestmentThesis({ analysis }: any) {
         <Grid item xs={12} md={7}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="subtitle2" color="primary" gutterBottom>THE BULL CASE</Typography>
-            <List size="small">
+            <List>
                <ThesisItem text="Strong institutional accumulation detected in latest quarterly flow." />
                <ThesisItem text="Price broke out of a 6-month Wyckoff accumulation base with high volume." />
                <ThesisItem text="ML models predict a 72% probability of a 5% move in 10 trading days." />
@@ -23,7 +23,7 @@ export default function InvestmentThesis({ analysis }: any) {
             <Divider sx={{ my: 2, opacity: 0.05 }} />
 
             <Typography variant="subtitle2" color="error" gutterBottom>THE BEAR CASE / RISKS</Typography>
-            <List size="small">
+            <List>
                <ThesisItem text="Current valuation (P/E 34x) is 15% above the 5-year historical median." icon={<AlertTriangle size={14} className="text-rose-500" />} />
                <ThesisItem text="Rising input costs may impact operating margins in the next two quarters." icon={<AlertTriangle size={14} className="text-rose-500" />} />
             </List>

@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Activity, HelpCircle } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 export default function CorrelationEngine({ symbol }: { symbol: string }) {
   const correlations = [
@@ -37,7 +37,7 @@ export default function CorrelationEngine({ symbol }: { symbol: string }) {
                 {correlations.map((c) => (
                   <TableRow key={c.target} hover>
                     <TableCell sx={{ py: 2, fontWeight: 'bold' }}>{c.target}</TableCell>
-                    <TableCell variant="caption" color="textSecondary">{c.type}</TableCell>
+                    <TableCell sx={{ color: 'text.secondary' }}>{c.type}</TableCell>
                     <TableCell align="right">
                       <Box sx={{ display: 'inline-block', px: 1.5, py: 0.5, borderRadius: 1, bgcolor: getHeatmapColor(c.value), fontWeight: 'bold' }}>
                          {c.value.toFixed(2)}

@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Grid, Tooltip } from '@mui/material';
-import { CheckCircle2, AlertCircle, HelpCircle } from 'lucide-react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function StockHealthScorecard({ metrics }: any) {
   if (!metrics) return null;

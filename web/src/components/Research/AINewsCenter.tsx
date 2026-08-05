@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, List, ListItem, ListItemText, Chip, Stack } from '@mui/material';
+import { Box, Typography, Paper, List, ListItem, Chip, Stack } from '@mui/material';
 import { Newspaper, ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
 
 export default function AINewsCenter() {

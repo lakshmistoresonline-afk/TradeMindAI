@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Rating, Chip, Stack } from '@mui/material';
-import { TrendingUp, Award, Zap, Info } from 'lucide-react';
+import { Award } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
 export default function AIScoreCard({ score, grade, confidence }: any) {

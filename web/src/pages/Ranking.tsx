@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Grid, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Avatar } from '@mui/material';
-import { Trophy, TrendingUp, DollarSign, Activity, Zap } from 'lucide-react';
+import { Box, Typography, Paper, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from '@mui/material';
+import { Trophy, TrendingUp, DollarSign, Zap } from 'lucide-react';
 import { getStocks } from '../api/client';
 
 export default function Ranking() {

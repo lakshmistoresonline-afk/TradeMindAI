@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Grid, Chip, Stack, CircularProgress, Divider } from '@mui/material';
-import { Fingerprint, Activity, ShieldCheck, Zap, BrainCircuit } from 'lucide-react';
+import { Fingerprint, Activity, BrainCircuit } from 'lucide-react';
 import { getDigitalTwin } from '../../api/client';
 
 export default function DigitalTwin({ symbol }: { symbol: string }) {

@@ -1,6 +1,6 @@
 import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableHead, TableRow, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
-import { BarChart3, TrendingUp, DollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
 export default function FinancialWorkspace() {

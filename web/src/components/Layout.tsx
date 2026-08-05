@@ -1,6 +1,6 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert } from '@mui/material';
-import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot, Wallet, Calendar, ShieldAlert, Code, Monitor, Trophy, Pin, Star, Book, ShieldCheck } from 'lucide-react';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Chip, Divider } from '@mui/material';
+import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot, Wallet, Calendar, ShieldAlert, Code, Monitor, Trophy, Star, Book, ShieldCheck } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CommandPalette from './CommandPalette';
 
@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
-  const [pinnedStocks, setPinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
+  const [pinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setNotification({ open: true, message, severity });

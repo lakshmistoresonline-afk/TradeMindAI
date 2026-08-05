@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, IconButton, TextField, InputAdornment, Button } from '@mui/material';
-import { Search, Info, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw } from 'lucide-react';
 import { getStocks } from '../api/client';
 
 import { useNavigate } from 'react-router-dom';
