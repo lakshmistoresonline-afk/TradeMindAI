@@ -59,23 +59,37 @@ export default function Analysis() {
 ### EXECUTIVE SUMMARY
 ${selectedStock.analysis?.consensus}
 
+### AI THESIS
+- **Bull Case:** Strong institutional accumulation and breakout structure.
+- **Bear Case:** Valuation at premium levels vs historical median.
+- **Invalidation:** Thesis fails if weekly close below support.
+
 ### KEY METRICS
 - **Sector:** ${selectedStock.sector}
+- **Industry:** ${selectedStock.industry}
 - **Market Cap:** ₹${(selectedStock.market_cap / 1e7).toFixed(2)} Cr
-- **P/E Ratio:** ${selectedStock.pe_ratio}
-- **RSI:** ${selectedStock.analysis?.technical_data?.indicators?.RSI?.toFixed(2)}
+- **P/E Ratio:** ${selectedStock.pe_ratio?.toFixed(2)}
+- **P/B Ratio:** ${selectedStock.pb_ratio?.toFixed(2)}
+- **ROE:** ${(selectedStock.roe * 100).toFixed(2)}%
+- **Beta:** ${selectedStock.beta?.toFixed(2)}
 
-### AI THESIS
-The multi-agent consensus indicates a ${selectedStock.analysis?.consensus.toUpperCase().includes('BUY') ? 'STRONG BULLISH' : 'NEUTRAL'} outlook based on 12 specialized institutional agents.
+### TECHNICAL POSTURE
+- **Primary Trend:** ${selectedStock.analysis?.technical_data?.mtf_alignment?.overall_bias}
+- **RSI (14):** ${selectedStock.analysis?.technical_data?.indicators?.momentum_rsi?.toFixed(2)}
+- **Pivot Point:** ₹${selectedStock.analysis?.technical_data?.indicators?.Pivot?.toFixed(2)}
+
+### QUANTITATIVE RISK
+- **Sharpe Ratio:** ${selectedStock.analysis?.technical_data?.quant_metrics?.sharpe_ratio?.toFixed(2)}
+- **Max Drawdown:** ${(selectedStock.analysis?.technical_data?.quant_metrics?.max_drawdown * 100).toFixed(1)}%
 
 ---
-*Disclaimer: AI-generated research is for informational purposes only.*
+*Disclaimer: AI-generated research is for informational purposes only. Past performance does not guarantee future outcomes.*
 `;
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${selectedStock.symbol}_Institutional_Report.md`;
+    a.download = `${selectedStock.symbol}_Institutional_Research.md`;
     a.click();
   };
 
