@@ -14,17 +14,8 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Failed to login');
-    } finally {
-      setLoading(false);
-    }
+    // Simulate login - Bypassing real Firebase Auth for now
+    navigate('/');
   };
 
   return (

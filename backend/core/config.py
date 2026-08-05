@@ -7,12 +7,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "TradeMind AI"
 
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
-    # e.g: '["https://com-webcraft-trademindai-c8f75.web.app", "http://localhost:5173"]'
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "https://com-webcraft-trademindai-c8f75.web.app",
-        "https://com-webcraft-trademindai-c8f75.firebaseapp.app",
-        "http://localhost:5173"
-    ]
+    # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000"]'
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:

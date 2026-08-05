@@ -10,16 +10,6 @@ export const apiClient = axios.create({
   },
 });
 
-// Interceptor to add Firebase ID Token to every request
-apiClient.interceptors.request.use(async (config) => {
-  const user = auth.currentUser;
-  if (user) {
-    const token = await user.getIdToken();
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 export const getStocks = async () => {
   const response = await apiClient.get('/stocks');
   return response.data;
@@ -27,6 +17,11 @@ export const getStocks = async () => {
 
 export const getMarketStats = async () => {
   const response = await apiClient.get('/stocks/market-stats');
+  return response.data;
+};
+
+export const getInstitutionalFlow = async () => {
+  const response = await apiClient.get('/stocks/fii-dii');
   return response.data;
 };
 

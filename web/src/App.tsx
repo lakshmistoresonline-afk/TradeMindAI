@@ -8,6 +8,7 @@ import Settings from './pages/Settings'
 import Portfolio from './pages/Portfolio'
 import Login from './pages/Login'
 import SectorRotation from './pages/SectorRotation'
+import AIChat from './pages/AIChat'
 
 const darkTheme = createTheme({
   palette: {
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/market" element={<Market />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/analysis" element={<Analysis />} />
+                <Route path="/chat" element={<AIChat />} />
                 <Route path="/sectors" element={<SectorRotation />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Box, Typography, Grid, Paper, Button, CircularProgress } from '@mui/material'
-import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play } from 'lucide-react'
-import { getStocks, triggerBatchAnalysis, getMarketStats } from '../api/client'
+import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { getStocks, triggerBatchAnalysis, getMarketStats, getInstitutionalFlow } from '../api/client'
 
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
   const [marketStats, setMarketStats] = useState<any>(null)
+  const [instFlow, setInstFlow] = useState<any>(null)
   const [triggering, setTriggering] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -25,12 +26,14 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [stocksData, statsData] = await Promise.all([
+        const [stocksData, statsData, flowData] = await Promise.all([
           getStocks(),
-          getMarketStats()
+          getMarketStats(),
+          getInstitutionalFlow()
         ])
         setStocks(stocksData)
         setMarketStats(statsData)
+        setInstFlow(flowData)
       } catch (error) {
         console.error('Error fetching dashboard data:', error)
       } finally {
@@ -98,6 +101,41 @@ export default function Dashboard() {
               change={`${signalStrength}% Conf.`}
               icon={<MessageSquare />}
             />
+          </Grid>
+
+          {/* Institutional Flow Section */}
+          <Grid item xs={12}>
+             <Paper sx={{ p: 3, backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box>
+                    <Typography variant="subtitle2" color="textSecondary">FII Net Cash</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="h6" color={instFlow?.FII_Net >= 0 ? "primary" : "error"}>
+                        {instFlow?.FII_Net >= 0 ? "+" : ""}{instFlow?.FII_Net} Cr
+                      </Typography>
+                      {instFlow?.FII_Net >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
+                    </Box>
+                  </Box>
+                  <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle2" color="textSecondary">DII Net Cash</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="h6" color={instFlow?.DII_Net >= 0 ? "primary" : "error"}>
+                        {instFlow?.DII_Net >= 0 ? "+" : ""}{instFlow?.DII_Net} Cr
+                      </Typography>
+                      {instFlow?.DII_Net >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
+                    </Box>
+                  </Box>
+                  <Box sx={{ ml: 'auto', textAlign: 'right' }}>
+                    <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>Institutional Bias</Typography>
+                    <Chip
+                      label={instFlow?.Market_Sentiment || "Wait..."}
+                      size="small"
+                      color={instFlow?.Market_Sentiment?.includes("Bullish") ? "primary" : "warning"}
+                    />
+                  </Box>
+                </Box>
+             </Paper>
           </Grid>
 
           {/* TradingView Chart */}

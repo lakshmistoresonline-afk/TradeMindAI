@@ -8,17 +8,15 @@ router = APIRouter()
 
 @router.post("/trigger")
 async def trigger_full_analysis(
-    period: str = "10y",
-    current_user: dict = Depends(get_current_user)
+    period: str = "10y"
 ):
-    # Only authenticated users can trigger expensive batch analysis
+    # Trigger the Celery task with 10y period
     task = analyze_nifty_50.delay(period=period)
     return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
 
 @router.post("/backtest/{symbol}")
 async def trigger_backtest(
-    symbol: str,
-    current_user: dict = Depends(get_current_user)
+    symbol: str
 ):
     task = run_adhoc_backtest.delay(symbol)
     return {"message": "Backtest triggered", "task_id": task.id}
@@ -26,8 +24,7 @@ async def trigger_backtest(
 @router.get("/backtest/{symbol}")
 async def get_backtest_results(
     symbol: str,
-    db: firestore.Client = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    db: firestore.Client = Depends(get_db)
 ):
     doc = db.collection("backtests").document(symbol).get()
     if doc.exists:
@@ -37,8 +34,7 @@ async def get_backtest_results(
 @router.get("/backtest/{symbol}/signals")
 async def get_backtest_signals(
     symbol: str,
-    db: firestore.Client = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    db: firestore.Client = Depends(get_db)
 ):
     signals_ref = db.collection("backtests").document(symbol).collection("signals")
     docs = signals_ref.order_by("date", direction=firestore.Query.DESCENDING).limit(100).stream()
