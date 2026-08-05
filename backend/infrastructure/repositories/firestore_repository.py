@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Optional, Dict, Any
 from google.cloud import firestore
 from datetime import datetime

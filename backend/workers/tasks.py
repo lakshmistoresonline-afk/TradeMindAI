@@ -2,11 +2,12 @@ from celery import Celery, group
 from celery.schedules import crontab
 from backend.core.config import settings
 from backend.core.database import db_client
-from backend.data.collector import DataCollector
 from backend.analysis.technical import TechnicalAnalysis
 from backend.ai.workflow import create_ai_workflow
 import datetime
 import yfinance as yf
+import pandas as pd
+import json
 
 from backend.analysis.smc import SMCAnalysis
 from backend.analysis.backtester import BacktestEngine
@@ -139,7 +140,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
         })
 
         # 10. Broadcast Real-time Alert (Enterprise Integration)
-        from backend.app.main import manager
+        from backend.core.websocket import manager
         alert_msg = {
             "type": "ANALYSIS_COMPLETE",
             "symbol": symbol,

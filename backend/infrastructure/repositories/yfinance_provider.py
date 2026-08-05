@@ -1,3 +1,4 @@
+from __future__ import annotations
 import yfinance as yf
 from typing import Dict, Any, List
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow
