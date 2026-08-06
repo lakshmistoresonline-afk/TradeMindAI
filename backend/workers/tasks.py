@@ -44,6 +44,7 @@ def analyze_stock_task(symbol: str, period="10y"):
 
 async def _analyze_stock_logic(symbol: str, period: str):
     import pandas as pd
+    import traceback
     from backend.core.container import container
     from backend.analysis.technical import TechnicalAnalysis
     from backend.ai.workflow import create_ai_workflow
@@ -53,23 +54,30 @@ async def _analyze_stock_logic(symbol: str, period: str):
 
     db = container.repository.db
 
-    # Diagnostic Log
-    db.collection("system_logs").add({
-        "type": "WORKER_START",
-        "symbol": symbol,
-        "timestamp": datetime.datetime.utcnow()
-    })
+    def log_status(step: str, error: str = None):
+        log_data = {
+            "type": "WORKER_ERROR" if error else "WORKER_STEP",
+            "symbol": symbol,
+            "step": step,
+            "timestamp": datetime.datetime.utcnow()
+        }
+        if error: log_data["error"] = error
+        db.collection("system_logs").add(log_data)
 
-    service = container.stock_service
-    ml_service = container.ml_service
-    feature_store = container.feature_store
-
-    # Ensure feature registry is initialized
-    await feature_store.initialize_registry()
+    log_status("START")
 
     try:
+        service = container.stock_service
+        ml_service = container.ml_service
+        feature_store = container.feature_store
+
+        # Ensure feature registry is initialized
+        await feature_store.initialize_registry()
+        log_status("REGISTRY_READY")
+
         # 1. Incremental Sync
         stock = await service.collect_stock_data(symbol, period)
+        log_status("DATA_COLLECTED")
 
         # 2. Get Context (250 bars)
         recent_prices = await service.repository.get_recent_prices(symbol, limit=250)
@@ -78,11 +86,6 @@ async def _analyze_stock_logic(symbol: str, period: str):
 
         df = pd.DataFrame([p.model_dump() for p in recent_prices])
         df.set_index('date', inplace=True)
-
-        # Data Quality Check
-        quality_report = await service.validate_data_quality(symbol, df)
-        if quality_report["status"] == "failed":
-            print(f"Data Quality Warning for {symbol}: {quality_report['issues']}")
 
         # 3. Technical & SMC Analysis
         df_ta = TechnicalAnalysis.calculate_indicators(df)
@@ -93,22 +96,24 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "order_blocks": smc_obs[-5:],
             "fvgs": smc_fvgs[-5:]
         }
+        log_status("TECHNICAL_READY")
 
         # 4. Feature Store Ingestion (Standardized AI Inputs)
         ai_features = feature_store.extract_institutional_features(df_ta, smc_data)
         await feature_store.ingest_features(symbol, df.index[-1], ai_features)
+        log_status("FEATURES_INGESTED")
 
         # 5. Quantitative Analytics (Institutional Metrics)
         nifty_df = await service.provider.fetch_history("^NSEI", period)
         quant_metrics = QuantEngine.calculate_metrics(symbol, df, nifty_df)
+        log_status("QUANT_READY")
 
-        # 6. ML Prediction (Using champion model)
+        # 6. ML Prediction
         ml_prediction = await ml_service.predict_with_champion(symbol, ai_features)
+        log_status("ML_READY")
 
-        # 7. AI Consensus (Reading from Precomputed Features)
+        # 7. AI Consensus
         workflow = create_ai_workflow()
-
-        # Vision 2.0: Multi-Timeframe Alignment
         mtf_results = await container.timeframe_service.analyze_alignment(symbol)
 
         initial_state = {
@@ -129,7 +134,9 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "recommendations": [],
             "consensus": ""
         }
+        log_status("AI_WORKFLOW_START")
         result = workflow.invoke(initial_state)
+        log_status("AI_WORKFLOW_COMPLETE")
 
         # 8. Unified AI Investment Score
         scoring_results = ScoringService.calculate_unified_score(ai_features, ml_prediction, result)
@@ -144,23 +151,17 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "updated_at": datetime.datetime.utcnow()
         })
 
-        # 10. Diagnostic Log
-        db.collection("system_logs").add({
+        log_data = {
             "type": "WORKER_SUCCESS",
             "symbol": symbol,
             "timestamp": datetime.datetime.utcnow(),
             "consensus": result.get("consensus", "HOLD")[:50]
-        })
+        }
+        db.collection("system_logs").add(log_data)
 
         return result["consensus"]
     except Exception as e:
-        # Error Log
-        db.collection("system_logs").add({
-            "type": "WORKER_ERROR",
-            "symbol": symbol,
-            "error": str(e),
-            "timestamp": datetime.datetime.utcnow()
-        })
+        log_status("ERROR", error=f"{str(e)}\n{traceback.format_exc()}")
         return f"Error analyzing {symbol}: {str(e)}"
 
 @celery_app.task
