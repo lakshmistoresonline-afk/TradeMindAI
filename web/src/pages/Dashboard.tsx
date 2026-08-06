@@ -62,14 +62,14 @@ export default function Dashboard() {
       {
         name: 'Advancing',
         type: 'line',
-        data: marketStats?.Breadth ? [Math.round(marketStats.Breadth.advancing * 0.6), Math.round(marketStats.Breadth.advancing * 0.8), marketStats.Breadth.advancing] : [40, 52, 72],
+        data: marketStats?.Breadth?.advancing ? [Math.round(marketStats.Breadth.advancing * 0.6), Math.round(marketStats.Breadth.advancing * 0.8), marketStats.Breadth.advancing] : [40, 52, 65, 58, 65, 72],
         color: '#10b981',
         smooth: true
       },
       {
         name: 'Declining',
         type: 'line',
-        data: marketStats?.Breadth ? [Math.round(marketStats.Breadth.declining * 1.2), Math.round(marketStats.Breadth.declining * 1.1), marketStats.Breadth.declining] : [60, 48, 28],
+        data: marketStats?.Breadth?.declining ? [Math.round(marketStats.Breadth.declining * 1.2), Math.round(marketStats.Breadth.declining * 1.1), marketStats.Breadth.declining] : [60, 48, 35, 42, 35, 28],
         color: '#f43f5e',
         smooth: true
       }
@@ -198,7 +198,7 @@ export default function Dashboard() {
                   <Box sx={{ ml: { xs: 0, sm: 'auto' }, textAlign: { xs: 'left', sm: 'right' }, width: { xs: '100%', sm: 'auto' } }}>
                     <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>Institutional Bias</Typography>
                     <Chip
-                      label={instFlow?.Market_Sentiment || "Wait..."}
+                      label={instFlow?.Market_Sentiment || "Syncing..."}
                       size="small"
                       color={instFlow?.Market_Sentiment?.includes("Bullish") ? "primary" : "warning"}
                     />

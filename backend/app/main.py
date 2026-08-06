@@ -53,3 +53,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get("/")
 async def root():
     return {"message": "Welcome to TradeMind AI API"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "timestamp": datetime.datetime.utcnow()}

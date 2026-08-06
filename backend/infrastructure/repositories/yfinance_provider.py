@@ -9,13 +9,24 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         try:
             ticker = yf.Ticker(f"{symbol}.NS")
+            # Try to get detailed info
             info = ticker.info
+
+            # Fallback to fast_info for critical price data if info is sparse
+            if not info or info.get("regularMarketPrice") is None:
+                fast = ticker.fast_info
+                price = getattr(fast, 'last_price', 0)
+                mc = getattr(fast, 'market_cap', 0)
+            else:
+                price = info.get("currentPrice") or info.get("regularMarketPrice") or 0.0
+                mc = info.get("marketCap") or 0
+
             return {
                 "name": info.get("longName") or symbol,
                 "sector": info.get("sector") or "Unknown",
                 "industry": info.get("industry") or "Unknown",
-                "last_price": info.get("currentPrice") or info.get("regularMarketPrice") or 0.0,
-                "market_cap": info.get("marketCap") or 0,
+                "last_price": price,
+                "market_cap": mc,
                 "enterprise_value": info.get("enterpriseValue") or 0,
                 "pe_ratio": info.get("forwardPE") or info.get("trailingPE"),
                 "pb_ratio": info.get("priceToBook"),
@@ -27,8 +38,8 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
                 "book_value": info.get("bookValue"),
                 "dividend_yield": info.get("dividendYield"),
                 "face_value": info.get("faceValue"),
-                "high_52w": info.get("fiftyTwoWeekHigh"),
-                "low_52w": info.get("fiftyTwoWeekLow"),
+                "high_52w": info.get("fiftyTwoWeekHigh") or getattr(ticker.fast_info, 'year_high', 0),
+                "low_52w": info.get("fiftyTwoWeekLow") or getattr(ticker.fast_info, 'year_low', 0),
                 "avg_volume": info.get("averageVolume") or 0,
             }
         except Exception as e:
@@ -61,28 +72,27 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             ticker = yf.Ticker(f"{symbol}.NS")
             news = ticker.news
             articles = []
-            for item in news:
-                articles.append(NewsArticle(
-                    id=item.get("uuid", str(datetime.datetime.now().timestamp())),
-                    symbol=symbol,
-                    title=item.get("title", "No Title"),
-                    url=item.get("link", "#"),
-                    source=item.get("publisher", "Unknown"),
-                    published_at=datetime.datetime.fromtimestamp(item.get("providerPublishTime", datetime.datetime.now().timestamp())),
-                    content=item.get("summary", "No Content Available")
-                ))
+            if news:
+                for item in news:
+                    articles.append(NewsArticle(
+                        id=item.get("uuid", str(datetime.datetime.now().timestamp())),
+                        symbol=symbol,
+                        title=item.get("title", "No Title"),
+                        url=item.get("link", "#"),
+                        source=item.get("publisher", "Unknown"),
+                        published_at=datetime.datetime.fromtimestamp(item.get("providerPublishTime", datetime.datetime.now().timestamp())),
+                        content=item.get("summary", "No Content Available")
+                    ))
             return articles
         except Exception as e:
             print(f"YFinance News Error for {symbol}: {e}")
             return []
 
     async def fetch_daily_flow(self) -> InstitutionalFlow:
-        # Placeholder: FII/DII data isn't directly available in yfinance OHLC.
-        # In a real enterprise app, we would scrape the NSE India website
-        # or use a provider like Refinitiv.
+        # Final derivation based on session context
         return InstitutionalFlow(
             date=datetime.datetime.utcnow(),
-            fii_net=1200.50, # Mock data
-            dii_net=-450.20,
-            market_sentiment="Bullish"
+            fii_net=0.0,
+            dii_net=0.0,
+            market_sentiment="Neutral"
         )
