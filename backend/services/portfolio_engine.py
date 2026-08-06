@@ -1,8 +1,6 @@
 from typing import List, Dict, Any
 from backend.domain.models.stock import Stock
 from backend.domain.models.data_platform import PortfolioHealth
-import pandas as pd
-import numpy as np
 
 class PortfolioEngine:
     @staticmethod
@@ -10,6 +8,7 @@ class PortfolioEngine:
         """
         Calculates aggregate portfolio metrics and health score.
         """
+        import numpy as np
         if not holdings:
             return PortfolioHealth(
                 user_id=user_id, health_score=0, diversification_score=0,

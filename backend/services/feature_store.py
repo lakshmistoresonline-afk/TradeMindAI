@@ -1,4 +1,3 @@
-import pandas as pd
 from typing import Dict, Any, List, Optional
 from backend.domain.models.data_platform import FeatureVector, FeatureDefinition
 from backend.domain.interfaces.repository import IDataPlatformRepository
@@ -77,10 +76,11 @@ class FeatureStoreService:
         )
         await self.repository.save_feature_vector(vector)
 
-    def extract_institutional_features(self, df_ta: pd.DataFrame, smc_data: Dict[str, Any], extra_context: Dict[str, Any] = None) -> Dict[str, Any]:
+    def extract_institutional_features(self, df_ta: Any, smc_data: Dict[str, Any], extra_context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Refined Institutional Feature Engineering.
         """
+        import pandas as pd
         last_row = df_ta.iloc[-1]
 
         features = {

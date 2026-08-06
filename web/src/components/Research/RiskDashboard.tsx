@@ -5,7 +5,7 @@ interface RiskDashboardProps {
   stock?: any;
 }
 
-export default function RiskDashboard({ stock }: RiskDashboardProps) {
+export const RiskDashboard: React.FC<RiskDashboardProps> = ({ stock }) => {
   const risks = [
     { label: 'Market Risk', score: 65, level: 'MEDIUM', desc: 'Sensitivity to broader Nifty 100 volatility.' },
     { label: 'Company Risk', score: 25, level: 'LOW', desc: 'Financial stability and management quality.' },
@@ -56,4 +56,8 @@ export default function RiskDashboard({ stock }: RiskDashboardProps) {
       </Grid>
     </Box>
   );
-}
+};
+
+export default RiskDashboard;
+
+import React from 'react';

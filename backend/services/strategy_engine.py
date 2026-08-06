@@ -1,5 +1,4 @@
 from typing import List, Dict, Any, Optional
-import pandas as pd
 from backend.domain.models.stock import StockPrice
 from backend.domain.models.data_platform import FeatureVector
 

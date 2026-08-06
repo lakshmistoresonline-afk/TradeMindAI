@@ -1,5 +1,3 @@
-import pandas as pd
-import pandas_ta as ta
 from typing import Dict, Any, List
 from backend.domain.interfaces.repository import IMarketDataProvider
 
@@ -35,10 +33,11 @@ class MultiTimeframeService:
             "summary": f"Institutional alignment is {alignment}. Primary bias is {biases[1]}."
         }
 
-    def _get_bias(self, df: pd.DataFrame, window: int) -> Dict[str, Any]:
+    def _get_bias(self, df: Any, window: int) -> Dict[str, Any]:
         if df.empty or len(df) < window:
             return {"bias": "NEUTRAL", "score": 50}
 
+        import pandas_ta as ta
         close = df["Close"].iloc[-1]
         sma = ta.sma(df["Close"], length=window).iloc[-1]
         rsi = ta.rsi(df["Close"], length=14).iloc[-1]

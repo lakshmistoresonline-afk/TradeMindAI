@@ -1,5 +1,5 @@
-import pandas as pd
 import datetime
+from typing import Any
 from google.cloud import firestore
 from backend.ai.workflow import create_ai_workflow
 from backend.analysis.technical import TechnicalAnalysis

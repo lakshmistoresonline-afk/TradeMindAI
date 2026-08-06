@@ -1,9 +1,7 @@
-import pandas as pd
-import pandas_ta as ta
-
 class TechnicalAnalysis:
     @staticmethod
-    def calculate_indicators(df: pd.DataFrame):
+    def calculate_indicators(df: Any):
+        import pandas_ta as ta
         # Trend Indicators
         df["EMA_20"] = ta.ema(df["Close"], length=20)
         df["EMA_50"] = ta.ema(df["Close"], length=50)

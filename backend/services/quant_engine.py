@@ -1,15 +1,15 @@
-import pandas as pd
-import numpy as np
 from typing import Dict, Any, List
 from backend.domain.models.data_platform import QuantMetric
 from datetime import datetime
 
 class QuantEngine:
     @staticmethod
-    def calculate_metrics(symbol: str, df: pd.DataFrame, benchmark_df: pd.DataFrame = None) -> QuantMetric:
+    def calculate_metrics(symbol: str, df: Any, benchmark_df: Any = None) -> QuantMetric:
         """
         Calculates institutional risk and performance metrics.
         """
+        import pandas as pd
+        import numpy as np
         returns = df["Close"].pct_change().dropna()
 
         # 1. Volatility (Annualized)

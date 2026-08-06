@@ -9,6 +9,7 @@ class AIPortfolioManager(PortfolioEngine):
         """
         Vision 2.0: Active AI Portfolio Rebalancing.
         """
+        import numpy as np
         suggestions = []
 
         # 1. Sector Allocation Check

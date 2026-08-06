@@ -1,7 +1,3 @@
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score
 import joblib
 import os
 from typing import Dict, Any, List, Optional
@@ -21,6 +17,10 @@ class MLService:
         Enterprise Training Pipeline:
         Trains, evaluates, and registers a new model version.
         """
+        import pandas as pd
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.metrics import accuracy_score, precision_score, recall_score
+
         if len(features) < 100:
             raise ValueError("Insufficient features for training")
 
@@ -80,6 +80,7 @@ class MLService:
         Production Inference:
         Uses the current champion model for prediction.
         """
+        import pandas as pd
         champion = await self.repository.get_champion_model(symbol)
         if not champion:
             return {"prediction": "N/A", "confidence": 0, "model_version": "none"}

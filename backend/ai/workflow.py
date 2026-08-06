@@ -1,4 +1,3 @@
-from langgraph.graph import StateGraph, END
 from backend.ai.agents import (
     AgentState, TechnicalAgent, ICTAgent, WyckoffAgent, ElliottWaveAgent,
     FundamentalAgent, EarningsAgent, OptionsAgent, SentimentAgent,
@@ -6,6 +5,7 @@ from backend.ai.agents import (
 )
 
 def create_ai_workflow():
+    from langgraph.graph import StateGraph, END
     workflow = StateGraph(AgentState)
 
     # Initialize Agents

@@ -1,8 +1,8 @@
-import pandas as pd
+from typing import Any
 
 class WyckoffAnalysis:
     @staticmethod
-    def detect_phase(df: pd.DataFrame):
+    def detect_phase(df: Any):
         # Extremely simplified Wyckoff phase detection
         # Accumulation: Range bound with increasing volume on up days
         # Distribution: Range bound with increasing volume on down days

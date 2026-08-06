@@ -2,17 +2,9 @@ from celery import Celery, group
 from celery.schedules import crontab
 from backend.core.config import settings
 from backend.core.database import db_client
-from backend.analysis.technical import TechnicalAnalysis
-from backend.ai.workflow import create_ai_workflow
 import datetime
 import yfinance as yf
-import pandas as pd
 import json
-
-from backend.analysis.smc import SMCAnalysis
-from backend.analysis.backtester import BacktestEngine
-from backend.services.quant_engine import QuantEngine
-from backend.services.scoring_service import ScoringService
 
 celery_app = Celery("tasks", broker=settings.REDIS_URL)
 
@@ -55,6 +47,13 @@ def analyze_stock_task(symbol: str, period="10y"):
     return loop.run_until_complete(_analyze_stock_logic(symbol, period))
 
 async def _analyze_stock_logic(symbol: str, period: str):
+    import pandas as pd
+    from backend.analysis.technical import TechnicalAnalysis
+    from backend.ai.workflow import create_ai_workflow
+    from backend.analysis.smc import SMCAnalysis
+    from backend.services.quant_engine import QuantEngine
+    from backend.services.scoring_service import ScoringService
+
     service = container.stock_service
     ml_service = container.ml_service
     feature_store = container.feature_store
@@ -90,7 +89,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
         }
 
         # 4. Feature Store Ingestion (Standardized AI Inputs)
-        ai_features = feature_store.extract_ai_features(df_ta, smc_data)
+        ai_features = feature_store.extract_institutional_features(df_ta, smc_data)
         await feature_store.ingest_features(symbol, df.index[-1], ai_features)
 
         # 5. Quantitative Analytics (Institutional Metrics)
@@ -182,6 +181,7 @@ def analyze_nifty_100(period="10y"):
 
 @celery_app.task
 def run_adhoc_backtest(symbol: str):
+    from backend.analysis.backtester import BacktestEngine
     db = db_client
     engine = BacktestEngine(db)
     return engine.run_10y_backtest(symbol)

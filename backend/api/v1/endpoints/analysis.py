@@ -1,5 +1,4 @@
 from fastapi import APIRouter, BackgroundTasks, Depends
-from backend.workers.tasks import analyze_nifty_100, run_adhoc_backtest
 from backend.core.database import get_db
 from backend.core.auth import get_current_user
 from backend.core.rbac.middleware import require_permission
@@ -11,6 +10,7 @@ router = APIRouter()
 async def trigger_full_analysis(
     period: str = "10y"
 ):
+    from backend.workers.tasks import analyze_nifty_100
     # Trigger the Celery task with 10y period
     task = analyze_nifty_100.delay(period=period)
     return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
@@ -19,6 +19,7 @@ async def trigger_full_analysis(
 async def trigger_backtest(
     symbol: str
 ):
+    from backend.workers.tasks import run_adhoc_backtest
     task = run_adhoc_backtest.delay(symbol)
     return {"message": "Backtest triggered", "task_id": task.id}
 

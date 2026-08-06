@@ -1,5 +1,3 @@
-import pandas as pd
-
 class Screeners:
     @staticmethod
     def rsi_oversold(df_dict: dict, threshold=30):

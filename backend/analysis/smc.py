@@ -1,9 +1,6 @@
-import pandas as pd
-import numpy as np
-
 class SMCAnalysis:
     @staticmethod
-    def detect_order_blocks(df: pd.DataFrame):
+    def detect_order_blocks(df: Any):
         order_blocks = []
         # Simplified OB detection logic:
         # Bullish OB: Last down candle before a strong up move that breaks structure

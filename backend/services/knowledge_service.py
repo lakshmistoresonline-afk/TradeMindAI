@@ -1,4 +1,3 @@
-import numpy as np
 import os
 from typing import List, Dict, Any, Optional
 from backend.domain.interfaces.repository import IDataPlatformRepository
@@ -31,6 +30,7 @@ class KnowledgeService:
         """
         Embeds and indexes a document chunk.
         """
+        import numpy as np
         embedding = self.model.encode([text])[0]
         self.index.add(np.array([embedding]).astype('float32'))
         self.doc_map.append({"text": text, "metadata": metadata})
@@ -39,6 +39,7 @@ class KnowledgeService:
         """
         Performs semantic search across indexed knowledge.
         """
+        import numpy as np
         query_embedding = self.model.encode([query])[0]
         distances, indices = self.index.search(np.array([query_embedding]).astype('float32'), top_k)
 

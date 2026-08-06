@@ -35,7 +35,10 @@ export default function SectorRotation() {
       {
         name: 'Avg Daily Return (%)',
         type: 'line',
-        data: Object.keys(sectorPerformance).map(k => sectorPerformance[k].change.reduce((a:any, b:any) => a + b, 0) / sectorPerformance[k].change.length),
+        data: Object.keys(sectorPerformance).map(k => {
+           const changes = sectorPerformance[k].change;
+           return changes.length > 0 ? changes.reduce((a:any, b:any) => a + b, 0) / changes.length : 0;
+        }),
         color: '#3b82f6'
       }
     ]

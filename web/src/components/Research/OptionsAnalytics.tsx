@@ -6,7 +6,7 @@ interface OptionsAnalyticsProps {
   data?: any;
 }
 
-export default function OptionsAnalytics({ data }: OptionsAnalyticsProps) {
+export const OptionsAnalytics: React.FC<OptionsAnalyticsProps> = ({ data }) => {
   const oiOption = {
     xAxis: { type: 'category', data: ['2400', '2450', '2500', '2550', '2600', '2650', '2700'] },
     yAxis: { type: 'value' },
@@ -51,4 +51,8 @@ export default function OptionsAnalytics({ data }: OptionsAnalyticsProps) {
       </Grid>
     </Box>
   );
-}
+};
+
+export default OptionsAnalytics;
+
+import React from 'react';

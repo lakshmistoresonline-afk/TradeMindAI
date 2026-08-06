@@ -1,15 +1,16 @@
-import pandas as pd
-import numpy as np
 from datetime import datetime
 from backend.domain.models.ios import MarketRegime
 
 class MarketRegimeEngine:
     @staticmethod
-    def detect_regime(nifty_df: pd.DataFrame, vix_value: float) -> MarketRegime:
+    def detect_regime(nifty_df: Any, vix_value: float) -> MarketRegime:
         """
         Institutional Market Regime Detection logic.
         Uses Nifty 50 returns and India VIX.
         """
+        import pandas as pd
+        import numpy as np
+
         returns = nifty_df["Close"].pct_change().tail(20) # Last 20 days
         avg_return = returns.mean()
         volatility = returns.std()

@@ -2,7 +2,6 @@ from typing import List, Dict, Any
 from backend.domain.interfaces.repository import IStockRepository, IMarketDataProvider, INewsProvider, IInstitutionalDataProvider
 from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow
-import pandas as pd
 from datetime import datetime
 
 class StockService:
@@ -61,7 +60,7 @@ class StockService:
 
         return stock
 
-    async def sync_incremental_prices(self, symbol: str, new_history_df: pd.DataFrame):
+    async def sync_incremental_prices(self, symbol: str, new_history_df: Any):
         # Implementation of incremental storage logic
         for index, row in new_history_df.iterrows():
             # Check if this date already exists in Firestore to avoid duplicate writes
