@@ -37,29 +37,49 @@ async def get_market_stats():
         "^INDIAVIX": "India VIX"
     }
     stats = {}
-    for symbol, name in indices.items():
-        ticker = yf.Ticker(symbol)
-        info = ticker.fast_info
-        stats[name] = {
-            "value": round(info.last_price, 2),
-            "change": round(((info.last_price - info.previous_close) / info.previous_close) * 100, 2)
+
+    try:
+        for symbol, name in indices.items():
+            try:
+                ticker = yf.Ticker(symbol)
+                # fast_info can fail for some indices, use a fallback
+                info = ticker.fast_info
+                price = getattr(info, 'last_price', 0)
+                prev = getattr(info, 'previous_close', price)
+
+                if price == 0: # Fallback to standard info
+                    price = ticker.info.get('regularMarketPrice', 0)
+                    prev = ticker.info.get('regularMarketPreviousClose', price)
+
+                stats[name] = {
+                    "value": round(price, 2),
+                    "change": round(((price - prev) / prev) * 100, 2) if prev != 0 else 0
+                }
+            except Exception as e:
+                print(f"Error fetching index {name}: {e}")
+                stats[name] = {"value": 0, "change": 0}
+
+        # Vision 2.0: Market Breadth Calculation
+        from backend.core.database import db_client
+        # Increased limit for broader coverage
+        stocks_ref = db_client.collection("stocks").limit(150).stream()
+        advancing, declining = 0, 0
+        for doc in stocks_ref:
+            data = doc.to_dict()
+            change = data.get("change_pct", 0)
+            if change > 0: advancing += 1
+            elif change < 0: declining += 1
+
+        stats["Breadth"] = {
+            "advancing": advancing,
+            "declining": declining,
+            "ratio": round(advancing/declining, 2) if declining > 0 else advancing
         }
-
-    # Vision 2.0: Market Breadth Calculation
-    from backend.core.database import db_client
-    stocks_ref = db_client.collection("stocks").limit(100).stream()
-    advancing, declining = 0, 0
-    for doc in stocks_ref:
-        data = doc.to_dict()
-        change = data.get("change_pct", 0)
-        if change > 0: advancing += 1
-        elif change < 0: declining += 1
-
-    stats["Breadth"] = {
-        "advancing": advancing,
-        "declining": declining,
-        "ratio": round(advancing/declining, 2) if declining > 0 else advancing
-    }
+    except Exception as e:
+        print(f"Global market stats error: {e}")
+        # Ensure we return a valid structure even on failure
+        if "Breadth" not in stats:
+            stats["Breadth"] = {"advancing": 0, "declining": 0, "ratio": 0}
 
     return stats
 

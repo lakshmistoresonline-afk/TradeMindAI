@@ -10,7 +10,11 @@ import ReactECharts from 'echarts-for-react';
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
   const [marketStats, setMarketStats] = useState<any>(null)
-  const [instFlow, setInstFlow] = useState<any>(null)
+  const [instFlow, setInstFlow] = useState<any>({
+    FII_Net: 0,
+    DII_Net: 0,
+    Market_Sentiment: 'Initializing...'
+  })
   const [triggering, setTriggering] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -220,19 +224,25 @@ export default function Dashboard() {
             <Grid item xs={12} md={4}>
               <Paper sx={{ p: 3, height: '500px', display: 'flex', flexDirection: 'column' }}>
                 <Typography variant="h6" gutterBottom>Live AI Signals</Typography>
-                <Box sx={{ overflowY: 'auto' }}>
+                <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
                   {stocks.filter(s => s.analysis).length > 0 ? (
                     stocks.filter(s => s.analysis).map((stock) => (
                       <FeedItem
                         key={stock.symbol}
                         symbol={stock.symbol}
                         action={stock.analysis.consensus.toUpperCase().includes('BUY') ? 'BUY' : 'HOLD'}
-                        reason={stock.analysis.recommendations[0]?.analysis.substring(0, 100) + '...'}
+                        reason={stock.analysis.recommendations?.[0]?.analysis?.substring(0, 100) + '...'}
                       />
                     ))
                   ) : (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                      <Typography color="textSecondary" align="center">No live signals found. <br/> Trigger analysis to populate data.</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2 }}>
+                      <MessageSquare size={48} opacity={0.1} />
+                      <Typography color="textSecondary" align="center">
+                        No live signals found. <br/>
+                        Trigger the institutional research agents <br/>
+                        to generate real-time consensus.
+                      </Typography>
+                      <Button variant="outlined" size="small" onClick={handleTrigger}>Start Analysis</Button>
                     </Box>
                   )}
                 </Box>
