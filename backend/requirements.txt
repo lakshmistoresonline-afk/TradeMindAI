@@ -11,10 +11,10 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
 aiohttp==3.9.5
 pandas==2.2.2
-numpy==1.26.4
+numpy<2.0.0
 scikit-learn==1.5.0
 yfinance==0.2.40
-pandas-ta==0.3.14b0
+pandas-ta @ git+https://github.com/twopirllc/pandas-ta.git@development
 langchain-core>=0.2.0
 langchain-community>=0.2.0
 faiss-cpu==1.8.0
