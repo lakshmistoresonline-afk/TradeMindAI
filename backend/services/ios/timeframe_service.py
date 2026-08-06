@@ -1,5 +1,5 @@
 import pandas as pd
-import pandas_ta_classic as ta
+import pandas_ta as ta
 from typing import Dict, Any, List
 from backend.domain.interfaces.repository import IMarketDataProvider
 
