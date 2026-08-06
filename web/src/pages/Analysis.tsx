@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Grid, Autocomplete, TextField, Stack, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from '@mui/material';
 import { Search, History, CheckCircle, XCircle, FileText, Database, Fingerprint } from 'lucide-react';
-import { getStocks, triggerBacktest, getBacktestResults, getBacktestSignals } from '../api/client';
+import {
+  getStocks, triggerBacktest, getBacktestResults,
+  getBacktestSignals, getStockTimeline
+} from '../api/client';
 import ResearchHeader from '../components/Research/ResearchHeader';
 import AIExecutiveSummary from '../components/Research/AIExecutiveSummary';
 import TechnicalDeepDive from '../components/Research/TechnicalDeepDive';

@@ -6,15 +6,13 @@ import { useState, useEffect } from 'react';
 export default function Admin() {
   const [evaluation, setEvaluation] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
      Promise.all([getSystemEvaluation(), getSystemLogs()])
        .then(([evalData, logsData]) => {
           setEvaluation(evalData);
           setLogs(logsData);
-       })
-       .finally(() => setLoading(false));
+       });
   }, []);
 
   const usageOption = {
@@ -85,7 +83,7 @@ export default function Admin() {
                        <TableCell>
                           <Chip label={log.type} size="small" variant="outlined" sx={{ fontSize: '0.6rem' }} />
                        </TableCell>
-                       <TableCell fontWeight="bold">{log.symbol || 'SYSTEM'}</TableCell>
+                       <TableCell sx={{ fontWeight: 'bold' }}>{log.symbol || 'SYSTEM'}</TableCell>
                        <TableCell sx={{ fontSize: '0.75rem' }}>
                           {log.step || log.error || 'N/A'}
                        </TableCell>
