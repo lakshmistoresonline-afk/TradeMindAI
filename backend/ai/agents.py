@@ -180,7 +180,17 @@ class InstitutionalAgent(BaseAgent):
 
 class RiskAgent(BaseAgent):
     def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Multi-Agent Reports for {state['symbol']}: {state['recommendations']}. Assess aggregate risk.")
+        prompt = self.get_structured_prompt(f"""
+        Assess aggregate risk for {state['symbol']}.
+        Technical Data: {state['technical_data']}
+        Analyst Reports: {state['recommendations']}
+
+        Focus on:
+        - Divergence between Price and Volume.
+        - Counter-trend institutional flows.
+        - Extreme valuation levels.
+        - Upcoming event risk (Earnings/Budget).
+        """)
         response = self.llm.invoke(prompt)
         try:
             import json
@@ -192,10 +202,23 @@ class ConsensusAgent(BaseAgent):
     def analyze(self, state: AgentState):
         prompt = f"""
         Final synthesis for {state['symbol']}.
-        Reports: {state['recommendations']}
 
-        Provide a final institutional suggestion.
-        Format your response as a professional executive summary.
+        Institutional Priority Weighting:
+        1. Technical & SMC: 40% (Foundation)
+        2. Macro & Institutional: 25% (Market Context)
+        3. Fundamental: 20% (Long-term value)
+        4. Sentiment & Options: 15% (Short-term noise)
+
+        Analyst Reports: {state['recommendations']}
+
+        Synthesize these reports into a final institutional suggestion.
+        If agents conflict, prioritize the Technical/SMC bias unless Macro risk is EXTREME.
+
+        Format your response as a professional executive summary with:
+        1. FINAL RATING (BUY/SELL/HOLD)
+        2. CONVICTION SCORE (0-100%)
+        3. PRIMARY THESIS
+        4. KEY RISKS & INVALIDATION POINT
         """
         response = self.llm.invoke(prompt)
         state['consensus'] = response.content
