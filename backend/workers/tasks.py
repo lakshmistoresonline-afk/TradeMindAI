@@ -1,9 +1,7 @@
 from celery import Celery, group
 from celery.schedules import crontab
 from backend.core.config import settings
-from backend.core.database import db_client
 import datetime
-import yfinance as yf
 import json
 
 celery_app = Celery("tasks", broker=settings.REDIS_URL)
@@ -37,25 +35,26 @@ celery_app.conf.beat_schedule = {
 }
 celery_app.conf.timezone = 'Asia/Kolkata'
 
-from backend.core.container import container
-import asyncio
-
 @celery_app.task
 def analyze_stock_task(symbol: str, period="10y"):
+    import asyncio
     # Wrapper to run async service in sync celery
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_analyze_stock_logic(symbol, period))
 
 async def _analyze_stock_logic(symbol: str, period: str):
     import pandas as pd
+    from backend.core.container import container
     from backend.analysis.technical import TechnicalAnalysis
     from backend.ai.workflow import create_ai_workflow
     from backend.analysis.smc import SMCAnalysis
     from backend.services.quant_engine import QuantEngine
     from backend.services.scoring_service import ScoringService
 
+    db = container.repository.db
+
     # Diagnostic Log
-    container.repository.db.collection("system_logs").add({
+    db.collection("system_logs").add({
         "type": "WORKER_START",
         "symbol": symbol,
         "timestamp": datetime.datetime.utcnow()
@@ -145,8 +144,8 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "updated_at": datetime.datetime.utcnow()
         })
 
-        # Diagnostic Log
-        container.repository.db.collection("system_logs").add({
+        # 10. Diagnostic Log
+        db.collection("system_logs").add({
             "type": "WORKER_SUCCESS",
             "symbol": symbol,
             "timestamp": datetime.datetime.utcnow(),
@@ -156,7 +155,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
         return result["consensus"]
     except Exception as e:
         # Error Log
-        container.repository.db.collection("system_logs").add({
+        db.collection("system_logs").add({
             "type": "WORKER_ERROR",
             "symbol": symbol,
             "error": str(e),
@@ -193,6 +192,7 @@ def analyze_nifty_100(period="10y"):
 
 @celery_app.task
 def run_adhoc_backtest(symbol: str):
+    from backend.core.database import db_client
     from backend.analysis.backtester import BacktestEngine
     db = db_client
     engine = BacktestEngine(db)
@@ -203,6 +203,8 @@ def train_models_task():
     """
     Retrains models for all Nifty 100 stocks using the Feature Store.
     """
+    from backend.core.container import container
+    import asyncio
     service = container.stock_service
     ml_service = container.ml_service
 
@@ -225,11 +227,11 @@ def train_models_task():
 
     loop = asyncio.get_event_loop()
     for symbol in symbols:
-        loop.run_until_complete(_train_with_features(symbol, ml_service))
+        loop.run_until_complete(_train_with_features(symbol, ml_service, container))
 
     return f"Retraining complete for {len(symbols)} stocks."
 
-async def _train_with_features(symbol, ml_service):
+async def _train_with_features(symbol, ml_service, container):
     # Fetch all features with targets from Feature Store
     end_date = datetime.datetime.utcnow()
     start_date = end_date - datetime.timedelta(days=365*5) # 5 years
@@ -243,6 +245,7 @@ def update_training_labels():
     """
     Daily task to update Feature Store with actual price outcomes.
     """
+    import asyncio
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_update_labels_logic())
 
@@ -251,6 +254,7 @@ def process_market_intelligence():
     """
     Vision 2.0: Generates Daily Intelligence, Regimes, and Opportunities.
     """
+    import asyncio
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_process_intel_logic())
 
@@ -260,10 +264,13 @@ def refresh_ai_rankings():
     Vision 2.0: AI Ranking Engine (Module 13).
     Recalculates top picks across categories.
     """
+    import asyncio
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_refresh_rankings_logic())
 
 async def _process_intel_logic():
+    import yfinance as yf
+    from backend.core.container import container
     service = container.stock_service
     ios_repo = container.ios_repo
 
@@ -299,6 +306,7 @@ async def _process_intel_logic():
     return "Market Intelligence Processed."
 
 async def _refresh_rankings_logic():
+    from backend.core.container import container
     service = container.stock_service
     repo = service.repository
 
@@ -321,6 +329,7 @@ async def _refresh_rankings_logic():
     return "AI Rankings Refreshed."
 
 async def _update_labels_logic():
+    from backend.core.container import container
     repo = container.repository
     dp_repo = container.data_platform_repo
 
