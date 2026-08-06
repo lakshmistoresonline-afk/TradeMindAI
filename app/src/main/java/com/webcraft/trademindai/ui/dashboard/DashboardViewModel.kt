@@ -23,6 +23,9 @@ class DashboardViewModel @Inject constructor(
     private val _marketStats = MutableStateFlow<Map<String, MarketStatsResponse>>(emptyMap())
     val marketStats: StateFlow<Map<String, MarketStatsResponse>> = _marketStats.asStateFlow()
 
+    private val _regime = MutableStateFlow<String>("Initializing...")
+    val regime: StateFlow<String> = _regime.asStateFlow()
+
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
@@ -35,9 +38,11 @@ class DashboardViewModel @Inject constructor(
             _loading.value = true
             val statsResult = repository.getMarketStats()
             val stocksResult = repository.getStocks()
+            val regimeResult = repository.getMarketRegime()
             
             statsResult.onSuccess { _marketStats.value = it }
             stocksResult.onSuccess { _stocks.value = it }
+            regimeResult.onSuccess { _regime.value = it }
             
             _loading.value = false
         }

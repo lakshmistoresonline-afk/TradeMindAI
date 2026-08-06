@@ -45,4 +45,13 @@ class StockRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getMarketRegime(): Result<String> {
+        return try {
+            val response = apiService.getMarketRegime()
+            Result.success(response.regime)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

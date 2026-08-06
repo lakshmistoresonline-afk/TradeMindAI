@@ -26,6 +26,7 @@ fun DashboardScreen(
 ) {
     val stocks by viewModel.stocks.collectAsState()
     val marketStats by viewModel.marketStats.collectAsState()
+    val regime by viewModel.regime.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
     Scaffold(
@@ -53,7 +54,7 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    MarketRegimeSection(viewModel)
+                    MarketRegimeSection(regime)
                 }
 
                 item {
@@ -105,7 +106,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun MarketRegimeSection(viewModel: DashboardViewModel) {
+fun MarketRegimeSection(regime: String) {
     // Basic implementation for parity
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -114,7 +115,7 @@ fun MarketRegimeSection(viewModel: DashboardViewModel) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Institutional Market Regime", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.tertiary)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("BULLISH", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
+            Text(regime.uppercase(), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
             Text("Institutional accumulation detected across Nifty 100. High probability of trend continuation.", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         }
     }

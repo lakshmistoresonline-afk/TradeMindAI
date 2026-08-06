@@ -8,4 +8,5 @@ interface IStockRepository {
     suspend fun getStockDetail(symbol: String): Result<Stock>
     suspend fun getMarketStats(): Result<Map<String, MarketStatsResponse>>
     suspend fun triggerAnalysis(): Result<String>
+    suspend fun getMarketRegime(): Result<String>
 }
