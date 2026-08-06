@@ -73,6 +73,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
      setActiveWorkspace(ws);
      localStorage.setItem('active_workspace', ws.id);
      showNotification(`Switched to ${ws.name} workspace`, 'success');
+
+     // Vision 2.0: Deep Workspace Navigation
+     if (ws.id === '1') navigate('/');
+     if (ws.id === '2') navigate('/market');
+     if (ws.id === '3') navigate('/ranking');
   };
 
   const handleClose = () => setNotification({ ...notification, open: false });

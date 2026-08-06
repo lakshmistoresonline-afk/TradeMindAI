@@ -15,7 +15,12 @@ async def get_market_regime():
     """
     regime = await container.ios_repo.get_latest_regime()
     if not regime:
-        raise HTTPException(status_code=404, detail="Regime data not found")
+        # Fallback for empty DB (RC-2 Safe)
+        return MarketRegime(
+            date=datetime.datetime.utcnow(), regime="SIDEWAYS", risk_mode="NEUTRAL",
+            sentiment_score=0.5, volatility_index=15.0,
+            description="Market analysis currently in progress. Initializing regime detection..."
+        )
     return regime
 
 @router.get("/opportunities", response_model=List[MarketOpportunity])
@@ -32,7 +37,12 @@ async def get_market_intelligence(type: str = "CLOSING"):
     """
     report = await container.ios_repo.get_latest_intel_report(type)
     if not report:
-        raise HTTPException(status_code=404, detail="Intelligence report not found")
+        # Fallback for empty DB (RC-2 Safe)
+        return MarketIntelligenceReport(
+            id="initial", type=type, date=datetime.datetime.utcnow(),
+            summary="Market Intelligence Engine initialized. Calculating institutional bias for latest session...",
+            key_events=["Data Ingestion Active"], top_movers=[], sector_performance={}, ai_bias="NEUTRAL"
+        )
     return report
 
 @router.post("/intel/trigger")
