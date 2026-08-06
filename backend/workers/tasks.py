@@ -45,6 +45,7 @@ def analyze_stock_task(symbol: str, period="10y"):
 async def _analyze_stock_logic(symbol: str, period: str):
     import pandas as pd
     import traceback
+    import gc
     from backend.core.container import container
     from backend.analysis.technical import TechnicalAnalysis
     from backend.ai.workflow import create_ai_workflow
@@ -84,14 +85,12 @@ async def _analyze_stock_logic(symbol: str, period: str):
         if not recent_prices:
             return f"No price history found for {symbol}"
 
+        # Build DataFrame and explicitly normalize columns
         df = pd.DataFrame([p.model_dump() for p in recent_prices])
         df.set_index('date', inplace=True)
 
-        # Vision 2.0: Standardize column names for Technical Analysis
-        df.rename(columns={
-            "open": "Open", "high": "High", "low": "Low",
-            "close": "Close", "volume": "Volume"
-        }, inplace=True)
+        # Force TitleCase for all analytical modules
+        df.columns = [c.capitalize() for c in df.columns]
 
         # 3. Technical & SMC Analysis
         df_ta = TechnicalAnalysis.calculate_indicators(df)
@@ -104,16 +103,13 @@ async def _analyze_stock_logic(symbol: str, period: str):
         }
         log_status("TECHNICAL_READY")
 
-        # 4. Feature Store Ingestion (Standardized AI Inputs)
+        # 4. Feature Store Ingestion
         ai_features = feature_store.extract_institutional_features(df_ta, smc_data)
         await feature_store.ingest_features(symbol, df.index[-1], ai_features)
         log_status("FEATURES_INGESTED")
 
-        # 5. Quantitative Analytics (Institutional Metrics)
+        # 5. Quantitative Analytics
         nifty_df = await service.provider.fetch_history("^NSEI", period)
-        if nifty_df.empty:
-             log_status("QUANT_WARNING", error="Benchmark data (NIFTY) empty. Using default metrics.")
-
         quant_metrics = QuantEngine.calculate_metrics(symbol, df, nifty_df)
         log_status("QUANT_READY")
 
@@ -160,28 +156,26 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "updated_at": datetime.datetime.utcnow()
         })
 
-        log_data = {
+        db.collection("system_logs").add({
             "type": "WORKER_SUCCESS",
             "symbol": symbol,
             "timestamp": datetime.datetime.utcnow(),
             "consensus": result.get("consensus", "HOLD")[:50]
-        }
-        db.collection("system_logs").add(log_data)
+        })
 
         return result["consensus"]
     except Exception as e:
         log_status("ERROR", error=f"{str(e)}\n{traceback.format_exc()}")
         return f"Error analyzing {symbol}: {str(e)}"
     finally:
-        import gc
-        gc.collect() # Force garbage collection to keep memory under 512MB
+        gc.collect()
 
 @celery_app.task
 def analyze_nifty_100(period="10y"):
     # Official Nifty 100 symbols (updated for NSE)
     symbols = [
         "ABB", "ACC", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", "ADANIPOWER", "ATGL", "AMBUJACEM", "APOLLOHOSP",
-        "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AU SMALL FINANCE BANK", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
+        "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
         "BANDHANBNK", "BANKBARODA", "BANKINDIA", "BEL", "BHEL", "BPCL", "BHARTIARTL", "BIOCON", "BOSCHLTD", "BRITANNIA",
         "CANBK", "CGPOWER", "CHOLAFIN", "CIPLA", "COALINDIA", "COLPAL", "CONCOR", "CUMMINSIND", "DLF", "DABUR",
         "DALBHARAT", "DEEPAKNTR", "DRREDDY", "EICHERMOT", "ESCORTS", "GAIL", "GMRINFRA", "GLAND", "GODREJCP", "GODREJPROP",
@@ -191,7 +185,7 @@ def analyze_nifty_100(period="10y"):
         "LT", "LICHSGFIN", "LICI", "MRF", "M&M", "MARICO", "MARUTI", "MAXHEALTH", "MAHABANK", "MPHASIS",
         "NHPC", "NMDC", "NTPC", "NESTLEIND", "NYKAA", "ONGC", "PAYTM", "PIIND", "PNB", "PFC",
         "PAGEIND", "PATANJALI", "PIDILITIND", "POLYCAB", "POWERGRID", "PRESTIGE", "RVNL", "RECLTD", "RELIANCE", "SBICARD",
-        "SBILIFE", "SBIN", "SRF", "SAMVARDHANA", "SHREECEM", "SHRIRAMFIN", "SIEMENS", "SONACOMS", "SUNPHARMA", "SUNTV",
+        "SBILIFE", "SBIN", "SRF", "SHREECEM", "SHRIRAMFIN", "SIEMENS", "SONACOMS", "SUNPHARMA", "SUNTV",
         "SUPREMEIND", "SYNGENE", "TATACOMM", "TATACONSUM", "TATAMOTORS", "TATAMTRDVR", "TATAPOWER", "TATASTEEL", "TCS", "TECHM",
         "TITAN", "TORNTPHARM", "TRENT", "TIINDIA", "UPL", "ULTRACEMCO", "UNITDSPR", "VBL", "VEDL", "WIPRO",
         "YESBANK", "ZOMATO", "ZYDUSLIFE"
@@ -213,9 +207,6 @@ def run_adhoc_backtest(symbol: str):
 
 @celery_app.task
 def train_models_task():
-    """
-    Retrains models for all Nifty 100 stocks using the Feature Store.
-    """
     from backend.core.container import container
     import asyncio
     service = container.stock_service
@@ -223,7 +214,7 @@ def train_models_task():
 
     symbols = [
         "ABB", "ACC", "ADANIENSOL", "ADANIENT", "ADANIGREEN", "ADANIPORTS", "ADANIPOWER", "ATGL", "AMBUJACEM", "APOLLOHOSP",
-        "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AUBANK", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
+        "ASHOKLEY", "ASIANPAINT", "ASTRAL", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
         "BANDHANBNK", "BANKBARODA", "BEL", "BHEL", "BPCL", "BHARTIARTL", "BIOCON", "BOSCHLTD", "BRITANNIA", "CANBK",
         "CGPOWER", "CHOLAFIN", "CIPLA", "COALINDIA", "COLPAL", "CONCOR", "CUMMINSIND", "DLF", "DABUR", "DALBHARAT",
         "DEEPAKNTR", "DRREDDY", "EICHERMOT", "GAIL", "GMRINFRA", "GODREJCP", "GODREJPROP", "GRASIM", "HAL", "HCLTECH",
@@ -232,7 +223,7 @@ def train_models_task():
         "JSWENERGY", "JSWSTEEL", "JINDALSTEL", "JUBLFOOD", "KOTAKBANK", "LTIM", "LT", "LICHSGFIN", "LICI", "MRF",
         "M&M", "MARICO", "MARUTI", "MAXHEALTH", "MPHASIS", "NHPC", "NMDC", "NTPC", "NESTLEIND", "NYKAA",
         "ONGC", "PAYTM", "PIIND", "PNB", "PFC", "PIDILITIND", "POLYCAB", "POWERGRID", "PRESTIGE", "RVNL",
-        "RECLTD", "RELIANCE", "SBICARD", "SBILIFE", "SBIN", "SRF", "MOTHERSON", "SHREECEM", "SHRIRAMFIN", "SIEMENS",
+        "RECLTD", "RELIANCE", "SBICARD", "SBILIFE", "SBIN", "SRF", "SHREECEM", "SHRIRAMFIN", "SIEMENS",
         "SONACOMS", "SUNPHARMA", "SUNTV", "SUPREMEIND", "SYNGENE", "TATACOMM", "TATACONSUM", "TATAMOTORS", "TATAPOWER", "TATASTEEL",
         "TCS", "TECHM", "TITAN", "TORNTPHARM", "TRENT", "TIINDIA", "UPL", "ULTRACEMCO", "UNITDSPR", "VBL",
         "VEDL", "WIPRO", "YESBANK", "ZOMATO", "ZYDUSLIFE"
@@ -255,28 +246,18 @@ async def _train_with_features(symbol, ml_service, container):
 
 @celery_app.task
 def update_training_labels():
-    """
-    Daily task to update Feature Store with actual price outcomes.
-    """
     import asyncio
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_update_labels_logic())
 
 @celery_app.task
 def process_market_intelligence():
-    """
-    Vision 2.0: Generates Daily Intelligence, Regimes, and Opportunities.
-    """
     import asyncio
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_process_intel_logic())
 
 @celery_app.task
 def refresh_ai_rankings():
-    """
-    Vision 2.0: AI Ranking Engine (Module 13).
-    Recalculates top picks across categories.
-    """
     import asyncio
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_refresh_rankings_logic())

@@ -1,11 +1,17 @@
-from backend.ai.agents import (
-    AgentState, TechnicalAgent, ICTAgent, WyckoffAgent, ElliottWaveAgent,
-    FundamentalAgent, EarningsAgent, OptionsAgent, SentimentAgent,
-    MacroAgent, InstitutionalAgent, RiskAgent, ConsensusAgent
-)
+from backend.ai.agents import AgentState
 
 def create_ai_workflow():
+    """
+    Institutional AI Workflow Factory.
+    Uses Lazy Loading for heavy langgraph modules to save RAM in production.
+    """
     from langgraph.graph import StateGraph, END
+    from backend.ai.agents import (
+        TechnicalAgent, ICTAgent, WyckoffAgent, ElliottWaveAgent,
+        FundamentalAgent, EarningsAgent, OptionsAgent, SentimentAgent,
+        MacroAgent, InstitutionalAgent, RiskAgent, ConsensusAgent
+    )
+
     workflow = StateGraph(AgentState)
 
     # Initialize Agents
@@ -36,7 +42,7 @@ def create_ai_workflow():
     workflow.add_node("risk", risk.analyze)
     workflow.add_node("consensus", consensus.analyze)
 
-    # Define Execution Flow (Parallel tracks where possible in future, sequential for now)
+    # Define Execution Flow
     workflow.set_entry_point("technical")
 
     workflow.add_edge("technical", "ict")

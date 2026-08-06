@@ -9,6 +9,22 @@ class TechnicalAnalysis:
         if df is None or len(df) < 2:
             return df
 
+        # Institutional Column Normalization
+        # Maps any case (close, Close, CLOSE) to the expected TitleCase
+        df.columns = [c.capitalize() for c in df.columns]
+
+        # Ensure required columns exist, if not, try to find alternatives
+        col_map = {"Volume": ["Vol", "Qty"], "Close": ["Last", "Price"]}
+        for target, alts in col_map.items():
+            if target not in df.columns:
+                for alt in alts:
+                    if alt in df.columns:
+                        df[target] = df[alt]
+                        break
+
+        if "Close" not in df.columns:
+            raise KeyError(f"Critical Error: 'Close' column not found in data. Available: {df.columns.tolist()}")
+
         # Trend Indicators
         df["EMA_20"] = ta.ema(df["Close"], length=20)
         df["EMA_50"] = ta.ema(df["Close"], length=50)
@@ -18,19 +34,27 @@ class TechnicalAnalysis:
         df["RSI"] = ta.rsi(df["Close"], length=14)
 
         # MACD
-        macd = ta.macd(df["Close"])
-        df = pd.concat([df, macd], axis=1)
+        try:
+            macd = ta.macd(df["Close"])
+            if macd is not None:
+                df = pd.concat([df, macd], axis=1)
+        except: pass
 
         # Volatility - Bollinger Bands
-        bbands = ta.bbands(df["Close"])
-        df = pd.concat([df, bbands], axis=1)
+        try:
+            bbands = ta.bbands(df["Close"])
+            if bbands is not None:
+                df = pd.concat([df, bbands], axis=1)
+        except: pass
 
         # ADX
-        adx = ta.adx(df["High"], df["Low"], df["Close"])
-        df = pd.concat([df, adx], axis=1)
+        try:
+            adx = ta.adx(df["High"], df["Low"], df["Close"])
+            if adx is not None:
+                df = pd.concat([df, adx], axis=1)
+        except: pass
 
         # Support & Resistance (Classic Pivots)
-        # Using iloc[-2] safely
         try:
             last_h = df["High"].iloc[-2]
             last_l = df["Low"].iloc[-2]
@@ -51,26 +75,30 @@ class TechnicalAnalysis:
     def detect_patterns(df: Any):
         if df is None or len(df) < 5: return None
         # Candlestick patterns using pandas-ta
-        patterns = df.ta.cdl_pattern(name="all")
-        return patterns
+        try:
+            patterns = df.ta.cdl_pattern(name="all")
+            return patterns
+        except: return None
 
     @staticmethod
     def calculate_volume_profile(df: Any, bins=20):
         if df is None or len(df) < bins: return {}
         # Calculate Volume at Price
-        price_min = df["Low"].min()
-        price_max = df["High"].max()
-        bin_size = (price_max - price_min) / bins
+        try:
+            price_min = df["Low"].min()
+            price_max = df["High"].max()
+            bin_size = (price_max - price_min) / bins
 
-        if bin_size == 0: return {}
+            if bin_size == 0: return {}
 
-        # Group volume into price bins
-        df["price_bin"] = ((df["Close"] - price_min) // bin_size).clip(0, bins-1)
-        profile = df.groupby("price_bin")["Volume"].sum().to_dict()
+            # Group volume into price bins
+            df["price_bin"] = ((df["Close"] - price_min) // bin_size).clip(0, bins-1)
+            profile = df.groupby("price_bin")["Volume"].sum().to_dict()
 
-        return {
-            "min": price_min,
-            "max": price_max,
-            "bin_size": bin_size,
-            "profile": profile
-        }
+            return {
+                "min": price_min,
+                "max": price_max,
+                "bin_size": bin_size,
+                "profile": profile
+            }
+        except: return {}
