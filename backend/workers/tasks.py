@@ -154,7 +154,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
             ]
 
         # 9. Persist Global Source of Truth
-        await service.repository.db.collection("stocks").document(symbol).update({
+        db.collection("stocks").document(symbol).update({
             "analysis": result,
             "ai_investment_score": scoring_results["score"],
             "ai_investment_grade": scoring_results["grade"],
