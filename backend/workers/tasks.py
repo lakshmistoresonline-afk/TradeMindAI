@@ -14,7 +14,7 @@ celery_app.conf.beat_schedule = {
     },
     "analyze-nifty-100-evening": {
         "task": "backend.workers.tasks.analyze_nifty_100",
-        "schedule": crontab(hour=16, minute=0, day_of_week="mon-fri"),
+        "schedule": crontab(hour=16, minute=15, day_of_week="mon-fri"),
     },
     "retrain-models-weekly": {
         "task": "backend.workers.tasks.train_models_task",
@@ -166,6 +166,9 @@ async def _analyze_stock_logic(symbol: str, period: str):
     except Exception as e:
         log_status("ERROR", error=f"{str(e)}\n{traceback.format_exc()}")
         return f"Error analyzing {symbol}: {str(e)}"
+    finally:
+        import gc
+        gc.collect() # Force garbage collection to keep memory under 512MB
 
 @celery_app.task
 def analyze_nifty_100(period="10y"):
