@@ -33,12 +33,16 @@ class FirestoreStockRepository(IStockRepository):
         stock_ref = self.db.collection("stocks").document(symbol)
         prices_ref = stock_ref.collection("prices")
 
-        batch = self.db.batch()
-        for price in prices:
-            date_id = price.date.strftime("%Y-%m-%d")
-            doc_ref = prices_ref.document(date_id)
-            batch.set(doc_ref, price.model_dump())
-        batch.commit()
+        # Firestore Batch limit is 500 operations
+        chunk_size = 450
+        for i in range(0, len(prices), chunk_size):
+            chunk = prices[i : i + chunk_size]
+            batch = self.db.batch()
+            for price in chunk:
+                date_id = price.date.strftime("%Y-%m-%d")
+                doc_ref = prices_ref.document(date_id)
+                batch.set(doc_ref, price.model_dump())
+            batch.commit()
 
     async def get_recent_prices(self, symbol: str, limit: int = 250) -> List[StockPrice]:
         prices_ref = self.db.collection("stocks").document(symbol).collection("prices")
@@ -63,11 +67,14 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
         self.db = db
 
     async def save_news(self, articles: List[NewsArticle]) -> None:
-        batch = self.db.batch()
-        for article in articles:
-            doc_ref = self.db.collection("news").document(article.id)
-            batch.set(doc_ref, article.model_dump())
-        batch.commit()
+        chunk_size = 450
+        for i in range(0, len(articles), chunk_size):
+            chunk = articles[i : i + chunk_size]
+            batch = self.db.batch()
+            for article in chunk:
+                doc_ref = self.db.collection("news").document(article.id)
+                batch.set(doc_ref, article.model_dump())
+            batch.commit()
 
     async def get_latest_news(self, symbol: str, limit: int = 10) -> List[NewsArticle]:
         docs = self.db.collection("news")\
