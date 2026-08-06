@@ -8,6 +8,13 @@ class MarketRegimeEngine:
         Institutional Market Regime Detection logic.
         Uses Nifty 50 returns and India VIX.
         """
+        if nifty_df is None or len(nifty_df) < 50: # Need at least 50 days for rolling mean
+            return MarketRegime(
+                date=datetime.utcnow(), regime="SIDEWAYS", risk_mode="RISK_OFF",
+                sentiment_score=0.5, volatility_index=vix_value,
+                description="Insufficient benchmark data to detect regime. Defaulting to SIDEWAYS."
+            )
+
         import pandas as pd
         import numpy as np
 

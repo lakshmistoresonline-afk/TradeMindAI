@@ -8,6 +8,13 @@ class QuantEngine:
         """
         Calculates institutional risk and performance metrics.
         """
+        if df is None or len(df) < 30: # Need at least 30 days for reasonable metrics
+            return QuantMetric(
+                symbol=symbol, date=datetime.utcnow(),
+                sharpe_ratio=0, sortino_ratio=0, max_drawdown=0,
+                beta=1.0, alpha=0, volatility=0
+            )
+
         import pandas as pd
         import numpy as np
         returns = df["Close"].pct_change().dropna()

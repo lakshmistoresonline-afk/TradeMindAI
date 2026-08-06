@@ -24,6 +24,10 @@ class StockService:
         fetch_period = period if is_initial_load else "1mo"
         history_df = await self.provider.fetch_history(symbol, fetch_period)
 
+        if history_df.empty:
+            print(f"No history found for {symbol}. Skipping detailed analysis.")
+            return Stock(symbol=symbol, **info)
+
         # 2. Sync News (Vision 2.0)
         from backend.core.container import container
         news = await self.news_provider.fetch_latest_news(symbol)

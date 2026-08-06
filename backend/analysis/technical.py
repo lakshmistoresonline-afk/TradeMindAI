@@ -6,6 +6,9 @@ class TechnicalAnalysis:
         import pandas as pd
         import pandas_ta as ta
 
+        if df is None or len(df) < 2:
+            return df
+
         # Trend Indicators
         df["EMA_20"] = ta.ema(df["Close"], length=20)
         df["EMA_50"] = ta.ema(df["Close"], length=50)
@@ -27,31 +30,39 @@ class TechnicalAnalysis:
         df = pd.concat([df, adx], axis=1)
 
         # Support & Resistance (Classic Pivots)
-        last_h = df["High"].iloc[-2]
-        last_l = df["Low"].iloc[-2]
-        last_c = df["Close"].iloc[-2]
+        # Using iloc[-2] safely
+        try:
+            last_h = df["High"].iloc[-2]
+            last_l = df["Low"].iloc[-2]
+            last_c = df["Close"].iloc[-2]
 
-        pivot = (last_h + last_l + last_c) / 3
-        df["Pivot"] = pivot
-        df["R1"] = (2 * pivot) - last_l
-        df["S1"] = (2 * pivot) - last_h
-        df["R2"] = pivot + (last_h - last_l)
-        df["S2"] = pivot - (last_h - last_l)
+            pivot = (last_h + last_l + last_c) / 3
+            df["Pivot"] = pivot
+            df["R1"] = (2 * pivot) - last_l
+            df["S1"] = (2 * pivot) - last_h
+            df["R2"] = pivot + (last_h - last_l)
+            df["S2"] = pivot - (last_h - last_l)
+        except:
+            pass
 
         return df
 
     @staticmethod
     def detect_patterns(df: Any):
+        if df is None or len(df) < 5: return None
         # Candlestick patterns using pandas-ta
         patterns = df.ta.cdl_pattern(name="all")
         return patterns
 
     @staticmethod
     def calculate_volume_profile(df: Any, bins=20):
+        if df is None or len(df) < bins: return {}
         # Calculate Volume at Price
         price_min = df["Low"].min()
         price_max = df["High"].max()
         bin_size = (price_max - price_min) / bins
+
+        if bin_size == 0: return {}
 
         # Group volume into price bins
         df["price_bin"] = ((df["Close"] - price_min) // bin_size).clip(0, bins-1)

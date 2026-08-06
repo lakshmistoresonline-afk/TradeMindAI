@@ -80,6 +80,9 @@ class FeatureStoreService:
         """
         Refined Institutional Feature Engineering.
         """
+        if df_ta is None or df_ta.empty:
+            return {}
+
         import pandas as pd
         last_row = df_ta.iloc[-1]
 
