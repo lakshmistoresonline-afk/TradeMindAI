@@ -28,6 +28,10 @@ class AgentState(TypedDict):
 class BaseAgent:
     def __init__(self, name: str):
         self.name = name
+        # Diagnostic Check for API Key
+        if settings.GROQ_API_KEY == "YOUR_GROQ_API_KEY":
+             raise ValueError("GROQ_API_KEY not configured in environment variables.")
+
         # Using Llama 3 70B on Groq
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,

@@ -54,6 +54,13 @@ async def _analyze_stock_logic(symbol: str, period: str):
     from backend.services.quant_engine import QuantEngine
     from backend.services.scoring_service import ScoringService
 
+    # Diagnostic Log
+    container.repository.db.collection("system_logs").add({
+        "type": "WORKER_START",
+        "symbol": symbol,
+        "timestamp": datetime.datetime.utcnow()
+    })
+
     service = container.stock_service
     ml_service = container.ml_service
     feature_store = container.feature_store
@@ -138,18 +145,23 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "updated_at": datetime.datetime.utcnow()
         })
 
-        # 10. Broadcast Real-time Alert (Enterprise Integration)
-        from backend.core.websocket import manager
-        alert_msg = {
-            "type": "ANALYSIS_COMPLETE",
+        # Diagnostic Log
+        container.repository.db.collection("system_logs").add({
+            "type": "WORKER_SUCCESS",
             "symbol": symbol,
-            "signal": result.get("consensus", "HOLD")[:50],
-            "timestamp": datetime.datetime.utcnow().isoformat()
-        }
-        await manager.broadcast(json.dumps(alert_msg))
+            "timestamp": datetime.datetime.utcnow(),
+            "consensus": result.get("consensus", "HOLD")[:50]
+        })
 
         return result["consensus"]
     except Exception as e:
+        # Error Log
+        container.repository.db.collection("system_logs").add({
+            "type": "WORKER_ERROR",
+            "symbol": symbol,
+            "error": str(e),
+            "timestamp": datetime.datetime.utcnow()
+        })
         return f"Error analyzing {symbol}: {str(e)}"
 
 @celery_app.task

@@ -37,18 +37,12 @@ class ScoringService:
             (tech_score * weights["technical"]) +
             (fund_score * weights["fundamental"]) +
             (ml_score * weights["ml_bias"]) +
-            (inst_score * weights["institutional"])
-        ) / sum(weights.values()) * 100 # Normalizing back to 0-100 scale based on active weights
-
-        # Wait, sum of weights is 1.0.
-        total_score = (
-            (tech_score * weights["technical"]) +
-            (fund_score * weights["fundamental"]) +
-            (ml_score * weights["ml_bias"]) +
             (inst_score * weights["institutional"]) +
-            (50 * weights["smc"]) + # placeholders
+            (50 * weights["smc"]) +
             (50 * weights["sentiment"])
         )
+
+        # total_score is already on 0-100 scale because component scores are 0-100
 
         grade = "D"
         if total_score >= 85: grade = "AAA"
