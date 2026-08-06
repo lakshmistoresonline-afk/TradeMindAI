@@ -146,6 +146,13 @@ async def _analyze_stock_logic(symbol: str, period: str):
         # 8. Unified AI Investment Score
         scoring_results = ScoringService.calculate_unified_score(ai_features, ml_prediction, result)
 
+        # Convert Pydantic models to dicts for Firestore serialization
+        if "recommendations" in result:
+            result["recommendations"] = [
+                r.model_dump() if hasattr(r, "model_dump") else r
+                for r in result["recommendations"]
+            ]
+
         # 9. Persist Global Source of Truth
         await service.repository.db.collection("stocks").document(symbol).update({
             "analysis": result,
