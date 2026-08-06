@@ -1,9 +1,17 @@
 import { Box, Typography, Paper } from '@mui/material';
 import ReactECharts from 'echarts-for-react';
 
-export default function RadarComparison({ symbol }: { symbol: string }) {
+export default function RadarComparison({ stock }: { stock: any }) {
+  if (!stock) return null;
+
+  const score = stock.ai_investment_score || 50;
+  const momentum = stock.analysis?.technical_data?.indicators?.momentum_rsi * 100 || 50;
+  const valuation = stock.pe_ratio < 30 ? 80 : 40;
+  const growth = 75; // Mock logic
+  const smc = stock.analysis?.technical_data?.smc?.order_blocks?.length > 0 ? 90 : 30;
+
   const option = {
-    legend: { data: [symbol, 'Sector Average'], textStyle: { color: '#fff' }, bottom: 0 },
+    legend: { data: [stock.symbol, 'Sector Average'], textStyle: { color: '#fff' }, bottom: 0 },
     radar: {
       indicator: [
         { name: 'Valuation', max: 100 },
@@ -20,8 +28,8 @@ export default function RadarComparison({ symbol }: { symbol: string }) {
       type: 'radar',
       data: [
         {
-          value: [82, 75, 90, 88, 65],
-          name: symbol,
+          value: [valuation, momentum, growth, score, smc],
+          name: stock.symbol,
           itemStyle: { color: '#10b981' },
           areaStyle: { opacity: 0.1 }
         },

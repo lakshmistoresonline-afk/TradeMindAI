@@ -29,6 +29,16 @@ async def trigger_backtest(
     task = run_adhoc_backtest.delay(symbol)
     return {"message": "Backtest triggered", "task_id": task.id}
 
+@router.get("/backtest")
+async def get_all_backtests(
+    db: firestore.Client = Depends(get_db)
+):
+    """
+    Fetches all historical backtest results to calculate global AI performance.
+    """
+    docs = db.collection("backtests").stream()
+    return [doc.to_dict() for doc in docs]
+
 @router.get("/backtest/{symbol}")
 async def get_backtest_results(
     symbol: str,

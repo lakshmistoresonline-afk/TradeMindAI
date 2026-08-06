@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict, Any
 from google.cloud import firestore
-from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport
+from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import datetime
 
@@ -52,3 +52,12 @@ class FirestoreIOSRepository(IIOSRepository):
         for doc in docs:
             return MarketIntelligenceReport(**doc.to_dict())
         return None
+
+    async def save_trade_feedback(self, feedback: TradeFeedback) -> None:
+        self.db.collection("trade_journal").document(feedback.id).set(feedback.model_dump())
+
+    async def get_user_trades(self, user_id: str) -> List[TradeFeedback]:
+        docs = self.db.collection("trade_journal")\
+            .where("user_id", "==", user_id)\
+            .order_by("exit_date", direction=firestore.Query.DESCENDING).stream()
+        return [TradeFeedback(**doc.to_dict()) for doc in docs]

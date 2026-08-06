@@ -1,12 +1,20 @@
-import { Box, Typography, Paper, Grid, Chip, LinearProgress } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Grid, Chip, LinearProgress, CircularProgress } from '@mui/material';
 import { Layers } from 'lucide-react';
+import { getSimilarPatterns } from '../../api/client';
 
 export default function SimilarityEngine({ symbol }: { symbol: string }) {
-  const matches = [
-    { date: 'Oct 2022', symbol: symbol, similarity: 94, outcome: '+12.5%', context: 'Post-earnings consolidation with similar RSI divergence.' },
-    { date: 'Jan 2024', symbol: 'TCS', similarity: 82, outcome: '+8.2%', context: 'Sector-wide institutional accumulation phase.' },
-    { date: 'May 2021', symbol: symbol, similarity: 78, outcome: '-4.1%', context: 'Overextended momentum with declining volume.' },
-  ];
+  const [matches, setMatches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    getSimilarPatterns(symbol)
+      .then(setMatches)
+      .finally(() => setLoading(false));
+  }, [symbol]);
+
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress size={24} /></Box>;
 
   return (
     <Box sx={{ mb: 4 }}>
@@ -20,11 +28,11 @@ export default function SimilarityEngine({ symbol }: { symbol: string }) {
         </Typography>
 
         <Grid container spacing={3}>
-           {matches.map((m, i) => (
+           {matches.length > 0 ? matches.map((m, i) => (
              <Grid item xs={12} key={i}>
                 <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, border: '1px solid #334155' }}>
                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                          <Typography variant="subtitle2" fontWeight="bold">{m.date}</Typography>
                          <Chip label={m.symbol} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.6rem' }} />
                          <Typography variant="caption" color="textSecondary">{m.context}</Typography>
@@ -43,14 +51,20 @@ export default function SimilarityEngine({ symbol }: { symbol: string }) {
                    </Box>
                 </Box>
              </Grid>
-           ))}
+           )) : (
+              <Box sx={{ p: 2, textAlign: 'center' }}>
+                 <Typography variant="caption" color="textSecondary">No significant historical matches found for the current regime.</Typography>
+              </Box>
+           )}
         </Grid>
 
-        <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 2, textAlign: 'center' }}>
-           <Typography variant="caption" fontWeight="bold" color="primary">
-              KEY LESSON: Current structure has a 78% historical probability of a positive mean-reversion move.
-           </Typography>
-        </Box>
+        {matches.length > 0 && (
+          <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 2, textAlign: 'center' }}>
+             <Typography variant="caption" fontWeight="bold" color="primary">
+                KEY LESSON: Current structure has a 78% historical probability of a positive mean-reversion move.
+             </Typography>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

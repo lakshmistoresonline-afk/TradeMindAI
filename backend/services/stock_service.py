@@ -38,6 +38,26 @@ class StockService:
         stock = Stock(symbol=symbol, **info)
         await self.repository.save_stock(stock)
 
+        # 4. Sync Earnings (Vision 2.0)
+        try:
+            import yfinance as yf
+            ticker = yf.Ticker(f"{symbol}.NS")
+            calendar = ticker.calendar
+            if calendar is not None and not calendar.empty:
+                from backend.domain.models.data_platform import EarningsData
+                # Convert timestamp to datetime
+                earning_date = calendar.iloc[0, 0] if hasattr(calendar, 'iloc') else datetime.utcnow()
+                earnings = EarningsData(
+                    symbol=symbol,
+                    date=earning_date,
+                    eps_actual=0.0, # Will be updated after results
+                    eps_estimate=info.get("forwardEps", 0.0),
+                    revenue_actual=0.0,
+                    revenue_estimate=0.0
+                )
+                await container.data_platform_repo.save_earnings(earnings)
+        except: pass
+
         if is_initial_load:
             # Memory Optimization: For initial 10Y load, we save everything but only
             # calculate complex indicators for the most recent 2 years.

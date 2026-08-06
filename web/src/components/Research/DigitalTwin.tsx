@@ -54,8 +54,8 @@ export default function DigitalTwin({ symbol }: { symbol: string }) {
 
          <Divider sx={{ my: 4, opacity: 0.1 }} />
 
-         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                <Chip label="Continuously Learning" size="small" variant="outlined" icon={<BrainCircuit size={12} />} />
                <Chip label="Real-time Synced" size="small" variant="outlined" icon={<Activity size={12} />} />
             </Box>

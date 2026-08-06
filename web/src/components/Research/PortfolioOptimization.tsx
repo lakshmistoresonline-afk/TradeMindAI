@@ -1,12 +1,17 @@
-import { Box, Typography, Paper, Grid, Chip, Stack, List, ListItem, ListItemText, ListItemIcon, LinearProgress } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Grid, Chip, Stack, List, ListItem, ListItemText, ListItemIcon, LinearProgress, CircularProgress } from '@mui/material';
 import { Target, RefreshCcw } from 'lucide-react';
+import { getPortfolioOptimizations } from '../../api/client';
 
 export default function PortfolioOptimization() {
-  const recommendations = [
-    { type: 'REBALANCE', text: 'Reduce IT Sector exposure by 5% to match institutional benchmarks.', priority: 'HIGH' },
-    { type: 'SIZE', text: 'RELIANCE: Increase position size by 2.5% based on breakout conviction.', priority: 'MEDIUM' },
-    { type: 'DIVERSIFY', text: 'Add Healthcare exposure to reduce portfolio beta to 0.85.', priority: 'LOW' }
-  ];
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getPortfolioOptimizations()
+      .then(setRecommendations)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <Box sx={{ mb: 4 }}>
@@ -16,19 +21,27 @@ export default function PortfolioOptimization() {
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={7}>
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={{ p: 3, minHeight: 280 }}>
             <Typography variant="subtitle2" color="textSecondary" gutterBottom>ACTIVE REBALANCING SUGGESTIONS</Typography>
-            <List>
-               {recommendations.map((rec, i) => (
-                 <ListItem key={i} sx={{ bgcolor: 'rgba(255,255,255,0.02)', mb: 1, borderRadius: 2 }}>
-                    <ListItemIcon>
-                       {rec.type === 'REBALANCE' ? <RefreshCcw className="text-blue-400" /> : <Target className="text-emerald-500" />}
-                    </ListItemIcon>
-                    <ListItemText primary={rec.text} primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
-                    <Chip label={rec.priority} size="small" color={rec.priority === 'HIGH' ? 'error' : 'primary'} variant="outlined" sx={{ fontSize: '0.6rem' }} />
-                 </ListItem>
-               ))}
-            </List>
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress size={24} /></Box>
+            ) : (
+              <List>
+                {recommendations.length > 0 ? recommendations.map((rec, i) => (
+                  <ListItem key={i} sx={{ bgcolor: 'rgba(255,255,255,0.02)', mb: 1, borderRadius: 2 }}>
+                      <ListItemIcon>
+                        {rec.type === 'REBALANCE' ? <RefreshCcw className="text-blue-400" /> : <Target className="text-emerald-500" />}
+                      </ListItemIcon>
+                      <ListItemText primary={rec.text} primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
+                      <Chip label={rec.priority} size="small" color={rec.priority === 'HIGH' ? 'error' : 'primary'} variant="outlined" sx={{ fontSize: '0.6rem' }} />
+                  </ListItem>
+                )) : (
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 2, textAlign: 'center' }}>
+                    Portfolio is currently optimized for the detected regime.
+                  </Typography>
+                )}
+              </List>
+            )}
           </Paper>
         </Grid>
 

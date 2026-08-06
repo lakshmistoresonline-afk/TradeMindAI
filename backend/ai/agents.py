@@ -55,7 +55,9 @@ class BaseAgent:
             "confidence": 0.0 to 1.0,
             "reasons": ["reason 1", "reason 2"],
             "risks": ["risk 1", "risk 2"],
-            "supporting_evidence": {{"metric_name": "value"}}
+            "supporting_evidence": {{"metric_name": "value"}},
+            "moat_rating": "WIDE | NARROW | NONE",
+            "management_score": 0.0 to 5.0
         }}
         """
 

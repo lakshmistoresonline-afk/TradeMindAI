@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Dict, Any, Optional
 from backend.core.container import container
 from backend.core.auth import get_current_user
-from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport
+from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback
 import uuid
 import datetime
 
@@ -66,6 +66,14 @@ async def get_mtf_alignment(symbol: str):
     """
     return await container.timeframe_service.analyze_alignment(symbol)
 
+@router.get("/similarity/{symbol}")
+async def get_similar_patterns(symbol: str):
+    """
+    Vision 2.0: AI Similarity Engine.
+    Scans historical data to find similar technical and regime structures.
+    """
+    return await container.feature_store.find_similar_patterns(symbol)
+
 @router.get("/notes/{symbol}", response_model=List[ResearchNote])
 async def get_research_notes(symbol: str, current_user: dict = Depends(get_current_user)):
     return await container.ios_repo.get_stock_notes(current_user["uid"], symbol)
@@ -91,6 +99,52 @@ async def save_workspace(workspace: WorkspaceState, current_user: dict = Depends
     workspace.user_id = current_user["uid"]
     await container.ios_repo.save_workspace(workspace)
     return workspace
+
+@router.get("/journal", response_model=List[TradeFeedback])
+async def get_trade_journal(current_user: dict = Depends(get_current_user)):
+    """
+    Vision 2.0: AI Trade Coach & Journal.
+    Retrieves all historical trades and AI mentorship feedback.
+    """
+    return await container.ios_repo.get_user_trades(current_user["uid"])
+
+@router.post("/journal")
+async def add_trade_to_journal(trade_data: Dict[str, Any], current_user: dict = Depends(get_current_user)):
+    """
+    Vision 2.0: AI Trade Coach.
+    Analyzes a new trade execution and provides instant feedback.
+    """
+    # 1. Fetch AI Sentiment at entry date (Simplified for demo)
+    ai_score = 75.0
+
+    # 2. Generate Feedback via Coach Service
+    feedback = container.coach_service.generate_feedback({
+        **trade_data,
+        "user_id": current_user["uid"],
+        "entry_date": datetime.datetime.fromisoformat(trade_data["entry_date"]),
+        "exit_date": datetime.datetime.fromisoformat(trade_data["exit_date"])
+    }, ai_score)
+
+    # 3. Persist
+    await container.ios_repo.save_trade_feedback(feedback)
+    return feedback
+
+@router.get("/portfolio/optimize")
+async def get_portfolio_optimizations(current_user: dict = Depends(get_current_user)):
+    """
+    Vision 2.0: Active AI Portfolio Rebalancing.
+    """
+    # 1. Fetch current portfolio holdings (Integration with Paper Trading / Real broker)
+    # Placeholder: getting all stocks for now to simulate logic
+    stocks = await container.repository.get_all_stocks(limit=10)
+
+    # 2. Get Regime for bias context
+    regime = await container.ios_repo.get_latest_regime()
+    bias = regime.regime if regime else "SIDEWAYS"
+
+    # 3. Generate suggestions
+    from backend.services.ios.portfolio_manager import AIPortfolioManager
+    return AIPortfolioManager.get_rebalancing_suggestions(stocks, bias)
 
 @router.get("/api-keys")
 async def get_api_keys(current_user: dict = Depends(get_current_user)):

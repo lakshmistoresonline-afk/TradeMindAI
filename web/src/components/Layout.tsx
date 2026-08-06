@@ -2,6 +2,8 @@ import React, { useState, createContext, useContext, useEffect } from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Chip, Divider } from '@mui/material';
 import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, Briefcase, PieChart, Bot, Wallet, Calendar, ShieldAlert, Code, Monitor, Trophy, Star, Book, ShieldCheck } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useMediaQuery, useTheme, IconButton } from '@mui/material';
+import { Menu as MenuIcon } from 'lucide-react';
 import CommandPalette from './CommandPalette';
 
 const drawerWidth = 240;
@@ -42,7 +44,11 @@ const menuItems = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [pinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
 
@@ -77,12 +83,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <CommandPalette />
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#0f172a', borderBottom: '1px solid #334155' }} elevation={0}>
           <Toolbar>
+            {isMobile && (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={() => setDrawerOpen(true)}
+                sx={{ mr: 2 }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
             <TrendingUp className="text-emerald-500 mr-2" />
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', mr: 4 }}>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', mr: 4, display: { xs: 'none', sm: 'block' } }}>
               TradeMind AI
             </Typography>
 
-            <Stack direction="row" spacing={1} sx={{ ml: 4 }}>
+            <Stack direction="row" spacing={1} sx={{ ml: isMobile ? 0 : 4, overflowX: 'auto', py: 1 }}>
                {workspaces.map(ws => (
                  <Chip
                    key={ws.id}
@@ -91,14 +108,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                    onClick={() => handleWorkspaceChange(ws)}
                    variant={activeWorkspace.id === ws.id ? 'filled' : 'outlined'}
                    color={activeWorkspace.id === ws.id ? 'primary' : 'default'}
-                   sx={{ cursor: 'pointer' }}
+                   sx={{ cursor: 'pointer', flexShrink: 0 }}
                  />
                ))}
             </Stack>
           </Toolbar>
         </AppBar>
         <Drawer
-          variant="permanent"
+          variant={isMobile ? "temporary" : "permanent"}
+          open={isMobile ? drawerOpen : true}
+          onClose={() => setDrawerOpen(false)}
           sx={{
             width: drawerWidth,
             flexShrink: 0,
@@ -147,9 +166,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </List>
           </Box>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: '#020617', minHeight: '100vh' }}>
+        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, backgroundColor: '#020617', minHeight: '100vh', width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
           <Toolbar />
-          <Container maxWidth="xl">
+          <Container maxWidth="xl" disableGutters={isMobile}>
             {children}
           </Container>
         </Box>

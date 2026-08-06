@@ -1,14 +1,27 @@
-import { Box, Typography, Paper, Grid, Stack, Divider } from '@mui/material';
-import { Landmark } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Grid, Stack, Divider, CircularProgress, Chip } from '@mui/material';
+import { Landmark, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
+import { getInstitutionalFlow } from '../../api/client';
 
 export default function InstitutionalActivity() {
+  const [flow, setFlow] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getInstitutionalFlow()
+      .then(setFlow)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <CircularProgress size={20} />;
+
   const flowOption = {
     xAxis: { type: 'category', data: ['Apr', 'May', 'Jun', 'Jul'] },
     yAxis: { type: 'value' },
     series: [
-      { name: 'FII Flow', type: 'line', data: [1200, -450, 800, 2100], color: '#10b981', smooth: true },
-      { name: 'DII Flow', type: 'line', data: [500, 1100, 200, 650], color: '#3b82f6', smooth: true }
+      { name: 'FII Flow', type: 'line', data: [1200, -450, 800, flow?.FII_Net || 2100], color: '#10b981', smooth: true },
+      { name: 'DII Flow', type: 'line', data: [500, 1100, 200, flow?.DII_Net || 650], color: '#3b82f6', smooth: true }
     ],
     legend: { show: true, textStyle: { color: '#fff' } },
     grid: { top: 40, bottom: 40, left: 40, right: 20 }
@@ -32,19 +45,28 @@ export default function InstitutionalActivity() {
           <Paper sx={{ p: 3, height: 300 }}>
              <Typography variant="subtitle2" color="textSecondary" gutterBottom>INSTITUTIONAL CONFIDENCE</Typography>
              <Box sx={{ textAlign: 'center', mt: 4 }}>
-                <Typography variant="h3" fontWeight="bold" color="primary">STRONG</Typography>
+                <Typography variant="h3" fontWeight="bold" color="primary">{flow?.Market_Sentiment?.toUpperCase() || 'STRONG'}</Typography>
                 <Typography variant="body2" color="textSecondary">Accumulation Phase Detected</Typography>
 
                 <Divider sx={{ my: 3, opacity: 0.1 }} />
 
                 <Stack spacing={2}>
-                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Typography variant="caption">Mutual Fund Holdings</Typography>
-                      <Typography variant="caption" fontWeight="bold">+1.2% QoQ</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                         <Typography variant="caption" fontWeight="bold">+1.2% QoQ</Typography>
+                         <ArrowUpRight size={12} className="text-emerald-500" />
+                      </Box>
                    </Box>
                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="caption">Promoter Pledging</Typography>
                       <Typography variant="caption" fontWeight="bold" color="success.main">NONE</Typography>
+                   </Box>
+                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="caption">FII Net Cash</Typography>
+                      <Typography variant="caption" fontWeight="bold" color={flow?.FII_Net >= 0 ? "primary.main" : "error.main"}>
+                         ₹{flow?.FII_Net} Cr
+                      </Typography>
                    </Box>
                 </Stack>
              </Box>

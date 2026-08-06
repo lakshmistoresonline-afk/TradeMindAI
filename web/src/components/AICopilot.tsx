@@ -44,7 +44,7 @@ export default function AICopilot({ stockContext }: { stockContext?: any }) {
         anchor="right"
         open={open}
         onClose={() => setOpen(false)}
-        PaperProps={{ sx: { width: 450, bgcolor: '#020617', borderLeft: '1px solid #334155' } }}
+        PaperProps={{ sx: { width: { xs: '100%', sm: 450 }, bgcolor: '#020617', borderLeft: '1px solid #334155' } }}
       >
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ p: 3, bgcolor: '#0f172a', borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

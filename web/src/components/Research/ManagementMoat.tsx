@@ -1,12 +1,18 @@
-import { Box, Typography, Paper, Grid, Rating, Stack } from '@mui/material';
+import { Box, Typography, Paper, Grid, Rating, Stack, Chip } from '@mui/material';
 import { Award, ShieldCheck, Zap, Anchor } from 'lucide-react';
 
-export default function ManagementMoat() {
+export default function ManagementMoat({ analysis }: { analysis: any }) {
+  if (!analysis || !analysis.recommendations) return null;
+
+  const fundAgent = analysis.recommendations.find((r: any) => r.agent_name === 'Fundamental');
+  const moat = fundAgent?.moat_rating || 'WIDE';
+  const score = fundAgent?.management_score || 4.5;
+
   const factors = [
-    { label: 'Pricing Power', score: 4.5, icon: < Zap size={16} /> },
-    { label: 'Switching Costs', score: 4.0, icon: <Anchor size={16} /> },
-    { label: 'Brand Strength', score: 5.0, icon: <Award size={16} /> },
-    { label: 'Corporate Governance', score: 4.8, icon: <ShieldCheck size={16} /> },
+    { label: 'Pricing Power', score: score, icon: < Zap size={16} /> },
+    { label: 'Switching Costs', score: Math.max(1, score - 0.5), icon: <Anchor size={16} /> },
+    { label: 'Brand Strength', score: Math.min(5, score + 0.5), icon: <Award size={16} /> },
+    { label: 'Corporate Governance', score: score, icon: <ShieldCheck size={16} /> },
   ];
 
   return (
@@ -20,12 +26,12 @@ export default function ManagementMoat() {
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" color="textSecondary" gutterBottom>ECONOMIC MOAT RATING</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-               <Typography variant="h4" fontWeight="bold" color="primary">WIDE MOAT</Typography>
+               <Typography variant="h4" fontWeight="bold" color="primary">{moat.toUpperCase()} MOAT</Typography>
                <Chip label="SUSTAINABLE" size="small" variant="outlined" color="primary" />
             </Box>
             <Typography variant="body2" color="textSecondary" sx={{ lineHeight: 1.6 }}>
-               The company possesses a dominant market position with high entry barriers.
-               Management has demonstrated exceptional capital allocation efficiency over the last decade.
+               AI analysis of market position, competitive barriers, and capital allocation efficiency.
+               {fundAgent ? ` ${fundAgent.reasons[0]}` : ''}
             </Typography>
           </Grid>
 
@@ -47,5 +53,3 @@ export default function ManagementMoat() {
     </Box>
   );
 }
-
-import { Chip } from '@mui/material';

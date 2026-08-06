@@ -1,28 +1,18 @@
-import { Box, Typography, Paper, Grid, Chip, List, ListItem, Divider } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Grid, Chip, List, ListItem, Divider, CircularProgress } from '@mui/material';
 import { Book, Lightbulb } from 'lucide-react';
-
-const mockJournal = [
-  {
-    symbol: 'TATASTEEL',
-    pnl: 1240.50,
-    status: 'PROFIT',
-    feedback: 'Excellent execution. You followed the SMC breakout rule perfectly and exited before the sector resistance.',
-    mistakes: [],
-    lessons: ['Keep trailing stop loss on sector resistance.'],
-    date: 'Aug 01'
-  },
-  {
-    symbol: 'WIPRO',
-    pnl: -450.20,
-    status: 'LOSS',
-    feedback: 'Premature entry. You entered before the EMA cross was confirmed. Be patient for confirmation.',
-    mistakes: ['Entry without confirmation'],
-    lessons: ['Wait for 15-min candle close for confirmation.'],
-    date: 'Jul 28'
-  }
-];
+import { getTradeJournal } from '../api/client';
 
 export default function Journal() {
+  const [journal, setJournal] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTradeJournal()
+      .then(setJournal)
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>AI Trade Coach & Journal</Typography>
@@ -30,48 +20,56 @@ export default function Journal() {
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 0, overflow: 'hidden' }}>
-            <List>
-               {mockJournal.map((entry, i) => (
-                 <Box key={i}>
-                   <ListItem sx={{ display: 'block', p: 4 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography variant="h6" fontWeight="bold">{entry.symbol}</Typography>
-                            <Chip label={entry.status} color={entry.status === 'PROFIT' ? 'success' : 'error'} size="small" />
-                         </Box>
-                         <Typography variant="h6" color={entry.pnl >= 0 ? 'primary' : 'error'} fontWeight="bold">
-                            {entry.pnl >= 0 ? '+' : ''}₹{entry.pnl}
-                         </Typography>
-                      </Box>
+            {loading ? (
+              <Box sx={{ p: 4, textAlign: 'center' }}><CircularProgress /></Box>
+            ) : (
+              <List>
+                {journal.length > 0 ? journal.map((entry, i) => (
+                  <Box key={i}>
+                    <ListItem sx={{ display: 'block', p: 4 }}>
+                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                             <Typography variant="h6" fontWeight="bold">{entry.symbol}</Typography>
+                             <Chip label={entry.pnl >= 0 ? 'PROFIT' : 'LOSS'} color={entry.pnl >= 0 ? 'success' : 'error'} size="small" />
+                          </Box>
+                          <Typography variant="h6" color={entry.pnl >= 0 ? 'primary' : 'error'} fontWeight="bold">
+                             {entry.pnl >= 0 ? '+' : ''}₹{entry.pnl.toLocaleString()}
+                          </Typography>
+                       </Box>
 
-                      <Box sx={{ p: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 2, mb: 2, borderLeft: '4px solid #10b981' }}>
-                         <Typography variant="subtitle2" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                            <Book size={16} /> AI COACH FEEDBACK
-                         </Typography>
-                         <Typography variant="body2" sx={{ lineHeight: 1.6 }}>{entry.feedback}</Typography>
-                      </Box>
+                       <Box sx={{ p: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 2, mb: 2, borderLeft: '4px solid #10b981' }}>
+                          <Typography variant="subtitle2" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                             <Book size={16} /> AI COACH FEEDBACK
+                          </Typography>
+                          <Typography variant="body2" sx={{ lineHeight: 1.6 }}>{entry.feedback}</Typography>
+                       </Box>
 
-                      <Grid container spacing={2}>
-                         <Grid item xs={6}>
-                            <Typography variant="caption" color="textSecondary" gutterBottom display="block">MISTAKES</Typography>
-                            {entry.mistakes.length > 0 ? entry.mistakes.map(m => (
-                              <Chip key={m} label={m} size="small" variant="outlined" color="error" sx={{ mr: 1, fontSize: '0.6rem' }} />
-                            )) : <Typography variant="body2" color="primary">NONE</Typography>}
-                         </Grid>
-                         <Grid item xs={6}>
-                            <Typography variant="caption" color="textSecondary" gutterBottom display="block">LESSONS LEARNED</Typography>
-                            {entry.lessons.map(l => (
-                              <Typography key={l} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                 <Lightbulb size={12} className="text-amber-500" /> {l}
-                              </Typography>
-                            ))}
-                         </Grid>
-                      </Grid>
-                   </ListItem>
-                   <Divider />
-                 </Box>
-               ))}
-            </List>
+                       <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                             <Typography variant="caption" color="textSecondary" gutterBottom display="block">MISTAKES</Typography>
+                             {entry.mistakes && entry.mistakes.length > 0 ? entry.mistakes.map((m: any) => (
+                               <Chip key={m} label={m} size="small" variant="outlined" color="error" sx={{ mr: 1, fontSize: '0.6rem' }} />
+                             )) : <Typography variant="body2" color="primary">NONE</Typography>}
+                          </Grid>
+                          <Grid item xs={6}>
+                             <Typography variant="caption" color="textSecondary" gutterBottom display="block">LESSONS LEARNED</Typography>
+                             {entry.lessons && entry.lessons.map((l: any) => (
+                               <Typography key={l} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Lightbulb size={12} className="text-amber-500" /> {l}
+                               </Typography>
+                             ))}
+                          </Grid>
+                       </Grid>
+                    </ListItem>
+                    <Divider />
+                  </Box>
+                )) : (
+                  <Box sx={{ p: 4, textAlign: 'center' }}>
+                     <Typography color="textSecondary">No journal entries found. Add your executed trades to get AI feedback.</Typography>
+                  </Box>
+                )}
+              </List>
+            )}
           </Paper>
         </Grid>
 

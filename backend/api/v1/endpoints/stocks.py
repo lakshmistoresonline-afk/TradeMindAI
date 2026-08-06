@@ -92,3 +92,32 @@ async def get_stock_detail(
     if stock:
         return stock
     return {"error": "Stock not found"}
+
+@router.get("/{symbol}/news")
+async def get_stock_news(
+    symbol: str
+):
+    """
+    Fetches the latest institutional news and AI sentiment for a stock.
+    """
+    return await container.data_platform_repo.get_latest_news(symbol)
+
+@router.get("/{symbol}/earnings")
+async def get_stock_earnings(
+    symbol: str
+):
+    """
+    Fetches the latest earnings data and upcoming dates for a stock.
+    """
+    return await container.data_platform_repo.get_latest_earnings(symbol)
+
+@router.get("/{symbol}/timeline")
+async def get_stock_timeline(
+    symbol: str
+):
+    """
+    Fetches the institutional intelligence timeline for a stock.
+    """
+    docs = container.repository.db.collection("stocks").document(symbol).collection("timeline")\
+        .order_by("date", direction=firestore.Query.DESCENDING).limit(20).stream()
+    return [doc.to_dict() for doc in docs]

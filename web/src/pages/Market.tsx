@@ -63,8 +63,9 @@ export default function Market() {
         />
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+        <TableContainer component={Paper}>
+          <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
               <TableCell>Symbol</TableCell>
@@ -120,6 +121,7 @@ export default function Market() {
           </TableBody>
         </Table>
       </TableContainer>
+      </Box>
     </Box>
   );
 }

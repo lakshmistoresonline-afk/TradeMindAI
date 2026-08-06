@@ -55,8 +55,20 @@ export default function Dashboard() {
     xAxis: { type: 'category', data: ['09:15', '10:30', '11:45', '13:00', '14:15', '15:30'] },
     yAxis: { type: 'value' },
     series: [
-      { name: 'Advancing', type: 'line', data: [40, 52, 61, 58, 65, 72], color: '#10b981', smooth: true },
-      { name: 'Declining', type: 'line', data: [60, 48, 39, 42, 35, 28], color: '#f43f5e', smooth: true }
+      {
+        name: 'Advancing',
+        type: 'line',
+        data: marketStats?.Breadth ? [Math.round(marketStats.Breadth.advancing * 0.6), Math.round(marketStats.Breadth.advancing * 0.8), marketStats.Breadth.advancing] : [40, 52, 72],
+        color: '#10b981',
+        smooth: true
+      },
+      {
+        name: 'Declining',
+        type: 'line',
+        data: marketStats?.Breadth ? [Math.round(marketStats.Breadth.declining * 1.2), Math.round(marketStats.Breadth.declining * 1.1), marketStats.Breadth.declining] : [60, 48, 28],
+        color: '#f43f5e',
+        smooth: true
+      }
     ],
     legend: { show: true, textStyle: { color: '#fff' } },
     grid: { top: 40, bottom: 40, left: 40, right: 20 }
@@ -64,7 +76,7 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Overview</Typography>
         <Button
           variant="contained"
@@ -88,7 +100,7 @@ export default function Dashboard() {
           <OpportunityEngine />
           <Grid container spacing={3}>
             {/* Dashboard Stats */}
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <StatCard
                 title="NIFTY 100"
                 value={marketStats?.['NIFTY 100']?.value?.toLocaleString() || '---'}
@@ -96,7 +108,7 @@ export default function Dashboard() {
                 icon={<BarChart2 />}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <StatCard
                 title="BANK NIFTY"
                 value={marketStats?.['BANK NIFTY']?.value?.toLocaleString() || '---'}
@@ -104,7 +116,7 @@ export default function Dashboard() {
                 icon={<TrendingUp />}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <StatCard
                 title="India VIX"
                 value={marketStats?.['India VIX']?.value?.toString() || '---'}
@@ -112,7 +124,7 @@ export default function Dashboard() {
                 icon={<ShieldCheck />}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <StatCard
                 title="AI Sentiment"
                 value={signalStrength > 60 ? 'Bullish' : signalStrength < 40 ? 'Bearish' : 'Neutral'}
@@ -124,10 +136,10 @@ export default function Dashboard() {
             {/* Vision 2.0: Market Breadth */}
             <Grid item xs={12}>
               <Paper sx={{ p: 3, bgcolor: 'rgba(16, 185, 129, 0.05)', border: '1px solid #10b981' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
                   <Box>
                     <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>MARKET BREADTH (ADVANCE/DECLINE)</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, mt: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 4 }, mt: 1, flexWrap: 'wrap' }}>
                       <Box>
                         <Typography variant="h4" fontWeight="bold" color="primary">{marketStats?.Breadth?.advancing || 0}</Typography>
                         <Typography variant="caption" color="textSecondary">ADVANCING</Typography>
@@ -136,7 +148,7 @@ export default function Dashboard() {
                         <Typography variant="h4" fontWeight="bold" color="error">{marketStats?.Breadth?.declining || 0}</Typography>
                         <Typography variant="caption" color="textSecondary">DECLINING</Typography>
                       </Box>
-                      <Divider orientation="vertical" flexItem />
+                      <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
                       <Box>
                         <Typography variant="h4" fontWeight="bold">{marketStats?.Breadth?.ratio || 0}</Typography>
                         <Typography variant="caption" color="textSecondary">A/D RATIO</Typography>
@@ -157,27 +169,29 @@ export default function Dashboard() {
             {/* Institutional Flow Section */}
             <Grid item xs={12}>
               <Paper sx={{ p: 3, backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary">FII Net Cash</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="h6" color={(instFlow?.FII_Net || 0) >= 0 ? "primary" : "error"}>
-                        {(instFlow?.FII_Net || 0) >= 0 ? "+" : ""}{instFlow?.FII_Net || 0} Cr
-                      </Typography>
-                      {(instFlow?.FII_Net || 0) >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
+                <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box>
+                      <Typography variant="subtitle2" color="textSecondary">FII Net Cash</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" color={(instFlow?.FII_Net || 0) >= 0 ? "primary" : "error"}>
+                          {(instFlow?.FII_Net || 0) >= 0 ? "+" : ""}{instFlow?.FII_Net || 0} Cr
+                        </Typography>
+                        {(instFlow?.FII_Net || 0) >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
+                      </Box>
+                    </Box>
+                    <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                    <Box>
+                      <Typography variant="subtitle2" color="textSecondary">DII Net Cash</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" color={(instFlow?.DII_Net || 0) >= 0 ? "primary" : "error"}>
+                          {(instFlow?.DII_Net || 0) >= 0 ? "+" : ""}{instFlow?.DII_Net || 0} Cr
+                        </Typography>
+                        {(instFlow?.DII_Net || 0) >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
+                      </Box>
                     </Box>
                   </Box>
-                  <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary">DII Net Cash</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="h6" color={(instFlow?.DII_Net || 0) >= 0 ? "primary" : "error"}>
-                        {(instFlow?.DII_Net || 0) >= 0 ? "+" : ""}{instFlow?.DII_Net || 0} Cr
-                      </Typography>
-                      {(instFlow?.DII_Net || 0) >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
-                    </Box>
-                  </Box>
-                  <Box sx={{ ml: 'auto', textAlign: 'right' }}>
+                  <Box sx={{ ml: { xs: 0, sm: 'auto' }, textAlign: { xs: 'left', sm: 'right' }, width: { xs: '100%', sm: 'auto' } }}>
                     <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>Institutional Bias</Typography>
                     <Chip
                       label={instFlow?.Market_Sentiment || "Wait..."}

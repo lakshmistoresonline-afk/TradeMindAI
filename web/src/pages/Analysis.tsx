@@ -43,6 +43,7 @@ export default function Analysis() {
   const [selectedStock, setSelectedStock] = useState<any | null>(null);
   const [backtestReport, setBacktestReport] = useState<any | null>(null);
   const [backtestSignals, setBacktestSignals] = useState<any[]>([]);
+  const [timeline, setTimeline] = useState<any[]>([]);
   const [loadingBacktest, setLoadingBacktest] = useState(false);
   const [view, setView] = useState('research'); // 'research', 'backtest', 'twin'
 
@@ -115,6 +116,7 @@ ${selectedStock.analysis?.consensus}
     if (selectedStock) {
       fetchBacktest(selectedStock.symbol);
       fetchSignals(selectedStock.symbol);
+      getStockTimeline(selectedStock.symbol).then(setTimeline);
     }
   }, [selectedStock]);
 
@@ -151,11 +153,11 @@ ${selectedStock.analysis?.consensus}
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 4, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Institutional Research</Typography>
 
         <Autocomplete
-          sx={{ width: 300 }}
+          sx={{ width: { xs: '100%', sm: 300 } }}
           options={stocks}
           getOptionLabel={(option) => `${option.symbol} - ${option.name}`}
           onChange={(_, newValue) => setSelectedStock(newValue)}
@@ -169,34 +171,39 @@ ${selectedStock.analysis?.consensus}
         <Box>
           <ResearchHeader stock={selectedStock} />
 
-          <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
+          <Box sx={{ mb: 4, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
              <Button
                variant={view === 'research' ? 'contained' : 'outlined'}
                startIcon={<FileText size={18} />}
                onClick={() => setView('research')}
+               size="small"
              >
-               Research Report
+               Report
              </Button>
              <Button
                variant={view === 'backtest' ? 'contained' : 'outlined'}
                startIcon={<History size={18} />}
                onClick={() => setView('backtest')}
+               size="small"
              >
-               Backtest & Accuracy
+               Backtest
              </Button>
              <Button
                variant={view === 'twin' ? 'contained' : 'outlined'}
                startIcon={<Fingerprint size={18} />}
                onClick={() => setView('twin')}
+               size="small"
              >
                Digital Twin
              </Button>
-             <Box sx={{ ml: 'auto' }}>
+             <Box sx={{ ml: { xs: 0, sm: 'auto' }, width: { xs: '100%', sm: 'auto' }, mt: { xs: 1, sm: 0 } }}>
                 <Button
                   variant="outlined"
                   color="primary"
+                  fullWidth
                   startIcon={<FileText size={18} />}
                   onClick={generateReport}
+                  size="small"
                 >
                   Generate Research Report
                 </Button>
@@ -205,17 +212,17 @@ ${selectedStock.analysis?.consensus}
 
           {view === 'research' ? (
             <Grid container spacing={3}>
-              <Grid item xs={12} md={9}>
+              <Grid item xs={12} lg={9}>
                 {/* Module 1 & 2: Score & Confidence */}
                 <Grid container spacing={3} sx={{ mb: 4 }}>
-                   <Grid item xs={12} md={6}>
+                   <Grid item xs={12} sm={6}>
                       <AIScoreCard
                         score={selectedStock.ai_investment_score || 0}
                         grade={selectedStock.ai_investment_grade || 'B'}
                         confidence={selectedStock.confidence_metrics}
                       />
                    </Grid>
-                   <Grid item xs={12} md={6}>
+                   <Grid item xs={12} sm={6}>
                       <StockHealthScorecard metrics={selectedStock.health_metrics} />
                    </Grid>
                 </Grid>
@@ -246,13 +253,13 @@ ${selectedStock.analysis?.consensus}
                       <MarketStructure smc={selectedStock.analysis?.technical_data?.smc} />
                    </Grid>
                    <Grid item xs={12}>
-                      <EarningsIntelligence />
+                      <EarningsIntelligence symbol={selectedStock.symbol} />
                    </Grid>
                    <Grid item xs={12}>
-                      <AIResearchTimeline />
+                      <AIResearchTimeline symbol={selectedStock.symbol} />
                    </Grid>
                    <Grid item xs={12}>
-                      <ManagementMoat />
+                      <ManagementMoat analysis={selectedStock.analysis} />
                    </Grid>
                    <Grid item xs={12}>
                       <HistoricalAIPerformance />
@@ -261,7 +268,7 @@ ${selectedStock.analysis?.consensus}
                       <FundamentalReport stock={selectedStock} />
                    </Grid>
                    <Grid item xs={12}>
-                      <RadarComparison symbol={selectedStock.symbol} />
+                      <RadarComparison stock={selectedStock} />
                    </Grid>
                    <Grid item xs={12}>
                       <FinancialWorkspace />
@@ -270,7 +277,7 @@ ${selectedStock.analysis?.consensus}
                       <InstitutionalActivity />
                    </Grid>
                    <Grid item xs={12}>
-                      <AINewsCenter />
+                      <AINewsCenter symbol={selectedStock.symbol} />
                    </Grid>
                    <Grid item xs={12}>
                       <OptionsAnalytics data={selectedStock.analysis?.options_data} />
@@ -303,16 +310,12 @@ ${selectedStock.analysis?.consensus}
                       <AILearningMentor />
                    </Grid>
                    <Grid item xs={12}>
-                      <RecommendationHistory history={[
-                        { date: 'Aug 01', rating: 'BUY', confidence: 88, outcome: 12.4, accuracy: 'HIT' },
-                        { date: 'Jul 15', rating: 'BUY', confidence: 72, outcome: 4.2, accuracy: 'HIT' },
-                        { date: 'Jun 28', rating: 'HOLD', confidence: 65, outcome: -2.1, accuracy: 'HIT' }
-                      ]} />
+                      <RecommendationHistory history={timeline.filter(t => t.type === 'RATING')} />
                    </Grid>
                 </Grid>
               </Grid>
 
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} lg={3}>
                 <Stack spacing={3}>
                   <Paper sx={{ p: 3 }}>
                     <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

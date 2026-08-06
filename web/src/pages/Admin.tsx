@@ -1,13 +1,20 @@
 import { Box, Typography, Paper, Grid, Chip, LinearProgress, Stack, Divider, CircularProgress, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import ReactECharts from 'echarts-for-react';
-import { getSystemEvaluation } from '../api/client';
+import { getSystemEvaluation, getSystemLogs } from '../api/client';
 import { useState, useEffect } from 'react';
 
 export default function Admin() {
   const [evaluation, setEvaluation] = useState<any>(null);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-     getSystemEvaluation().then(setEvaluation);
+     Promise.all([getSystemEvaluation(), getSystemLogs()])
+       .then(([evalData, logsData]) => {
+          setEvaluation(evalData);
+          setLogs(logsData);
+       })
+       .finally(() => setLoading(false));
   }, []);
 
   const usageOption = {
@@ -39,7 +46,7 @@ export default function Admin() {
           <Paper sx={{ p: 3, height: 400 }}>
              <Typography variant="subtitle2" color="textSecondary" gutterBottom>AGENT ACCURACY MONITOR</Typography>
              <Stack spacing={3} sx={{ mt: 4 }}>
-                {evaluation?.agents.map((agent: any) => (
+                {evaluation?.agents?.map((agent: any) => (
                    <AgentProgress key={agent.name} label={agent.name} value={agent.accuracy} />
                 ))}
                 {!evaluation && <CircularProgress />}
@@ -57,33 +64,43 @@ export default function Admin() {
       </Grid>
 
       <Paper sx={{ mt: 3, p: 3 }}>
-         <Typography variant="h6" gutterBottom>Security & Audit Logs</Typography>
+         <Typography variant="h6" gutterBottom>Security & Forensic Audit Logs</Typography>
          <TableContainer>
             <Table size="small">
                <TableHead>
                   <TableRow>
                      <TableCell>Timestamp</TableCell>
-                     <TableCell>User</TableCell>
-                     <TableCell>Action</TableCell>
-                     <TableCell>IP Address</TableCell>
+                     <TableCell>Type</TableCell>
+                     <TableCell>Symbol</TableCell>
+                     <TableCell>Step / Detail</TableCell>
                      <TableCell align="right">Status</TableCell>
                   </TableRow>
                </TableHead>
                <TableBody>
-                  <TableRow>
-                     <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>19:42:01</TableCell>
-                     <TableCell>admin@trademind.ai</TableCell>
-                     <TableCell>BATCH_ANALYSIS_TRIGGER</TableCell>
-                     <TableCell>106.213.12.42</TableCell>
-                     <TableCell align="right"><Chip label="SUCCESS" size="small" color="success" sx={{ fontSize: '0.6rem' }} /></TableCell>
-                  </TableRow>
-                  <TableRow>
-                     <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>18:15:34</TableCell>
-                     <TableCell>system_worker</TableCell>
-                     <TableCell>ML_MODEL_RETRAIN</TableCell>
-                     <TableCell>internal_ip</TableCell>
-                     <TableCell align="right"><Chip label="SUCCESS" size="small" color="success" sx={{ fontSize: '0.6rem' }} /></TableCell>
-                  </TableRow>
+                  {logs.length > 0 ? logs.map((log, i) => (
+                    <TableRow key={i}>
+                       <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                          {new Date(log.timestamp).toLocaleTimeString()}
+                       </TableCell>
+                       <TableCell>
+                          <Chip label={log.type} size="small" variant="outlined" sx={{ fontSize: '0.6rem' }} />
+                       </TableCell>
+                       <TableCell fontWeight="bold">{log.symbol || 'SYSTEM'}</TableCell>
+                       <TableCell sx={{ fontSize: '0.75rem' }}>
+                          {log.step || log.error || 'N/A'}
+                       </TableCell>
+                       <TableCell align="right">
+                          <Chip
+                            label={log.type.includes('ERROR') ? 'FAILED' : 'SUCCESS'}
+                            size="small"
+                            color={log.type.includes('ERROR') ? 'error' : 'success'}
+                            sx={{ fontSize: '0.6rem' }}
+                          />
+                       </TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow><TableCell colSpan={5} align="center"><Typography color="textSecondary">No logs found.</Typography></TableCell></TableRow>
+                  )}
                </TableBody>
             </Table>
          </TableContainer>

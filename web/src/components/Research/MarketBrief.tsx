@@ -21,8 +21,8 @@ export default function MarketBrief() {
 
   return (
     <Box sx={{ mb: 4 }}>
-      <Paper sx={{ p: 3, border: '1px solid #10b981', bgcolor: 'rgba(16, 185, 129, 0.05)' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Paper sx={{ p: { xs: 2, sm: 3 }, border: '1px solid #10b981', bgcolor: 'rgba(16, 185, 129, 0.05)' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Zap size={20} className="text-emerald-500" />
               <Typography variant="h6" fontWeight="bold">AI Daily Intelligence</Typography>
@@ -51,7 +51,7 @@ export default function MarketBrief() {
 
         <Divider sx={{ my: 3, opacity: 0.1 }} />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 3 }, flexWrap: 'wrap' }}>
            <MarketRegimeTag label="Regime" value={regime?.regime} color="#10b981" />
            <MarketRegimeTag label="Risk Mode" value={regime?.risk_mode} color="#3b82f6" />
            <MarketRegimeTag label="VIX" value={regime?.volatility_index} color="#94a3b8" />

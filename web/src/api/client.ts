@@ -29,6 +29,21 @@ export const getStockDetail = async (symbol: string) => {
   return response.data;
 };
 
+export const getStockNews = async (symbol: string) => {
+  const response = await apiClient.get(`/stocks/${symbol}/news`);
+  return response.data;
+};
+
+export const getStockEarnings = async (symbol: string) => {
+  const response = await apiClient.get(`/stocks/${symbol}/earnings`);
+  return response.data;
+};
+
+export const getStockTimeline = async (symbol: string) => {
+  const response = await apiClient.get(`/stocks/${symbol}/timeline`);
+  return response.data;
+};
+
 export const triggerBatchAnalysis = async () => {
   const response = await apiClient.post('/analysis/trigger');
   return response.data;
@@ -36,6 +51,11 @@ export const triggerBatchAnalysis = async () => {
 
 export const triggerBacktest = async (symbol: string) => {
   const response = await apiClient.post(`/analysis/backtest/${symbol}`);
+  return response.data;
+};
+
+export const getGlobalPerformance = async () => {
+  const response = await apiClient.get('/analysis/backtest');
   return response.data;
 };
 
@@ -79,6 +99,11 @@ export const getMTFAlignment = async (symbol: string) => {
   return response.data;
 };
 
+export const getSimilarPatterns = async (symbol: string) => {
+  const response = await apiClient.get(`/ios/similarity/${symbol}`);
+  return response.data;
+};
+
 export const getResearchNotes = async (symbol: string) => {
   const response = await apiClient.get(`/ios/notes/${symbol}`);
   return response.data;
@@ -94,6 +119,11 @@ export const getSystemEvaluation = async () => {
   return response.data;
 };
 
+export const getSystemLogs = async () => {
+  const response = await apiClient.get('/admin/logs');
+  return response.data;
+};
+
 export const getWorkspaces = async () => {
   const response = await apiClient.get('/ios/workspaces');
   return response.data;
@@ -101,6 +131,21 @@ export const getWorkspaces = async () => {
 
 export const saveWorkspace = async (workspace: any) => {
   const response = await apiClient.post('/ios/workspaces', workspace);
+  return response.data;
+};
+
+export const getTradeJournal = async () => {
+  const response = await apiClient.get('/ios/journal');
+  return response.data;
+};
+
+export const addTradeToJournal = async (trade: any) => {
+  const response = await apiClient.post('/ios/journal', trade);
+  return response.data;
+};
+
+export const getPortfolioOptimizations = async () => {
+  const response = await apiClient.get('/ios/portfolio/optimize');
   return response.data;
 };
 

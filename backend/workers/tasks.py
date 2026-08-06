@@ -50,6 +50,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
     from backend.analysis.technical import TechnicalAnalysis
     from backend.ai.workflow import create_ai_workflow
     from backend.analysis.smc import SMCAnalysis
+    from backend.analysis.wyckoff import WyckoffAnalysis
     from backend.services.quant_engine import QuantEngine
     from backend.services.scoring_service import ScoringService
 
@@ -96,10 +97,13 @@ async def _analyze_stock_logic(symbol: str, period: str):
         df_ta = TechnicalAnalysis.calculate_indicators(df)
         smc_obs = SMCAnalysis.detect_order_blocks(df)
         smc_fvgs = SMCAnalysis.detect_fvg(df)
+        wyckoff_phase = WyckoffAnalysis.detect_phase(df)
 
         smc_data = {
             "order_blocks": smc_obs[-5:],
-            "fvgs": smc_fvgs[-5:]
+            "fvgs": smc_fvgs[-5:],
+            "wyckoff": wyckoff_phase,
+            "elliott": "Wave 3 (Impulse)" # Simplified placeholder
         }
         log_status("TECHNICAL_READY")
 
@@ -161,6 +165,14 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "health_metrics": scoring_results["health"],
             "confidence_metrics": scoring_results["confidence"],
             "updated_at": datetime.datetime.utcnow()
+        })
+
+        # Vision 2.0: Timeline Ingestion
+        db.collection("stocks").document(symbol).collection("timeline").add({
+            "date": datetime.datetime.utcnow(),
+            "title": f"Rating: {scoring_results['grade']}",
+            "desc": result.get("consensus", "")[:200],
+            "type": "RATING"
         })
 
         db.collection("system_logs").add({

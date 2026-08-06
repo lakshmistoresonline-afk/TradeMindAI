@@ -13,18 +13,18 @@ export default function ResearchHeader({ stock }: { stock: any }) {
 
   return (
     <Box sx={{ mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h4" fontWeight="bold">{stock.name}</Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 1 }}>
+          <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>{stock.name}</Typography>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1, flexWrap: 'wrap' }}>
             <Typography variant="h6" color="textSecondary">{stock.symbol}</Typography>
             <Chip label={stock.sector} size="small" variant="outlined" icon={<Layers size={14} />} />
             <Chip label={stock.industry} size="small" variant="outlined" />
           </Box>
         </Box>
-        <Box sx={{ textAlign: 'right' }}>
-          <Typography variant="h4" fontWeight="bold">₹{stock.last_price?.toLocaleString()}</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
+        <Box sx={{ textAlign: { xs: 'left', sm: 'right' }, width: { xs: '100%', sm: 'auto' } }}>
+          <Typography variant="h4" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>₹{stock.last_price?.toLocaleString()}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
             {stock.change_pct >= 0 ? <TrendingUp size={20} className="text-emerald-500" /> : <TrendingDown size={20} className="text-rose-500" />}
             <Typography variant="h6" color={stock.change_pct >= 0 ? 'primary' : 'error'} fontWeight="bold">
               {stock.change_pct?.toFixed(2)}%
