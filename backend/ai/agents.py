@@ -29,8 +29,12 @@ class BaseAgent:
     def __init__(self, name: str):
         self.name = name
         # Diagnostic Check for API Key
-        if settings.GROQ_API_KEY == "YOUR_GROQ_API_KEY":
+        key = settings.GROQ_API_KEY
+        if not key or key == "YOUR_GROQ_API_KEY":
              raise ValueError("GROQ_API_KEY not configured in environment variables.")
+
+        # Log key availability (safe prefix only)
+        print(f"Agent {name} initialized with key prefix: {key[:8]}...")
 
         # Using Llama 3 70B on Groq
         self.llm = ChatGroq(
