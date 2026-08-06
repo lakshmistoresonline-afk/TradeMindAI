@@ -17,6 +17,9 @@ class StockService:
         existing_stock = await self.repository.get_stock_by_symbol(symbol)
         info = await self.provider.fetch_stock_info(symbol)
 
+        # Vision 2.0: Dynamic Price Refresh
+        last_price = info.get("last_price", 0.0)
+
         is_initial_load = not (existing_stock and existing_stock.updated_at)
         fetch_period = period if is_initial_load else "1mo"
         history_df = await self.provider.fetch_history(symbol, fetch_period)

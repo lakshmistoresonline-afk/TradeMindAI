@@ -7,29 +7,41 @@ import datetime
 
 class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataProvider):
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
-        ticker = yf.Ticker(f"{symbol}.NS")
-        info = ticker.info
-        return {
-            "name": info.get("longName"),
-            "sector": info.get("sector"),
-            "industry": info.get("industry"),
-            "last_price": info.get("currentPrice"),
-            "market_cap": info.get("marketCap"),
-            "enterprise_value": info.get("enterpriseValue"),
-            "pe_ratio": info.get("forwardPE"),
-            "pb_ratio": info.get("priceToBook"),
-            "peg_ratio": info.get("pegRatio"),
-            "roe": info.get("returnOnEquity"),
-            "roce": info.get("returnOnAssets"), # ROCE not directly in basic info, using ROA as proxy or need more calcs
-            "eps": info.get("forwardEps"),
-            "debt_to_equity": info.get("debtToEquity"),
-            "book_value": info.get("bookValue"),
-            "dividend_yield": info.get("dividendYield"),
-            "face_value": info.get("faceValue"),
-            "high_52w": info.get("fiftyTwoWeekHigh"),
-            "low_52w": info.get("fiftyTwoWeekLow"),
-            "avg_volume": info.get("averageVolume"),
-        }
+        try:
+            ticker = yf.Ticker(f"{symbol}.NS")
+            info = ticker.info
+            return {
+                "name": info.get("longName") or symbol,
+                "sector": info.get("sector") or "Unknown",
+                "industry": info.get("industry") or "Unknown",
+                "last_price": info.get("currentPrice") or info.get("regularMarketPrice") or 0.0,
+                "market_cap": info.get("marketCap") or 0,
+                "enterprise_value": info.get("enterpriseValue") or 0,
+                "pe_ratio": info.get("forwardPE") or info.get("trailingPE"),
+                "pb_ratio": info.get("priceToBook"),
+                "peg_ratio": info.get("pegRatio"),
+                "roe": info.get("returnOnEquity"),
+                "roce": info.get("returnOnAssets"),
+                "eps": info.get("forwardEps") or info.get("trailingEps"),
+                "debt_to_equity": info.get("debtToEquity"),
+                "book_value": info.get("bookValue"),
+                "dividend_yield": info.get("dividendYield"),
+                "face_value": info.get("faceValue"),
+                "high_52w": info.get("fiftyTwoWeekHigh"),
+                "low_52w": info.get("fiftyTwoWeekLow"),
+                "avg_volume": info.get("averageVolume") or 0,
+            }
+        except Exception as e:
+            print(f"YFinance Error for {symbol}: {e}")
+            # Fallback to absolute minimum data to prevent crash
+            return {
+                "name": symbol,
+                "sector": "Unknown",
+                "industry": "Unknown",
+                "last_price": 0.0,
+                "market_cap": 0,
+                "avg_volume": 0
+            }
 
     async def fetch_history(self, symbol: str, period: str) -> Any:
         ticker = yf.Ticker(f"{symbol}.NS")
@@ -37,20 +49,24 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
         return ticker.history(period=period, auto_adjust=True)
 
     async def fetch_latest_news(self, symbol: str) -> List[NewsArticle]:
-        ticker = yf.Ticker(f"{symbol}.NS")
-        news = ticker.news
-        articles = []
-        for item in news:
-            articles.append(NewsArticle(
-                id=item["uuid"],
-                symbol=symbol,
-                title=item["title"],
-                url=item["link"],
-                source=item["publisher"],
-                published_at=datetime.datetime.fromtimestamp(item["providerPublishTime"]),
-                content=item.get("summary", "")
-            ))
-        return articles
+        try:
+            ticker = yf.Ticker(f"{symbol}.NS")
+            news = ticker.news
+            articles = []
+            for item in news:
+                articles.append(NewsArticle(
+                    id=item.get("uuid", str(datetime.datetime.now().timestamp())),
+                    symbol=symbol,
+                    title=item.get("title", "No Title"),
+                    url=item.get("link", "#"),
+                    source=item.get("publisher", "Unknown"),
+                    published_at=datetime.datetime.fromtimestamp(item.get("providerPublishTime", datetime.datetime.now().timestamp())),
+                    content=item.get("summary", "No Content Available")
+                ))
+            return articles
+        except Exception as e:
+            print(f"YFinance News Error for {symbol}: {e}")
+            return []
 
     async def fetch_daily_flow(self) -> InstitutionalFlow:
         # Placeholder: FII/DII data isn't directly available in yfinance OHLC.
