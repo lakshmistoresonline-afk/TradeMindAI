@@ -36,10 +36,10 @@ class BaseAgent:
         # Log key availability (safe prefix only)
         print(f"Agent {name} initialized with key prefix: {key[:8]}...")
 
-        # Using Llama 3 70B on Groq
+        # Using Llama 3.3 70B on Groq
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
-            model_name="llama3-70b-8192",
+            model_name="llama-3.3-70b-versatile",
             temperature=0.1
         )
 

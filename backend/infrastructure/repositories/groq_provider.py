@@ -8,7 +8,7 @@ class GroqAIProvider(IAIProvider):
     def __init__(self):
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
-            model_name="llama3-70b-8192",
+            model_name="llama-3.3-70b-versatile",
             temperature=0.1
         )
         self.workflow = create_ai_workflow()
