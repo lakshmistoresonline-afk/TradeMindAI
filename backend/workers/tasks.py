@@ -87,6 +87,12 @@ async def _analyze_stock_logic(symbol: str, period: str):
         df = pd.DataFrame([p.model_dump() for p in recent_prices])
         df.set_index('date', inplace=True)
 
+        # Vision 2.0: Standardize column names for Technical Analysis
+        df.rename(columns={
+            "open": "Open", "high": "High", "low": "Low",
+            "close": "Close", "volume": "Volume"
+        }, inplace=True)
+
         # 3. Technical & SMC Analysis
         df_ta = TechnicalAnalysis.calculate_indicators(df)
         smc_obs = SMCAnalysis.detect_order_blocks(df)
