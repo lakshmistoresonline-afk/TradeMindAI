@@ -35,6 +35,16 @@ async def get_market_intelligence(type: str = "CLOSING"):
         raise HTTPException(status_code=404, detail="Intelligence report not found")
     return report
 
+@router.post("/intel/trigger")
+async def trigger_market_intel():
+    """
+    Vision 2.0: Manually triggers the Daily Market Intelligence processing.
+    Populates regimes, opportunities and closing reports.
+    """
+    from backend.workers.tasks import process_market_intelligence
+    task = process_market_intelligence.delay()
+    return {"message": "Market Intelligence processing triggered", "task_id": task.id}
+
 @router.get("/graph/{symbol}")
 async def get_knowledge_graph(symbol: str):
     """

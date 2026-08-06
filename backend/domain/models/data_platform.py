@@ -70,6 +70,7 @@ class FeatureVector(BaseModel):
     version: str
     features: Dict[str, float]
     target: Optional[float] = None # For ML Training
+    metadata: Dict[str, Any] = {}
 
 class Prediction(BaseModel):
     symbol: str

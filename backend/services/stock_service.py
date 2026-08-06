@@ -21,9 +21,11 @@ class StockService:
         fetch_period = period if is_initial_load else "1mo"
         history_df = await self.provider.fetch_history(symbol, fetch_period)
 
-        # 2. Sync News (New)
+        # 2. Sync News (Vision 2.0)
+        from backend.core.container import container
         news = await self.news_provider.fetch_latest_news(symbol)
-        # In a full impl, we'd save news to data_platform_repo via repository
+        if news:
+            await container.data_platform_repo.save_news(news)
 
         # 3. Map to Domain & Persist
         stock = Stock(symbol=symbol, **info)
