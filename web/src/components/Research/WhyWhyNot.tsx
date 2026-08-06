@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { CheckCircle2, XCircle, HelpCircle, Info } from 'lucide-react';
+import { CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
 
 export default function WhyWhyNot({ analysis }: { analysis: any }) {
   if (!analysis || !analysis.recommendations) return null;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Grid, Stack, Divider, CircularProgress, Chip } from '@mui/material';
-import { Landmark, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Stack, Divider, CircularProgress } from '@mui/material';
+import { Landmark, ArrowUpRight } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 import { getInstitutionalFlow } from '../../api/client';
 
