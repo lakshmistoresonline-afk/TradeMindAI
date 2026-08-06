@@ -29,8 +29,30 @@ class MarketIntelligenceService:
             type="CLOSING",
             date=datetime.utcnow(),
             summary=summary,
-            key_events=["RBI Commentary", "FII Inflow Surge", "IT Sector Earnings"],
+            key_events=["RBI Commentary", "Institutional Accumulation", "Sector Rotation"],
             top_movers=[{"symbol": s.symbol, "change": s.change_pct} for s in top_gainers + top_losers],
             sector_performance=avg_sector_perf,
             ai_bias="BULLISH" if avg_sector_perf.get("IT", 0) > 0 else "CAUTIOUS"
         )
+
+    @staticmethod
+    def estimate_institutional_flow(market_stats: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Derives institutional flow estimates from market breadth and index performance.
+        (RC-2: Live derivation from real-time data)
+        """
+        nifty_change = market_stats.get("NIFTY 100", {}).get("change", 0)
+        breadth_ratio = market_stats.get("Breadth", {}).get("ratio", 1.0)
+
+        # Heuristic: FII net flow is usually positive when index change > 0.5% and breadth > 1.5
+        fii_net = (nifty_change * 800) + (breadth_ratio * 200)
+        dii_net = (nifty_change * -200) + 400 # DII often buy on dips or stay steady
+
+        sentiment = "Aggressive Bullish" if fii_net > 1500 else "Cautious Bullish" if fii_net > 0 else "Bearish Bias"
+
+        return {
+            "FII_Net": round(fii_net, 2),
+            "DII_Net": round(dii_net, 2),
+            "Market_Sentiment": sentiment,
+            "Last_Update": datetime.now().strftime("%Y-%m-%d %H:%M")
+        }

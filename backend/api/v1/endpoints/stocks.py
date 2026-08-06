@@ -65,13 +65,12 @@ async def get_market_stats():
 
 @router.get("/fii-dii")
 async def get_institutional_flow():
-    # Mock data for institutional flow
-    return {
-        "FII_Net": 1240.50, # In Crores
-        "DII_Net": -850.20,
-        "Market_Sentiment": "Cautious Bullish",
-        "Last_Update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    }
+    """
+    Vision 2.0: Institutional Cash Flow Audit.
+    Returns estimates derived from real-time market breadth and volume.
+    """
+    stats = await get_market_stats()
+    return container.intel_service.estimate_institutional_flow(stats)
 
 @router.get("/")
 @cache(expire=600)

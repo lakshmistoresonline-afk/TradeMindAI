@@ -102,6 +102,7 @@ class ModelMetadata(BaseModel):
     is_champion: bool = False
     last_trained: datetime
     hyperparameters: Dict[str, Any]
+    feature_importances: Dict[str, float] = {}
 
 class OptionsMetric(BaseModel):
     symbol: str

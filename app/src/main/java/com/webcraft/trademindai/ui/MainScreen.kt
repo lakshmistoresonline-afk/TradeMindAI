@@ -1,14 +1,14 @@
 package com.webcraft.trademindai.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Dashboard
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +42,16 @@ fun MainScreen() {
             composable("market") { MarketScreen(onStockClick = { /* Navigate to detail */ }) }
             composable("portfolio") { PortfolioScreen() }
             composable("analysis") { AnalysisScreen() }
+            composable("opportunities") { 
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) { 
+                    Text("Opportunities Coming Soon") 
+                } 
+            }
+            composable("journal") { 
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) { 
+                    Text("Journal Coming Soon") 
+                } 
+            }
         }
     }
 }
@@ -50,10 +60,10 @@ fun MainScreen() {
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem("Intelligence", "dashboard", Icons.Default.Dashboard),
-        BottomNavItem("Opportunities", "opportunities", Icons.Default.Star),
+        BottomNavItem("Signals", "opportunities", Icons.Default.Star),
         BottomNavItem("Journal", "journal", Icons.Default.MenuBook),
         BottomNavItem("Portfolio", "portfolio", Icons.Default.AccountBalanceWallet),
-        BottomNavItem("AI", "analysis", Icons.Default.AutoAwesome)
+        BottomNavItem("AI Research", "analysis", Icons.Default.AutoAwesome)
     )
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()

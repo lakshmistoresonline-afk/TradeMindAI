@@ -45,6 +45,9 @@ class MLService:
         prec = precision_score(y_test, y_pred, zero_division=0)
         rec = recall_score(y_test, y_pred, zero_division=0)
 
+        # Feature Importance
+        importances = dict(zip(X.columns, model.feature_importances_.astype(float)))
+
         version = datetime.utcnow().strftime("%Y%m%d%H%M")
         model_name = f"{symbol}_rf_{version}.joblib"
         joblib.dump(model, os.path.join(self.model_dir, model_name))
@@ -60,7 +63,8 @@ class MLService:
             recall=float(rec),
             is_champion=False,
             last_trained=datetime.utcnow(),
-            hyperparameters={"n_estimators": 100}
+            hyperparameters={"n_estimators": 100},
+            feature_importances=importances
         )
 
         # Champion Selection Logic:

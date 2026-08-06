@@ -29,8 +29,8 @@ class ScoringService:
         # 3. ML Bias
         ml_score = ml_prediction.get("confidence", 0) if ml_prediction.get("prediction") == "UP" else (100 - ml_prediction.get("confidence", 0)) if ml_prediction.get("prediction") == "DOWN" else 50
 
-        # 4. Institutional Bias (Mocked for now)
-        inst_score = 75
+        # 4. Institutional Bias (RC-2: Derived from feature store)
+        inst_score = 50 + (features.get("fii_net_bias", 0) * 50)
 
         # Aggregate
         total_score = (

@@ -298,7 +298,7 @@ ${selectedStock.analysis?.consensus}
                       <MarketReplay />
                    </Grid>
                    <Grid item xs={12}>
-                      <ScenarioSimulator />
+                      <ScenarioSimulator stock={selectedStock} />
                    </Grid>
                    <Grid item xs={12}>
                       <CorrelationEngine symbol={selectedStock.symbol} />
