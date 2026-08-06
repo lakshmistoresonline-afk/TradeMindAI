@@ -105,6 +105,9 @@ async def _analyze_stock_logic(symbol: str, period: str):
 
         # 5. Quantitative Analytics (Institutional Metrics)
         nifty_df = await service.provider.fetch_history("^NSEI", period)
+        if nifty_df.empty:
+             log_status("QUANT_WARNING", error="Benchmark data (NIFTY) empty. Using default metrics.")
+
         quant_metrics = QuantEngine.calculate_metrics(symbol, df, nifty_df)
         log_status("QUANT_READY")
 

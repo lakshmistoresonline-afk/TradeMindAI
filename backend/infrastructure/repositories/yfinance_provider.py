@@ -44,9 +44,17 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             }
 
     async def fetch_history(self, symbol: str, period: str) -> Any:
-        ticker = yf.Ticker(f"{symbol}.NS")
-        # auto_adjust=True handles stock splits and dividends automatically
-        return ticker.history(period=period, auto_adjust=True)
+        try:
+            ticker = yf.Ticker(f"{symbol}.NS")
+            # auto_adjust=True handles stock splits and dividends automatically
+            df = ticker.history(period=period, auto_adjust=True)
+            if df.empty:
+                print(f"Warning: Empty history for {symbol}")
+            return df
+        except Exception as e:
+            import pandas as pd
+            print(f"YFinance History Error for {symbol}: {e}")
+            return pd.DataFrame()
 
     async def fetch_latest_news(self, symbol: str) -> List[NewsArticle]:
         try:
