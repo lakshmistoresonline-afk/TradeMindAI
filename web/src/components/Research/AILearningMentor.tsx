@@ -5,23 +5,23 @@ export default function AILearningMentor() {
   const concepts = [
     {
       term: 'Order Block (SMC)',
-      definition: 'A specific price level where institutional buyers or sellers have placed large orders, creating a supply or demand zone.',
-      why_it_matters: 'Identifying these zones helps retail traders align with institutional flow.'
+      definition: 'A price region where institutional activity is concentrated, often leading to strong momentum shifts.',
+      why_it_matters: 'TradeMind AI prioritizes these zones for high-conviction entry signals.'
     },
     {
-      term: 'RSI Divergence',
-      definition: 'When the price makes a new high/low but the RSI indicator does not, suggesting a weakening trend.',
-      why_it_matters: 'It often precedes a price reversal or consolidation.'
+      term: 'Consensus Agent',
+      definition: 'Our meta-AI layer that weights 12 specialized analyst agents to provide a unified investment decision.',
+      why_it_matters: 'Reduces individual agent bias and increases overall signal reliability.'
     },
     {
-      term: 'Wide Moat',
-      definition: 'A significant competitive advantage that allows a company to protect its long-term profits and market share.',
-      why_it_matters: 'Wide moat companies are generally safer long-term investments.'
+      term: 'Digital Twin',
+      definition: 'A real-time data mirror of an asset that combines its technical posture, risk profile, and intelligence DNA.',
+      why_it_matters: 'Provides a complete identity of the stock beyond simple price action.'
     },
     {
       term: 'Sharpe Ratio',
-      definition: 'A measure of risk-adjusted return, calculated by dividing the excess return by the volatility.',
-      why_it_matters: 'Higher Sharpe ratios indicate better returns for each unit of risk taken.'
+      definition: 'An institutional metric that evaluates how much excess return you receive for the extra volatility you endure.',
+      why_it_matters: 'TradeMind AI only recommends trades with a favorable risk-adjusted profile.'
     }
   ];
 

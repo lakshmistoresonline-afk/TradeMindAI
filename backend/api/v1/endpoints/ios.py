@@ -174,3 +174,15 @@ async def generate_api_key(current_user: dict = Depends(get_current_user)):
     }
     container.ios_repo.db.collection("api_keys").document(key_data["id"]).set(key_data)
     return key_data
+
+@router.get("/calendar")
+async def get_economic_calendar():
+    """
+    Vision 2.0: Institutional Economic Calendar.
+    """
+    # In a full impl, we'd use a macro provider like TradingEconomics or Investing.com
+    return [
+        {"time": "11:00 AM", "country": "IN", "event": "RBI Monetary Policy Meeting", "impact": "CRITICAL", "forecast": "6.50%", "actual": "6.50%"},
+        {"time": "2:30 PM", "country": "EU", "event": "ECB Press Conference", "impact": "HIGH", "forecast": "---", "actual": "---"},
+        {"time": "6:00 PM", "country": "US", "event": "Non-Farm Payrolls", "impact": "HIGH", "forecast": "180K", "actual": "---"}
+    ]

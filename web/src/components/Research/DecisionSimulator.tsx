@@ -7,8 +7,17 @@ export default function DecisionSimulator({ stock }: { stock: any }) {
   const [holdingDays, setHoldingDays] = useState(30);
 
   const calculateReturn = () => {
-     // Simplified simulation logic based on ML bias
-     const bias = stock.analysis?.technical_data?.ml_prediction?.prediction === 'UP' ? 1.2 : -0.5;
+     // RC-3: Simulation logic based on AI structured consensus
+     const structured = stock.structured_consensus || {};
+     const rating = structured.rating || 'HOLD';
+
+     let bias = 0;
+     if (rating === 'STRONG BUY') bias = 1.8;
+     else if (rating === 'BUY') bias = 1.2;
+     else if (rating === 'STRONG SELL') bias = -1.5;
+     else if (rating === 'SELL') bias = -0.8;
+     else bias = 0.2; // Baseline drift
+
      const vol = stock.beta || 1.0;
      const projected = (bias * vol * (holdingDays / 365)) * 100;
      return projected;

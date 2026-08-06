@@ -40,6 +40,8 @@ import AICopilot from '../components/AICopilot';
 
 import { useLocation } from 'react-router-dom';
 
+import DecisionEngineHeader from '../components/Research/DecisionEngineHeader';
+
 export default function Analysis() {
   const location = useLocation();
   const [stocks, setStocks] = useState<any[]>([]);
@@ -174,6 +176,8 @@ ${selectedStock.analysis?.consensus}
         <Box>
           <ResearchHeader stock={selectedStock} />
 
+          <DecisionEngineHeader stock={selectedStock} />
+
           <Box sx={{ mb: 4, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
              <Button
                variant={view === 'research' ? 'contained' : 'outlined'}
@@ -216,21 +220,7 @@ ${selectedStock.analysis?.consensus}
           {view === 'research' ? (
             <Grid container spacing={3}>
               <Grid item xs={12} lg={9}>
-                {/* Module 1 & 2: Score & Confidence */}
-                <Grid container spacing={3} sx={{ mb: 4 }}>
-                   <Grid item xs={12} sm={6}>
-                      <AIScoreCard
-                        score={selectedStock.ai_investment_score || 0}
-                        grade={selectedStock.ai_investment_grade || 'B'}
-                        confidence={selectedStock.confidence_metrics}
-                      />
-                   </Grid>
-                   <Grid item xs={12} sm={6}>
-                      <StockHealthScorecard metrics={selectedStock.health_metrics} />
-                   </Grid>
-                </Grid>
-
-                <AIExecutiveSummary analysis={selectedStock.analysis} />
+                <AIExecutiveSummary stock={selectedStock} />
                 <InvestmentThesis analysis={selectedStock.analysis} />
                 <WhyWhyNot analysis={selectedStock.analysis} />
 
@@ -243,9 +233,7 @@ ${selectedStock.analysis?.consensus}
                       <Box sx={{ mt: 1, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2 }}>
                          <Typography variant="caption" color="primary" fontWeight="bold">AI CHART NARRATION:</Typography>
                          <Typography variant="body2" color="textSecondary" sx={{ mt: 0.5 }}>
-                            Price is trending above all major EMAs (20, 50, 200) indicating a strong secular bull trend.
-                            RSI at 62 suggests healthy momentum without being overextended.
-                            Institutional accumulation is evident at the ₹2450 level.
+                            {selectedStock.structured_consensus?.thesis?.substring(0, 300) || selectedStock.analysis?.consensus?.substring(0, 300)}...
                          </Typography>
                       </Box>
                    </Grid>
@@ -277,7 +265,7 @@ ${selectedStock.analysis?.consensus}
                       <FinancialWorkspace />
                    </Grid>
                    <Grid item xs={12}>
-                      <InstitutionalActivity />
+                      <InstitutionalActivity stock={selectedStock} />
                    </Grid>
                    <Grid item xs={12}>
                       <AINewsCenter symbol={selectedStock.symbol} />
@@ -320,6 +308,14 @@ ${selectedStock.analysis?.consensus}
 
               <Grid item xs={12} lg={3}>
                 <Stack spacing={3}>
+                  <AIScoreCard
+                    score={selectedStock.ai_investment_score || 0}
+                    grade={selectedStock.ai_investment_grade || 'B'}
+                    confidence={selectedStock.confidence_metrics}
+                  />
+
+                  <StockHealthScorecard metrics={selectedStock.health_metrics} />
+
                   <Paper sx={{ p: 3 }}>
                     <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Database size={16} /> DATA LINEAGE

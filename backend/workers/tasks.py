@@ -147,6 +147,21 @@ async def _analyze_stock_logic(symbol: str, period: str):
         result = workflow.invoke(initial_state)
         log_status("AI_WORKFLOW_COMPLETE")
 
+        # RC-3: Structured Consensus Parsing
+        structured_consensus = {}
+        if result.get("consensus"):
+            try:
+                # Try to parse JSON from the LLM response
+                import re
+                json_match = re.search(r'\{.*\}', result["consensus"], re.DOTALL)
+                if json_match:
+                    structured_consensus = json.loads(json_match.group())
+                else:
+                    structured_consensus = {"thesis": result["consensus"]}
+            except Exception as e:
+                print(f"Error parsing structured consensus: {e}")
+                structured_consensus = {"thesis": result["consensus"]}
+
         # 8. Unified AI Investment Score
         scoring_results = ScoringService.calculate_unified_score(ai_features, ml_prediction, result)
 
@@ -160,6 +175,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
         # 9. Persist Global Source of Truth
         db.collection("stocks").document(symbol).update({
             "analysis": result,
+            "structured_consensus": structured_consensus,
             "ai_investment_score": scoring_results["score"],
             "ai_investment_grade": scoring_results["grade"],
             "health_metrics": scoring_results["health"],

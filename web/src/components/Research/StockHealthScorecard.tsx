@@ -43,10 +43,10 @@ export default function StockHealthScorecard({ metrics }: any) {
         </Grid>
         <Grid item xs={6}>
             <Box sx={{ p: 1.5, border: '1px solid #334155', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-               <AlertCircle size={14} className="text-amber-500" />
+               <AlertCircle size={14} className={metrics?.Valuation === 'EXPENSIVE' ? "text-amber-500" : "text-emerald-500"} />
                <Box>
                   <Typography variant="caption" color="textSecondary" sx={{ display: 'block', lineHeight: 1 }}>Valuation</Typography>
-                  <Typography variant="body2" fontWeight="bold">EXPENSIVE</Typography>
+                  <Typography variant="body2" fontWeight="bold">{metrics?.Valuation || 'STABLE'}</Typography>
                </Box>
             </Box>
         </Grid>

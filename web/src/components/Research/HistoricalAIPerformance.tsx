@@ -20,6 +20,9 @@ export default function HistoricalAIPerformance() {
   const avgProfit = data.length > 0 ? data.reduce((acc, curr) => acc + (curr.avg_profit || 0), 0) / data.length : 4.8;
   const totalSignals = data.reduce((acc, curr) => acc + (curr.total_signals || 0), 0);
 
+  // Real-time Calibration Note:
+  // Benchmark win rate for institutional systems is typically >65%.
+
   const performanceOption = {
     xAxis: { type: 'category', data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'] },
     yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },

@@ -211,14 +211,21 @@ class ConsensusAgent(BaseAgent):
 
         Analyst Reports: {state['recommendations']}
 
-        Synthesize these reports into a final institutional suggestion.
+        Synthesize these reports into a final institutional decision.
         If agents conflict, prioritize the Technical/SMC bias unless Macro risk is EXTREME.
 
-        Format your response as a professional executive summary with:
-        1. FINAL RATING (BUY/SELL/HOLD)
-        2. CONVICTION SCORE (0-100%)
-        3. PRIMARY THESIS
-        4. KEY RISKS & INVALIDATION POINT
+        Return a structured JSON response EXACTLY in this format:
+        {{
+            "rating": "BUY | SELL | HOLD | STRONG BUY | STRONG SELL",
+            "conviction": 0 to 100,
+            "thesis": "Complete professional summary of why this decision was made.",
+            "target": numeric_price_target,
+            "stop_loss": numeric_stop_loss,
+            "risk_reward": "e.g. 1:2.5",
+            "key_catalysts": ["catalyst 1", "catalyst 2"],
+            "key_risks": ["risk 1", "risk 2"],
+            "invalidation_point": "specific price or event"
+        }}
         """
         response = self.llm.invoke(prompt)
         state['consensus'] = response.content

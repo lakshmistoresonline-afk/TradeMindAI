@@ -46,7 +46,7 @@ export default function DigitalTwin({ symbol }: { symbol: string }) {
                <Typography variant="subtitle2" color="textSecondary" gutterBottom>AI STATE SUMMARY</Typography>
                <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, borderLeft: '3px solid #10b981' }}>
                   <Typography variant="body2" sx={{ lineHeight: 1.6, fontStyle: 'italic' }}>
-                     "{data.intelligence_state.consensus?.substring(0, 200)}..."
+                     "{data.structured_consensus?.thesis?.substring(0, 200) || data.intelligence_state.consensus?.substring(0, 200)}..."
                   </Typography>
                </Box>
             </Grid>

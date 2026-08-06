@@ -37,17 +37,46 @@ const darkTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "JetBrains Mono", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontWeight: 900 },
+    h4: { fontWeight: 800 },
+    h6: { fontWeight: 700, letterSpacing: 0.5 },
+    subtitle2: { fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.75rem' },
   },
   components: {
     MuiPaper: {
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          border: '1px solid #334155',
+          border: '1px solid #1e293b',
+          borderRadius: 8,
         },
       },
     },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 600,
+          borderRadius: 6,
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: '1px solid rgba(255,255,255,0.05)',
+          padding: '8px 16px',
+        },
+        head: {
+          fontWeight: 700,
+          color: '#94a3b8',
+          fontSize: '0.65rem',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+        }
+      }
+    }
   },
 })
 

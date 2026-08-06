@@ -54,7 +54,9 @@ export default function ResearchHeader({ stock }: { stock: any }) {
               <Typography variant="h5" fontWeight="bold" align="center">{(stock.avg_volume / 1e6).toFixed(2)}M</Typography>
               <Divider sx={{ my: 2, opacity: 0.1 }} />
               <Typography variant="caption" color="textSecondary" align="center" gutterBottom>DELIVERY PERCENTAGE</Typography>
-              <Typography variant="h5" fontWeight="bold" align="center" color="primary">58.4%</Typography>
+              <Typography variant="h5" fontWeight="bold" align="center" color="primary">
+                 {stock.delivery_pct ? `${stock.delivery_pct.toFixed(1)}%` : '---'}
+              </Typography>
            </Paper>
         </Grid>
       </Grid>

@@ -159,6 +159,11 @@ export const generateAPIKey = async () => {
   return response.data;
 };
 
+export const getEconomicCalendar = async () => {
+  const response = await apiClient.get('/ios/calendar');
+  return response.data;
+};
+
 export const chatWithAssistant = async (message: string) => {
   const response = await apiClient.post('/ai/chat', { message });
   return response.data.response;

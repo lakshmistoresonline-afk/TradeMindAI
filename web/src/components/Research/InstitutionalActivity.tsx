@@ -4,7 +4,7 @@ import { Landmark, ArrowUpRight } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 import { getInstitutionalFlow } from '../../api/client';
 
-export default function InstitutionalActivity() {
+export default function InstitutionalActivity({ stock }: { stock?: any }) {
   const [flow, setFlow] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -52,20 +52,24 @@ export default function InstitutionalActivity() {
 
                 <Stack spacing={2}>
                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="caption">Mutual Fund Holdings</Typography>
+                      <Typography variant="caption">FII Holding</Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                         <Typography variant="caption" fontWeight="bold">+1.2% QoQ</Typography>
-                         <ArrowUpRight size={12} className="text-emerald-500" />
+                         <Typography variant="caption" fontWeight="bold">
+                            {stock?.fii_holding ? `${stock.fii_holding.toFixed(1)}%` : '---'}
+                         </Typography>
+                         {(stock?.fii_holding > 20) && <ArrowUpRight size={12} className="text-emerald-500" />}
                       </Box>
                    </Box>
                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="caption">Promoter Pledging</Typography>
-                      <Typography variant="caption" fontWeight="bold" color="success.main">NONE</Typography>
+                      <Typography variant="caption">DII Holding</Typography>
+                      <Typography variant="caption" fontWeight="bold">
+                         {stock?.dii_holding ? `${stock.dii_holding.toFixed(1)}%` : '---'}
+                      </Typography>
                    </Box>
                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="caption">FII Net Cash</Typography>
-                      <Typography variant="caption" fontWeight="bold" color={flow?.FII_Net >= 0 ? "primary.main" : "error.main"}>
-                         ₹{flow?.FII_Net} Cr
+                      <Typography variant="caption">Promoter Holding</Typography>
+                      <Typography variant="caption" fontWeight="bold">
+                         {stock?.promoter_holding ? `${stock.promoter_holding.toFixed(1)}%` : '---'}
                       </Typography>
                    </Box>
                 </Stack>

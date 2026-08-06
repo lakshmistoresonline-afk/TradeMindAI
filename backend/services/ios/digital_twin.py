@@ -42,6 +42,7 @@ class DigitalTwinService:
                 "health": stock.health_metrics,
                 "consensus": stock.analysis.get("consensus") if stock.analysis else "N/A"
             },
+            "structured_consensus": getattr(stock, 'structured_consensus', {}),
             "technical_posture": {
                 "trend": "BULLISH" if stock.last_price > ema_50 else "BEARISH" if ema_50 > 0 else "NEUTRAL",
                 "volatility": "HIGH" if stock.beta and stock.beta > 1.2 else "LOW",

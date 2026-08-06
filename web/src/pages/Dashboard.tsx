@@ -230,8 +230,10 @@ export default function Dashboard() {
                       <FeedItem
                         key={stock.symbol}
                         symbol={stock.symbol}
-                        action={stock.analysis.consensus.toUpperCase().includes('BUY') ? 'BUY' : 'HOLD'}
-                        reason={stock.analysis.recommendations?.[0]?.analysis?.substring(0, 100) + '...'}
+                        action={stock.structured_consensus?.rating || (stock.analysis.consensus.toUpperCase().includes('BUY') ? 'BUY' : 'HOLD')}
+                        conviction={stock.structured_consensus?.conviction || stock.ai_investment_score}
+                        catalyst={stock.structured_consensus?.key_catalysts?.[0]}
+                        reason={stock.structured_consensus?.thesis || stock.analysis.recommendations?.[0]?.analysis}
                       />
                     ))
                   ) : (
@@ -270,14 +272,19 @@ function StatCard({ title, value, change, icon }: any) {
   )
 }
 
-function FeedItem({ symbol, action, reason }: any) {
+function FeedItem({ symbol, action, reason, conviction, catalyst }: any) {
   return (
-    <Box sx={{ mb: 2, p: 1, borderBottom: '1px solid #334155' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography fontWeight="bold">{symbol}</Typography>
-        <Typography color={action === 'BUY' ? 'primary' : 'warning'}>{action}</Typography>
+    <Box sx={{ mb: 2, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, borderLeft: `4px solid ${action === 'BUY' ? '#10b981' : '#f43f5e'}` }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography fontWeight="bold" sx={{ fontSize: '1rem' }}>{symbol}</Typography>
+        <Box sx={{ textAlign: 'right' }}>
+           <Chip label={action} size="small" color={action === 'BUY' ? 'primary' : 'error'} sx={{ fontWeight: 'bold', height: 20, fontSize: '0.65rem' }} />
+           <Typography variant="caption" display="block" color="textSecondary" sx={{ mt: 0.5 }}>{conviction}% Conviction</Typography>
+        </Box>
       </Box>
-      <Typography variant="caption" color="textSecondary">{reason}</Typography>
+      <Typography variant="caption" color="textSecondary" sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4 }}>
+         {catalyst || reason}
+      </Typography>
     </Box>
   )
 }
