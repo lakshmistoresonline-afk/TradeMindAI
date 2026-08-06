@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Dict, Any
 from backend.domain.interfaces.repository import IStockRepository, IMarketDataProvider, INewsProvider, IInstitutionalDataProvider
 from backend.domain.models.stock import Stock, StockPrice
@@ -82,11 +83,12 @@ class StockService:
     async def get_market_overview(self, limit: int = 50, offset: int = 0) -> List[Stock]:
         return await self.repository.get_all_stocks(limit, offset)
 
-    async def validate_data_quality(self, symbol: str, df: pd.DataFrame) -> Dict[str, Any]:
+    async def validate_data_quality(self, symbol: str, df: Any) -> Dict[str, Any]:
         """
         Enterprise Data Quality Engine:
         Automatically detects anomalies, gaps, and outliers.
         """
+        import pandas as pd
         report = {
             "symbol": symbol,
             "timestamp": datetime.now(),

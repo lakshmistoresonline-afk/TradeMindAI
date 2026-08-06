@@ -1,3 +1,5 @@
+from typing import Any
+
 class SMCAnalysis:
     @staticmethod
     def detect_order_blocks(df: Any):
@@ -13,7 +15,7 @@ class SMCAnalysis:
         return order_blocks
 
     @staticmethod
-    def detect_fvg(df: pd.DataFrame):
+    def detect_fvg(df: Any):
         # Fair Value Gap detection
         fvgs = []
         for i in range(1, len(df) - 1):

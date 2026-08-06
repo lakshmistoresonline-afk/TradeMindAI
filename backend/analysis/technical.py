@@ -1,7 +1,11 @@
+from typing import Any
+
 class TechnicalAnalysis:
     @staticmethod
     def calculate_indicators(df: Any):
+        import pandas as pd
         import pandas_ta as ta
+
         # Trend Indicators
         df["EMA_20"] = ta.ema(df["Close"], length=20)
         df["EMA_50"] = ta.ema(df["Close"], length=50)
@@ -37,13 +41,13 @@ class TechnicalAnalysis:
         return df
 
     @staticmethod
-    def detect_patterns(df: pd.DataFrame):
+    def detect_patterns(df: Any):
         # Candlestick patterns using pandas-ta
         patterns = df.ta.cdl_pattern(name="all")
         return patterns
 
     @staticmethod
-    def calculate_volume_profile(df: pd.DataFrame, bins=20):
+    def calculate_volume_profile(df: Any, bins=20):
         # Calculate Volume at Price
         price_min = df["Low"].min()
         price_max = df["High"].max()

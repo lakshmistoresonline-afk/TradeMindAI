@@ -1,5 +1,4 @@
 from typing import Dict, Any, List
-import numpy as np
 
 class ScoringService:
     @staticmethod
@@ -7,6 +6,7 @@ class ScoringService:
         """
         Consolidates all intelligence into a single investment score (0-100).
         """
+        import numpy as np
         weights = {
             "technical": 0.20,
             "fundamental": 0.25,
