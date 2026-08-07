@@ -62,6 +62,10 @@ class StockService:
         except: pass
 
         if is_full_sync:
+            # Memory Optimization: For initial 10Y load, we save everything but only
+            # calculate complex indicators for the most recent 2 years.
+            from backend.analysis.technical import TechnicalAnalysis
+
             # A. Process Full History (Raw Price Data)
             print(f"[{symbol}] Processing 10Y Raw History ({len(history_df)} days)...")
             raw_prices = []
