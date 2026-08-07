@@ -207,21 +207,7 @@ export default function Dashboard() {
               </Paper>
             </Grid>
 
-            {/* TradingView Chart */}
-            <Grid item xs={12} md={8}>
-              <Paper sx={{ p: 0, height: '500px', overflow: 'hidden' }}>
-                <iframe
-                  src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=NSE%3ANIFTY&interval=D&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=localhost&utm_medium=widget&utm_campaign=chart&utm_term=NSE%3ANIFTY"
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  allowTransparency
-                  allowFullScreen
-                ></iframe>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12}>
               <Paper sx={{ p: 3, height: '500px', display: 'flex', flexDirection: 'column' }}>
                 <Typography variant="h6" gutterBottom>Live AI Signals</Typography>
                 <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>

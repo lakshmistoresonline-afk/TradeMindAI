@@ -48,18 +48,35 @@ class HybridStockRepository(IStockRepository):
         self.pg.commit()
 
     async def save_historical_prices(self, symbol: str, prices: List[StockPrice]) -> None:
+        """
+        RC-4: Optimized Upsert for Historical Prices in SQL.
+        """
         for p in prices:
-            db_price = PriceDB(
-                symbol=symbol,
-                date=p.date,
-                open=p.open,
-                high=p.high,
-                low=p.low,
-                close=p.close,
-                volume=p.volume,
-                indicators=p.indicators
-            )
-            self.pg.add(db_price)
+            # Check if this symbol+date already exists
+            existing = self.pg.query(PriceDB).filter(
+                PriceDB.symbol == symbol,
+                PriceDB.date == p.date
+            ).first()
+
+            if existing:
+                existing.open = p.open
+                existing.high = p.high
+                existing.low = p.low
+                existing.close = p.close
+                existing.volume = p.volume
+                existing.indicators = p.indicators
+            else:
+                db_price = PriceDB(
+                    symbol=symbol,
+                    date=p.date,
+                    open=p.open,
+                    high=p.high,
+                    low=p.low,
+                    close=p.close,
+                    volume=p.volume,
+                    indicators=p.indicators
+                )
+                self.pg.add(db_price)
         self.pg.commit()
 
     async def get_recent_prices(self, symbol: str, limit: int = 250) -> List[StockPrice]:

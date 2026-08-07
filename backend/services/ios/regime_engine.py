@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from backend.domain.models.ios import MarketRegime
 
 class MarketRegimeEngine:

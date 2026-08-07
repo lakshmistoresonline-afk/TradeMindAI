@@ -36,10 +36,10 @@ class BaseAgent:
         # Log key availability (safe prefix only)
         print(f"Agent {name} initialized with key prefix: {key[:8]}...")
 
-        # Using Llama 3.3 70B on Groq
+        # RC-4: Switched to 8B model to prevent 429 Rate Limits during Nifty 100 sweeps
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
-            model_name="llama-3.3-70b-versatile",
+            model_name="llama-3.1-8b-instant",
             temperature=0.1
         )
 
