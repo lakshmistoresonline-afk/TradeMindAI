@@ -18,7 +18,10 @@ def check():
             r = httpx.get(base_url + path, timeout=20.0)
             if r.status_code == 200:
                 data = r.json()
-                if isinstance(data, list):
+                if name == "Stocks":
+                    with_analysis = len([s for s in data if s.get("analysis")])
+                    status = f"✅ {len(data)} items ({with_analysis} with DNA)"
+                elif isinstance(data, list):
                     status = f"✅ {len(data)} items"
                 elif isinstance(data, dict):
                     # Check for empty-like objects

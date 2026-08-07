@@ -1,23 +1,27 @@
 import os
+import sys
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
+# Add backend to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 load_dotenv('backend/.env')
 
-def inspect():
+def sync_schema():
     url = os.getenv("POSTGRES_URL")
     engine = create_engine(url)
 
     with engine.connect() as conn:
-        print("\n--- intel_reports ---")
-        res = conn.execute(text("SELECT id, type, date, summary FROM intel_reports"))
-        for row in res:
-            print(row)
+        print("Cleaning up old schema...")
+        conn.execute(text("DROP TABLE IF EXISTS market_regimes"))
+        conn.execute(text("DROP TABLE IF EXISTS intel_reports"))
+        conn.commit()
 
-        print("\n--- stocks ---")
-        res = conn.execute(text("SELECT symbol, updated_at FROM stocks"))
-        for row in res:
-            print(row)
+    from backend.core.postgres import init_db
+    init_db()
+    print("Schema Re-synchronized Successfully.")
 
 if __name__ == "__main__":
-    inspect()
+    sync_schema()
+    # (Removed inspect call temporarily)
