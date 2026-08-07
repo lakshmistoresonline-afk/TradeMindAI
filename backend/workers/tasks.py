@@ -57,14 +57,18 @@ async def _analyze_stock_logic(symbol: str, period: str):
     db = container.repository.db
 
     def log_status(step: str, error: str = None):
-        log_data = {
-            "type": "WORKER_ERROR" if error else "WORKER_STEP",
-            "symbol": symbol,
-            "step": step,
-            "timestamp": datetime.datetime.utcnow()
-        }
-        if error: log_data["error"] = error
-        db.collection("system_logs").add(log_data)
+        print(f"[{symbol}] {step}: {error or 'OK'}")
+        try:
+            log_data = {
+                "type": "WORKER_ERROR" if error else "WORKER_STEP",
+                "symbol": symbol,
+                "step": step,
+                "timestamp": datetime.datetime.utcnow()
+            }
+            if error: log_data["error"] = error
+            db.collection("system_logs").add(log_data)
+        except Exception as e:
+            print(f"Firestore logging failed: {e}")
 
     log_status("START")
 

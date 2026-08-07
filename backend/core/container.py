@@ -23,25 +23,29 @@ class Container:
     @property
     def repository(self):
         if self._repository is None:
-            from backend.infrastructure.repositories.firestore_repository import FirestoreStockRepository
+            from backend.infrastructure.repositories.hybrid_repository import HybridStockRepository
             from backend.core.database import db_client
-            self._repository = FirestoreStockRepository(db_client)
+            from backend.core.postgres import SessionLocal, init_db
+            init_db() # Ensure tables exist
+            self._repository = HybridStockRepository(SessionLocal(), db_client)
         return self._repository
 
     @property
     def data_platform_repo(self):
         if self._data_platform_repo is None:
-            from backend.infrastructure.repositories.firestore_repository import FirestoreDataPlatformRepository
+            from backend.infrastructure.repositories.hybrid_repository import HybridDataPlatformRepository
             from backend.core.database import db_client
-            self._data_platform_repo = FirestoreDataPlatformRepository(db_client)
+            from backend.core.postgres import SessionLocal
+            self._data_platform_repo = HybridDataPlatformRepository(SessionLocal(), db_client)
         return self._data_platform_repo
 
     @property
     def ios_repo(self):
         if self._ios_repo is None:
-            from backend.infrastructure.repositories.firestore_ios_repository import FirestoreIOSRepository
+            from backend.infrastructure.repositories.hybrid_repository import HybridIOSRepository
             from backend.core.database import db_client
-            self._ios_repo = FirestoreIOSRepository(db_client)
+            from backend.core.postgres import SessionLocal
+            self._ios_repo = HybridIOSRepository(SessionLocal(), db_client)
         return self._ios_repo
 
     @property
