@@ -52,8 +52,37 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to TradeMind AI API"}
+    db_status = "READY"
+    try:
+        from backend.core.postgres import engine
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        db_type = "PostgreSQL (Neon)" if "neon" in str(engine.url) else "SQLite"
+    except Exception as e:
+        db_status = f"ERROR: {str(e)}"
+        db_type = "UNKNOWN"
+
+    return {
+        "message": "Welcome to TradeMind AI API",
+        "database": {
+            "engine": db_type,
+            "status": db_status
+        },
+        "version": "2.0.0-RC4.1"
+    }
 
 @app.get("/health")
 async def health():
     return {"status": "healthy", "timestamp": datetime.datetime.utcnow()}
+
+@app.get("/debug/db")
+async def debug_db():
+    from backend.core.container import container
+    from backend.core.postgres import StockDB
+    try:
+        stocks = await container.repository.get_all_stocks(limit=5)
+        return {"status": "SUCCESS", "count": len(stocks), "samples": [s.symbol for s in stocks]}
+    except Exception as e:
+        import traceback
+        return {"status": "ERROR", "error": str(e), "trace": traceback.format_exc()}

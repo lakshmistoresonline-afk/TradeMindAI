@@ -15,24 +15,21 @@ from backend.workers.tasks import _analyze_stock_logic, _process_intel_logic
 from backend.core.postgres import init_db
 
 async def populate():
-    print("--- TradeMind AI: PRODUCTION DATA POPULATION SPRINT ---")
+    print("--- TradeMind AI: PRODUCTION DATA POPULATION SPRINT (RC-4) ---")
 
-    # Initialize DB
+    # Initialize DB (Cloud Postgres)
     init_db()
 
-    # Fixed symbols (HUL -> HINDUNILVR)
-    symbols = [
-        "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "SBIN", "BHARTIARTL", "ITC", "LT", "HINDUNILVR",
-        "KOTAKBANK", "AXISBANK", "ASIANPAINT", "MARUTI", "TITAN", "BAJFINANCE", "ADANIENT", "SUNPHARMA", "ULTRACEMCO", "JSWSTEEL"
-    ]
+    # Target core symbols first
+    symbols = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"]
 
     print(f"Ingesting {len(symbols)} high-conviction symbols...")
 
     for symbol in symbols:
         try:
             print(f"Analyzing {symbol}...")
-            # RC-4: Force full 10y sync for institutional completeness
-            result = await _analyze_stock_logic(symbol, period="10y")
+            # Use 1y period for faster population
+            result = await _analyze_stock_logic(symbol, period="1y")
             print(f"  -> SUCCESS: {result}")
         except Exception as e:
             print(f"  -> FAILED {symbol}: {e}")
@@ -43,8 +40,6 @@ async def populate():
         print(f"  -> SUCCESS: {intel_result}")
     except Exception as e:
         print(f"  -> FAILED INTEL: {e}")
-        import traceback
-        traceback.print_exc()
 
     print("\n--- POPULATION COMPLETE ---")
 
