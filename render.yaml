@@ -5,7 +5,7 @@ services:
     env: docker
     region: singapore
     plan: free
-    dockerContext: backend
+    dockerContext: .
     dockerfilePath: backend/Dockerfile
     envVars:
       - key: FIREBASE_PROJECT_ID
@@ -27,7 +27,7 @@ services:
     env: docker
     region: singapore
     plan: free
-    dockerContext: backend
+    dockerContext: .
     dockerfilePath: backend/Dockerfile
     envVars:
       - key: FIREBASE_PROJECT_ID
@@ -49,7 +49,7 @@ services:
     env: docker
     region: singapore
     plan: free
-    dockerContext: backend
+    dockerContext: .
     dockerfilePath: backend/Dockerfile
     envVars:
       - key: FIREBASE_PROJECT_ID
