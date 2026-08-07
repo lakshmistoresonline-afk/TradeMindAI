@@ -47,9 +47,15 @@ class MultiTimeframeService:
         df.columns = [c.capitalize() for c in df.columns]
 
         try:
+            import math
             close = df["Close"].iloc[-1]
+            if math.isnan(close): close = 0.0
+
             sma = ta.sma(df["Close"], length=window).iloc[-1]
+            if math.isnan(sma): sma = close
+
             rsi = ta.rsi(df["Close"], length=14).iloc[-1]
+            if math.isnan(rsi): rsi = 50.0
 
             bias = "NEUTRAL"
             score = 50
@@ -70,4 +76,4 @@ class MultiTimeframeService:
                 "price": float(close)
             }
         except:
-            return {"bias": "NEUTRAL", "score": 50}
+            return {"bias": "NEUTRAL", "score": 50, "price": 0.0}

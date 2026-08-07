@@ -35,13 +35,16 @@ class HybridStockRepository(IStockRepository):
 
     async def save_stock(self, stock: Stock) -> None:
         def json_serializable(data):
-            """Recursively convert datetimes to strings for JSON columns."""
+            """Recursively convert datetimes and NaNs to serializable formats."""
+            import math
             if isinstance(data, dict):
                 return {k: json_serializable(v) for k, v in data.items()}
             elif isinstance(data, list):
                 return [json_serializable(i) for i in data]
             elif isinstance(data, datetime):
                 return data.isoformat()
+            elif isinstance(data, float) and (math.isnan(data) or math.isinf(data)):
+                return None
             return data
 
         with self.session_factory() as pg:
