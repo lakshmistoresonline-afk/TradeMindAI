@@ -4,10 +4,13 @@ import pandas as pd
 from typing import List, Dict, Any
 
 class DuckDBEngine:
-    def __init__(self, db_path: str = "backend/data/analytical.duckdb"):
-        self.db_path = db_path
-        # Analytical storage: Parquet files for feature vectors
-        self.feature_storage = "backend/data/features"
+    def __init__(self, db_path: str = None):
+        # Determine base directory reliably
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.db_path = db_path or os.path.join(base_dir, "data", "analytical.duckdb")
+
+        # Standardized path for analytical features
+        self.feature_storage = os.path.join(base_dir, "data", "features")
         if not os.path.exists(self.feature_storage):
             os.makedirs(self.feature_storage)
 

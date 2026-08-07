@@ -31,8 +31,8 @@ async def populate():
     for symbol in symbols:
         try:
             print(f"Analyzing {symbol}...")
-            # Use shorter period for speed during population
-            result = await _analyze_stock_logic(symbol, period="1y")
+            # RC-4: Force full 10y sync for institutional completeness
+            result = await _analyze_stock_logic(symbol, period="10y")
             print(f"  -> SUCCESS: {result}")
         except Exception as e:
             print(f"  -> FAILED {symbol}: {e}")

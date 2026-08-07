@@ -177,7 +177,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
             ]
 
         # 9. Persist Global Source of Truth
-        db.collection("stocks").document(symbol).update({
+        db.collection("stocks").document(symbol).set({
             "analysis": result,
             "structured_consensus": structured_consensus,
             "ai_investment_score": scoring_results["score"],
@@ -185,7 +185,7 @@ async def _analyze_stock_logic(symbol: str, period: str):
             "health_metrics": scoring_results["health"],
             "confidence_metrics": scoring_results["confidence"],
             "updated_at": datetime.datetime.utcnow()
-        })
+        }, merge=True)
 
         # Vision 2.0: Timeline Ingestion
         db.collection("stocks").document(symbol).collection("timeline").add({

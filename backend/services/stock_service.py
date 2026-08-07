@@ -18,8 +18,11 @@ class StockService:
         existing_stock = await self.repository.get_stock_by_symbol(symbol)
         info = await self.provider.fetch_stock_info(symbol)
 
-        is_initial_load = not (existing_stock and existing_stock.updated_at)
-        fetch_period = period if is_initial_load else "1mo"
+        # Vision 2.0: Decide if we need a full historical sync
+        # Force full sync if period is 10y or if stock has no update history
+        is_full_sync = period == "10y" or not (existing_stock and existing_stock.updated_at)
+
+        fetch_period = period if is_full_sync else "1mo"
         history_df = await self.provider.fetch_history(symbol, fetch_period)
 
         if history_df.empty:
@@ -58,7 +61,7 @@ class StockService:
                 await container.data_platform_repo.save_earnings(earnings)
         except: pass
 
-        if is_initial_load:
+        if is_full_sync:
             # Memory Optimization: For initial 10Y load, we save everything but only
             # calculate complex indicators for the most recent 2 years.
             from backend.analysis.technical import TechnicalAnalysis
