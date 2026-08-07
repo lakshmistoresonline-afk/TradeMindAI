@@ -27,7 +27,8 @@ class Container:
             from backend.core.database import db_client
             from backend.core.postgres import SessionLocal, init_db
             init_db() # Ensure tables exist
-            self._repository = HybridStockRepository(SessionLocal(), db_client)
+            # Pass a session creator instead of a single leaked session
+            self._repository = HybridStockRepository(SessionLocal, db_client)
         return self._repository
 
     @property
@@ -36,7 +37,7 @@ class Container:
             from backend.infrastructure.repositories.hybrid_repository import HybridDataPlatformRepository
             from backend.core.database import db_client
             from backend.core.postgres import SessionLocal
-            self._data_platform_repo = HybridDataPlatformRepository(SessionLocal(), db_client)
+            self._data_platform_repo = HybridDataPlatformRepository(SessionLocal, db_client)
         return self._data_platform_repo
 
     @property
@@ -45,7 +46,7 @@ class Container:
             from backend.infrastructure.repositories.hybrid_repository import HybridIOSRepository
             from backend.core.database import db_client
             from backend.core.postgres import SessionLocal
-            self._ios_repo = HybridIOSRepository(SessionLocal(), db_client)
+            self._ios_repo = HybridIOSRepository(SessionLocal, db_client)
         return self._ios_repo
 
     @property

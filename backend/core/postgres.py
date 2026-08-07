@@ -6,7 +6,7 @@ import os
 from .config import settings
 
 # Hybrid Logic: Fallback to SQLite for local development if PG URL missing
-DATABASE_URL = os.getenv("POSTGRES_URL", "sqlite:///./local_operational.db")
+DATABASE_URL = settings.POSTGRES_URL
 
 from sqlalchemy import create_engine
 # SQLite needs special args for concurrent access in some cases

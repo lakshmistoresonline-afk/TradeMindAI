@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install specific numerical stack versions first to prevent binary conflicts
 RUN pip install --upgrade pip setuptools wheel
-RUN pip install "numpy==1.26.4" "pandas==2.2.2" "numba==0.59.1" "tqdm" "scikit-learn==1.5.0"
+RUN pip install "numpy==1.26.4" "pandas==2.2.2" "numba==0.59.1" "tqdm" "scikit-learn==1.5.0" "psycopg2-binary==2.9.12"
 
 # Install remaining dependencies
 COPY requirements.txt .

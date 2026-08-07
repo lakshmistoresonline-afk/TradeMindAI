@@ -18,6 +18,8 @@ services:
         sync: false
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
+      - key: POSTGRES_URL
+        sync: false
 
   # 2. The Background Worker
   - type: web
@@ -38,6 +40,8 @@ services:
         sync: false
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
+      - key: POSTGRES_URL
+        sync: false
 
   # 3. The Scheduler
   - type: web
@@ -53,4 +57,6 @@ services:
       - key: SERVICE_TYPE
         value: beat
       - key: REDIS_URL
+        sync: false
+      - key: POSTGRES_URL
         sync: false
