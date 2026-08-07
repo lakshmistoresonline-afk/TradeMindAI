@@ -19,6 +19,9 @@ except ValueError:
     elif os.path.exists("service-account.json"):
         cred = credentials.Certificate("service-account.json")
         app = firebase_admin.initialize_app(cred)
+    elif os.path.exists("backend/service-account.json"):
+        cred = credentials.Certificate("backend/service-account.json")
+        app = firebase_admin.initialize_app(cred)
     else:
         # 3. Fallback to default
         app = firebase_admin.initialize_app(options={

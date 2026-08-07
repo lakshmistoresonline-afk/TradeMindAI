@@ -62,11 +62,8 @@ class StockService:
         except: pass
 
         if is_full_sync:
-            # Memory Optimization: For initial 10Y load, we save everything but only
-            # calculate complex indicators for the most recent 2 years.
-            from backend.analysis.technical import TechnicalAnalysis
-
             # A. Process Full History (Raw Price Data)
+            print(f"[{symbol}] Processing 10Y Raw History ({len(history_df)} days)...")
             raw_prices = []
             for index, row in history_df.iterrows():
                 raw_prices.append(StockPrice(
@@ -77,10 +74,12 @@ class StockService:
 
             # Batch save raw prices first
             await self.repository.save_historical_prices(symbol, raw_prices)
+            print(f"[{symbol}] Raw History Saved.")
             del raw_prices
             gc.collect()
 
             # B. Calculate Indicators for Recent 2 Years (Approx 500 trading days)
+            print(f"[{symbol}] Calculating Institutional Indicators (Last 2Y)...")
             recent_df = history_df.tail(600) # Buffer for long EMAs
             df_ta = TechnicalAnalysis.calculate_indicators(recent_df)
 
