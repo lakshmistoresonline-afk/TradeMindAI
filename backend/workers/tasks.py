@@ -176,16 +176,25 @@ async def _analyze_stock_logic(symbol: str, period: str):
                 for r in result["recommendations"]
             ]
 
-        # 9. Persist Global Source of Truth
-        db.collection("stocks").document(symbol).set({
-            "analysis": result,
-            "structured_consensus": structured_consensus,
-            "ai_investment_score": scoring_results["score"],
-            "ai_investment_grade": scoring_results["grade"],
-            "health_metrics": scoring_results["health"],
-            "confidence_metrics": scoring_results["confidence"],
-            "updated_at": datetime.datetime.utcnow()
-        }, merge=True)
+        # 9. Persist Global Source of Truth via Repository (Hybrid Tier)
+        # Update existing stock object with new research DNA
+        stock.analysis = result
+        stock.structured_consensus = structured_consensus
+        stock.ai_investment_score = scoring_results["score"]
+        stock.ai_investment_grade = scoring_results["grade"]
+        stock.health_metrics = scoring_results["health"]
+        stock.confidence_metrics = scoring_results["confidence"]
+        stock.updated_at = datetime.datetime.utcnow()
+
+        await container.repository.save_stock(stock)
+
+        # Vision 2.0: Timeline Ingestion (Firestore - Keep for real-time stream)
+        db.collection("stocks").document(symbol).collection("timeline").add({
+            "date": datetime.datetime.utcnow(),
+            "title": f"Rating: {scoring_results['grade']}",
+            "desc": result.get("consensus", "")[:200],
+            "type": "RATING"
+        })
 
         # Vision 2.0: Timeline Ingestion
         db.collection("stocks").document(symbol).collection("timeline").add({

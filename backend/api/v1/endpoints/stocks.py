@@ -60,13 +60,11 @@ async def get_market_stats():
                 stats[name] = {"value": 0, "change": 0}
 
         # Vision 2.0: Market Breadth Calculation
-        from backend.core.database import db_client
-        # Increased limit for broader coverage
-        stocks_ref = db_client.collection("stocks").limit(150).stream()
+        # Increased limit for broader coverage - Now using Repository (SQL)
+        stocks_list = await container.repository.get_all_stocks(limit=150)
         advancing, declining = 0, 0
-        for doc in stocks_ref:
-            data = doc.to_dict()
-            change = data.get("change_pct", 0)
+        for stock in stocks_list:
+            change = stock.change_pct or 0
             if change > 0: advancing += 1
             elif change < 0: declining += 1
 
