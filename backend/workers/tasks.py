@@ -163,12 +163,23 @@ async def _analyze_stock_logic(symbol: str, period: str):
                     json_str = json_match.group(1)
                     # Resilient clean-up of common LLM errors
                     json_str = json_str.replace("'", "\"") # Replace single quotes
+
+                    # Remove trailing commas before closing braces
+                    json_str = re.sub(r',\s*}', '}', json_str)
+                    json_str = re.sub(r',\s*]', ']', json_str)
+
                     structured_consensus = json.loads(json_str)
                 else:
                     structured_consensus = {"thesis": content}
             except Exception as e:
                 print(f"Error parsing structured consensus for {symbol}: {e}")
-                structured_consensus = {"thesis": result["consensus"]}
+                # Secondary cleanup attempt for specific unescaped newline/char issues
+                try:
+                    # Escape control characters that LLMs sometimes leave raw
+                    clean_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', json_str)
+                    structured_consensus = json.loads(clean_str)
+                except:
+                    structured_consensus = {"thesis": result["consensus"]}
 
         # 8. Unified AI Investment Score
         scoring_results = ScoringService.calculate_unified_score(ai_features, ml_prediction, result)

@@ -36,11 +36,13 @@ class BaseAgent:
         # Log key availability (safe prefix only)
         print(f"Agent {name} initialized with key prefix: {key[:8]}...")
 
-        # RC-4: Switched to 8B model to prevent 429 Rate Limits during Nifty 100 sweeps
+        # Using Llama 3.1 8B for high-throughput batch processing
+        # Integrated with Retry logic for Rate Limit Resilience
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
             model_name="llama-3.1-8b-instant",
-            temperature=0.1
+            temperature=0.1,
+            max_retries=3 # Built-in langchain retry
         )
 
     def get_structured_prompt(self, context: str) -> str:

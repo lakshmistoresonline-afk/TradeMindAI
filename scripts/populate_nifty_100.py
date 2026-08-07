@@ -52,14 +52,12 @@ async def populate():
         try:
             print(f"[{i+1}/{len(symbols)}] Processing {symbol}...")
 
-            # The logic inside _analyze_stock_logic handles:
-            # - Metadata collection (P/E, Market Cap, etc.)
-            # - Historical price ingestion (10 Years)
-            # - Technical indicator calculation
-            # - 12-Agent AI Consensus synthesis
-            # - Multi-timeframe alignment
-            # - Quant risk metrics
-            # - SQL & Parquet persistence
+            # RC-4 Optimization: Skip if already analyzed with consensus today
+            existing = await container.repository.get_stock_by_symbol(symbol)
+            if existing and existing.analysis and existing.updated_at.date() == datetime.date.today():
+                print(f"  ⏭️  {symbol}: Already up-to-date. Skipping.")
+                success_count += 1
+                continue
 
             result = await _analyze_stock_logic(symbol, period="10y")
 
@@ -70,9 +68,9 @@ async def populate():
 
             success_count += 1
 
-            # RC-4 Guardrail: Wait 15 seconds between stocks to prevent 429 Rate Limits from Groq/LLM
+            # RC-4 Guardrail: Wait 30 seconds between stocks to clear Groq Token Quota (TPM)
             if i < len(symbols) - 1:
-                await asyncio.sleep(15)
+                await asyncio.sleep(30)
 
         except Exception as e:
             print(f"  ❌ {symbol}: CRITICAL FAILURE - {e}")
