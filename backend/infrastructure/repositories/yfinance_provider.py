@@ -56,7 +56,9 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
 
     async def fetch_history(self, symbol: str, period: str) -> Any:
         try:
-            ticker = yf.Ticker(f"{symbol}.NS")
+            # Handle indices differently (they don't need .NS suffix usually)
+            ticker_symbol = f"{symbol}.NS" if not symbol.startswith("^") else symbol
+            ticker = yf.Ticker(ticker_symbol)
             # auto_adjust=True handles stock splits and dividends automatically
             df = ticker.history(period=period, auto_adjust=True)
             if df.empty:

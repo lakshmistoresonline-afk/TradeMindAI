@@ -273,12 +273,15 @@ function StatCard({ title, value, change, icon }: any) {
 }
 
 function FeedItem({ symbol, action, reason, conviction, catalyst }: any) {
+  const isBuy = action?.toUpperCase().includes('BUY');
+  const isSell = action?.toUpperCase().includes('SELL');
+
   return (
-    <Box sx={{ mb: 2, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, borderLeft: `4px solid ${action === 'BUY' ? '#10b981' : '#f43f5e'}` }}>
+    <Box sx={{ mb: 2, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, borderLeft: `4px solid ${isBuy ? '#10b981' : isSell ? '#f43f5e' : '#fbbf24'}` }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography fontWeight="bold" sx={{ fontSize: '1rem' }}>{symbol}</Typography>
         <Box sx={{ textAlign: 'right' }}>
-           <Chip label={action} size="small" color={action === 'BUY' ? 'primary' : 'error'} sx={{ fontWeight: 'bold', height: 20, fontSize: '0.65rem' }} />
+           <Chip label={action} size="small" color={isBuy ? 'primary' : isSell ? 'error' : 'warning'} sx={{ fontWeight: 'bold', height: 20, fontSize: '0.65rem' }} />
            <Typography variant="caption" display="block" color="textSecondary" sx={{ mt: 0.5 }}>{conviction}% Conviction</Typography>
         </Box>
       </Box>

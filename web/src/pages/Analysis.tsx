@@ -107,7 +107,7 @@ ${selectedStock.analysis?.consensus}
 
         // Handle deep-link from Market page
         if (location.state?.symbol) {
-           const stock = data.find((s: any) => s.symbol === location.state.symbol);
+           const stock = data.find((s: any) => s.symbol.toUpperCase() === location.state.symbol.toUpperCase());
            if (stock) setSelectedStock(stock);
         }
       } catch (error) {

@@ -6,8 +6,22 @@ export default function AIExecutiveSummary({ stock }: { stock: any }) {
 
   const analysis = stock.analysis;
   const structured = stock.structured_consensus || {};
-  const rating = structured.rating || (analysis.consensus?.includes('BUY') ? 'BUY' : analysis.consensus?.includes('SELL') ? 'SELL' : 'HOLD');
-  const conviction = structured.conviction || stock.confidence_metrics?.score || 50;
+
+  // Resilient signal resolver
+  const getRating = () => {
+    if (structured.rating) return structured.rating;
+    if (analysis.consensus) {
+      const c = analysis.consensus.toUpperCase();
+      if (c.includes('STRONG BUY')) return 'STRONG BUY';
+      if (c.includes('STRONG SELL')) return 'STRONG SELL';
+      if (c.includes('BUY')) return 'BUY';
+      if (c.includes('SELL')) return 'SELL';
+    }
+    return 'HOLD';
+  };
+
+  const rating = getRating();
+  const conviction = structured.conviction || stock.ai_investment_score || 50;
 
   return (
     <Box sx={{ mb: 4 }}>

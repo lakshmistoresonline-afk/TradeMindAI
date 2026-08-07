@@ -5,7 +5,21 @@ export default function DecisionEngineHeader({ stock }: { stock: any }) {
   if (!stock || !stock.analysis) return null;
 
   const structured = stock.structured_consensus || {};
-  const rating = structured.rating || 'HOLD';
+
+  // Resilient signal resolver
+  const getRating = () => {
+    if (structured.rating) return structured.rating;
+    if (stock.analysis?.consensus) {
+      const c = stock.analysis.consensus.toUpperCase();
+      if (c.includes('STRONG BUY')) return 'STRONG BUY';
+      if (c.includes('STRONG SELL')) return 'STRONG SELL';
+      if (c.includes('BUY')) return 'BUY';
+      if (c.includes('SELL')) return 'SELL';
+    }
+    return 'HOLD';
+  };
+
+  const rating = getRating();
   const conviction = structured.conviction || stock.ai_investment_score || 0;
 
   const isBullish = rating.includes('BUY');
