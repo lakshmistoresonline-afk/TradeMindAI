@@ -50,7 +50,19 @@ class HybridStockRepository(IStockRepository):
     async def save_historical_prices(self, symbol: str, prices: List[StockPrice]) -> None:
         """
         RC-4: Optimized Upsert for Historical Prices in SQL.
+        Handles JSON NaN cleaning for PostgreSQL compatibility.
         """
+        def clean_indicators(indicators):
+            if not indicators: return None
+            import math
+            cleaned = {}
+            for k, v in indicators.items():
+                if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                    cleaned[k] = None
+                else:
+                    cleaned[k] = v
+            return cleaned
+
         for p in prices:
             # Check if this symbol+date already exists
             existing = self.pg.query(PriceDB).filter(
@@ -58,13 +70,15 @@ class HybridStockRepository(IStockRepository):
                 PriceDB.date == p.date
             ).first()
 
+            cleaned_inds = clean_indicators(p.indicators)
+
             if existing:
                 existing.open = p.open
                 existing.high = p.high
                 existing.low = p.low
                 existing.close = p.close
                 existing.volume = p.volume
-                existing.indicators = p.indicators
+                existing.indicators = cleaned_inds
             else:
                 db_price = PriceDB(
                     symbol=symbol,
@@ -74,7 +88,7 @@ class HybridStockRepository(IStockRepository):
                     low=p.low,
                     close=p.close,
                     volume=p.volume,
-                    indicators=p.indicators
+                    indicators=cleaned_inds
                 )
                 self.pg.add(db_price)
         self.pg.commit()

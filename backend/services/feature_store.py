@@ -84,14 +84,25 @@ class FeatureStoreService:
             return {}
 
         import pandas as pd
+        import math
         last_row = df_ta.iloc[-1]
+
+        # Resilient value extractor
+        def get_val(key, default=0.0):
+            val = last_row.get(key)
+            if val is None or (isinstance(val, float) and math.isnan(val)):
+                return default
+            return val
+
+        ema20 = get_val("EMA_20")
+        ema50 = get_val("EMA_50")
 
         features = {
             # Core Technical
-            "trend_ema_cross": float(last_row["EMA_20"] > last_row["EMA_50"]),
-            "momentum_rsi": float(last_row["RSI"] / 100.0) if "RSI" in last_row else 0.5,
-            "volatility_bb": float((last_row["Close"] - last_row["BBL_5_2.0"]) / (last_row["BBU_5_2.0"] - last_row["BBL_5_2.0"])) if (last_row.get("BBU_5_2.0") != last_row.get("BBL_5_2.0")) else 0.5,
-            "volume_relative": float(last_row["Volume"] / df_ta["Volume"].tail(20).mean()) if df_ta["Volume"].tail(20).mean() != 0 else 1.0,
+            "trend_ema_cross": float(ema20 > ema50) if (ema20 and ema50) else 0.5,
+            "momentum_rsi": float(get_val("RSI", 50.0) / 100.0),
+            "volatility_bb": float((get_val("Close") - get_val("BBL_5_2.0")) / (get_val("BBU_5_2.0") - get_val("BBL_5_2.0"))) if (get_val("BBU_5_2.0") != get_val("BBL_5_2.0")) else 0.5,
+            "volume_relative": float(get_val("Volume") / df_ta["Volume"].tail(20).mean()) if df_ta["Volume"].tail(20).mean() != 0 else 1.0,
 
             # SMC Logic
             "smc_bullish_ob": float(any(ob["type"] == "bullish" for ob in smc_data.get("order_blocks", []))),
