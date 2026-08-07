@@ -24,9 +24,14 @@ export default function Ranking() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-         <Trophy size={32} className="text-amber-500" />
-         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>AI Ranking Engine</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Trophy size={32} className="text-amber-500" />
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>AI Ranking Engine</Typography>
+         </Box>
+         <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+            LAST CALIBRATED: {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+         </Typography>
       </Box>
 
       <Paper sx={{ p: 0, overflow: 'hidden' }}>

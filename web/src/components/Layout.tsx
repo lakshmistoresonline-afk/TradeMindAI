@@ -104,9 +104,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </IconButton>
             )}
             <TrendingUp className="text-emerald-500 mr-2" />
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', mr: 4, display: { xs: 'none', sm: 'block' } }}>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', mr: 2, display: { xs: 'none', sm: 'block' } }}>
               TradeMind AI
             </Typography>
+
+            {!isMobile && (
+              <Box sx={{ bgcolor: 'rgba(255,255,255,0.05)', px: 1.5, py: 0.5, borderRadius: 1, border: '1px solid #334155' }}>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                   <Calendar size={12} /> {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </Typography>
+              </Box>
+            )}
 
             <Stack direction="row" spacing={1} sx={{ ml: isMobile ? 0 : 4, overflowX: 'auto', py: 1 }}>
                {workspaces.map(ws => (

@@ -30,6 +30,9 @@ export default function ResearchHeader({ stock }: { stock: any }) {
               {stock.change_pct?.toFixed(2)}%
             </Typography>
           </Box>
+          <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 0.5 }}>
+             LAST UPDATED: {stock.updated_at ? new Date(stock.updated_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '---'}
+          </Typography>
         </Box>
       </Box>
 

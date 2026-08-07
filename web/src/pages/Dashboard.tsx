@@ -81,7 +81,12 @@ export default function Dashboard() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Overview</Typography>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Overview</Typography>
+          <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+             TRADING SESSION: {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<Play size={18} />}

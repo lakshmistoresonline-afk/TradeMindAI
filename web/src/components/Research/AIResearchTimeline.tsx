@@ -32,8 +32,8 @@ export default function AIResearchTimeline({ symbol }: { symbol: string }) {
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography variant="subtitle2" fontWeight="bold">{item.title}</Typography>
-                    <Typography variant="caption" color="textSecondary">
-                       {new Date(item.date).toLocaleDateString()}
+                    <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                       {item.date ? new Date(item.date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '---'}
                     </Typography>
                     <Chip label={item.type} size="small" variant="outlined" sx={{ height: 18, fontSize: '0.6rem' }} />
                   </Box>

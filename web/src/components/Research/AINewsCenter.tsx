@@ -49,8 +49,8 @@ export default function AINewsCenter({ symbol }: { symbol: string }) {
                     <Zap size={14} />
                     <Typography variant="caption" fontWeight="bold">AI IMPACT ANALYSIS ACTIVE</Typography>
                  </Box>
-                 <Typography variant="caption" color="textSecondary">
-                    {new Date(item.published_at).toLocaleDateString()}
+                 <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+                    {item.published_at ? new Date(item.published_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '---'}
                  </Typography>
               </Box>
             </ListItem>

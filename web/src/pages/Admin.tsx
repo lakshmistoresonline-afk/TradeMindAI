@@ -78,7 +78,10 @@ export default function Admin() {
                   {logs.length > 0 ? logs.map((log, i) => (
                     <TableRow key={i}>
                        <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                          {new Date(log.timestamp).toLocaleTimeString()}
+                          <Box sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                             {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </Box>
+                          {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                        </TableCell>
                        <TableCell>
                           <Chip label={log.type} size="small" variant="outlined" sx={{ fontSize: '0.6rem' }} />

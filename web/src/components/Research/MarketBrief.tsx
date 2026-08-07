@@ -37,6 +37,9 @@ export default function MarketBrief() {
            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Zap size={20} className="text-emerald-500" />
               <Typography variant="h6" fontWeight="bold">AI Daily Intelligence</Typography>
+              <Typography variant="caption" color="textSecondary" sx={{ ml: 1 }}>
+                 {intel?.date ? new Date(intel.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : new Date().toLocaleDateString()}
+              </Typography>
            </Box>
            <Chip label={intel?.type || "MARKET_LIVE"} size="small" color="primary" sx={{ fontWeight: 'bold' }} />
         </Box>

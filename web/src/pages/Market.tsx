@@ -37,6 +37,9 @@ export default function Market() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Market Data</Typography>
+          <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
+             AS OF: {new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+          </Typography>
           <Button
             size="small"
             variant="outlined"

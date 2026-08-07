@@ -30,7 +30,7 @@ export default function RecommendationHistory({ history }: { history: any[] }) {
           <TableBody>
             {history.map((h, i) => (
               <TableRow key={i} hover>
-                <TableCell>{new Date(h.date).toLocaleDateString()}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>{new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</TableCell>
                 <TableCell>
                    <Chip
                     label={h.title.split(': ')[1] || h.title}

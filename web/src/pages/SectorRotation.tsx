@@ -47,7 +47,12 @@ export default function SectorRotation() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Institutional Sector Rotation</Typography>
+         <Box>
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Institutional Sector Rotation</Typography>
+            <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 'bold' }}>
+               SESSION ANALYSIS: {new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+            </Typography>
+         </Box>
          <Chip label="Real-time Animated Feed" color="primary" variant="outlined" />
       </Box>
 

@@ -31,6 +31,9 @@ export default function Journal() {
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                              <Typography variant="h6" fontWeight="bold">{entry.symbol}</Typography>
                              <Chip label={entry.pnl >= 0 ? 'PROFIT' : 'LOSS'} color={entry.pnl >= 0 ? 'success' : 'error'} size="small" />
+                             <Typography variant="caption" color="textSecondary">
+                                {entry.exit_date ? new Date(entry.exit_date).toLocaleDateString() : '---'}
+                             </Typography>
                           </Box>
                           <Typography variant="h6" color={entry.pnl >= 0 ? 'primary' : 'error'} fontWeight="bold">
                              {entry.pnl >= 0 ? '+' : ''}₹{entry.pnl.toLocaleString()}

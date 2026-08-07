@@ -58,7 +58,7 @@ export default function Analysis() {
 # TRADE MIND AI: INSTITUTIONAL EQUITY RESEARCH
 ## ${selectedStock.name} (${selectedStock.symbol})
 
-**Report Date:** ${new Date().toLocaleDateString()}
+**Report Generated:** ${new Date().toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}
 **AI Investment Score:** ${selectedStock.ai_investment_score} / 100
 **Grade:** ${selectedStock.ai_investment_grade}
 
