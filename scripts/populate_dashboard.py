@@ -31,6 +31,8 @@ async def populate():
             # Use 1y period for faster population
             result = await _analyze_stock_logic(symbol, period="1y")
             print(f"  -> SUCCESS: {result}")
+            # RC-4: Aggressive sleep to prevent Groq 429 during sprint
+            await asyncio.sleep(12)
         except Exception as e:
             print(f"  -> FAILED {symbol}: {e}")
 

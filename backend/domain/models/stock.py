@@ -40,6 +40,7 @@ class Stock(BaseModel):
     public_holding: Optional[float] = None
 
     analysis: Optional[Dict[str, Any]] = None
+    structured_consensus: Optional[Dict[str, Any]] = None
     ai_investment_score: Optional[float] = None
     ai_investment_grade: Optional[str] = None # AAA, AA, A, B, C, D
     health_metrics: Optional[Dict[str, str]] = None # "Financial": "GOOD", etc.
