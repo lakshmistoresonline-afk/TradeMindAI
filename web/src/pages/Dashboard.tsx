@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Box, Typography, Grid, Paper, Button, CircularProgress, Divider, Chip } from '@mui/material'
-import { TrendingUp, BarChart2, MessageSquare, ShieldCheck, Play, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { Box, Typography, Grid, Paper, Button, CircularProgress, Divider, Chip, Stack } from '@mui/material'
+import { MessageSquare, Play } from 'lucide-react'
 import { getStocks, triggerBatchAnalysis, getMarketStats, getInstitutionalFlow } from '../api/client'
 import MarketBrief from '../components/Research/MarketBrief'
 import OpportunityEngine from '../components/Research/OpportunityEngine'
-
-import ReactECharts from 'echarts-for-react';
+import QuickResearchDrawer from '../components/Research/QuickResearchDrawer'
 
 export default function Dashboard() {
   const [stocks, setStocks] = useState<any[]>([])
@@ -17,6 +16,10 @@ export default function Dashboard() {
   })
   const [triggering, setTriggering] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  // Quick Research State
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedStockForDrawer, setSelectedStockForDrawer] = useState<any>(null);
 
   const handleTrigger = async () => {
     setTriggering(true)
@@ -55,29 +58,6 @@ export default function Dashboard() {
   const buySignals = stocks.filter(s => s.analysis?.consensus?.toUpperCase().includes('BUY')).length;
   const signalStrength = stocks.length > 0 ? Math.round((buySignals / stocks.length) * 100) : 0;
 
-  const breadthOption = {
-    xAxis: { type: 'category', data: ['09:15', '10:30', '11:45', '13:00', '14:15', '15:30'] },
-    yAxis: { type: 'value' },
-    series: [
-      {
-        name: 'Advancing',
-        type: 'line',
-        data: marketStats?.Breadth?.advancing ? [Math.round(marketStats.Breadth.advancing * 0.6), Math.round(marketStats.Breadth.advancing * 0.8), marketStats.Breadth.advancing] : [40, 52, 65, 58, 65, 72],
-        color: '#10b981',
-        smooth: true
-      },
-      {
-        name: 'Declining',
-        type: 'line',
-        data: marketStats?.Breadth?.declining ? [Math.round(marketStats.Breadth.declining * 1.2), Math.round(marketStats.Breadth.declining * 1.1), marketStats.Breadth.declining] : [60, 48, 35, 42, 35, 28],
-        color: '#f43f5e',
-        smooth: true
-      }
-    ],
-    legend: { show: true, textStyle: { color: '#fff' } },
-    grid: { top: 40, bottom: 40, left: 40, right: 20 }
-  };
-
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
@@ -105,116 +85,80 @@ export default function Dashboard() {
         </Box>
       ) : (
         <Box>
-          <MarketBrief />
-          <OpportunityEngine />
-          <Grid container spacing={3}>
-            {/* Dashboard Stats */}
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard
-                title="NIFTY 100"
-                value={marketStats?.['NIFTY 100']?.value?.toLocaleString() || '---'}
-                change={marketStats?.['NIFTY 100'] ? `${marketStats?.['NIFTY 100'].change}%` : '0%'}
-                icon={<BarChart2 />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard
-                title="BANK NIFTY"
-                value={marketStats?.['BANK NIFTY']?.value?.toLocaleString() || '---'}
-                change={marketStats?.['BANK NIFTY'] ? `${marketStats?.['BANK NIFTY'].change}%` : '0%'}
-                icon={<TrendingUp />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard
-                title="India VIX"
-                value={marketStats?.['India VIX']?.value?.toString() || '---'}
-                change={marketStats?.['India VIX'] ? `${marketStats?.['India VIX'].change}%` : '0%'}
-                icon={<ShieldCheck />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <StatCard
-                title="AI Sentiment"
-                value={signalStrength > 60 ? 'Bullish' : signalStrength < 40 ? 'Bearish' : 'Neutral'}
-                change={`${signalStrength}% Conf.`}
-                icon={<MessageSquare />}
-              />
-            </Grid>
+          {/* RC-4: Unified Market Pulse Header */}
+          <Paper sx={{ p: 0, mb: 4, overflow: 'hidden', border: '1px solid #1e293b', bgcolor: '#0f172a' }}>
+            <Grid container>
+              {/* Indices Pulse */}
+              <Grid item xs={12} md={4} sx={{ p: 3, borderRight: { md: '1px solid #1e293b' }, borderBottom: { xs: '1px solid #1e293b', md: 'none' } }}>
+                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 2 }}>MARKET INDICES</Typography>
+                <Stack spacing={2}>
+                  <IndexRow label="NIFTY 50" data={marketStats?.['NIFTY 50']} />
+                  <IndexRow label="BANK NIFTY" data={marketStats?.['BANK NIFTY']} />
+                  <IndexRow label="INDIA VIX" data={marketStats?.['India VIX']} isVix />
+                </Stack>
+              </Grid>
 
-            {/* Vision 2.0: Market Breadth */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3, bgcolor: 'rgba(16, 185, 129, 0.05)', border: '1px solid #10b981' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+              {/* Breadth & Sentiment Pulse */}
+              <Grid item xs={12} md={4} sx={{ p: 3, borderRight: { md: '1px solid #1e293b' }, borderBottom: { xs: '1px solid #1e293b', md: 'none' } }}>
+                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 2 }}>SESSION BREADTH</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Box>
-                    <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>MARKET BREADTH (ADVANCE/DECLINE)</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 4 }, mt: 1, flexWrap: 'wrap' }}>
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold" color="primary">{marketStats?.Breadth?.advancing || 0}</Typography>
-                        <Typography variant="caption" color="textSecondary">ADVANCING</Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold" color="error">{marketStats?.Breadth?.declining || 0}</Typography>
-                        <Typography variant="caption" color="textSecondary">DECLINING</Typography>
-                      </Box>
-                      <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold">{marketStats?.Breadth?.ratio || 0}</Typography>
-                        <Typography variant="caption" color="textSecondary">A/D RATIO</Typography>
-                      </Box>
-                    </Box>
+                    <Typography variant="h3" fontWeight={900} color="primary">{marketStats?.Breadth?.advancing || 0}</Typography>
+                    <Typography variant="caption" color="textSecondary">ADVANCING</Typography>
                   </Box>
+                  <Box sx={{ height: 60, width: 2, bgcolor: 'rgba(255,255,255,0.05)' }} />
                   <Box sx={{ textAlign: 'right' }}>
-                    <Chip label={(marketStats?.Breadth?.ratio || 0) > 1 ? "HEALTHY BREADTH" : "WEAK BREADTH"} color={(marketStats?.Breadth?.ratio || 0) > 1 ? "primary" : "warning"} variant="outlined" />
+                    <Typography variant="h3" fontWeight={900} color="error">{marketStats?.Breadth?.declining || 0}</Typography>
+                    <Typography variant="caption" color="textSecondary">DECLINING</Typography>
                   </Box>
                 </Box>
-                <Divider sx={{ my: 2, opacity: 0.1 }} />
-                <Box sx={{ height: 200 }}>
-                   <ReactECharts option={breadthOption} style={{ height: '100%' }} theme="dark" />
+                <Divider sx={{ my: 2, opacity: 0.05 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="textSecondary">AI SENTIMENT</Typography>
+                  <Chip
+                    label={signalStrength > 60 ? 'BULLISH' : signalStrength < 40 ? 'BEARISH' : 'NEUTRAL'}
+                    size="small"
+                    color={signalStrength > 60 ? 'primary' : signalStrength < 40 ? 'error' : 'default'}
+                    sx={{ fontWeight: 'bold', borderRadius: 1 }}
+                  />
                 </Box>
-              </Paper>
+              </Grid>
+
+              {/* Institutional Flow Pulse */}
+              <Grid item xs={12} md={4} sx={{ p: 3, bgcolor: 'rgba(16, 185, 129, 0.02)' }}>
+                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 2 }}>INSTITUTIONAL FLOW (EST.)</Typography>
+                <Stack spacing={1}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2">FII Net</Typography>
+                    <Typography variant="body2" fontWeight="bold" color={(instFlow?.FII_Net || 0) >= 0 ? 'primary' : 'error'}>
+                      {(instFlow?.FII_Net || 0) >= 0 ? '+' : ''}{instFlow?.FII_Net || 0} Cr
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2">DII Net</Typography>
+                    <Typography variant="body2" fontWeight="bold" color={(instFlow?.DII_Net || 0) >= 0 ? 'primary' : 'error'}>
+                      {(instFlow?.DII_Net || 0) >= 0 ? '+' : ''}{instFlow?.DII_Net || 0} Cr
+                    </Typography>
+                  </Box>
+                </Stack>
+                <Box sx={{ mt: 3, p: 1.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px dashed #334155' }}>
+                   <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mb: 0.5 }}>INSTITUTIONAL BIAS</Typography>
+                   <Typography variant="subtitle2" fontWeight="bold" color="primary">{instFlow?.Market_Sentiment || 'Syncing...'}</Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+
+          <Grid container spacing={3}>
+            {/* Live Signals & Market Brief */}
+            <Grid item xs={12} lg={8}>
+              <MarketBrief />
+              <OpportunityEngine />
             </Grid>
 
-            {/* Institutional Flow Section */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3, backgroundColor: 'rgba(15, 23, 42, 0.5)' }}>
-                <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2, flexWrap: 'wrap' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box>
-                      <Typography variant="subtitle2" color="textSecondary">FII Net Cash</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="h6" color={(instFlow?.FII_Net || 0) >= 0 ? "primary" : "error"}>
-                          {(instFlow?.FII_Net || 0) >= 0 ? "+" : ""}{instFlow?.FII_Net || 0} Cr
-                        </Typography>
-                        {(instFlow?.FII_Net || 0) >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
-                      </Box>
-                    </Box>
-                    <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-                    <Box>
-                      <Typography variant="subtitle2" color="textSecondary">DII Net Cash</Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="h6" color={(instFlow?.DII_Net || 0) >= 0 ? "primary" : "error"}>
-                          {(instFlow?.DII_Net || 0) >= 0 ? "+" : ""}{instFlow?.DII_Net || 0} Cr
-                        </Typography>
-                        {(instFlow?.DII_Net || 0) >= 0 ? <ArrowUpRight size={16} className="text-emerald-500" /> : <ArrowDownRight size={16} className="text-rose-500" />}
-                      </Box>
-                    </Box>
-                  </Box>
-                  <Box sx={{ ml: { xs: 0, sm: 'auto' }, textAlign: { xs: 'left', sm: 'right' }, width: { xs: '100%', sm: 'auto' } }}>
-                    <Typography variant="caption" color="textSecondary" sx={{ display: 'block' }}>Institutional Bias</Typography>
-                    <Chip
-                      label={instFlow?.Market_Sentiment || "Syncing..."}
-                      size="small"
-                      color={instFlow?.Market_Sentiment?.includes("Bullish") ? "primary" : "warning"}
-                    />
-                  </Box>
-                </Box>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Paper sx={{ p: 3, height: '500px', display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" gutterBottom>Live AI Signals</Typography>
+            <Grid item xs={12} lg={4}>
+              <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', border: '1px solid #1e293b' }}>
+                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 3 }}>LIVE AI SIGNALS</Typography>
                 <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
                   {stocks.filter(s => s.analysis).length > 0 ? (
                     stocks.filter(s => s.analysis).map((stock) => (
@@ -225,16 +169,16 @@ export default function Dashboard() {
                         conviction={stock.structured_consensus?.conviction || stock.ai_investment_score}
                         catalyst={stock.structured_consensus?.key_catalysts?.[0]}
                         reason={stock.structured_consensus?.thesis || stock.analysis.recommendations?.[0]?.analysis}
+                        onClick={() => {
+                           setSelectedStockForDrawer(stock);
+                           setDrawerOpen(true);
+                        }}
                       />
                     ))
                   ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2 }}>
-                      <MessageSquare size={48} opacity={0.1} />
-                      <Typography color="textSecondary" align="center">
-                        No live signals found. <br/>
-                        Trigger the institutional research agents <br/>
-                        to generate real-time consensus.
-                      </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2, opacity: 0.5 }}>
+                      <MessageSquare size={48} />
+                      <Typography color="textSecondary" align="center">No live signals found.</Typography>
                       <Button variant="outlined" size="small" onClick={handleTrigger}>Start Analysis</Button>
                     </Box>
                   )}
@@ -244,31 +188,50 @@ export default function Dashboard() {
           </Grid>
         </Box>
       )}
+
+      <QuickResearchDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        stock={selectedStockForDrawer}
+      />
     </Box>
   )
 }
 
-function StatCard({ title, value, change, icon }: any) {
+function IndexRow({ label, data, isVix = false }: any) {
+  const isUp = (data?.change || 0) >= 0;
+  const color = isVix ? (isUp ? '#f43f5e' : '#10b981') : (isUp ? '#10b981' : '#f43f5e');
+
   return (
-    <Paper sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-        <Typography color="textSecondary" variant="subtitle2">{title}</Typography>
-        <Box className="text-emerald-500">{icon}</Box>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Typography variant="body2" sx={{ fontWeight: 600 }}>{label}</Typography>
+      <Box sx={{ textAlign: 'right' }}>
+        <Typography variant="body1" fontWeight={800}>
+          {data?.value?.toLocaleString() || '---'}
+        </Typography>
+        <Typography variant="caption" sx={{ color: color, fontWeight: 'bold' }}>
+          {isUp ? '+' : ''}{data?.change || 0}%
+        </Typography>
       </Box>
-      <Typography variant="h5" fontWeight="bold">{value}</Typography>
-      <Typography variant="caption" color={change?.startsWith('-') ? 'error' : 'primary'}>
-        {change} Today
-      </Typography>
-    </Paper>
-  )
+    </Box>
+  );
 }
 
-function FeedItem({ symbol, action, reason, conviction, catalyst }: any) {
+function FeedItem({ symbol, action, reason, conviction, catalyst, onClick }: any) {
   const isBuy = action?.toUpperCase().includes('BUY');
   const isSell = action?.toUpperCase().includes('SELL');
 
   return (
-    <Box sx={{ mb: 2, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, borderLeft: `4px solid ${isBuy ? '#10b981' : isSell ? '#f43f5e' : '#fbbf24'}` }}>
+    <Box
+      onClick={onClick}
+      sx={{
+        mb: 2, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2,
+        borderLeft: `4px solid ${isBuy ? '#10b981' : isSell ? '#f43f5e' : '#fbbf24'}`,
+        cursor: 'pointer',
+        transition: '0.2s',
+        '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', transform: 'translateX(4px)' }
+      }}
+    >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
         <Typography fontWeight="bold" sx={{ fontSize: '1rem' }}>{symbol}</Typography>
         <Box sx={{ textAlign: 'right' }}>

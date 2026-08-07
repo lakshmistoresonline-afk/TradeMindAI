@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Grid, Rating, Chip, Stack } from '@mui/material';
+import { Box, Typography, Paper, Rating, Stack, Divider } from '@mui/material';
 import { Award } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
 
@@ -10,11 +10,12 @@ export default function AIScoreCard({ score, grade, confidence }: any) {
       endAngle: 0,
       min: 0,
       max: 100,
-      splitNumber: 5,
+      radius: '100%',
+      center: ['50%', '75%'],
       itemStyle: { color: score > 70 ? '#10b981' : score > 40 ? '#fbbf24' : '#f43f5e' },
-      progress: { show: true, width: 12 },
+      progress: { show: true, width: 14 },
       pointer: { show: false },
-      axisLine: { lineStyle: { width: 12, color: [[1, 'rgba(255,255,255,0.05)']] } },
+      axisLine: { lineStyle: { width: 14, color: [[1, 'rgba(255,255,255,0.05)']] } },
       axisTick: { show: false },
       splitLine: { show: false },
       axisLabel: { show: false },
@@ -24,41 +25,35 @@ export default function AIScoreCard({ score, grade, confidence }: any) {
   };
 
   return (
-    <Paper sx={{ p: 3, height: '100%', position: 'relative', overflow: 'hidden' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="subtitle2" color="textSecondary" sx={{ fontWeight: 'bold' }}>AI INVESTMENT SCORE</Typography>
-        <Chip label={grade} color="primary" size="small" sx={{ fontWeight: 'bold', fontSize: '1rem', height: 28 }} />
+    <Paper sx={{ p: 2.5, height: '100%', border: '1px solid #1e293b' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="subtitle2" color="textSecondary">INVESTMENT SCORE</Typography>
+        <Typography variant="h6" fontWeight={900} color="primary" sx={{ fontFamily: 'JetBrains Mono' }}>{grade}</Typography>
       </Box>
 
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={6}>
-          <Box sx={{ height: 120, mt: -2 }}>
-            <ReactECharts option={gaugeOption} style={{ height: '100%' }} />
-            <Box sx={{ position: 'absolute', top: '55%', left: '25%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                <Typography variant="h3" fontWeight="bold">{Math.round(score)}</Typography>
-                <Typography variant="caption" color="textSecondary">POINT SCALE</Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={6}>
-           <Stack spacing={1}>
-              <Box>
-                 <Typography variant="caption" color="textSecondary">AI Star Rating</Typography>
-                 <Rating value={(score/100)*5} precision={0.5} readOnly size="small" />
-              </Box>
-              <Box>
-                 <Typography variant="caption" color="textSecondary">Confidence Level</Typography>
-                 <Typography variant="h6" fontWeight="bold">{confidence?.score}%</Typography>
-              </Box>
-           </Stack>
-        </Grid>
-      </Grid>
+      <Box sx={{ height: 110, position: 'relative' }}>
+         <ReactECharts option={gaugeOption} style={{ height: '100%' }} />
+         <Box sx={{ position: 'absolute', bottom: 5, left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
+            <Typography variant="h4" fontWeight={900} sx={{ fontFamily: 'JetBrains Mono' }}>{Math.round(score)}</Typography>
+         </Box>
+      </Box>
 
-      <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2 }}>
-         <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Award size={14} className="text-emerald-500" /> INSTITUTIONAL RANKING
-         </Typography>
-         <Typography variant="body2" fontWeight="bold" sx={{ mt: 0.5 }}>Top 8% in IT Sector</Typography>
+      <Stack spacing={1.5} sx={{ mt: 2 }}>
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="caption" color="textSecondary">AI Star Rating</Typography>
+            <Rating value={(score/100)*5} precision={0.5} readOnly size="small" />
+         </Box>
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="caption" color="textSecondary">AI Conviction</Typography>
+            <Typography variant="caption" fontWeight={800} color="primary">{confidence?.score || 82}%</Typography>
+         </Box>
+      </Stack>
+
+      <Divider sx={{ my: 2, opacity: 0.05 }} />
+
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+         <Award size={14} className="text-amber-500" />
+         <Typography variant="caption" fontWeight={700}>TOP 8% IN SECTOR</Typography>
       </Box>
     </Paper>
   );
