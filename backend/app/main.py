@@ -37,6 +37,15 @@ async def startup():
     redis = aioredis.from_url(settings.REDIS_URL, encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
+    # Auto-initialize SQL Schema on startup
+    from backend.core.postgres import init_db
+    try:
+        print("Syncing Database Schema...")
+        init_db()
+        print("Database Schema Ready.")
+    except Exception as e:
+        print(f"Database Initialization Failed: {e}")
+
 # Set all CORS enabled origins
 app.add_middleware(
     CORSMiddleware,
@@ -69,7 +78,7 @@ async def root():
             "engine": db_type,
             "status": db_status
         },
-        "version": "2.0.0-RC4.1"
+        "version": "2.0.0-RC4.2"
     }
 
 @app.get("/health")
