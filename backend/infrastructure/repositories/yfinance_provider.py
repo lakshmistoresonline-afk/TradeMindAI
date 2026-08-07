@@ -21,6 +21,13 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
                 price = info.get("currentPrice") or info.get("regularMarketPrice") or 0.0
                 mc = info.get("marketCap") or 0
 
+            # Extract shareholding if available
+            holders = ticker.major_holders
+            promoter = 0.0
+            if holders is not None and not holders.empty:
+                try: promoter = float(holders.iloc[0, 0].replace('%','')) if isinstance(holders.iloc[0,0], str) else float(holders.iloc[0,0])
+                except: pass
+
             return {
                 "name": info.get("longName") or symbol,
                 "sector": info.get("sector") or "Unknown",
@@ -41,6 +48,9 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
                 "high_52w": info.get("fiftyTwoWeekHigh") or getattr(ticker.fast_info, 'year_high', 0),
                 "low_52w": info.get("fiftyTwoWeekLow") or getattr(ticker.fast_info, 'year_low', 0),
                 "avg_volume": info.get("averageVolume") or 0,
+                "promoter_holding": promoter,
+                "fii_holding": info.get("heldPercentInstitutions", 0) * 100,
+                "dii_holding": info.get("heldPercentInsiders", 0) * 100, # Insider as DI proxy if sparse
             }
         except Exception as e:
             print(f"YFinance Error for {symbol}: {e}")

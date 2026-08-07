@@ -109,6 +109,38 @@ class IntelReportDB(Base):
     key_events = Column(JSON)
     ai_bias = Column(String)
 
+class NewsDB(Base):
+    __tablename__ = "news"
+    id = Column(String, primary_key=True)
+    symbol = Column(String, ForeignKey("stocks.symbol"), index=True)
+    title = Column(String)
+    url = Column(String)
+    source = Column(String)
+    published_at = Column(DateTime, index=True)
+    content = Column(String)
+    sentiment_label = Column(String)
+    sentiment_score = Column(Float)
+
+class EarningsDB(Base):
+    __tablename__ = "earnings"
+    id = Column(String, primary_key=True)
+    symbol = Column(String, ForeignKey("stocks.symbol"), index=True)
+    date = Column(DateTime, index=True)
+    eps_actual = Column(Float)
+    eps_estimate = Column(Float)
+    revenue_actual = Column(Float)
+    revenue_estimate = Column(Float)
+    surprise_pct = Column(Float)
+
+class OpportunityDB(Base):
+    __tablename__ = "opportunities"
+    id = Column(String, primary_key=True)
+    symbol = Column(String, index=True)
+    type = Column(String)
+    conviction_score = Column(Float)
+    ai_thesis = Column(String)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 

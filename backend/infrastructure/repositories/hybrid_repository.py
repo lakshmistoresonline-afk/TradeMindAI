@@ -96,10 +96,31 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         self.fs = firestore_db
         self.duck = analytical_engine
 
-    async def save_news(self, articles: List[NewsArticle]) -> None: pass
-    async def get_latest_news(self, symbol: str, limit: int = 10) -> List[NewsArticle]: return []
-    async def save_institutional_flow(self, flow: InstitutionalFlow) -> None: pass
-    async def get_latest_institutional_flow(self) -> Optional[InstitutionalFlow]: return None
+    async def save_news(self, articles: List[NewsArticle]) -> None:
+        from backend.core.postgres import NewsDB
+        with self.session_factory() as pg:
+            for art in articles:
+                existing = pg.query(NewsDB).filter(NewsDB.id == art.id).first()
+                if not existing:
+                    pg.add(NewsDB(**art.model_dump()))
+            pg.commit()
+
+    async def get_latest_news(self, symbol: str, limit: int = 10) -> List[NewsArticle]:
+        from backend.core.postgres import NewsDB
+        with self.session_factory() as pg:
+            res = pg.query(NewsDB).filter(NewsDB.symbol == symbol).order_by(NewsDB.published_at.desc()).limit(limit).all()
+            return [NewsArticle(**{c.name: getattr(r, c.name) for c in r.__table__.columns}) for r in res]
+
+    async def save_institutional_flow(self, flow: InstitutionalFlow) -> None:
+        from google.cloud import firestore
+        # User Heuristic tier - kept in Firestore for real-time reactivity
+        self.fs.collection("institutional_flow").document(flow.date.strftime("%Y-%m-%d")).set(flow.model_dump())
+
+    async def get_latest_institutional_flow(self) -> Optional[InstitutionalFlow]:
+        from google.cloud import firestore
+        docs = self.fs.collection("institutional_flow").order_by("date", direction=firestore.Query.DESCENDING).limit(1).stream()
+        for doc in docs: return InstitutionalFlow(**doc.to_dict())
+        return None
 
     async def save_feature_vector(self, vector: FeatureVector) -> None:
         df = pd.DataFrame([{"date": vector.date, **vector.features}])
@@ -120,8 +141,20 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         docs = self.fs.collection("alerts").where("is_read", "==", False).limit(limit).stream()
         return [Alert(**doc.to_dict()) for doc in docs]
 
-    async def save_earnings(self, earnings: EarningsData) -> None: pass
-    async def get_latest_earnings(self, symbol: str) -> Optional[EarningsData]: return None
+    async def save_earnings(self, earnings: EarningsData) -> None:
+        from backend.core.postgres import EarningsDB
+        with self.session_factory() as pg:
+            doc_id = f"{earnings.symbol}_{earnings.date.strftime('%Y-%m-%d')}"
+            existing = pg.query(EarningsDB).filter(EarningsDB.id == doc_id).first()
+            if not existing:
+                pg.add(EarningsDB(id=doc_id, **earnings.model_dump()))
+            pg.commit()
+
+    async def get_latest_earnings(self, symbol: str) -> Optional[EarningsData]:
+        from backend.core.postgres import EarningsDB
+        with self.session_factory() as pg:
+            res = pg.query(EarningsDB).filter(EarningsDB.symbol == symbol).order_by(EarningsDB.date.desc()).first()
+            return EarningsData(**{c.name: getattr(res, c.name) for c in res.__table__.columns}) if res else None
     async def save_options_chain(self, chain: OptionsChain) -> None: pass
     async def get_latest_options_chain(self, symbol: str) -> Optional[OptionsChain]: return None
 
@@ -207,8 +240,17 @@ class HybridIOSRepository(IIOSRepository):
                 )
             return None
 
-    async def save_opportunity(self, opportunity: MarketOpportunity) -> None: pass
-    async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]: return []
+    async def save_opportunity(self, opportunity: MarketOpportunity) -> None:
+        from backend.core.postgres import OpportunityDB
+        with self.session_factory() as pg:
+            pg.add(OpportunityDB(**opportunity.model_dump()))
+            pg.commit()
+
+    async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]:
+        from backend.core.postgres import OpportunityDB
+        with self.session_factory() as pg:
+            res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
+            return [MarketOpportunity(**{c.name: getattr(r, c.name) for c in r.__table__.columns if c.name != 'indicators'}) for r in res]
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         with self.session_factory() as pg:
