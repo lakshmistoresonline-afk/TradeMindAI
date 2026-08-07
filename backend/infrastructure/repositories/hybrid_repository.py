@@ -85,6 +85,9 @@ class HybridStockRepository(IStockRepository):
 
     def _map_db_to_stock(self, db_obj: StockDB) -> Stock:
         data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
+        # Ensure BigInt market_cap fits into float
+        if data.get('market_cap'):
+            data['market_cap'] = float(data['market_cap'])
         return Stock(**data)
 
 class HybridDataPlatformRepository(IDataPlatformRepository):
@@ -180,13 +183,29 @@ class HybridIOSRepository(IIOSRepository):
 
     async def save_market_regime(self, regime: MarketRegime) -> None:
         with self.session_factory() as pg:
-            pg.add(RegimeDB(date=regime.date, regime=regime.regime, risk_mode=regime.risk_mode, description=regime.description, volatility_index=regime.volatility_index))
+            pg.add(RegimeDB(
+                date=regime.date,
+                regime=regime.regime,
+                risk_mode=regime.risk_mode,
+                sentiment_score=regime.sentiment_score,
+                description=regime.description,
+                volatility_index=regime.volatility_index
+            ))
             pg.commit()
 
     async def get_latest_regime(self) -> Optional[MarketRegime]:
         with self.session_factory() as pg:
             r = pg.query(RegimeDB).order_by(RegimeDB.date.desc()).first()
-            return MarketRegime(date=r.date, regime=r.regime, risk_mode=r.risk_mode, sentiment_score=0.5, volatility_index=r.volatility_index, description=r.description) if r else None
+            if r:
+                return MarketRegime(
+                    date=r.date,
+                    regime=r.regime,
+                    risk_mode=r.risk_mode,
+                    sentiment_score=r.sentiment_score or 0.5,
+                    volatility_index=r.volatility_index,
+                    description=r.description
+                )
+            return None
 
     async def save_opportunity(self, opportunity: MarketOpportunity) -> None: pass
     async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]: return []
@@ -199,7 +218,18 @@ class HybridIOSRepository(IIOSRepository):
     async def get_latest_intel_report(self, report_type: str) -> Optional[MarketIntelligenceReport]:
         with self.session_factory() as pg:
             r = pg.query(IntelReportDB).filter(IntelReportDB.type == report_type).order_by(IntelReportDB.date.desc()).first()
-            return MarketIntelligenceReport(id=r.id, type=r.type, date=r.date, summary=r.summary, key_events=r.key_events, top_movers=[], sector_performance={}, ai_bias=r.ai_bias) if r else None
+            if r:
+                return MarketIntelligenceReport(
+                    id=r.id,
+                    type=r.type,
+                    date=r.date,
+                    summary=r.summary,
+                    key_events=r.key_events or [],
+                    top_movers=[],
+                    sector_performance={},
+                    ai_bias=r.ai_bias or "NEUTRAL"
+                )
+            return None
 
     async def save_trade_feedback(self, feedback: TradeFeedback) -> None: self.fs.collection("trade_journal").document(feedback.id).set(feedback.model_dump())
     async def get_user_trades(self, user_id: str) -> List[TradeFeedback]:

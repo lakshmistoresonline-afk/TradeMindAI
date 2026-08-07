@@ -20,6 +20,13 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
     POSTGRES_URL: str = "sqlite:///./local_operational.db"
+
+    @validator("POSTGRES_URL", pre=True)
+    def fix_postgres_prefix(cls, v: str) -> str:
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql://", 1)
+        return v
+
     FIREBASE_PROJECT_ID: str = "com-webcraft-trademindai-c8f75"
     GROQ_API_KEY: str = "YOUR_GROQ_API_KEY"
 

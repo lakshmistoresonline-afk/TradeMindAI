@@ -86,6 +86,7 @@ class RegimeDB(Base):
     date = Column(DateTime, default=datetime.datetime.utcnow)
     regime = Column(String)
     risk_mode = Column(String)
+    sentiment_score = Column(Float, default=0.5)
     description = Column(String)
     volatility_index = Column(Float)
 
