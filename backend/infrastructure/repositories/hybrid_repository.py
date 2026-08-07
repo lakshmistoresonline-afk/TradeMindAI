@@ -34,12 +34,30 @@ class HybridStockRepository(IStockRepository):
             return self._map_db_to_stock(s) if s else None
 
     async def save_stock(self, stock: Stock) -> None:
+        def json_serializable(data):
+            """Recursively convert datetimes to strings for JSON columns."""
+            if isinstance(data, dict):
+                return {k: json_serializable(v) for k, v in data.items()}
+            elif isinstance(data, list):
+                return [json_serializable(i) for i in data]
+            elif isinstance(data, datetime):
+                return data.isoformat()
+            return data
+
         with self.session_factory() as pg:
             db_stock = pg.query(StockDB).filter(StockDB.symbol == stock.symbol).first()
             data = stock.model_dump()
 
             db_columns = {c.name for c in StockDB.__table__.columns}
-            filtered_data = {k: v for k, v in data.items() if k in db_columns}
+            json_cols = {"analysis", "structured_consensus", "health_metrics", "confidence_metrics"}
+
+            filtered_data = {}
+            for k, v in data.items():
+                if k in db_columns:
+                    if k in json_cols:
+                        filtered_data[k] = json_serializable(v)
+                    else:
+                        filtered_data[k] = v
 
             if db_stock:
                 for key, value in filtered_data.items():

@@ -214,7 +214,7 @@ class ConsensusAgent(BaseAgent):
         Synthesize these reports into a final institutional decision.
         If agents conflict, prioritize the Technical/SMC bias unless Macro risk is EXTREME.
 
-        Return a structured JSON response EXACTLY in this format:
+        Return ONLY a structured JSON response. DO NOT explain. DO NOT use markdown code blocks.
         {{
             "rating": "BUY | SELL | HOLD | STRONG BUY | STRONG SELL",
             "conviction": 0 to 100,

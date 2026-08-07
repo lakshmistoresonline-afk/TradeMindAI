@@ -151,19 +151,23 @@ async def _analyze_stock_logic(symbol: str, period: str):
         result = workflow.invoke(initial_state)
         log_status("AI_WORKFLOW_COMPLETE")
 
-        # RC-3: Structured Consensus Parsing
+        # RC-3: Structured Consensus Parsing (Resilient to LLM "yapping")
         structured_consensus = {}
         if result.get("consensus"):
             try:
-                # Try to parse JSON from the LLM response
                 import re
-                json_match = re.search(r'\{.*\}', result["consensus"], re.DOTALL)
+                # Find the first { and last } to extract JSON
+                content = result["consensus"]
+                json_match = re.search(r'(\{.*\})', content, re.DOTALL)
                 if json_match:
-                    structured_consensus = json.loads(json_match.group())
+                    json_str = json_match.group(1)
+                    # Resilient clean-up of common LLM errors
+                    json_str = json_str.replace("'", "\"") # Replace single quotes
+                    structured_consensus = json.loads(json_str)
                 else:
-                    structured_consensus = {"thesis": result["consensus"]}
+                    structured_consensus = {"thesis": content}
             except Exception as e:
-                print(f"Error parsing structured consensus: {e}")
+                print(f"Error parsing structured consensus for {symbol}: {e}")
                 structured_consensus = {"thesis": result["consensus"]}
 
         # 8. Unified AI Investment Score
