@@ -19,8 +19,10 @@ def check():
             if r.status_code == 200:
                 data = r.json()
                 if name == "Stocks":
-                    with_analysis = len([s for s in data if s.get("analysis")])
-                    status = f"✅ {len(data)} items ({with_analysis} with DNA)"
+                    with_analysis = [s for s in data if s.get("analysis")]
+                    status = f"✅ {len(data)} items ({len(with_analysis)} with DNA)"
+                    if with_analysis:
+                        print(f"Sample DNA (First 100 chars): {json.dumps(with_analysis[0].get('analysis'))[:100]}")
                 elif isinstance(data, list):
                     status = f"✅ {len(data)} items"
                 elif isinstance(data, dict):

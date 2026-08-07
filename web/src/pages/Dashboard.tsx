@@ -161,20 +161,26 @@ export default function Dashboard() {
                 <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 3 }}>LIVE AI SIGNALS</Typography>
                 <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
                   {stocks.filter(s => s.analysis).length > 0 ? (
-                    stocks.filter(s => s.analysis).map((stock) => (
-                      <FeedItem
-                        key={stock.symbol}
-                        symbol={stock.symbol}
-                        action={stock.structured_consensus?.rating || (stock.analysis.consensus.toUpperCase().includes('BUY') ? 'BUY' : 'HOLD')}
-                        conviction={stock.structured_consensus?.conviction || stock.ai_investment_score}
-                        catalyst={stock.structured_consensus?.key_catalysts?.[0]}
-                        reason={stock.structured_consensus?.thesis || stock.analysis.recommendations?.[0]?.analysis}
-                        onClick={() => {
-                           setSelectedStockForDrawer(stock);
-                           setDrawerOpen(true);
-                        }}
-                      />
-                    ))
+                    stocks.filter(s => s.analysis).map((stock) => {
+                      const analysis = stock.analysis || {};
+                      const structured = stock.structured_consensus || {};
+                      const rating = structured.rating || (analysis.consensus?.toUpperCase().includes('BUY') ? 'BUY' : 'HOLD');
+
+                      return (
+                        <FeedItem
+                          key={stock.symbol}
+                          symbol={stock.symbol}
+                          action={rating}
+                          conviction={structured.conviction || stock.ai_investment_score || 0}
+                          catalyst={structured.key_catalysts?.[0] || 'Analyzing session dynamics...'}
+                          reason={structured.thesis || analysis.consensus}
+                          onClick={() => {
+                             setSelectedStockForDrawer(stock);
+                             setDrawerOpen(true);
+                          }}
+                        />
+                      );
+                    })
                   ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2, opacity: 0.5 }}>
                       <MessageSquare size={48} />

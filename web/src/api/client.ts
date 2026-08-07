@@ -10,7 +10,7 @@ export const apiClient = axios.create({
 });
 
 export const getStocks = async () => {
-  const response = await apiClient.get('/stocks');
+  const response = await apiClient.get('/stocks/');
   return response.data;
 };
 
