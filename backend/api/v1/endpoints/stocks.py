@@ -61,12 +61,16 @@ async def get_market_stats():
                 # 2. If history failed (Common on restricted servers), try manual scrape fallback
                 if price == 0:
                     headers = {'User-Agent': 'Mozilla/5.0'}
-                    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=2d", headers=headers)
+                    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", headers=headers)
                     if r.status_code == 200:
                         data = r.json()
-                        meta = data['chart']['result'][0]['meta']
-                        price = meta['regularMarketPrice']
-                        prev = meta['previousClose']
+                        chart = data['chart']['result'][0]
+                        closes = chart['indicators']['quote'][0]['close']
+                        # Filter out None values
+                        valid_closes = [c for c in closes if c is not None]
+                        if valid_closes:
+                            price = valid_closes[-1]
+                            prev = valid_closes[-2] if len(valid_closes) > 1 else price
 
                 stats[name] = {
                     "value": round(float(price), 2),
