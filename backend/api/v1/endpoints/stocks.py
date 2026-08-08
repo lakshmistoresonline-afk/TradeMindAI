@@ -7,6 +7,9 @@ from fastapi_cache.decorator import cache
 import yfinance as yf
 from typing import List
 import datetime
+import requests
+import json
+import traceback
 
 router = APIRouter()
 
@@ -29,7 +32,6 @@ async def analyze_portfolio(
 @router.get("/market-stats")
 @cache(expire=300) # Cache indices for 5 minutes
 async def get_market_stats():
-    # Keep public for dashboard loading
     indices = {
         "^NSEI": "NIFTY 50",
         "^CNX100": "NIFTY 100",
@@ -39,8 +41,6 @@ async def get_market_stats():
     stats = {}
 
     try:
-        import requests
-        # Mimic browser to avoid IP blocking
         session = requests.Session()
         session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -48,48 +48,40 @@ async def get_market_stats():
 
         for symbol, name in indices.items():
             try:
-                # RC-4: Extremely resilient index fetch using dual-layer fallback
-                # 1. Try yfinance history
-                ticker = yf.Ticker(symbol, session=session)
-                df = ticker.history(period="2d")
-
+                # 1. Try manual scraper first (Fastest and most reliable on servers)
                 price, prev = 0.0, 0.0
-                if not df.empty:
-                    price = float(df["Close"].iloc[-1])
-                    prev = float(df["Close"].iloc[-2]) if len(df) > 1 else price
-
-                # 2. If history failed (Common on restricted servers), try manual scrape fallback
-                if price == 0:
-                    headers = {'User-Agent': 'Mozilla/5.0'}
-                    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", headers=headers)
+                try:
+                    r = session.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", timeout=5)
                     if r.status_code == 200:
                         data = r.json()
                         chart = data['chart']['result'][0]
                         closes = chart['indicators']['quote'][0]['close']
-                        # Filter out None values
                         valid_closes = [c for c in closes if c is not None]
                         if valid_closes:
                             price = valid_closes[-1]
                             prev = valid_closes[-2] if len(valid_closes) > 1 else price
+                except: pass
+
+                # 2. Try yfinance history as fallback
+                if price == 0:
+                    ticker = yf.Ticker(symbol, session=session)
+                    df = ticker.history(period="2d")
+                    if not df.empty:
+                        price = float(df["Close"].iloc[-1])
+                        prev = float(df["Close"].iloc[-2]) if len(df) > 1 else price
 
                 stats[name] = {
                     "value": round(float(price), 2),
                     "change": round(float(((price - prev) / prev) * 100), 2) if (prev and prev != 0) else 0.0
                 }
             except Exception as e:
-                import traceback
                 print(f"Error fetching index {name}: {e}")
-                stats[name] = {"value": 0, "change": 0, "error": str(e), "trace": traceback.format_exc()[:100]}
-                import traceback
-                print(f"Error fetching index {name}: {e}")
-                stats[name] = {"value": 0, "change": 0, "error": str(e), "trace": traceback.format_exc()[:100]}
+                stats[name] = {"value": 0, "change": 0}
 
-        # Vision 2.0: Market Breadth Calculation
-        # Increased limit for broader coverage - Now using Repository (SQL)
+        # 3. Market Breadth Calculation (SQL Tier)
         stocks_list = await container.repository.get_all_stocks(limit=150)
         advancing, declining = 0, 0
         for stock in stocks_list:
-            # Resilient check for change_pct (SQL often returns float or None)
             change = getattr(stock, 'change_pct', 0) or 0
             if change > 0: advancing += 1
             elif change < 0: declining += 1
@@ -101,7 +93,6 @@ async def get_market_stats():
         }
     except Exception as e:
         print(f"Global market stats error: {e}")
-        # Ensure we return a valid structure even on failure
         if "Breadth" not in stats:
             stats["Breadth"] = {"advancing": 0, "declining": 0, "ratio": 0}
 
@@ -109,10 +100,6 @@ async def get_market_stats():
 
 @router.get("/fii-dii")
 async def get_institutional_flow():
-    """
-    Vision 2.0: Institutional Cash Flow Audit.
-    Returns estimates derived from real-time market breadth and volume.
-    """
     stats = await get_market_stats()
     return container.intel_service.estimate_institutional_flow(stats)
 
@@ -137,30 +124,16 @@ async def get_stock_detail(
     return {"error": "Stock not found"}
 
 @router.get("/{symbol}/news")
-async def get_stock_news(
-    symbol: str
-):
-    """
-    Fetches the latest institutional news and AI sentiment for a stock.
-    """
+async def get_stock_news(symbol: str):
     return await container.data_platform_repo.get_latest_news(symbol)
 
 @router.get("/{symbol}/earnings")
-async def get_stock_earnings(
-    symbol: str
-):
-    """
-    Fetches the latest earnings data and upcoming dates for a stock.
-    """
+async def get_stock_earnings(symbol: str):
     return await container.data_platform_repo.get_latest_earnings(symbol)
 
 @router.get("/{symbol}/timeline")
-async def get_stock_timeline(
-    symbol: str
-):
-    """
-    Fetches the institutional intelligence timeline for a stock.
-    """
+async def get_stock_timeline(symbol: str):
+    from google.cloud import firestore
     docs = container.repository.db.collection("stocks").document(symbol).collection("timeline")\
         .order_by("date", direction=firestore.Query.DESCENDING).limit(20).stream()
     return [doc.to_dict() for doc in docs]

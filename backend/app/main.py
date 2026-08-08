@@ -78,7 +78,7 @@ async def root():
             "engine": db_type,
             "status": db_status
         },
-        "version": "2.0.0-RC4.7"
+        "version": "2.0.0-RC4.8"
     }
 
 @app.get("/health")
