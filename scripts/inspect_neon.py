@@ -13,8 +13,8 @@ def inspect():
     engine = create_engine(url)
 
     with engine.connect() as conn:
-        print("\n--- STOCKS DNA CHECK ---")
-        res = conn.execute(text("SELECT symbol, updated_at, ai_investment_grade FROM stocks ORDER BY updated_at DESC LIMIT 10"))
+        print("\n--- STOCKS CHANGE_PCT CHECK ---")
+        res = conn.execute(text("SELECT symbol, change_pct FROM stocks LIMIT 15"))
         for row in res:
             print(row)
 

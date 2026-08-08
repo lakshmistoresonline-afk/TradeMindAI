@@ -39,30 +39,36 @@ async def get_market_stats():
     stats = {}
 
     try:
+        import requests
+        # Mimic browser to avoid IP blocking
+        session = requests.Session()
+        session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        })
+
         for symbol, name in indices.items():
             try:
-                ticker = yf.Ticker(symbol)
-                # RC-4: Use history(2d) for indices - the most reliable way to get price + change
-                df = ticker.history(period="2d")
-                if not df.empty and len(df) >= 1:
-                    price = df["Close"].iloc[-1]
-                    # If we only have 1 row, prev_close is Close. Else it's the row before.
-                    prev = df["Close"].iloc[-2] if len(df) > 1 else price
+                ticker = yf.Ticker(symbol, session=session)
+                # Primary: fast_info (More reliable on low-end servers)
+                fast = ticker.fast_info
+                price = getattr(fast, 'last_price', 0.0)
+                prev = getattr(fast, 'previous_close', price)
 
-                    stats[name] = {
-                        "value": round(float(price), 2),
-                        "change": round(float(((price - prev) / prev) * 100), 2) if prev != 0 else 0.0
-                    }
-                else:
-                    # Deep fallback to standard info if history fails
-                    info = ticker.info
-                    price = info.get('regularMarketPrice', 0.0)
-                    prev = info.get('regularMarketPreviousClose', price)
-                    stats[name] = {
-                        "value": round(float(price), 2),
-                        "change": round(float(((price - prev) / prev) * 100), 2) if prev != 0 else 0.0
-                    }
+                # Secondary: History if fast_info fails
+                if price == 0:
+                    df = ticker.history(period="2d")
+                    if not df.empty:
+                        price = df["Close"].iloc[-1]
+                        prev = df["Close"].iloc[-2] if len(df) > 1 else price
+
+                stats[name] = {
+                    "value": round(float(price), 2),
+                    "change": round(float(((price - prev) / prev) * 100), 2) if prev != 0 else 0.0
+                }
             except Exception as e:
+                import traceback
+                print(f"Error fetching index {name}: {e}")
+                stats[name] = {"value": 0, "change": 0, "error": str(e), "trace": traceback.format_exc()[:100]}
                 import traceback
                 print(f"Error fetching index {name}: {e}")
                 stats[name] = {"value": 0, "change": 0, "error": str(e), "trace": traceback.format_exc()[:100]}
