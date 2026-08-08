@@ -16,10 +16,14 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             if not info or info.get("regularMarketPrice") is None:
                 fast = ticker.fast_info
                 price = getattr(fast, 'last_price', 0)
+                prev_close = getattr(fast, 'previous_close', price)
                 mc = getattr(fast, 'market_cap', 0)
             else:
                 price = info.get("currentPrice") or info.get("regularMarketPrice") or 0.0
+                prev_close = info.get("regularMarketPreviousClose") or price
                 mc = info.get("marketCap") or 0
+
+            change_pct = ((price - prev_close) / prev_close * 100) if prev_close else 0.0
 
             # Extract shareholding if available
             holders = ticker.major_holders
@@ -33,6 +37,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
                 "sector": info.get("sector") or "Unknown",
                 "industry": info.get("industry") or "Unknown",
                 "last_price": price,
+                "change_pct": change_pct,
                 "market_cap": mc,
                 "enterprise_value": info.get("enterpriseValue") or 0,
                 "pe_ratio": info.get("forwardPE") or info.get("trailingPE"),

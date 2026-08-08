@@ -42,19 +42,26 @@ async def get_market_stats():
         for symbol, name in indices.items():
             try:
                 ticker = yf.Ticker(symbol)
-                # fast_info can fail for some indices, use a fallback
-                info = ticker.fast_info
-                price = getattr(info, 'last_price', 0)
-                prev = getattr(info, 'previous_close', price)
+                # RC-4: Use history(2d) for indices - the most reliable way to get price + change
+                df = ticker.history(period="2d")
+                if not df.empty and len(df) >= 1:
+                    price = df["Close"].iloc[-1]
+                    # If we only have 1 row, prev_close is Close. Else it's the row before.
+                    prev = df["Close"].iloc[-2] if len(df) > 1 else price
 
-                if price == 0: # Fallback to standard info
-                    price = ticker.info.get('regularMarketPrice', 0)
-                    prev = ticker.info.get('regularMarketPreviousClose', price)
-
-                stats[name] = {
-                    "value": round(price, 2),
-                    "change": round(((price - prev) / prev) * 100, 2) if prev != 0 else 0
-                }
+                    stats[name] = {
+                        "value": round(float(price), 2),
+                        "change": round(float(((price - prev) / prev) * 100), 2) if prev != 0 else 0.0
+                    }
+                else:
+                    # Deep fallback to standard info if history fails
+                    info = ticker.info
+                    price = info.get('regularMarketPrice', 0.0)
+                    prev = info.get('regularMarketPreviousClose', price)
+                    stats[name] = {
+                        "value": round(float(price), 2),
+                        "change": round(float(((price - prev) / prev) * 100), 2) if prev != 0 else 0.0
+                    }
             except Exception as e:
                 print(f"Error fetching index {name}: {e}")
                 stats[name] = {"value": 0, "change": 0}
@@ -64,14 +71,15 @@ async def get_market_stats():
         stocks_list = await container.repository.get_all_stocks(limit=150)
         advancing, declining = 0, 0
         for stock in stocks_list:
-            change = stock.change_pct or 0
+            # Resilient check for change_pct (SQL often returns float or None)
+            change = getattr(stock, 'change_pct', 0) or 0
             if change > 0: advancing += 1
             elif change < 0: declining += 1
 
         stats["Breadth"] = {
             "advancing": advancing,
             "declining": declining,
-            "ratio": round(advancing/declining, 2) if declining > 0 else advancing
+            "ratio": round(advancing/declining, 2) if declining > 0 else float(advancing)
         }
     except Exception as e:
         print(f"Global market stats error: {e}")

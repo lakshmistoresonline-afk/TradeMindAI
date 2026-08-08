@@ -41,21 +41,29 @@ async def verify_and_populate():
         "YESBANK", "ZOMATO", "ZYDUSLIFE"
     ]
 
+    # Process in batches of 5 to prevent session timeouts
+    batch_size = 5
+    processed = 0
+
     for i, symbol in enumerate(symbols):
+        if processed >= batch_size:
+            print(f"\n✅ Finished mini-batch of {batch_size}. Stopping for now.")
+            break
+
         try:
             print(f"[{i+1}/{len(symbols)}] Verifying {symbol}...")
 
             # Check current status in DB
             with engine.connect() as conn:
-                res = conn.execute(text("SELECT analysis, updated_at FROM stocks WHERE symbol = :s"), {"s": symbol}).fetchone()
+                res = conn.execute(text("SELECT analysis, updated_at, structured_consensus FROM stocks WHERE symbol = :s"), {"s": symbol}).fetchone()
 
             needs_update = False
             if not res:
                 print(f"  🆕 {symbol}: Missing from database. Initializing...")
                 needs_update = True
             else:
-                analysis, updated_at = res
-                if not analysis:
+                analysis, updated_at, structured = res
+                if not analysis or not structured:
                     print(f"  ⚠️ {symbol}: Incomplete DNA found. Repairing...")
                     needs_update = True
                 elif updated_at.date() < datetime.date.today():
@@ -65,8 +73,8 @@ async def verify_and_populate():
                     print(f"  ✅ {symbol}: Data is up-to-date. Skipping.")
 
             if needs_update:
+                processed += 1
                 # Trigger analysis logic
-                # period="10y" for initial, but could use "1y" for faster daily updates
                 result = await _analyze_stock_logic(symbol, period="10y")
 
                 if "Error" in str(result):
@@ -75,8 +83,8 @@ async def verify_and_populate():
                     print(f"  ✨ {symbol}: Research DNA successfully populated.")
 
                 # Groq Token Guard: Wait between individual stock analyses
-                print(f"  (Rate limit cooldown: 15s)")
-                await asyncio.sleep(15)
+                print(f"  (Rate limit cooldown: 30s)")
+                await asyncio.sleep(30)
 
         except Exception as e:
             print(f"  💥 {symbol}: Error during verification - {e}")

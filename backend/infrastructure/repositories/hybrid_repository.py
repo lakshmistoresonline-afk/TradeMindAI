@@ -259,16 +259,20 @@ class HybridIOSRepository(IIOSRepository):
         return [ResearchNote(**doc.to_dict()) for doc in docs]
 
     async def save_market_regime(self, regime: MarketRegime) -> None:
+        from backend.core.postgres import RegimeDB
         with self.session_factory() as pg:
-            pg.add(RegimeDB(
+            print(f"[HYBRID] Saving Market Regime to SQL...")
+            db_regime = RegimeDB(
                 date=regime.date,
                 regime=regime.regime,
                 risk_mode=regime.risk_mode,
                 sentiment_score=regime.sentiment_score,
                 description=regime.description,
                 volatility_index=regime.volatility_index
-            ))
+            )
+            pg.add(db_regime)
             pg.commit()
+            print(f"[HYBRID] Market Regime saved successfully.")
 
     async def get_latest_regime(self) -> Optional[MarketRegime]:
         with self.session_factory() as pg:
@@ -297,9 +301,20 @@ class HybridIOSRepository(IIOSRepository):
             return [MarketOpportunity(**{c.name: getattr(r, c.name) for c in r.__table__.columns if c.name != 'indicators'}) for r in res]
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
+        from backend.core.postgres import IntelReportDB
         with self.session_factory() as pg:
-            pg.add(IntelReportDB(id=report.id, type=report.type, date=report.date, summary=report.summary, key_events=report.key_events, ai_bias=report.ai_bias))
+            print(f"[HYBRID] Saving Intel Report ({report.type}) to SQL...")
+            db_report = IntelReportDB(
+                id=report.id,
+                type=report.type,
+                date=report.date,
+                summary=report.summary,
+                key_events=report.key_events,
+                ai_bias=report.ai_bias
+            )
+            pg.add(db_report)
             pg.commit()
+            print(f"[HYBRID] Intel Report saved successfully.")
 
     async def get_latest_intel_report(self, report_type: str) -> Optional[MarketIntelligenceReport]:
         with self.session_factory() as pg:
