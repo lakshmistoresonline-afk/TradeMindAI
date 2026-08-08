@@ -63,8 +63,9 @@ async def get_market_stats():
                         "change": round(float(((price - prev) / prev) * 100), 2) if prev != 0 else 0.0
                     }
             except Exception as e:
+                import traceback
                 print(f"Error fetching index {name}: {e}")
-                stats[name] = {"value": 0, "change": 0}
+                stats[name] = {"value": 0, "change": 0, "error": str(e), "trace": traceback.format_exc()[:100]}
 
         # Vision 2.0: Market Breadth Calculation
         # Increased limit for broader coverage - Now using Repository (SQL)
