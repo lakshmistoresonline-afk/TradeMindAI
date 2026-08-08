@@ -12,12 +12,16 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             # Try to get detailed info
             info = ticker.info
 
-            # Fallback to fast_info for critical price data if info is sparse
+            # Fallback to history for critical price data if info is sparse or broken
             if not info or info.get("regularMarketPrice") is None:
-                fast = ticker.fast_info
-                price = getattr(fast, 'last_price', 0)
-                prev_close = getattr(fast, 'previous_close', price)
-                mc = getattr(fast, 'market_cap', 0)
+                # RC-4: Avoid fast_info as it is currently unstable/broken in yfinance
+                hist = ticker.history(period="1d")
+                if not hist.empty:
+                    price = float(hist["Close"].iloc[-1])
+                    prev_close = float(hist["Open"].iloc[-1])
+                    mc = 0.0
+                else:
+                    price, prev_close, mc = 0.0, 0.0, 0.0
             else:
                 price = info.get("currentPrice") or info.get("regularMarketPrice") or 0.0
                 prev_close = info.get("regularMarketPreviousClose") or price
