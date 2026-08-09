@@ -139,6 +139,7 @@ class OpportunityDB(Base):
     type = Column(String)
     conviction_score = Column(Float)
     ai_thesis = Column(String)
+    indicators = Column(JSON)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
 def init_db():

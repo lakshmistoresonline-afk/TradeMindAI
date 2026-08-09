@@ -1,6 +1,7 @@
 package com.webcraft.trademindai.data.repository
 
 import com.webcraft.trademindai.data.remote.ApiService
+import com.webcraft.trademindai.data.remote.MarketRegimeResponse
 import com.webcraft.trademindai.data.remote.MarketStatsResponse
 import com.webcraft.trademindai.domain.model.Stock
 import com.webcraft.trademindai.domain.repository.IStockRepository
@@ -46,10 +47,28 @@ class StockRepository @Inject constructor(
         }
     }
 
-    override suspend fun getMarketRegime(): Result<String> {
+    override suspend fun getMarketRegime(): Result<MarketRegimeResponse> {
         return try {
             val response = apiService.getMarketRegime()
-            Result.success(response.regime)
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getPerformanceAudit(): Result<List<Map<String, Any>>> {
+        return try {
+            val response = apiService.getPerformanceAudit()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getOpportunities(): Result<List<com.webcraft.trademindai.domain.model.MarketOpportunity>> {
+        return try {
+            val response = apiService.getOpportunities()
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }

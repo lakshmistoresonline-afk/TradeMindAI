@@ -28,11 +28,14 @@ fun DashboardScreen(
     val marketStats by viewModel.marketStats.collectAsState()
     val regime by viewModel.regime.collectAsState()
     val loading by viewModel.loading.collectAsState()
+    val selectedTimeframe by viewModel.selectedTimeframe.collectAsState()
+
+    val timeframes = listOf("ALL", "INTRADAY", "SWING", "POSITION", "LONG_TERM")
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("TradeMind AI", fontWeight = FontWeight.Bold) },
+                title = { Text("Market Command Center", fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = { viewModel.triggerAnalysis() }) {
                         Icon(Icons.Default.PlayArrow, contentDescription = "Trigger Analysis")
@@ -46,59 +49,98 @@ fun DashboardScreen(
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    MarketRegimeSection(regime)
+            Column(modifier = Modifier.padding(padding)) {
+                ScrollableTabRow(
+                    selectedTabIndex = timeframes.indexOf(selectedTimeframe),
+                    edgePadding = 16.dp,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    divider = {}
+                ) {
+                    timeframes.forEach { timeframe ->
+                        Tab(
+                            selected = selectedTimeframe == timeframe,
+                            onClick = { viewModel.setTimeframe(timeframe) },
+                            text = { Text(timeframe.replace("_", " ")) }
+                        )
+                    }
                 }
 
-                item {
-                    Text("Market Stats", style = MaterialTheme.typography.titleLarge)
-                }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        MarketRegimeSection(
+                            regime = regime?.regime ?: "Initializing...",
+                            description = regime?.description ?: "Calculating institutional sentiment..."
+                        )
+                    }
 
-                item {
-                    MarketBreadthCard(marketStats["Breadth"])
-                }
+                    item {
+                        Text("Market Pulse", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    }
 
-                item {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        val statsList = marketStats.filter { it.key != "Breadth" }.toList()
-                        for (i in statsList.indices step 2) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                MarketStatCard(
-                                    name = statsList[i].first,
-                                    value = statsList[i].second.value.toString(),
-                                    change = "${statsList[i].second.change}%",
-                                    isPositive = statsList[i].second.change >= 0,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                if (i + 1 < statsList.size) {
+                    item {
+                        MarketBreadthCard(marketStats["Breadth"])
+                    }
+
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            val statsList = marketStats.filter { it.key != "Breadth" }.toList()
+                            for (i in statsList.indices step 2) {
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     MarketStatCard(
-                                        name = statsList[i + 1].first,
-                                        value = statsList[i + 1].second.value.toString(),
-                                        change = "${statsList[i + 1].second.change}%",
-                                        isPositive = statsList[i + 1].second.change >= 0,
+                                        name = statsList[i].first,
+                                        value = statsList[i].second.value?.toString() ?: "0.0",
+                                        change = "${statsList[i].second.change ?: 0.0}%",
+                                        isPositive = (statsList[i].second.change ?: 0.0) >= 0,
                                         modifier = Modifier.weight(1f)
                                     )
-                                } else {
-                                    Spacer(modifier = Modifier.weight(1f))
+                                    if (i + 1 < statsList.size) {
+                                        MarketStatCard(
+                                            name = statsList[i + 1].first,
+                                            value = statsList[i + 1].second.value?.toString() ?: "0.0",
+                                            change = "${statsList[i + 1].second.change ?: 0.0}%",
+                                            isPositive = (statsList[i + 1].second.change ?: 0.0) >= 0,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    } else {
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                item {
-                    Text("AI Signals", style = MaterialTheme.typography.titleLarge)
-                }
+                    item {
+                        Text("AI Forensic Signals", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    }
 
-                items(stocks.filter { it.analysis != null }) { stock ->
-                    StockSignalCard(stock)
+                    val filteredStocks = stocks.filter { stock ->
+                        val timeframe = stock.structured_consensus?.get("timeframe") as? String
+                        val targetTf = if (selectedTimeframe == "POSITION") "MID_TERM" else selectedTimeframe
+                        (selectedTimeframe == "ALL" || timeframe == targetTf) && stock.analysis != null
+                    }
+
+                    if (filteredStocks.isEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                                Text("No $selectedTimeframe signals detected.", color = Color.Gray)
+                            }
+                        }
+                    }
+
+                    items(filteredStocks) { stock ->
+                        StockSignalCard(stock)
+                    }
+                    
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -106,8 +148,86 @@ fun DashboardScreen(
 }
 
 @Composable
-fun MarketRegimeSection(regime: String) {
-    // Basic implementation for parity
+fun StockSignalCard(stock: Stock) {
+    val structured = stock.structured_consensus
+    val entry = (structured?.get("entry") as? Number)?.toDouble() ?: stock.last_price ?: 0.0
+    val target = (structured?.get("target") as? Number)?.toDouble() ?: 0.0
+    val stopLoss = (structured?.get("stop_loss") as? Number)?.toDouble() ?: 0.0
+    val conviction = (structured?.get("conviction") as? Number)?.toInt() ?: 0
+    val rating = structured?.get("rating") as? String ?: "HOLD"
+    val timeframe = structured?.get("timeframe") as? String ?: "SWING"
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp, 
+            if (rating.contains("BUY")) Color(0xFF10b981).copy(alpha = 0.5f) 
+            else if (rating.contains("SELL")) Color.Red.copy(alpha = 0.5f)
+            else Color.Gray.copy(alpha = 0.3f)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(stock.symbol, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(timeframe, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                }
+                
+                Column(horizontalAlignment = Alignment.End) {
+                    val isBuy = rating.contains("BUY")
+                    val color = if (isBuy) Color(0xFF10b981) else if (rating.contains("SELL")) Color.Red else Color.Gray
+                    Text(
+                        text = rating,
+                        color = color,
+                        fontWeight = FontWeight.Black,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text("$conviction% Conviction", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                PriceMetric(label = "ENTRY", value = "₹${entry.toInt()}", color = MaterialTheme.colorScheme.onSurface)
+                PriceMetric(label = "TARGET", value = "₹${target.toInt()}", color = Color(0xFF10b981))
+                PriceMetric(label = "STOP LOSS", value = "₹${stopLoss.toInt()}", color = Color.Red)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            val thesis = structured?.get("thesis") as? String ?: stock.analysis?.consensus ?: ""
+            Text(
+                text = thesis,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun PriceMetric(label: String, value: String, color: Color) {
+    Column {
+        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = color)
+    }
+}
+
+@Composable
+fun MarketRegimeSection(regime: String, description: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.1f))
@@ -116,14 +236,13 @@ fun MarketRegimeSection(regime: String) {
             Text("Institutional Market Regime", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.tertiary)
             Spacer(modifier = Modifier.height(4.dp))
             Text(regime.uppercase(), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
-            Text("Institutional accumulation detected across Nifty 100. High probability of trend continuation.", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(description, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         }
     }
 }
 
 @Composable
-fun MarketBreadthCard(breadth: Any?) {
-    // Basic implementation for parity
+fun MarketBreadthCard(breadth: com.webcraft.trademindai.data.remote.MarketStatsResponse?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f))
@@ -137,15 +256,15 @@ fun MarketBreadthCard(breadth: Any?) {
             ) {
                 Column {
                     Text("Advancing", style = MaterialTheme.typography.bodySmall)
-                    Text("65", fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
+                    Text("${breadth?.advancing ?: 0}", fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
                 }
                 Column {
                     Text("Declining", style = MaterialTheme.typography.bodySmall)
-                    Text("35", fontWeight = FontWeight.Bold, color = Color.Red)
+                    Text("${breadth?.declining ?: 0}", fontWeight = FontWeight.Bold, color = Color.Red)
                 }
                 Column {
                     Text("Ratio", style = MaterialTheme.typography.bodySmall)
-                    Text("1.85", fontWeight = FontWeight.Bold)
+                    Text("${breadth?.ratio ?: 0.0}", fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -168,33 +287,6 @@ fun MarketStatCard(
                 text = change,
                 style = MaterialTheme.typography.bodySmall,
                 color = if (isPositive) Color(0xFF10b981) else Color.Red
-            )
-        }
-    }
-}
-
-@Composable
-fun StockSignalCard(stock: Stock) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(stock.symbol, fontWeight = FontWeight.Bold)
-                Text(stock.name ?: "", style = MaterialTheme.typography.bodySmall)
-            }
-            
-            val isBuy = stock.analysis?.consensus?.contains("BUY", ignoreCase = true) == true
-            Text(
-                text = stock.analysis?.consensus ?: "HOLD",
-                color = if (isBuy) Color(0xFF10b981) else Color.Gray,
-                fontWeight = FontWeight.Bold
             )
         }
     }

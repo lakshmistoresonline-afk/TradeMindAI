@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.webcraft.trademindai.domain.model.Stock
 import com.webcraft.trademindai.ui.viewmodel.DashboardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,7 +75,7 @@ fun MarketRegimeBanner() {
 }
 
 @Composable
-fun StockItem(stock: com.webcraft.trademindai.data.remote.StockDto, onClick: () -> Unit) {
+fun StockItem(stock: Stock, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,16 +84,16 @@ fun StockItem(stock: com.webcraft.trademindai.data.remote.StockDto, onClick: () 
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = stock.symbol, style = MaterialTheme.typography.headlineSmall)
-            Text(text = stock.name, style = MaterialTheme.typography.bodyMedium)
+            Text(text = stock.name ?: "", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "₹${stock.price}")
+                Text(text = "₹${stock.last_price ?: 0.0}")
                 Text(
-                    text = "${stock.change}%",
-                    color = if (stock.change >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    text = "${stock.change_pct ?: 0.0}%",
+                    color = if ((stock.change_pct ?: 0.0) >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                 )
             }
         }

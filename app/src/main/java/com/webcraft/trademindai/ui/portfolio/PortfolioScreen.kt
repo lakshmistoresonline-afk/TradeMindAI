@@ -22,12 +22,11 @@ fun PortfolioScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val stocks by viewModel.stocks.collectAsState()
-    val watchlist = listOf("RELIANCE", "TCS", "INFY") // Mock watchlist for now
-    val myStocks = stocks.filter { watchlist.contains(it.symbol) }
+    val myStocks = stocks.filter { it.analysis != null }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Portfolio", fontWeight = FontWeight.Bold) })
+            TopAppBar(title = { Text("Portfolio", fontWeight = FontWeight.Bold) })
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { /* Add symbol */ }) {

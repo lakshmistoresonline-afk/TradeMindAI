@@ -202,8 +202,11 @@ class RiskAgent(BaseAgent):
 
 class ConsensusAgent(BaseAgent):
     def analyze(self, state: AgentState):
+        current_price = state.get('technical_data', {}).get('indicators', {}).get('last_price', 'Unknown')
+
         prompt = f"""
         Final synthesis for {state['symbol']}.
+        CURRENT PRICE: {current_price}
 
         Institutional Priority Weighting:
         1. Technical & SMC: 40% (Foundation)
@@ -217,10 +220,15 @@ class ConsensusAgent(BaseAgent):
         If agents conflict, prioritize the Technical/SMC bias unless Macro risk is EXTREME.
 
         Return ONLY a structured JSON response. DO NOT explain. DO NOT use markdown code blocks.
+        IMPORTANT: 'target', 'stop_loss', and 'entry' MUST be numeric floats. DO NOT include currency symbols or units.
+        IMPORTANT: 'timeframe' MUST be one of: "INTRADAY", "SWING", "MID_TERM", "LONG_TERM".
+
         {{
             "rating": "BUY | SELL | HOLD | STRONG BUY | STRONG SELL",
+            "timeframe": "INTRADAY | SWING | MID_TERM | LONG_TERM",
             "conviction": 0 to 100,
             "thesis": "Complete professional summary of why this decision was made.",
+            "entry": numeric_entry_price,
             "target": numeric_price_target,
             "stop_loss": numeric_stop_loss,
             "risk_reward": "e.g. 1:2.5",

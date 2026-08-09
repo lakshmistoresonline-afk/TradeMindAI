@@ -66,20 +66,54 @@ class BacktestEngine:
 
                 if "BUY" in consensus:
                     total_signals += 1
-                    # Measure accuracy: Check price after 30 days
-                    entry_price = df["Close"].iloc[i]
-                    exit_price = df["Close"].iloc[i + 30]
 
-                    is_success = exit_price > entry_price
+                    # RC-3: High-Fidelity Forensic Audit Logic
+                    # 1. Extract what the AI suggested back then
+                    structured = {}
+                    try:
+                        import re, json
+                        json_match = re.search(r'(\{.*\})', ai_result["consensus"], re.DOTALL)
+                        if json_match:
+                            json_str = json_match.group(1).replace("'", "\"")
+                            structured = json.loads(json_str)
+                    except: pass
+
+                    entry_price = df["Close"].iloc[i]
+                    target_price = structured.get("target", entry_price * 1.1)
+                    stop_loss_price = structured.get("stop_loss", entry_price * 0.95)
+
+                    # 2. Simulate price action for the next 30 bars
+                    outcome = "EXPIRED"
+                    exit_price = df["Close"].iloc[i + 30]
+                    hit_date = current_df.index[-1]
+
+                    future_df = df.iloc[i+1 : i+31]
+                    for f_date, row in future_df.iterrows():
+                        if row["High"] >= target_price:
+                            outcome = "TARGET_HIT"
+                            exit_price = target_price
+                            hit_date = f_date
+                            break
+                        if row["Low"] <= stop_loss_price:
+                            outcome = "STOP_LOSS"
+                            exit_price = stop_loss_price
+                            hit_date = f_date
+                            break
+
+                    is_success = outcome == "TARGET_HIT"
                     if is_success:
                         success_signals += 1
 
                     results.append({
                         "date": current_date.strftime("%Y-%m-%d"),
                         "signal": "BUY",
-                        "entry": entry_price,
-                        "exit_30d": exit_price,
-                        "profit_pct": ((exit_price - entry_price) / entry_price) * 100,
+                        "entry": round(float(entry_price), 2),
+                        "target": round(float(target_price), 2),
+                        "stop_loss": round(float(stop_loss_price), 2),
+                        "exit_price": round(float(exit_price), 2),
+                        "hit_date": hit_date.strftime("%Y-%m-%d"),
+                        "profit_pct": round(((exit_price - entry_price) / entry_price) * 100, 2),
+                        "outcome": outcome,
                         "success": is_success
                     })
             except Exception as e:

@@ -1,6 +1,7 @@
-import { Box, Typography, Drawer, IconButton, Divider, Stack, Chip, Button, Paper } from '@mui/material';
-import { X, ExternalLink, Zap, Target, ShieldCheck, TrendingUp, TrendingDown } from 'lucide-react';
+import { Box, Typography, Drawer, IconButton, Divider, Stack, Button, Paper, LinearProgress, Grid } from '@mui/material';
+import { X, ExternalLink, Target, ShieldCheck, TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAITradeDecision } from '../../hooks/useAITradeDecision';
 
 interface QuickResearchDrawerProps {
   open: boolean;
@@ -10,15 +11,12 @@ interface QuickResearchDrawerProps {
 
 export default function QuickResearchDrawer({ open, onClose, stock }: QuickResearchDrawerProps) {
   const navigate = useNavigate();
+  const decision = useAITradeDecision(stock);
 
   if (!stock) return null;
 
-  const analysis = stock.analysis || {};
-  const structured = stock.structured_consensus || {};
-  const rating = structured.rating || (analysis.consensus?.includes('BUY') ? 'BUY' : analysis.consensus?.includes('SELL') ? 'SELL' : 'HOLD');
-  const conviction = structured.conviction || stock.ai_investment_score || 0;
-  const isBullish = rating.includes('BUY');
-  const isBearish = rating.includes('SELL');
+  const isBullish = decision.rating.includes('BUY');
+  const isBearish = decision.rating.includes('SELL');
 
   return (
     <Drawer
@@ -41,10 +39,10 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
 
         <Box sx={{ mb: 4 }}>
            <Typography variant="h4" fontWeight={900}>{stock.symbol}</Typography>
-           <Typography variant="body2" color="textSecondary">{stock.name}</Typography>
+           <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 600 }}>{stock.name}</Typography>
 
            <Stack direction="row" spacing={2} sx={{ mt: 2 }} alignItems="center">
-              <Typography variant="h5" fontWeight={700}>₹{stock.last_price?.toLocaleString()}</Typography>
+              <Typography variant="h5" fontWeight={800} sx={{ fontFamily: 'JetBrains Mono' }}>₹{stock.last_price?.toLocaleString()}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: stock.change_pct >= 0 ? 'primary.main' : 'error.main' }}>
                  {stock.change_pct >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                  <Typography variant="body2" fontWeight="bold">{stock.change_pct?.toFixed(2)}%</Typography>
@@ -53,25 +51,41 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
         </Box>
 
         <Paper sx={{ p: 3, mb: 4, bgcolor: isBullish ? 'rgba(16, 185, 129, 0.05)' : isBearish ? 'rgba(244, 63, 94, 0.05)' : 'rgba(255,255,255,0.02)', border: '1px solid #334155' }}>
-           <Typography variant="caption" color="textSecondary" fontWeight={700}>AI RATING</Typography>
-           <Typography variant="h3" fontWeight={900} color={isBullish ? 'primary.main' : isBearish ? 'error.main' : 'warning.main'} sx={{ my: 1 }}>
-              {rating}
+           <Stack direction="row" justifyContent="space-between" mb={1}>
+              <Typography variant="caption" color="textSecondary" fontWeight={800}>AI RATING</Typography>
+              <Typography variant="caption" color="primary.main" fontWeight={900}>{decision.timeframe}</Typography>
+           </Stack>
+           <Typography variant="h3" fontWeight={900} color={isBullish ? 'primary.main' : isBearish ? 'error.main' : 'warning.main'} sx={{ mb: 1 }}>
+              {decision.rating}
            </Typography>
-           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="caption" fontWeight={700}>{conviction}% CONVICTION</Typography>
-              <Chip label="12 Agents Active" size="small" sx={{ height: 16, fontSize: '0.6rem', bgcolor: 'rgba(255,255,255,0.05)' }} />
+           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="caption" fontWeight={800}>{decision.conviction}% CONVICTION</Typography>
+              <Typography variant="caption" color="textSecondary" fontWeight={700}>Risk: {decision.riskLevel}</Typography>
            </Box>
+           <LinearProgress
+             variant="determinate"
+             value={decision.conviction}
+             color={isBullish ? 'primary' : isBearish ? 'error' : 'warning'}
+             sx={{ height: 4, borderRadius: 2 }}
+           />
         </Paper>
 
         <Stack spacing={3} sx={{ flexGrow: 1 }}>
-           <QuickStat icon={<Target size={16} />} label="PRICE TARGET" value={`₹${structured.target?.toLocaleString() || '---'}`} color="primary.main" />
-           <QuickStat icon={<ShieldCheck size={16} />} label="STOP LOSS" value={`₹${structured.stop_loss?.toLocaleString() || '---'}`} color="error.main" />
-           <QuickStat icon={<Zap size={16} />} label="ENTRY ZONE" value={`₹${stock.last_price?.toLocaleString()}`} color="info.main" />
+           <Grid container spacing={2}>
+              <Grid item xs={6}>
+                 <QuickStat icon={<Target size={14} />} label="TARGET" value={decision.target ? `₹${decision.target.toLocaleString()}` : '---'} color="primary.main" />
+              </Grid>
+              <Grid item xs={6}>
+                 <QuickStat icon={<ShieldCheck size={14} />} label="STOP LOSS" value={decision.stopLoss ? `₹${decision.stopLoss.toLocaleString()}` : '---'} color="error.main" />
+              </Grid>
+           </Grid>
 
            <Box>
-              <Typography variant="caption" color="textSecondary" fontWeight={700}>AI THESIS SUMMARY</Typography>
-              <Typography variant="body2" sx={{ mt: 1, lineHeight: 1.6, color: 'text.secondary' }}>
-                 {structured.thesis?.substring(0, 150) || analysis.consensus?.substring(0, 150)}...
+              <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 800, mb: 1 }}>
+                 <Activity size={14} /> FORENSIC THESIS
+              </Typography>
+              <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary', fontWeight: 500 }}>
+                 {decision.thesis?.substring(0, 180)}...
               </Typography>
            </Box>
         </Stack>
@@ -84,9 +98,9 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
             navigate('/analysis', { state: { symbol: stock.symbol } });
           }}
           startIcon={<ExternalLink size={18} />}
-          sx={{ mt: 4, py: 1.5, fontWeight: 800 }}
+          sx={{ mt: 4, py: 1.5, fontWeight: 900 }}
         >
-          Open Full Forensic Lab
+          Institutional Intelligence
         </Button>
       </Box>
     </Drawer>
@@ -96,10 +110,10 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
 function QuickStat({ icon, label, value, color }: any) {
   return (
     <Box>
-       <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 700 }}>
+       <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 800 }}>
           {icon} {label}
        </Typography>
-       <Typography variant="h6" fontWeight={800} sx={{ color }}>{value}</Typography>
+       <Typography variant="body1" fontWeight={800} sx={{ color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
     </Box>
   );
 }

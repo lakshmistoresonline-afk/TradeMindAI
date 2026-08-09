@@ -103,11 +103,20 @@ async def _analyze_stock_logic(symbol: str, period: str):
         smc_fvgs = SMCAnalysis.detect_fvg(df)
         wyckoff_phase = WyckoffAnalysis.detect_phase(df)
 
+        # Dynamic Elliott Wave Counter (Refined Placeholder)
+        last = df_ta.iloc[-1]
+        c, e20, e50, e200 = last.get("Close", 0), last.get("EMA_20", 0), last.get("EMA_50", 0), last.get("EMA_200", 0)
+
+        if c > e200 and e20 > e50: wave = "Wave 3 (Impulse)"
+        elif c < e200: wave = "Wave 4 (Correction)"
+        elif c > e200 and e20 < e50: wave = "Wave 5 (Ending)"
+        else: wave = "Wave 1 (Accumulation)"
+
         smc_data = {
             "order_blocks": smc_obs[-5:],
             "fvgs": smc_fvgs[-5:],
             "wyckoff": wyckoff_phase,
-            "elliott": "Wave 3 (Impulse)" # Simplified placeholder
+            "elliott": wave
         }
         log_status("TECHNICAL_READY")
 
@@ -163,6 +172,15 @@ async def _analyze_stock_logic(symbol: str, period: str):
                     json_str = json_match.group(1)
                     # Resilient clean-up of common LLM errors
                     json_str = json_str.replace("'", "\"") # Replace single quotes
+
+                    # RC-3: Clean numeric fields from noise like currency symbols
+                    def clean_numeric(match):
+                        val = match.group(2)
+                        # Remove everything except digits and decimal point
+                        cleaned = re.sub(r'[^\d.]', '', val)
+                        return f'"{match.group(1)}": {cleaned}'
+
+                    json_str = re.sub(r'"(target|stop_loss|entry|conviction)":\s*["\']?([^"\',}]+)["\']?', clean_numeric, json_str)
 
                     # Remove trailing commas before closing braces
                     json_str = re.sub(r',\s*}', '}', json_str)
@@ -256,9 +274,12 @@ def analyze_nifty_100(period="10y"):
 
     # Use Celery group for parallel execution
     job = group(analyze_stock_task.s(symbol, period=period) for symbol in symbols)
-    job.apply_async()
 
-    return f"Parallel analysis triggered for {len(symbols)} stocks."
+    # After batch analysis, trigger market intelligence refresh
+    callback = process_market_intelligence.si()
+    (job | callback).apply_async()
+
+    return f"Parallel analysis triggered for {len(symbols)} stocks with auto-intel callback."
 
 @celery_app.task
 def run_adhoc_backtest(symbol: str):

@@ -25,7 +25,7 @@ fun MarketScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Market Data", fontWeight = FontWeight.Bold) })
+            TopAppBar(title = { Text("Market Pulse", fontWeight = FontWeight.Bold) })
         }
     ) { padding ->
         LazyColumn(

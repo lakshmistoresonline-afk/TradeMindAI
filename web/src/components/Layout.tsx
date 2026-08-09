@@ -1,17 +1,12 @@
-import React, { useState, createContext, useContext, useEffect } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Chip, Divider } from '@mui/material';
-import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, PieChart, Bot, Wallet, Calendar, Code, Monitor, Trophy, Star, Book, ShieldCheck, Home } from 'lucide-react';
+import React, { useState, createContext, useContext } from 'react';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider } from '@mui/material';
+import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, PieChart, Bot, Wallet, Calendar, Code, Trophy, Star, Book, ShieldCheck, Home, Activity, Zap, Cpu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme, IconButton, BottomNavigation, BottomNavigationAction, Paper as MuiPaper } from '@mui/material';
 import { Menu as MenuIcon } from 'lucide-react';
 import CommandPalette from './CommandPalette';
 
 const drawerWidth = 240;
-const workspaces = [
-  { id: '1', name: 'AI Research', type: 'INSTITUTIONAL' },
-  { id: '2', name: 'Intraday Feed', type: 'TRADING' },
-  { id: '3', name: 'Quant Engine', type: 'ANALYTICS' },
-];
 
 // Notification Context
 export const NotificationContext = createContext({
@@ -22,35 +17,42 @@ export const useNotification = () => useContext(NotificationContext);
 
 const menuGroups = [
   {
-    title: 'MARKET RADAR',
+    title: 'MARKET',
     items: [
-      { text: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/' },
-      { text: 'Live Pulse', icon: <LineChart size={18} />, path: '/market' },
-      { text: 'Global Macro', icon: <Calendar size={18} />, path: '/calendar' },
-      { text: 'Sector Map', icon: <PieChart size={18} />, path: '/sectors' },
+      { text: 'Market Command Center', icon: <LayoutDashboard size={18} />, path: '/' },
+      { text: 'Market Pulse', icon: <LineChart size={18} />, path: '/market' },
+      { text: 'Macro Calendar', icon: <Calendar size={18} />, path: '/calendar' },
+      { text: 'Sector Rotation', icon: <PieChart size={18} />, path: '/sectors' },
     ]
   },
   {
-    title: 'INTELLIGENCE HUB',
+    title: 'INTELLIGENCE',
     items: [
-      { text: 'Stock Forensic', icon: <BrainCircuit size={18} />, path: '/analysis' },
-      { text: 'Alpha Scanner', icon: <Trophy size={18} />, path: '/ranking' },
-      { text: 'Research Lab', icon: <Book size={18} />, path: '/research' },
-      { text: 'AI Chat', icon: <Bot size={18} />, path: '/chat' },
+      { text: 'Stock Intelligence', icon: <BrainCircuit size={18} />, path: '/analysis' },
+      { text: 'Opportunity Scanner', icon: <Trophy size={18} />, path: '/ranking' },
+      { text: 'Research Hub', icon: <Book size={18} />, path: '/research' },
+      { text: 'AI Copilot', icon: <Bot size={18} />, path: '/chat' },
     ]
   },
   {
-    title: 'STRATEGY & EXECUTION',
+    title: 'PORTFOLIO & RISK',
     items: [
-      { text: 'Paper Trading', icon: <Wallet size={18} />, path: '/paper-trading' },
-      { text: 'Strategy Lab', icon: <Code size={18} />, path: '/strategy' },
+      { text: 'Portfolio', icon: <Wallet size={18} />, path: '/portfolio' },
+      { text: 'Portfolio Stress Test', icon: <ShieldCheck size={18} />, path: '/stress-test' },
+    ]
+  },
+  {
+    title: 'TRADING',
+    items: [
+      { text: 'Strategy Builder', icon: <Code size={18} />, path: '/strategy' },
+      { text: 'Signal Validation', icon: <Star size={18} />, path: '/paper-trading' },
       { text: 'Trade Journal', icon: <Book size={18} />, path: '/journal' },
     ]
   },
   {
-    title: 'TERMINAL SETTINGS',
+    title: 'SYSTEM',
     items: [
-      { text: 'Control Center', icon: <ShieldCheck size={18} />, path: '/admin' },
+      { text: 'System Control', icon: <ShieldCheck size={18} />, path: '/admin' },
       { text: 'Settings', icon: <Settings size={18} />, path: '/settings' },
     ]
   }
@@ -62,41 +64,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [pinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
     setNotification({ open: true, message, severity });
-
-    // Browser Native Notification
-    if (Notification.permission === 'granted') {
-      new Notification('TradeMind AI Alert', { body: message });
-    }
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem('active_workspace');
-    if (saved) {
-       const ws = workspaces.find(w => w.id === saved);
-       if (ws) setActiveWorkspace(ws);
-    }
-  }, []);
-
-  const handleWorkspaceChange = (ws: any) => {
-     setActiveWorkspace(ws);
-     localStorage.setItem('active_workspace', ws.id);
-     showNotification(`Switched to ${ws.name} workspace`, 'success');
-
-     // Vision 2.0: Deep Workspace Navigation
-     if (ws.id === '1') {
-       navigate('/');
-     } else if (ws.id === '2') {
-       navigate('/market');
-     } else if (ws.id === '3') {
-       navigate('/ranking');
-     }
   };
 
   const handleClose = () => setNotification({ ...notification, open: false });
@@ -119,34 +92,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </IconButton>
             )}
             <TrendingUp className="text-emerald-500 mr-2" />
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', mr: 2, display: { xs: 'none', sm: 'block' } }}>
-              TradeMind AI
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800, mr: 3, display: { xs: 'none', sm: 'block' }, letterSpacing: -0.5 }}>
+              TRADEMIND AI
             </Typography>
 
             {!isMobile && (
-              <Box sx={{ bgcolor: 'rgba(255,255,255,0.05)', px: 1.5, py: 0.5, borderRadius: 1, border: '1px solid #334155' }}>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                   <Calendar size={12} /> {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                </Typography>
-              </Box>
+              <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
+                 <StatusIndicator label="MARKET DATA" status="CONNECTED" icon={<Activity size={14} />} color="#10b981" />
+                 <StatusIndicator label="AI ENGINE" status="SYNCING" icon={<Zap size={14} />} color="#3b82f6" />
+                 <StatusIndicator label="QUANT ENGINE" status="CONNECTED" icon={<Cpu size={14} />} color="#10b981" />
+              </Stack>
             )}
 
-            <Stack direction="row" spacing={1} sx={{ ml: isMobile ? 0 : 4, overflowX: 'auto', py: 1 }}>
-               {workspaces.map(ws => (
-                 <Chip
-                   key={ws.id}
-                   icon={<Monitor size={14} />}
-                   label={ws.name}
-                   onClick={(e) => {
-                     e.preventDefault();
-                     handleWorkspaceChange(ws);
-                   }}
-                   variant={activeWorkspace.id === ws.id ? 'filled' : 'outlined'}
-                   color={activeWorkspace.id === ws.id ? 'primary' : 'default'}
-                   sx={{ cursor: 'pointer', flexShrink: 0, fontWeight: 'bold' }}
-                 />
-               ))}
-            </Stack>
+            {!isMobile && (
+               <Box sx={{ bgcolor: 'rgba(255,255,255,0.05)', px: 1.5, py: 0.5, borderRadius: 1, border: '1px solid #334155' }}>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5, fontFamily: 'JetBrains Mono' }}>
+                     {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                  </Typography>
+               </Box>
+            )}
           </Toolbar>
         </AppBar>
         <Drawer
@@ -167,7 +131,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 subheader={
                   <Typography
                     variant="caption"
-                    sx={{ p: 2, pb: 1, color: 'slategray', fontWeight: 700, letterSpacing: 1.2, display: 'block' }}
+                    sx={{ p: 2, pb: 1, color: 'slategray', fontWeight: 800, letterSpacing: 1.5, display: 'block', fontSize: '0.65rem' }}
                   >
                     {group.title}
                   </Typography>
@@ -184,18 +148,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         mx: 1,
                         borderRadius: 1,
                         mb: 0.5,
-                        py: 0.75
+                        py: 0.5
                       }}
                     >
-                      <ListItemIcon sx={{ color: 'slategray', minWidth: 36 }}>
+                      <ListItemIcon sx={{ color: 'slategray', minWidth: 32 }}>
                         {item.icon}
                       </ListItemIcon>
                       <ListItemText
                         primary={item.text}
                         primaryTypographyProps={{
                           variant: 'body2',
-                          fontWeight: location.pathname === item.path ? 700 : 500,
-                          fontSize: '0.825rem'
+                          fontWeight: location.pathname === item.path ? 800 : 500,
+                          fontSize: '0.8rem'
                         }}
                       />
                     </ListItemButton>
@@ -205,15 +169,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </List>
             ))}
 
-            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 'bold' }}>PINNED STOCKS</Typography>}>
+            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 800, letterSpacing: 1, fontSize: '0.65rem' }}>PINNED</Typography>}>
                {pinnedStocks.map(symbol => (
                  <ListItem key={symbol} disablePadding>
                     <ListItemButton
                       onClick={() => navigate('/analysis', { state: { symbol } })}
                       sx={{ mx: 1, borderRadius: 1, mb: 0.5 }}
                     >
-                       <ListItemIcon sx={{ color: 'primary.main', minWidth: 40 }}><Star size={16} /></ListItemIcon>
-                       <ListItemText primary={symbol} primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }} />
+                       <ListItemIcon sx={{ color: 'primary.main', minWidth: 32 }}><Star size={16} /></ListItemIcon>
+                       <ListItemText primary={symbol} primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
                     </ListItemButton>
                  </ListItem>
                ))}
@@ -228,7 +192,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Box>
 
         <Snackbar open={notification.open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity={notification.severity} sx={{ width: '100%', borderRadius: 2 }}>
+          <Alert onClose={handleClose} severity={notification.severity} sx={{ width: '100%', borderRadius: 1, fontWeight: 700 }}>
             {notification.message}
           </Alert>
         </Snackbar>
@@ -241,14 +205,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onChange={(_, newValue) => navigate(newValue)}
               sx={{ bgcolor: '#0f172a', borderTop: '1px solid #1e293b' }}
             >
-              <BottomNavigationAction label="Market" value="/" icon={<Home size={20} />} />
-              <BottomNavigationAction label="Forensic" value="/analysis" icon={<BrainCircuit size={20} />} />
-              <BottomNavigationAction label="Pulse" value="/market" icon={<LineChart size={20} />} />
-              <BottomNavigationAction label="Chat" value="/chat" icon={<Bot size={20} />} />
+              <BottomNavigationAction label="Home" value="/" icon={<Home size={20} />} />
+              <BottomNavigationAction label="Markets" value="/market" icon={<LineChart size={20} />} />
+              <BottomNavigationAction label="Signals" value="/ranking" icon={<Trophy size={20} />} />
+              <BottomNavigationAction label="Portfolio" value="/portfolio" icon={<Wallet size={20} />} />
+              <BottomNavigationAction label="AI" value="/chat" icon={<Bot size={20} />} />
             </BottomNavigation>
           </MuiPaper>
         )}
       </Box>
     </NotificationContext.Provider>
+  );
+}
+
+function StatusIndicator({ label, status, icon, color }: any) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 0.5, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
+       <Box sx={{ color }}>{icon}</Box>
+       <Box>
+          <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block', fontSize: '0.6rem', lineHeight: 1 }}>{label}</Typography>
+          <Typography variant="caption" sx={{ color, fontWeight: 900, fontSize: '0.65rem' }}>{status}</Typography>
+       </Box>
+    </Box>
   );
 }

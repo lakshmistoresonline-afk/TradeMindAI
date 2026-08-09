@@ -24,7 +24,7 @@ fun AnalysisScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Institutional Analysis", fontWeight = FontWeight.Bold) })
+            TopAppBar(title = { Text("Stock Intelligence", fontWeight = FontWeight.Bold) })
         }
     ) { padding ->
         if (analyzedStocks.isEmpty()) {

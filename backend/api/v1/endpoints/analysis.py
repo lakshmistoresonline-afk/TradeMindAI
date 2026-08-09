@@ -59,6 +59,29 @@ async def get_backtest_signals(
     signals = [doc.to_dict() for doc in docs]
     return signals
 
+@router.get("/performance/audit")
+async def get_performance_audit(
+    db: firestore.Client = Depends(get_db)
+):
+    """
+    Consolidates the most recent audited signals across all stocks for performance verification.
+    """
+    backtests = db.collection("backtests").stream()
+    all_signals = []
+    for bt in backtests:
+        symbol = bt.id
+        signals_ref = db.collection("backtests").document(symbol).collection("signals")
+        # Get last 5 signals per stock for a broad audit view
+        docs = signals_ref.order_by("date", direction=firestore.Query.DESCENDING).limit(5).stream()
+        for doc in docs:
+            sig = doc.to_dict()
+            sig["symbol"] = symbol
+            all_signals.append(sig)
+
+    # Sort by date descending
+    all_signals.sort(key=lambda x: x["date"], reverse=True)
+    return all_signals[:50]
+
 @router.get("/technical/{symbol}")
 async def get_technical_analysis(symbol: str):
     return {"analysis": "technical", "symbol": symbol}

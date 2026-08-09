@@ -30,11 +30,13 @@ class PortfolioEngine:
         hhi = np.sum(weights**2)
         diversification = (1 - hhi) * 100 # 100 is perfectly diversified
 
-        # 3. Risk Level (Based on aggregate Beta - placeholder logic)
-        avg_beta = 1.0 # In real impl, fetch from QuantMetrics
+        # 3. Risk Level (Beta-Weighted)
+        valid_betas = [s.beta for s in holdings if s.beta is not None]
+        avg_beta = np.mean(valid_betas) if valid_betas else 1.0
+
         risk_level = "MED"
-        if avg_beta < 0.8: risk_level = "LOW"
-        elif avg_beta > 1.2: risk_level = "HIGH"
+        if avg_beta < 0.85: risk_level = "LOW"
+        elif avg_beta > 1.15: risk_level = "HIGH"
 
         # 4. Health Score calculation
         # RC-2: Derived metrics from AI scores

@@ -298,7 +298,10 @@ class HybridIOSRepository(IIOSRepository):
         from backend.core.postgres import OpportunityDB
         with self.session_factory() as pg:
             res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
-            return [MarketOpportunity(**{c.name: getattr(r, c.name) for c in r.__table__.columns if c.name != 'indicators'}) for r in res]
+            return [MarketOpportunity(
+                **{c.name: getattr(r, c.name) for c in r.__table__.columns if c.name != 'indicators'},
+                indicators=r.indicators if isinstance(r.indicators, list) else []
+            ) for r in res]
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         from backend.core.postgres import IntelReportDB

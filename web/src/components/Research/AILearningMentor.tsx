@@ -10,13 +10,13 @@ export default function AILearningMentor() {
     },
     {
       term: 'Consensus Agent',
-      definition: 'Our meta-AI layer that weights 12 specialized analyst agents to provide a unified investment decision.',
+      definition: 'Our meta-AI layer that weights specialized analyst agents to provide a unified investment decision.',
       why_it_matters: 'Reduces individual agent bias and increases overall signal reliability.'
     },
     {
-      term: 'Digital Twin',
-      definition: 'A real-time data mirror of an asset that combines its technical posture, risk profile, and intelligence DNA.',
-      why_it_matters: 'Provides a complete identity of the stock beyond simple price action.'
+      term: 'Risk & Model Profile',
+      definition: 'A comprehensive analytical structure that evaluates an asset\'s volatility regime, beta exposure, and model calibration stability.',
+      why_it_matters: 'Ensures the AI decision is grounded in a robust statistical framework.'
     },
     {
       term: 'Sharpe Ratio',

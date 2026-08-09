@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Drawer, IconButton, TextField, Typography, Paper, Fab, CircularProgress, Chip } from '@mui/material';
 import { X, Send, Bot, BrainCircuit } from 'lucide-react';
 import { chatWithAssistant } from '../api/client';
+import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 
 export default function AICopilot({ stockContext }: { stockContext?: any }) {
   const [open, setOpen] = useState(false);
@@ -19,12 +20,21 @@ export default function AICopilot({ stockContext }: { stockContext?: any }) {
     setLoading(true);
 
     try {
-      // Enhanced context for Copilot
-      const contextPrompt = stockContext ? `Context: You are analyzing ${stockContext.symbol}. Current price ₹${stockContext.last_price}. AI Score: ${stockContext.ai_investment_score}. \nQuestion: ${message}` : message;
+      let contextPrompt = message;
+      if (stockContext) {
+        const decision = normalizeAITradeDecision(stockContext);
+        contextPrompt = `Context: Analyzing ${stockContext.symbol} (${stockContext.name}).
+Price: ₹${stockContext.last_price}.
+AI Rating: ${decision.rating}.
+Conviction: ${decision.conviction}%.
+Thesis: ${decision.thesis}.
+Question: ${message}`;
+      }
+
       const response = await chatWithAssistant(contextPrompt);
       setChat(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (e) {
-      setChat(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      setChat(prev => [...prev, { role: 'assistant', content: "System Link Error: I'm currently unable to reach institutional knowledge agents. Please try again." }]);
     } finally {
       setLoading(false);
     }
@@ -51,8 +61,8 @@ export default function AICopilot({ stockContext }: { stockContext?: any }) {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                <BrainCircuit size={24} className="text-emerald-500" />
                <Box>
-                  <Typography variant="h6" fontWeight="bold">AI Copilot</Typography>
-                  <Typography variant="caption" color="textSecondary">Institutional Analysis Active</Typography>
+                  <Typography variant="h6" fontWeight={800}>AI Copilot</Typography>
+                  <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700 }}>LEAD ANALYST ENGINE ACTIVE</Typography>
                </Box>
             </Box>
             <IconButton onClick={() => setOpen(false)} size="small"><X size={20} /></IconButton>
@@ -68,20 +78,26 @@ export default function AICopilot({ stockContext }: { stockContext?: any }) {
                   maxWidth: '85%',
                   bgcolor: m.role === 'user' ? '#10b981' : 'rgba(15, 23, 42, 0.5)',
                   color: m.role === 'user' ? '#000' : '#fff',
-                  border: m.role === 'user' ? 'none' : '1px solid #334155'
+                  border: m.role === 'user' ? 'none' : '1px solid #334155',
+                  borderRadius: 2
                 }}
                >
-                 <Typography variant="body2" sx={{ fontWeight: m.role === 'user' ? 500 : 400, lineHeight: 1.6 }}>{m.content}</Typography>
+                 <Typography variant="body2" sx={{ fontWeight: m.role === 'user' ? 600 : 400, lineHeight: 1.6 }}>{m.content}</Typography>
                </Paper>
              ))}
-             {loading && <CircularProgress size={20} sx={{ ml: 2 }} />}
+             {loading && (
+               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 1 }}>
+                  <CircularProgress size={16} />
+                  <Typography variant="caption" color="textSecondary">Reasoning...</Typography>
+               </Box>
+             )}
           </Box>
 
           <Box sx={{ p: 3, bgcolor: '#0f172a', borderTop: '1px solid #334155' }}>
              <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
                   fullWidth
-                  placeholder="Ask me anything about the market..."
+                  placeholder="Ask about setups, catalysts, or risks..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
@@ -94,14 +110,14 @@ export default function AICopilot({ stockContext }: { stockContext?: any }) {
                   color="primary"
                   disabled={!message.trim() || loading}
                   onClick={handleSend}
-                  sx={{ width: 40, height: 40, bgcolor: 'primary.main', color: 'black', '&:hover': { bgcolor: 'primary.dark' } }}
+                  sx={{ width: 40, height: 40, bgcolor: 'primary.main', color: 'black', '&:hover': { bgcolor: 'primary.dark' }, borderRadius: 1 }}
                 >
                   <Send size={18} />
                 </IconButton>
              </Box>
-             <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                <Chip label="Simulate Buy" size="small" variant="outlined" onClick={() => setMessage("What if I buy this stock today?")} />
-                <Chip label="Risk Audit" size="small" variant="outlined" onClick={() => setMessage("Run a deep risk audit.")} />
+             <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Chip label="Verify Catalyst" size="small" variant="outlined" sx={{ fontWeight: 700 }} onClick={() => setMessage("Verify the primary catalysts for this decision.")} />
+                <Chip label="Invalidation Points" size="small" variant="outlined" sx={{ fontWeight: 700 }} onClick={() => setMessage("What specific events would invalidate this thesis?")} />
              </Box>
           </Box>
         </Box>

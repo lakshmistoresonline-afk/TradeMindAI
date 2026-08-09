@@ -1,25 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
-import Dashboard from './pages/Dashboard'
-import Market from './pages/Market'
-import Analysis from './pages/Analysis'
+import MarketCommandCenter from './pages/MarketCommandCenter'
+import MarketPulse from './pages/MarketPulse'
+import StockIntelligence from './pages/StockIntelligence'
 import Settings from './pages/Settings'
 import Portfolio from './pages/Portfolio'
-import ResearchWorkspace from './pages/ResearchWorkspace'
+import ResearchHub from './pages/ResearchHub'
 import Login from './pages/Login'
 import SectorRotation from './pages/SectorRotation'
-import AIChat from './pages/AIChat'
+import AICopilot from './pages/AICopilot'
 import MarketTreemap from './pages/MarketIntel/MarketTreemap'
 import MarketHeatmap from './pages/MarketIntel/MarketHeatmap'
-import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilder'
-import PaperTrading from './pages/StrategyBuilder/PaperTrading'
-import EconomicCalendar from './pages/Calendar/EconomicCalendar'
+import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilderPage'
+import SignalValidation from './pages/StrategyBuilder/SignalValidation'
+import MacroCalendar from './pages/Calendar/MacroCalendar'
 import Journal from './pages/Journal'
-import Ranking from './pages/Ranking'
-import Admin from './pages/Admin'
-import StressTest from './pages/MarketIntel/StressTest'
-import OptionsVisualizer from './pages/Options/OptionsVisualizer'
+import OpportunityScanner from './pages/OpportunityScanner'
+import SystemControl from './pages/SystemControl'
+import PortfolioStressTest from './pages/PortfolioStressTest'
+import OptionsIntelligence from './pages/Options/OptionsIntelligence'
 
 const darkTheme = createTheme({
   palette: {
@@ -90,22 +90,22 @@ function App() {
           <Route path="/*" element={
             <Layout>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/market" element={<Market />} />
+                <Route path="/" element={<MarketCommandCenter />} />
+                <Route path="/market" element={<MarketPulse />} />
                 <Route path="/treemap" element={<MarketTreemap />} />
                 <Route path="/heatmap" element={<MarketHeatmap />} />
                 <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/research" element={<ResearchWorkspace />} />
-                <Route path="/stress-test" element={<StressTest />} />
-                <Route path="/analysis" element={<Analysis />} />
-                <Route path="/chat" element={<AIChat />} />
-                <Route path="/options" element={<OptionsVisualizer />} />
+                <Route path="/research" element={<ResearchHub />} />
+                <Route path="/stress-test" element={<PortfolioStressTest />} />
+                <Route path="/analysis" element={<StockIntelligence />} />
+                <Route path="/chat" element={<AICopilot />} />
+                <Route path="/options" element={<OptionsIntelligence />} />
                 <Route path="/strategy" element={<StrategyBuilder />} />
-                <Route path="/paper-trading" element={<PaperTrading />} />
+                <Route path="/paper-trading" element={<SignalValidation />} />
                 <Route path="/journal" element={<Journal />} />
-                <Route path="/calendar" element={<EconomicCalendar />} />
-                <Route path="/ranking" element={<Ranking />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/calendar" element={<MacroCalendar />} />
+                <Route path="/ranking" element={<OpportunityScanner />} />
+                <Route path="/admin" element={<SystemControl />} />
                 <Route path="/sectors" element={<SectorRotation />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
