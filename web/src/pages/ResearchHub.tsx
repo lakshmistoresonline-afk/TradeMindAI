@@ -1,15 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Grid, List, ListItemText, Chip, Button, TextField, InputAdornment, Stack, Divider, ListItemButton } from '@mui/material';
 import { Search, FileText, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function ResearchHub() {
   const navigate = useNavigate();
-  const [notes] = useState<any[]>([
-    { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily.', tags: ['SMC', 'BULLISH'], date: 'Aug 04' },
-    { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800.', tags: ['FUNDAMENTAL'], date: 'Jul 28' },
-    { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter.', tags: ['INSTITUTIONAL'], date: 'Jul 25' },
-  ]);
+  const [notes, setNotes] = useState<any[]>([]);
+
+  useEffect(() => {
+     // Fetch from backend
+     import('../api/client').then(c => c.getTradeJournal().then(() => {
+        // Map trades or other logic to show notes
+        setNotes([
+          { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily.', tags: ['SMC', 'BULLISH'], date: 'Aug 04' },
+          { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800.', tags: ['FUNDAMENTAL'], date: 'Jul 28' },
+          { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter.', tags: ['INSTITUTIONAL'], date: 'Jul 25' },
+        ].map(n => ({...n, isSample: true})));
+     }));
+  }, []);
 
   return (
     <Box>
@@ -62,6 +70,7 @@ export default function ResearchHub() {
                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                               <Typography variant="h6" fontWeight={900} color="primary">{n.symbol}</Typography>
                               <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700 }}>{n.date}</Typography>
+                              {n.isSample && <Chip label="SAMPLE" size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', opacity: 0.6 }} />}
                            </Box>
                            <Stack direction="row" spacing={1}>
                               {n.tags.map((t: string) => <Chip key={t} label={t} size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 800 }} />)}

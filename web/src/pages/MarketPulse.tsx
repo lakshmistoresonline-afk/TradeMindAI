@@ -20,6 +20,8 @@ export default function MarketPulse() {
   // Drawer State
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<any>(null);
+  const [sortField, setSortField] = useState('symbol');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const fetchStocks = async () => {
     setLoading(true);
@@ -45,7 +47,28 @@ export default function MarketPulse() {
     const matchesSector = sectorFilter === 'ALL' || s.sector === sectorFilter;
     const matchesRating = ratingFilter === 'ALL' || s.decision.rating === ratingFilter;
     return matchesSearch && matchesSector && matchesRating;
+  }).sort((a, b) => {
+    let valA: any = a[sortField];
+    let valB: any = b[sortField];
+
+    if (sortField === 'conviction') {
+      valA = a.decision.conviction;
+      valB = b.decision.conviction;
+    }
+
+    if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+    if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
   });
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
 
   return (
     <Box>
@@ -104,12 +127,13 @@ export default function MarketPulse() {
           <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ pl: 3 }}>SYMBOL</TableCell>
-              <TableCell>SECTOR</TableCell>
-              <TableCell align="right">CONVICTION</TableCell>
+              <TableCell sx={{ pl: 3, cursor: 'pointer' }} onClick={() => handleSort('symbol')}>SYMBOL</TableCell>
+              <TableCell sx={{ cursor: 'pointer' }} onClick={() => handleSort('sector')}>SECTOR</TableCell>
+              <TableCell align="right" sx={{ cursor: 'pointer' }} onClick={() => handleSort('conviction')}>CONVICTION</TableCell>
               <TableCell align="center">AI RATING</TableCell>
-              <TableCell align="right">LAST PRICE</TableCell>
-              <TableCell align="right">24H CHANGE</TableCell>
+              <TableCell align="right" sx={{ cursor: 'pointer' }} onClick={() => handleSort('last_price')}>LAST PRICE</TableCell>
+              <TableCell align="right" sx={{ cursor: 'pointer' }} onClick={() => handleSort('change_pct')}>24H CHANGE</TableCell>
+              <TableCell align="right" sx={{ cursor: 'pointer' }} onClick={() => handleSort('volume')}>REL. VOL</TableCell>
               <TableCell align="center">ACTION</TableCell>
             </TableRow>
           </TableHead>
@@ -150,13 +174,20 @@ export default function MarketPulse() {
                     sx={{ fontWeight: 900, fontSize: '0.65rem', minWidth: 80 }}
                    />
                 </TableCell>
-                <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{stock.last_price?.toLocaleString()}</TableCell>
+                <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>
+                   {stock.last_price ? `₹${stock.last_price.toLocaleString()}` : '---'}
+                </TableCell>
                 <TableCell align="right">
                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, color: (stock.change_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
                       <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
                         {(stock.change_pct || 0) >= 0 ? '+' : ''}{stock.change_pct?.toFixed(2)}%
                       </Typography>
                    </Box>
+                </TableCell>
+                <TableCell align="right">
+                   <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700, color: (stock.avg_volume > 0 && (stock.volume / stock.avg_volume) > 1.5) ? 'primary.main' : 'text.secondary' }}>
+                      {stock.avg_volume > 0 ? (stock.volume / stock.avg_volume).toFixed(1) : '1.0'}x
+                   </Typography>
                 </TableCell>
                 <TableCell align="center">
                   <Stack direction="row" spacing={1} justifyContent="center">

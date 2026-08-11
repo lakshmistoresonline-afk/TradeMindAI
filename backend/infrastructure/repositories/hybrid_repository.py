@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
-from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB
+from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB, LiveSignalDB, WorkspaceDB, ResearchNoteDB, TradeJournalDB
 from backend.core.duckdb_engine import analytical_engine
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert, EarningsData, OptionsChain
 from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
-from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback
+from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback, LiveSignal
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import pandas as pd
 import json
@@ -52,7 +52,7 @@ class HybridStockRepository(IStockRepository):
             data = stock.model_dump()
 
             db_columns = {c.name for c in StockDB.__table__.columns}
-            json_cols = {"analysis", "structured_consensus", "health_metrics", "confidence_metrics"}
+            json_cols = {"analysis", "structured_consensus", "health_metrics", "confidence_metrics", "options_data", "financial_history"}
 
             filtered_data = {}
             for k, v in data.items():
@@ -107,6 +107,8 @@ class HybridStockRepository(IStockRepository):
                         low=p.low,
                         close=p.close,
                         volume=p.volume,
+                        open_interest=p.open_interest,
+                        source=p.source,
                         indicators=clean_indicators(p.indicators)
                     ))
 
@@ -126,6 +128,14 @@ class HybridStockRepository(IStockRepository):
         with self.session_factory() as pg:
             pg.query(StockDB).filter(StockDB.symbol == symbol).update({"analysis": analysis, "updated_at": datetime.utcnow()})
             pg.commit()
+
+    async def get_instrument_by_symbol(self, symbol: str, source: str) -> Optional[Dict[str, Any]]:
+        from backend.core.postgres import InstrumentDB
+        with self.session_factory() as pg:
+            res = pg.query(InstrumentDB).filter(InstrumentDB.trading_symbol == symbol, InstrumentDB.source == source).first()
+            if res:
+                return {c.name: getattr(res, c.name) for c in res.__table__.columns}
+            return None
 
     def _map_db_to_stock(self, db_obj: StockDB) -> Stock:
         data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
@@ -248,20 +258,55 @@ class HybridIOSRepository(IIOSRepository):
         self.session_factory = session_factory
         self.fs = firestore_db
 
-    async def save_workspace(self, workspace: WorkspaceState) -> None: self.fs.collection("workspaces").document(workspace.id).set(workspace.model_dump())
-    async def get_user_workspaces(self, user_id: str) -> List[WorkspaceState]:
-        docs = self.fs.collection("workspaces").where("user_id", "==", user_id).stream()
-        return [WorkspaceState(**doc.to_dict()) for doc in docs]
+    async def save_workspace(self, workspace: WorkspaceState) -> None:
+        with self.session_factory() as pg:
+            db_ws = pg.query(WorkspaceDB).filter(WorkspaceDB.id == workspace.id).first()
+            if db_ws:
+                for k, v in workspace.model_dump().items(): setattr(db_ws, k, v)
+            else:
+                pg.add(WorkspaceDB(**workspace.model_dump()))
+            pg.commit()
 
-    async def save_research_note(self, note: ResearchNote) -> None: self.fs.collection("research_notes").document(note.id).set(note.model_dump())
+    async def get_user_workspaces(self, user_id: str) -> List[WorkspaceState]:
+        with self.session_factory() as pg:
+            res = pg.query(WorkspaceDB).filter(WorkspaceDB.user_id == user_id).all()
+            return [WorkspaceState(
+                id=r.id,
+                user_id=r.user_id,
+                name=r.name,
+                type=r.type,
+                layout_config=r.layout_config or {},
+                active_stocks=r.active_stocks or [],
+                saved_indicators=r.saved_indicators or [],
+                updated_at=r.updated_at
+            ) for r in res]
+
+    async def save_research_note(self, note: ResearchNote) -> None:
+        with self.session_factory() as pg:
+            db_note = pg.query(ResearchNoteDB).filter(ResearchNoteDB.id == note.id).first()
+            if db_note:
+                for k, v in note.model_dump().items(): setattr(db_note, k, v)
+            else:
+                pg.add(ResearchNoteDB(**note.model_dump()))
+            pg.commit()
+
     async def get_stock_notes(self, user_id: str, symbol: str) -> List[ResearchNote]:
-        docs = self.fs.collection("research_notes").where("user_id", "==", user_id).where("symbol", "==", symbol).stream()
-        return [ResearchNote(**doc.to_dict()) for doc in docs]
+        with self.session_factory() as pg:
+            res = pg.query(ResearchNoteDB).filter(ResearchNoteDB.user_id == user_id, ResearchNoteDB.symbol == symbol).all()
+            return [ResearchNote(
+                id=r.id,
+                user_id=r.user_id,
+                symbol=r.symbol,
+                content=r.content,
+                tags=r.tags or [],
+                attachments=r.attachments or [],
+                created_at=r.created_at,
+                updated_at=r.updated_at
+            ) for r in res]
 
     async def save_market_regime(self, regime: MarketRegime) -> None:
         from backend.core.postgres import RegimeDB
         with self.session_factory() as pg:
-            print(f"[HYBRID] Saving Market Regime to SQL...")
             db_regime = RegimeDB(
                 date=regime.date,
                 regime=regime.regime,
@@ -272,7 +317,6 @@ class HybridIOSRepository(IIOSRepository):
             )
             pg.add(db_regime)
             pg.commit()
-            print(f"[HYBRID] Market Regime saved successfully.")
 
     async def get_latest_regime(self) -> Optional[MarketRegime]:
         with self.session_factory() as pg:
@@ -299,14 +343,32 @@ class HybridIOSRepository(IIOSRepository):
         with self.session_factory() as pg:
             res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
             return [MarketOpportunity(
-                **{c.name: getattr(r, c.name) for c in r.__table__.columns if c.name != 'indicators'},
-                indicators=r.indicators if isinstance(r.indicators, list) else []
+                id=str(r.id),
+                symbol=str(r.symbol),
+                type=str(r.type),
+                conviction_score=float(r.conviction_score),
+                ai_thesis=str(r.ai_thesis),
+                indicators=r.indicators if isinstance(r.indicators, list) else [],
+                timestamp=r.timestamp
             ) for r in res]
+
+    async def save_live_signal(self, signal: LiveSignal) -> None:
+        with self.session_factory() as pg:
+            db_sig = pg.query(LiveSignalDB).filter(LiveSignalDB.id == signal.id).first()
+            if db_sig:
+                for k, v in signal.model_dump().items(): setattr(db_sig, k, v)
+            else:
+                pg.add(LiveSignalDB(**signal.model_dump()))
+            pg.commit()
+
+    async def get_active_live_signals(self) -> List[LiveSignal]:
+        with self.session_factory() as pg:
+            res = pg.query(LiveSignalDB).filter(LiveSignalDB.status == "ACTIVE").all()
+            return [LiveSignal(**{c.name: getattr(r, c.name) for c in r.__table__.columns}) for r in res]
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         from backend.core.postgres import IntelReportDB
         with self.session_factory() as pg:
-            print(f"[HYBRID] Saving Intel Report ({report.type}) to SQL...")
             db_report = IntelReportDB(
                 id=report.id,
                 type=report.type,
@@ -317,7 +379,6 @@ class HybridIOSRepository(IIOSRepository):
             )
             pg.add(db_report)
             pg.commit()
-            print(f"[HYBRID] Intel Report saved successfully.")
 
     async def get_latest_intel_report(self, report_type: str) -> Optional[MarketIntelligenceReport]:
         with self.session_factory() as pg:
@@ -335,7 +396,30 @@ class HybridIOSRepository(IIOSRepository):
                 )
             return None
 
-    async def save_trade_feedback(self, feedback: TradeFeedback) -> None: self.fs.collection("trade_journal").document(feedback.id).set(feedback.model_dump())
+    async def save_trade_feedback(self, feedback: TradeFeedback) -> None:
+        with self.session_factory() as pg:
+            db_trade = pg.query(TradeJournalDB).filter(TradeJournalDB.id == feedback.id).first()
+            if db_trade:
+                for k, v in feedback.model_dump().items(): setattr(db_trade, k, v)
+            else:
+                pg.add(TradeJournalDB(**feedback.model_dump()))
+            pg.commit()
+
     async def get_user_trades(self, user_id: str) -> List[TradeFeedback]:
-        docs = self.fs.collection("trade_journal").where("user_id", "==", user_id).stream()
-        return [TradeFeedback(**doc.to_dict()) for doc in docs]
+        with self.session_factory() as pg:
+            res = pg.query(TradeJournalDB).filter(TradeJournalDB.user_id == user_id).all()
+            return [TradeFeedback(
+                id=r.id,
+                user_id=r.user_id,
+                symbol=r.symbol,
+                entry_price=r.entry_price,
+                exit_price=r.exit_price,
+                quantity=r.quantity,
+                entry_date=r.entry_date,
+                exit_date=r.exit_date,
+                pnl=r.pnl,
+                ai_score_at_entry=r.ai_score_at_entry,
+                feedback=r.feedback,
+                mistakes=r.mistakes or [],
+                lessons=r.lessons or []
+            ) for r in res]

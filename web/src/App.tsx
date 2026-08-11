@@ -20,6 +20,7 @@ import OpportunityScanner from './pages/OpportunityScanner'
 import SystemControl from './pages/SystemControl'
 import PortfolioStressTest from './pages/PortfolioStressTest'
 import OptionsIntelligence from './pages/Options/OptionsIntelligence'
+import RiskGuard from './pages/RiskGuard'
 
 const darkTheme = createTheme({
   palette: {
@@ -95,6 +96,7 @@ function App() {
                 <Route path="/treemap" element={<MarketTreemap />} />
                 <Route path="/heatmap" element={<MarketHeatmap />} />
                 <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/risk" element={<RiskGuard />} />
                 <Route path="/research" element={<ResearchHub />} />
                 <Route path="/stress-test" element={<PortfolioStressTest />} />
                 <Route path="/analysis" element={<StockIntelligence />} />

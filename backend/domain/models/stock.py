@@ -10,6 +10,8 @@ class Stock(BaseModel):
 
     # Pricing & Performance
     last_price: Optional[float] = None
+    previous_close: Optional[float] = None
+    volume: Optional[float] = None
     change_pct: Optional[float] = None
     weekly_change: Optional[float] = None
     monthly_change: Optional[float] = None
@@ -41,8 +43,12 @@ class Stock(BaseModel):
 
     analysis: Optional[Dict[str, Any]] = None
     structured_consensus: Optional[Dict[str, Any]] = None
+    options_data: Optional[Dict[str, Any]] = None
+    financial_history: Optional[List[Dict[str, Any]]] = None
     ai_investment_score: Optional[float] = None
     ai_investment_grade: Optional[str] = None # AAA, AA, A, B, C, D
+    ai_status: str = "PENDING" # PENDING, SUCCESS, FAILED
+    ai_last_error: Optional[str] = None
     health_metrics: Optional[Dict[str, str]] = None # "Financial": "GOOD", etc.
     confidence_metrics: Optional[Dict[str, Any]] = None
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -58,6 +64,8 @@ class StockPrice(BaseModel):
     low: float
     close: float
     volume: int
+    open_interest: Optional[int] = None
+    source: Optional[str] = None
     indicators: Optional[Dict[str, Any]] = None
     smc: Optional[Dict[str, Any]] = None
 

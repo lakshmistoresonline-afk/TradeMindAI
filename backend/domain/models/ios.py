@@ -39,6 +39,24 @@ class MarketOpportunity(BaseModel):
     indicators: List[str]
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
+class LiveSignal(BaseModel):
+    id: str
+    symbol: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    rating: str
+    direction: str # LONG or SHORT
+    conviction: float
+    entry_price: float
+    target_price: Optional[float] = None
+    stop_loss_price: Optional[float] = None
+    timeframe: str
+    status: str # ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
+    outcome_date: Optional[datetime] = None
+    profit_pct: Optional[float] = None
+    mfe: float = 0.0
+    mae: float = 0.0
+    model_version: str = "TradeMind Core v2.2"
+
 class TradeFeedback(BaseModel):
     id: str
     user_id: str

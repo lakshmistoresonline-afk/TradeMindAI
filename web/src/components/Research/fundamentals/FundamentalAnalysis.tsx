@@ -6,12 +6,29 @@ import ReactECharts from 'echarts-for-react';
 export default function FundamentalAnalysis({ stock }: { stock: any }) {
   const [tab, setTab] = useState(0);
 
+  // Vision 2.2: Real Financial History from Backend
+  const history = stock?.financial_history || [];
+  const isSample = history.length === 0;
+
   const revenueOption = {
-    xAxis: { type: 'category', data: ['2022', '2023', '2024', '2025', '2026'] },
+    xAxis: {
+      type: 'category',
+      data: isSample ? ['2022', '2023', '2024', '2025', '2026'] : history.map((h: any) => h.year)
+    },
     yAxis: { type: 'value' },
     series: [
-      { name: 'Revenue', type: 'bar', data: [12000, 14500, 18200, 21000, 24500], color: '#10b981' },
-      { name: 'Net Profit', type: 'line', data: [1200, 1800, 2400, 3100, 3800], color: '#3b82f6' }
+      {
+        name: 'Revenue',
+        type: 'bar',
+        data: isSample ? [12000, 14500, 18200, 21000, 24500] : history.map((h: any) => h.revenue / 1e7), // Cr
+        color: '#10b981'
+      },
+      {
+        name: 'Net Profit',
+        type: 'line',
+        data: isSample ? [1200, 1800, 2400, 3100, 3800] : history.map((h: any) => h.net_income / 1e7),
+        color: '#3b82f6'
+      }
     ],
     legend: { show: true, textStyle: { color: '#94a3b8' }, top: 0 },
     grid: { top: 40, bottom: 40, left: 60, right: 20 }
@@ -24,6 +41,7 @@ export default function FundamentalAnalysis({ stock }: { stock: any }) {
           <Cpu size={20} className="text-emerald-500" /> Fundamental Analysis
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center">
+           {isSample && <Chip label="SAMPLE MODEL" size="small" variant="filled" color="warning" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }} />}
            <Tooltip title="Historical financial data verified via SQL Terminal.">
               <Chip label="HISTORICAL" size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }} color="info" />
            </Tooltip>
@@ -44,16 +62,18 @@ export default function FundamentalAnalysis({ stock }: { stock: any }) {
            {tab === 0 && (
              <Grid container spacing={4}>
                 <Grid item xs={12} md={7}>
-                   <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ fontWeight: 800 }}>HISTORICAL REVENUE & PROFIT (INR CR)</Typography>
+                   <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ fontWeight: 800 }}>
+                      HISTORICAL REVENUE & PROFIT (INR CR) {isSample && <Chip label="SAMPLE" size="small" sx={{ height: 14, fontSize: '0.5rem', ml: 1 }} />}
+                   </Typography>
                    <ReactECharts option={revenueOption} style={{ height: '300px' }} theme="dark" />
                 </Grid>
                 <Grid item xs={12} md={5}>
                    <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ fontWeight: 800 }}>FINANCIAL STRENGTH DNA</Typography>
                    <Box sx={{ mt: 2 }}>
-                      <MetricRow label="ROE" value={stock?.roe ? `${(stock.roe * 100).toFixed(1)}%` : '24.2%'} status="EXCELLENT" />
-                      <MetricRow label="ROCE" value="28.4%" status="STABLE" />
-                      <MetricRow label="D/E Ratio" value={stock?.debt_to_equity?.toFixed(2) || '0.12'} status="LOW" />
-                      <MetricRow label="Interest Coverage" value="12.5x" status="STRONG" />
+                      <MetricRow label="ROE" value={stock?.roe ? `${(stock.roe * 100).toFixed(1)}%` : '---'} status={stock?.roe > 0.2 ? "EXCELLENT" : "STABLE"} />
+                      <MetricRow label="ROCE" value={stock?.roce ? `${(stock.roce * 100).toFixed(1)}%` : '---'} status="STABLE" />
+                      <MetricRow label="D/E Ratio" value={stock?.debt_to_equity?.toFixed(2) || '---'} status={stock?.debt_to_equity < 0.5 ? "LOW" : "HIGH"} />
+                      <MetricRow label="Interest Coverage" value="---" status="STRONG" />
                    </Box>
                    <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 1, border: '1px solid #10b981' }}>
                       <Typography variant="caption" color="primary" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -102,14 +122,14 @@ export default function FundamentalAnalysis({ stock }: { stock: any }) {
              <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                    <Box sx={{ p: 2.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid #334155' }}>
-                      <Typography variant="caption" color="textSecondary" display="block" sx={{ fontWeight: 800 }}>Current P/E vs 5Y Median</Typography>
-                      <Typography variant="h4" fontWeight={900}>{stock?.pe_ratio?.toFixed(1) || '24.5'} <Typography component="span" variant="caption" color="error" sx={{ fontWeight: 900 }}> +12% Premium</Typography></Typography>
+                      <Typography variant="caption" color="textSecondary" display="block" sx={{ fontWeight: 800 }}>Current P/E Ratio</Typography>
+                      <Typography variant="h4" fontWeight={900}>{stock?.pe_ratio?.toFixed(1) || '---'}</Typography>
                    </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
                    <Box sx={{ p: 2.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid #334155' }}>
                       <Typography variant="caption" color="textSecondary" display="block" sx={{ fontWeight: 800 }}>Price to Book (P/B)</Typography>
-                      <Typography variant="h4" fontWeight={900}>{stock?.pb_ratio?.toFixed(1) || '4.2'}</Typography>
+                      <Typography variant="h4" fontWeight={900}>{stock?.pb_ratio?.toFixed(1) || '---'}</Typography>
                    </Box>
                 </Grid>
              </Grid>

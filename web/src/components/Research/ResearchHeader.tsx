@@ -28,7 +28,12 @@ export default function ResearchHeader({ stock }: { stock: any }) {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
             {stock.change_pct >= 0 ? <TrendingUp size={24} className="text-emerald-500" /> : <TrendingDown size={24} className="text-rose-500" />}
             <Typography variant="h5" color={stock.change_pct >= 0 ? 'primary' : 'error'} fontWeight={900}>
-              {(stock.change_pct || 0) >= 0 ? '+' : ''}{stock.change_pct?.toFixed(2)}%
+              {stock.last_price && stock.previous_close ? (
+                <Typography component="span" variant="h5" sx={{ mr: 1, fontWeight: 700 }}>
+                   {(stock.last_price - stock.previous_close) >= 0 ? '+' : ''}{(stock.last_price - stock.previous_close).toFixed(2)}
+                </Typography>
+              ) : null}
+              ({(stock.change_pct || 0) >= 0 ? '+' : ''}{stock.change_pct?.toFixed(2)}%)
             </Typography>
           </Box>
           <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 0.5, mt: 1, fontWeight: 700 }}>

@@ -1,3 +1,5 @@
+from .config import settings
+
 # Simple Singleton Container for Service Injection
 class Container:
     def __init__(self):
@@ -52,8 +54,12 @@ class Container:
     @property
     def provider(self):
         if self._provider is None:
-            from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
-            self._provider = YFinanceProvider()
+            if settings.MARKET_DATA_PROVIDER == "groww":
+                from backend.infrastructure.repositories.groww_provider import GrowwProvider
+                self._provider = GrowwProvider()
+            else:
+                from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
+                self._provider = YFinanceProvider()
         return self._provider
 
     @property

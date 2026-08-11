@@ -50,8 +50,12 @@ class StockDB(Base):
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
     ai_investment_score = Column(Float)
     ai_investment_grade = Column(String)
+    ai_status = Column(String, default="PENDING")
+    ai_last_error = Column(String)
     analysis = Column(JSON) # Consensus Agent results
     structured_consensus = Column(JSON)
+    options_data = Column(JSON)
+    financial_history = Column(JSON)
     health_metrics = Column(JSON)
     confidence_metrics = Column(JSON)
 
@@ -65,6 +69,8 @@ class PriceDB(Base):
     low = Column(Float)
     close = Column(Float)
     volume = Column(BigInteger)
+    open_interest = Column(BigInteger)
+    source = Column(String)
     indicators = Column(JSON) # EMA, RSI, MACD, etc.
 
 class FeatureDefinitionDB(Base):
@@ -141,6 +147,77 @@ class OpportunityDB(Base):
     ai_thesis = Column(String)
     indicators = Column(JSON)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+class LiveSignalDB(Base):
+    __tablename__ = "live_signals"
+    id = Column(String, primary_key=True)
+    symbol = Column(String, index=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    rating = Column(String)
+    direction = Column(String)
+    conviction = Column(Float)
+    entry_price = Column(Float)
+    target_price = Column(Float)
+    stop_loss_price = Column(Float)
+    timeframe = Column(String)
+    status = Column(String)
+    outcome_date = Column(DateTime)
+    profit_pct = Column(Float)
+    mfe = Column(Float)
+    mae = Column(Float)
+    model_version = Column(String)
+
+class WorkspaceDB(Base):
+    __tablename__ = "workspaces"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, index=True)
+    name = Column(String)
+    type = Column(String)
+    layout_config = Column(JSON)
+    active_stocks = Column(JSON)
+    saved_indicators = Column(JSON)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class ResearchNoteDB(Base):
+    __tablename__ = "research_notes"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, index=True)
+    symbol = Column(String, index=True)
+    content = Column(String)
+    tags = Column(JSON)
+    attachments = Column(JSON)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class TradeJournalDB(Base):
+    __tablename__ = "trade_journal"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, index=True)
+    symbol = Column(String, index=True)
+    entry_price = Column(Float)
+    exit_price = Column(Float)
+    quantity = Column(Integer)
+    entry_date = Column(DateTime)
+    exit_date = Column(DateTime)
+    pnl = Column(Float)
+    ai_score_at_entry = Column(Float)
+    feedback = Column(String)
+    mistakes = Column(JSON)
+    lessons = Column(JSON)
+
+class InstrumentDB(Base):
+    __tablename__ = "instruments"
+    id = Column(String, primary_key=True)
+    exchange = Column(String)
+    trading_symbol = Column(String)
+    segment = Column(String)
+    instrument_type = Column(String)
+    groww_symbol = Column(String, index=True)
+    expiry = Column(DateTime)
+    strike = Column(Float)
+    option_type = Column(String)
+    source = Column(String)
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
 
 def init_db():
     Base.metadata.create_all(bind=engine)

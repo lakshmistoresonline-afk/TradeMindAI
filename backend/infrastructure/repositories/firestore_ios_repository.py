@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict, Any
 from google.cloud import firestore
-from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback
+from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback, LiveSignal
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import datetime
 
@@ -41,6 +41,13 @@ class FirestoreIOSRepository(IIOSRepository):
     async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]:
         docs = self.db.collection("opportunities").order_by("timestamp", direction=firestore.Query.DESCENDING).limit(limit).stream()
         return [MarketOpportunity(**doc.to_dict()) for doc in docs]
+
+    async def save_live_signal(self, signal: LiveSignal) -> None:
+        self.db.collection("live_signals").document(signal.id).set(signal.model_dump())
+
+    async def get_active_live_signals(self) -> List[LiveSignal]:
+        docs = self.db.collection("live_signals").where("status", "==", "ACTIVE").stream()
+        return [LiveSignal(**doc.to_dict()) for doc in docs]
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         self.db.collection("intel_reports").document(report.id).set(report.model_dump())

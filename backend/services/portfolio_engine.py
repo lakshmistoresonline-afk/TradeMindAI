@@ -49,6 +49,9 @@ class PortfolioEngine:
             diversification_score=float(diversification),
             risk_level=risk_level,
             sector_allocation=sector_allocation,
-            expected_annual_return=float(avg_ai_score * 0.2), # Heuristic: higher score -> higher expected alpha
-            max_drawdown=-12.5 # Minimum institutional risk baseline
+            expected_annual_return=float(avg_ai_score * 0.2), # Heuristic: higher score -> higher alpha
+            max_drawdown=-12.5, # Minimum institutional risk baseline
+            avg_beta=float(avg_beta),
+            asset_correlation=0.65, # Placeholder for deep matrix analysis
+            var_95=total * 0.05 * 1.645 # Simple parametric VaR
         )

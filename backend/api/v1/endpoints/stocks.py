@@ -123,6 +123,19 @@ async def get_stock_detail(
         return stock
     return {"error": "Stock not found"}
 
+@router.get("/provider/capabilities")
+async def get_provider_capabilities():
+    return container.provider.capabilities
+
+@router.get("/{symbol}/option-chain")
+async def get_option_chain(symbol: str, expiry: Optional[str] = None):
+    exp_dt = datetime.datetime.fromisoformat(expiry) if expiry else None
+    return await container.provider.get_option_chain(symbol, exp_dt)
+
+@router.get("/{symbol}/ltp")
+async def get_stock_ltp(symbol: str):
+    return {"symbol": symbol, "ltp": await container.provider.get_ltp(symbol)}
+
 @router.get("/{symbol}/news")
 async def get_stock_news(symbol: str):
     return await container.data_platform_repo.get_latest_news(symbol)

@@ -2,60 +2,33 @@ from backend.ai.agents import AgentState
 
 def create_ai_workflow():
     """
-    Institutional AI Workflow Factory.
-    Uses Lazy Loading for heavy langgraph modules to save RAM in production.
+    Consolidated Institutional AI Workflow for Rate Limit Efficiency.
     """
     from langgraph.graph import StateGraph, END
     from backend.ai.agents import (
-        TechnicalAgent, ICTAgent, WyckoffAgent, ElliottWaveAgent,
-        FundamentalAgent, EarningsAgent, OptionsAgent, SentimentAgent,
-        MacroAgent, InstitutionalAgent, RiskAgent, ConsensusAgent
+        MarketAgent, CompanyAgent, ContextAgent, ConsensusAgent
     )
 
     workflow = StateGraph(AgentState)
 
     # Initialize Agents
-    tech = TechnicalAgent("Technical")
-    ict = ICTAgent()
-    wyckoff = WyckoffAgent()
-    waves = ElliottWaveAgent()
-    fund = FundamentalAgent("Fundamental")
-    earnings = EarningsAgent()
-    options = OptionsAgent()
-    sent = SentimentAgent("Sentiment")
-    macro = MacroAgent("Macro")
-    inst = InstitutionalAgent("Institutional")
-    risk = RiskAgent("Risk")
-    consensus = ConsensusAgent("Consensus")
+    market = MarketAgent()
+    company = CompanyAgent()
+    context = ContextAgent()
+    consensus = ConsensusAgent()
 
     # Add Nodes
-    workflow.add_node("technical", tech.analyze)
-    workflow.add_node("ict", ict.analyze)
-    workflow.add_node("wyckoff", wyckoff.analyze)
-    workflow.add_node("waves", waves.analyze)
-    workflow.add_node("fundamental", fund.analyze)
-    workflow.add_node("earnings", earnings.analyze)
-    workflow.add_node("options", options.analyze)
-    workflow.add_node("sentiment", sent.analyze)
-    workflow.add_node("macro", macro.analyze)
-    workflow.add_node("institutional", inst.analyze)
-    workflow.add_node("risk", risk.analyze)
+    workflow.add_node("market", market.analyze)
+    workflow.add_node("company", company.analyze)
+    workflow.add_node("context", context.analyze)
     workflow.add_node("consensus", consensus.analyze)
 
     # Define Execution Flow
-    workflow.set_entry_point("technical")
+    workflow.set_entry_point("market")
 
-    workflow.add_edge("technical", "ict")
-    workflow.add_edge("ict", "wyckoff")
-    workflow.add_edge("wyckoff", "waves")
-    workflow.add_edge("waves", "fundamental")
-    workflow.add_edge("fundamental", "earnings")
-    workflow.add_edge("earnings", "options")
-    workflow.add_edge("options", "sentiment")
-    workflow.add_edge("sentiment", "macro")
-    workflow.add_edge("macro", "institutional")
-    workflow.add_edge("institutional", "risk")
-    workflow.add_edge("risk", "consensus")
+    workflow.add_edge("market", "company")
+    workflow.add_edge("company", "context")
+    workflow.add_edge("context", "consensus")
     workflow.add_edge("consensus", END)
 
     return workflow.compile()

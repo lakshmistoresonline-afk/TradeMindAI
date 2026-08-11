@@ -19,7 +19,7 @@ class OpportunityEngine:
                 consensus = stock.analysis.get("consensus", "").upper()
                 score = stock.ai_investment_score or 0
 
-                if score > 75 and "BUY" in consensus:
+                if score > 70 and "BUY" in consensus:
                     opportunities.append(MarketOpportunity(
                         id=str(uuid.uuid4()),
                         symbol=stock.symbol,
@@ -28,7 +28,7 @@ class OpportunityEngine:
                         ai_thesis=f"Institutional accumulation complete. High probability momentum move detected for {stock.symbol}.",
                         indicators=["SMC Order Block", "EMA Cross", "High Confidence Consensus"]
                     ))
-                elif score > 60 and stock.pe_ratio and stock.pe_ratio < 25:
+                elif score > 55 and stock.pe_ratio and stock.pe_ratio < 35:
                     opportunities.append(MarketOpportunity(
                         id=str(uuid.uuid4()),
                         symbol=stock.symbol,
@@ -40,12 +40,12 @@ class OpportunityEngine:
 
             # 2. Bootstrap Mode (Raw Price Action - Fallback)
             # We use this if we don't have deep analysis yet to keep the dashboard alive
-            elif stock.change_pct and stock.change_pct > 2.0:
+            elif stock.change_pct and abs(stock.change_pct) > 1.5:
                 opportunities.append(MarketOpportunity(
                     id=str(uuid.uuid4()),
                     symbol=stock.symbol,
-                    type="MOMENTUM",
-                    conviction_score=65.0, # Baseline bootstrap score
+                    type="MOMENTUM" if stock.change_pct > 0 else "REVERSAL",
+                    conviction_score=60.0, # Baseline bootstrap score
                     ai_thesis=f"Session volatility detected. AI agents are currently scanning {stock.symbol} for institutional footprint.",
                     indicators=["Volume Spike", "Price Momentum", "AI SCANNING..."]
                 ))

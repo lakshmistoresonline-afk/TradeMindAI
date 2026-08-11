@@ -131,6 +131,9 @@ class PortfolioHealth(BaseModel):
     sector_allocation: Dict[str, float]
     expected_annual_return: float
     max_drawdown: float
+    avg_beta: float = 1.0
+    asset_correlation: float = 0.5
+    var_95: float = 0.0 # Value at Risk
 
 class Alert(BaseModel):
     id: str

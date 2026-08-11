@@ -141,12 +141,55 @@ class IDataPlatformRepository(ABC):
         pass
 
 class IMarketDataProvider(ABC):
+    @property
+    @abstractmethod
+    def capabilities(self) -> Dict[str, bool]:
+        pass
+
     @abstractmethod
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         pass
 
     @abstractmethod
-    async def fetch_history(self, symbol: str, period: str) -> Any:
+    async def fetch_history(self, symbol: str, period: str, interval: str = "1D") -> Any:
+        pass
+
+    @abstractmethod
+    async def get_historical_candles(
+        self,
+        symbol: str,
+        start_date: datetime,
+        end_date: datetime,
+        interval: str
+    ) -> List[StockPrice]:
+        pass
+
+    @abstractmethod
+    async def get_ltp(self, symbol: str) -> float:
+        pass
+
+    @abstractmethod
+    async def get_quote(self, symbol: str) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    async def get_ohlc(self, symbol: str) -> Dict[str, float]:
+        pass
+
+    @abstractmethod
+    async def get_greeks(self, symbol: str) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    async def get_expiries(self, symbol: str) -> List[datetime]:
+        pass
+
+    @abstractmethod
+    async def get_instruments(self) -> List[Dict[str, Any]]:
+        pass
+
+    @abstractmethod
+    async def get_option_chain(self, symbol: str, expiry: Optional[datetime] = None) -> OptionsChain:
         pass
 
 class INewsProvider(ABC):

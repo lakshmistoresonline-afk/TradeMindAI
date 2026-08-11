@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from pydantic import AnyHttpUrl, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -29,6 +29,11 @@ class Settings(BaseSettings):
 
     FIREBASE_PROJECT_ID: str = "com-webcraft-trademindai-c8f75"
     GROQ_API_KEY: str = "YOUR_GROQ_API_KEY"
+
+    GROWW_API_KEY: Optional[str] = None
+    GROWW_BASE_URL: str = "https://api.groww.in/v1"
+
+    MARKET_DATA_PROVIDER: str = "yfinance" # or "groww"
 
     SECRET_KEY: str = "SECRET"
     ALGORITHM: str = "HS256"

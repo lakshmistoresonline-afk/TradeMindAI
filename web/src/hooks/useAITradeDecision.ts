@@ -21,7 +21,10 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   else if (rawRating.includes('SELL')) rating = 'SELL';
 
   // 2. Normalize Conviction (0-100)
-  const conviction = Math.round(structured.conviction || stock.ai_investment_score || 0);
+  const conviction = Math.round(
+    (structured.conviction !== undefined && structured.conviction !== null)
+    ? structured.conviction : (stock.ai_investment_score || 0)
+  );
 
   // 3. Normalize Risk Level
   let riskLevel: RiskLevel = 'MODERATE';
@@ -47,12 +50,42 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   else if (structured.status) status = structured.status as DecisionStatus;
 
   // 6. Entry Logic
-  const entryLow = structured.entryZone?.low;
-  const entryHigh = structured.entryZone?.high;
-  const entry = structured.entry || stock.last_price;
+  const parseNum = (val: any) => {
+    if (val === null || val === undefined || val === 'Unknown' || val === 'N/A') return undefined;
+    const num = Number(val);
+    return isNaN(num) ? undefined : num;
+  };
+
+  const entry = parseNum(structured.entry) || stock.last_price;
+  const target = parseNum(structured.target);
+  const stopLoss = parseNum(structured.stop_loss);
 
   // 7. Drivers (Explainability)
-  const drivers = structured.drivers || (analysis.recommendations?.[0]?.reasons ? analysis.recommendations[0].reasons.slice(0, 3) : []);
+  let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];
+  if (drivers.length === 0 && Array.isArray(analysis.recommendations)) {
+     drivers = analysis.recommendations[0]?.reasons?.slice(0, 3) || [];
+  }
+  drivers = (drivers as any[]).filter(d => typeof d === 'string' && !d.includes('{'));
+
+  // 8. Robust Thesis/Reasoning
+  let thesis = structured.thesis || analysis.consensus || 'Analyzing session dynamics...';
+
+  // Prevent raw JSON or Code from leaking into UI
+  const codeMarkers = ['{', '```', 'import ', 'def ', 'return ', 'json.'];
+  const isLikelyCode = codeMarkers.some(m => thesis.includes(m));
+
+  if (isLikelyCode) {
+    if (structured.thesis && !structured.thesis.includes('{')) {
+      thesis = structured.thesis;
+    } else {
+      // Try to extract thesis from raw string if parsing failed
+      const match = thesis.match(/["']thesis["']:\s*["'](.*?)["']/);
+      thesis = (match && match[1]) ? match[1] : 'Synthesis in progress...';
+    }
+  }
+
+  // Final trim to remove any remaining artifacts
+  if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
 
   return {
     rating,
@@ -60,15 +93,13 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
     riskLevel,
     timeframe,
     status,
-    entryLow,
-    entryHigh,
     entry,
-    target: structured.target,
-    stopLoss: structured.stop_loss,
+    target,
+    stopLoss,
     riskReward: structured.risk_reward || '1:2.0',
-    primaryCatalyst: structured.key_catalysts?.[0] || analysis.recommendations?.[0]?.reasons?.[0],
-    keyRisks: structured.key_risks || analysis.recommendations?.[0]?.risks,
-    thesis: structured.thesis || analysis.consensus,
+    primaryCatalyst: structured.key_catalysts?.[0] || (analysis.recommendations?.[0] as any)?.reasons?.[0],
+    keyRisks: structured.key_risks || (analysis.recommendations?.[0] as any)?.risks,
+    thesis,
     invalidation: structured.invalidation_point,
     generatedAt: stock.updated_at,
     updatedAt: stock.updated_at,

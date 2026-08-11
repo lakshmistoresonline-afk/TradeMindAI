@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
-from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback
+from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback, LiveSignal
 
 class IIOSRepository(ABC):
     @abstractmethod
@@ -33,6 +33,14 @@ class IIOSRepository(ABC):
 
     @abstractmethod
     async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]:
+        pass
+
+    @abstractmethod
+    async def save_live_signal(self, signal: LiveSignal) -> None:
+        pass
+
+    @abstractmethod
+    async def get_active_live_signals(self) -> List[LiveSignal]:
         pass
 
     @abstractmethod

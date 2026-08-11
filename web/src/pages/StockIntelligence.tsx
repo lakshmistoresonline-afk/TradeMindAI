@@ -28,6 +28,8 @@ import OptionsIntelligence from '../components/Research/options/OptionsIntellige
 import QuantAnalytics from '../components/Research/quant/QuantAnalytics';
 import ScenarioStressLab from '../components/Research/quant/ScenarioStressLab';
 import AIPerformance from '../components/Research/quant/AIPerformance';
+import AIResearchTimeline from '../components/Research/AIResearchTimeline';
+import ResearchNotebook from '../components/Research/ResearchNotebook';
 
 import RiskAssessment from '../components/Research/risk/RiskAssessment';
 import AICopilot from '../components/AICopilot';
@@ -55,15 +57,20 @@ export default function StockIntelligence() {
 
 **Report Generated:** ${new Date().toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}
 **AI Conviction:** ${decision.conviction}%
-**Grade:** ${selectedStock.ai_investment_grade}
+**Grade:** ${selectedStock.ai_investment_grade || 'N/A'}
+**Rating:** ${decision.rating}
 
 ### EXECUTIVE SUMMARY
-${decision.thesis || 'Analysis pending...'}
+${decision.thesis || 'Analysis pending for latest session dynamics.'}
 
-### AI THESIS
-- **Bull Case:** Strong institutional accumulation and breakout structure.
-- **Bear Case:** Valuation at premium levels vs historical median.
-- **Invalidation:** ${decision.invalidation || 'Weekly close below support.'}
+### AI THESIS & DRIVERS
+${decision.drivers?.map(d => `- ${d}`).join('\n') || '- Technical structure alignment\n- Institutional flow bias'}
+
+### KEY CATALYST
+${decision.primaryCatalyst || 'Breakout above major structural resistance.'}
+
+### INVALIDATION
+${decision.invalidation || 'Weekly close below major support zone.'}
 `;
     const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -157,19 +164,19 @@ ${decision.thesis || 'Analysis pending...'}
             <Paper sx={{ p: 2, mb: 4, bgcolor: 'rgba(16, 185, 129, 0.05)', border: '1px solid #10b981', display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Briefcase size={20} className="text-emerald-500" />
-                  <Typography variant="subtitle2" fontWeight={800}>PORTFOLIO CONTEXT</Typography>
+                  <Typography variant="subtitle2" fontWeight={800}>PORTFOLIO CONTEXT (MODEL)</Typography>
                </Box>
                <Divider orientation="vertical" flexItem sx={{ opacity: 0.1 }} />
                <Box>
-                  <Typography variant="caption" color="textSecondary" display="block">WEIGHT</Typography>
+                  <Typography variant="caption" color="textSecondary" display="block">WEIGHT (MODEL)</Typography>
                   <Typography variant="body2" fontWeight={900}>4.2%</Typography>
                </Box>
                <Box>
-                  <Typography variant="caption" color="textSecondary" display="block">UNREALIZED P&L</Typography>
+                  <Typography variant="caption" color="textSecondary" display="block">UNREALIZED P&L (MODEL)</Typography>
                   <Typography variant="body2" fontWeight={900} color="primary">+₹24,500 (+12.4%)</Typography>
                </Box>
                <Box>
-                  <Typography variant="caption" color="textSecondary" display="block">RISK CONTRIBUTION</Typography>
+                  <Typography variant="caption" color="textSecondary" display="block">RISK CONTRIBUTION (MODEL)</Typography>
                   <Typography variant="body2" fontWeight={900} color="warning.main">MODERATE</Typography>
                </Box>
                <Chip label="IN HOLDINGS" size="small" color="primary" sx={{ ml: 'auto', fontWeight: 900, height: 20, fontSize: '0.6rem' }} />
@@ -210,7 +217,7 @@ ${decision.thesis || 'Analysis pending...'}
                     <TechnicalAnalysis data={selectedStock.analysis?.technical_data} />
                     <MarketStructure smc={selectedStock.analysis?.technical_data?.smc} />
                     <InstitutionalPositioning stock={selectedStock} />
-                    <OptionsIntelligence data={selectedStock.analysis?.options_data} />
+                    <OptionsIntelligence stock={selectedStock} />
                     <CorrelationAndHedging symbol={selectedStock.symbol} />
                  </Box>
                )}
@@ -265,34 +272,28 @@ ${decision.thesis || 'Analysis pending...'}
                         <Box>
                           <TableContainer>
                             <Table size="small">
-                              <TableHead>
+                              <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
                                 <TableRow>
-                                  <TableCell>Date</TableCell>
-                                  <TableCell>Entry</TableCell>
-                                  <TableCell>Target</TableCell>
-                                  <TableCell>Stop Loss</TableCell>
-                                  <TableCell align="right">Return</TableCell>
-                                  <TableCell align="center">Outcome</TableCell>
+                                  <TableCell sx={{ pl: 3 }}>DATE</TableCell>
+                                  <TableCell align="right">ENTRY</TableCell>
+                                  <TableCell align="right">TARGET</TableCell>
+                                  <TableCell align="right">STOP LOSS</TableCell>
+                                  <TableCell align="right">RETURN</TableCell>
+                                  <TableCell align="center">OUTCOME</TableCell>
                                 </TableRow>
                               </TableHead>
                               <TableBody>
                                 {backtestSignals.map((sig, idx) => (
                                   <TableRow key={idx} hover>
-                                    <TableCell sx={{ fontWeight: 700 }}>{sig.date}</TableCell>
-                                    <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{sig.entry.toFixed(2)}</TableCell>
-                                    <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'primary.main' }}>₹{sig.target?.toFixed(2) || '---'}</TableCell>
-                                    <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'error.main' }}>₹{sig.stop_loss?.toFixed(2) || '---'}</TableCell>
-                                    <TableCell align="right" sx={{ color: sig.profit_pct >= 0 ? '#10b981' : '#f43f5e', fontWeight: 800 }}>
-                                      {sig.profit_pct.toFixed(2)}%
+                                    <TableCell sx={{ pl: 3, fontWeight: 700, color: 'text.secondary' }}>{new Date(sig.date).toLocaleDateString()}</TableCell>
+                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{sig.entry.toLocaleString()}</TableCell>
+                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'primary.main' }}>₹{sig.target?.toLocaleString() || '---'}</TableCell>
+                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'error.main' }}>₹{sig.stop_loss?.toLocaleString() || '---'}</TableCell>
+                                    <TableCell align="right" sx={{ color: sig.profit_pct >= 0 ? 'primary.main' : 'error.main', fontWeight: 900 }}>
+                                      {sig.profit_pct >= 0 ? '+' : ''}{sig.profit_pct.toFixed(2)}%
                                     </TableCell>
                                     <TableCell align="center">
-                                      {sig.outcome === 'TARGET_HIT' ? (
-                                        <Chip label="HIT" size="small" color="primary" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 900 }} />
-                                      ) : sig.outcome === 'STOP_LOSS' ? (
-                                        <Chip label="STOP" size="small" color="error" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 900 }} />
-                                      ) : (
-                                        <Chip label="EXPIRED" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 900 }} />
-                                      )}
+                                      <StatusChip status={sig.outcome} />
                                     </TableCell>
                                   </TableRow>
                                 ))}
@@ -357,5 +358,18 @@ ${decision.thesis || 'Analysis pending...'}
   );
 }
 
-import ResearchNotebook from '../components/Research/ResearchNotebook';
-import AIResearchTimeline from '../components/Research/AIResearchTimeline';
+function StatusChip({ status }: { status: string }) {
+   const isHit = status === 'TARGET_HIT';
+   const isStop = status === 'STOP_LOSS';
+   const isActive = status === 'ACTIVE';
+
+   return (
+      <Chip
+         label={status === 'TARGET_HIT' ? 'HIT' : status === 'STOP_LOSS' ? 'STOP' : status}
+         size="small"
+         variant={isActive ? "outlined" : "filled"}
+         color={isHit ? "primary" : isStop ? "error" : isActive ? "info" : "default"}
+         sx={{ fontWeight: 900, height: 18, fontSize: '0.55rem' }}
+      />
+   );
+}

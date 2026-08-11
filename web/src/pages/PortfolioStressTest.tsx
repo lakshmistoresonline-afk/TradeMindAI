@@ -68,14 +68,14 @@ export default function PortfolioStressTest() {
 
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 4 }}>
-            <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 3, fontWeight: 900 }}>ESTIMATED IMPACT ANALYSIS</Typography>
+            <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 3, fontWeight: 900 }}>ESTIMATED IMPACT ANALYSIS (MODEL)</Typography>
             <Grid container spacing={3} sx={{ mt: 2 }}>
               {scenarios.map((scenario) => {
                 const estimatedLoss = totalValue * (scenario.impact / 100) * avgBeta;
                 return (
                 <Grid item xs={12} md={4} key={scenario.name}>
                   <Box sx={{ p: 2, textAlign: 'center', border: '1px solid #1e293b', borderRadius: 2, bgcolor: 'rgba(244, 63, 94, 0.03)' }}>
-                    <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>{scenario.name.toUpperCase()}</Typography>
+                    <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>{scenario.name.toUpperCase()} (MODEL)</Typography>
                     <Typography variant="h4" sx={{ color: '#f43f5e', fontWeight: 900, my: 1.5 }}>
                       -₹{Math.round(estimatedLoss).toLocaleString()}
                     </Typography>

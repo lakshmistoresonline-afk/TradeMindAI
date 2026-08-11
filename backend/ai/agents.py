@@ -3,6 +3,8 @@ from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
 from backend.core.config import settings
 from pydantic import BaseModel, Field
+import json
+import time
 
 class AgentResponse(BaseModel):
     agent_name: str
@@ -28,215 +30,157 @@ class AgentState(TypedDict):
 class BaseAgent:
     def __init__(self, name: str):
         self.name = name
-        # Diagnostic Check for API Key
-        key = settings.GROQ_API_KEY
-        if not key or key == "YOUR_GROQ_API_KEY":
-             raise ValueError("GROQ_API_KEY not configured in environment variables.")
+        self.primary_model = "llama-3.3-70b-versatile"
+        self.fallback_model = "llama-3.1-8b-instant"
 
-        # Log key availability (safe prefix only)
-        print(f"Agent {name} initialized with key prefix: {key[:8]}...")
-
-        # Using Llama 3.1 8B for high-throughput batch processing
-        # Integrated with Retry logic for Rate Limit Resilience
         self.llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
-            model_name="llama-3.1-8b-instant",
+            model_name=self.primary_model,
             temperature=0.1,
-            max_retries=3 # Built-in langchain retry
+            max_retries=3
         )
 
-    def get_structured_prompt(self, context: str) -> str:
-        return f"""
-        You are a highly experienced institutional {self.name} analyst.
-        Context: {context}
+    def use_fallback(self):
+        self.llm.model_name = self.fallback_model
 
-        Analyze the provided data and return a structured JSON response EXACTLY in this format:
+    def call_llm(self, prompt: str) -> Optional[Dict[str, Any]]:
+        retries = 0
+        while retries < 2:
+            try:
+                response = self.llm.invoke(prompt)
+                content = response.content
+
+                # Force extract JSON block if code or text is wrapping it
+                import re
+                json_match = re.search(r'(\{.*\})', content, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(1).replace("'", '"')
+                    # Remove any trailing commas or common LLM syntax errors
+                    json_str = re.sub(r',\s*\}', '}', json_str)
+                    json_str = re.sub(r',\s*\]', ']', json_str)
+                    return json.loads(json_str)
+
+                return None
+            except Exception as e:
+                if "429" in str(e) and retries == 0:
+                    self.use_fallback()
+                    retries += 1
+                    continue
+                else:
+                    print(f"   [!] {self.name} Error: {str(e)}")
+                    return None
+        return None
+
+class MarketAgent(BaseAgent):
+    def __init__(self): super().__init__("MarketAnalyst")
+    def analyze(self, state: AgentState):
+        prompt = f"""
+        Analyze Technical, SMC, Wyckoff, and Elliott Wave data for {state['symbol']}:
+        {state['technical_data']}
+
+        Return JSON:
         {{
-            "agent_name": "{self.name}",
-            "signal": "BUY | SELL | HOLD",
-            "confidence": 0.0 to 1.0,
-            "reasons": ["reason 1", "reason 2"],
-            "risks": ["risk 1", "risk 2"],
-            "supporting_evidence": {{"metric_name": "value"}},
-            "moat_rating": "WIDE | NARROW | NONE",
-            "management_score": 0.0 to 5.0
+            "agent_name": "MarketAnalyst",
+            "signal": "BUY|SELL|HOLD",
+            "confidence": 0.0-1.0,
+            "reasons": ["top 3 technical reasons"],
+            "risks": ["top 2 risks"],
+            "supporting_evidence": {{"wave": "count", "structure": "bias"}}
         }}
         """
-
-class TechnicalAgent(BaseAgent):
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Technical indicators and SMC data for {state['symbol']}: {state['technical_data']}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            data = json.loads(response.content)
-            state['recommendations'].append(AgentResponse(**data))
-        except:
-            state['recommendations'].append(AgentResponse(agent_name="Technical", signal="HOLD", confidence=0, reasons=["Parsing error"], risks=[], supporting_evidence={}))
+        data = self.call_llm(prompt)
+        if data: state['recommendations'].append(AgentResponse(**data))
         return state
 
-class ICTAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("ICT")
-
+class CompanyAgent(BaseAgent):
+    def __init__(self): super().__init__("CompanyAnalyst")
     def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"ICT Concepts (Liquidity, Gaps, Killzones) for {state['symbol']}: {state['technical_data'].get('ict', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
+        prompt = f"""
+        Analyze Fundamentals, Earnings, and Options for {state['symbol']}:
+        Fundamentals: {state['fundamental_data']}
+        Options: {state['options_data']}
+
+        Return JSON:
+        {{
+            "agent_name": "CompanyAnalyst",
+            "signal": "BUY|SELL|HOLD",
+            "confidence": 0.0-1.0,
+            "reasons": ["fundamental/options drivers"],
+            "risks": ["valuation/liquidity risks"],
+            "supporting_evidence": {{"pe": "value", "pcr": "value"}}
+        }}
+        """
+        data = self.call_llm(prompt)
+        if data: state['recommendations'].append(AgentResponse(**data))
         return state
 
-class WyckoffAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("Wyckoff")
-
+class ContextAgent(BaseAgent):
+    def __init__(self): super().__init__("ContextAnalyst")
     def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Wyckoff Phase Analysis for {state['symbol']}: {state['technical_data'].get('wyckoff', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
+        prompt = f"""
+        Analyze Sentiment, Macro, and Institutional flow for {state['symbol']}:
+        Sentiment: {state['news_sentiment']}
+        Institutional: {state['institutional_data']}
 
-class ElliottWaveAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("ElliottWave")
-
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Elliott Wave Theory count for {state['symbol']}: {state['technical_data'].get('waves', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class FundamentalAgent(BaseAgent):
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Fundamental ratios for {state['symbol']}: {state['fundamental_data']}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class EarningsAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("Earnings")
-
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Recent Earnings surprises for {state['symbol']}: {state.get('earnings_data', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class OptionsAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("Options")
-
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Options Chain (PCR, Max Pain, OI) for {state['symbol']}: {state.get('options_data', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class SentimentAgent(BaseAgent):
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"News sentiment for {state['symbol']}: {state['news_sentiment']}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class MacroAgent(BaseAgent):
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"Global macro indicators: {state.get('macro_data', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class InstitutionalAgent(BaseAgent):
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"FII/DII activity: {state.get('institutional_data', {})}")
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
-        return state
-
-class RiskAgent(BaseAgent):
-    def analyze(self, state: AgentState):
-        prompt = self.get_structured_prompt(f"""
-        Assess aggregate risk for {state['symbol']}.
-        Technical Data: {state['technical_data']}
-        Analyst Reports: {state['recommendations']}
-
-        Focus on:
-        - Divergence between Price and Volume.
-        - Counter-trend institutional flows.
-        - Extreme valuation levels.
-        - Upcoming event risk (Earnings/Budget).
-        """)
-        response = self.llm.invoke(prompt)
-        try:
-            import json
-            state['recommendations'].append(AgentResponse(**json.loads(response.content)))
-        except: pass
+        Return JSON:
+        {{
+            "agent_name": "ContextAnalyst",
+            "signal": "BUY|SELL|HOLD",
+            "confidence": 0.0-1.0,
+            "reasons": ["sentiment/context drivers"],
+            "risks": ["macro risks"],
+            "supporting_evidence": {{"bias": "value"}}
+        }}
+        """
+        data = self.call_llm(prompt)
+        if data: state['recommendations'].append(AgentResponse(**data))
         return state
 
 class ConsensusAgent(BaseAgent):
+    def __init__(self): super().__init__("ConsensusLead")
     def analyze(self, state: AgentState):
         current_price = state.get('technical_data', {}).get('indicators', {}).get('last_price', 'Unknown')
-
         prompt = f"""
-        Final synthesis for {state['symbol']}.
-        CURRENT PRICE: {current_price}
-
-        Institutional Priority Weighting:
-        1. Technical & SMC: 40% (Foundation)
-        2. Macro & Institutional: 25% (Market Context)
-        3. Fundamental: 20% (Long-term value)
-        4. Sentiment & Options: 15% (Short-term noise)
-
+        Final synthesis for {state['symbol']}. CURRENT PRICE: {current_price}
         Analyst Reports: {state['recommendations']}
 
-        Synthesize these reports into a final institutional decision.
-        If agents conflict, prioritize the Technical/SMC bias unless Macro risk is EXTREME.
-
-        Return ONLY a structured JSON response. DO NOT explain. DO NOT use markdown code blocks.
-        IMPORTANT: 'target', 'stop_loss', and 'entry' MUST be numeric floats. DO NOT include currency symbols or units.
-        IMPORTANT: 'timeframe' MUST be one of: "INTRADAY", "SWING", "MID_TERM", "LONG_TERM".
+        Return ONLY a clean JSON object.
+        DO NOT return Python code.
+        DO NOT explain your reasoning outside the JSON.
 
         {{
-            "rating": "BUY | SELL | HOLD | STRONG BUY | STRONG SELL",
-            "timeframe": "INTRADAY | SWING | MID_TERM | LONG_TERM",
+            "rating": "STRONG BUY|BUY|HOLD|SELL|STRONG SELL",
+            "timeframe": "INTRADAY|SWING|POSITION|LONG_TERM",
             "conviction": 0 to 100,
-            "thesis": "Complete professional summary of why this decision was made.",
-            "entry": numeric_entry_price,
-            "target": numeric_price_target,
-            "stop_loss": numeric_stop_loss,
+            "thesis": "Professional executive summary.",
+            "entry": {current_price},
+            "target": numeric_price or null,
+            "stop_loss": numeric_price or null,
             "risk_reward": "e.g. 1:2.5",
-            "key_catalysts": ["catalyst 1", "catalyst 2"],
-            "key_risks": ["risk 1", "risk 2"],
-            "invalidation_point": "specific price or event"
+            "key_catalysts": ["catalyst"],
+            "key_risks": ["risk"],
+            "invalidation_point": "price level"
         }}
         """
-        response = self.llm.invoke(prompt)
-        state['consensus'] = response.content
+        retries = 0
+        while retries < 2:
+            try:
+                response = self.llm.invoke(prompt)
+                content = response.content
+
+                # Verify it looks like JSON
+                import re
+                start = content.find('{')
+                end = content.rfind('}')
+                if start != -1 and end != -1:
+                    state['consensus'] = content[start:end+1]
+                    return state
+
+                retries += 1
+            except Exception as e:
+                if "429" in str(e) and retries == 0:
+                    self.use_fallback(); retries += 1; continue
+                else:
+                    state['consensus'] = '{"rating": "HOLD", "thesis": "Institutional analysis engine is currently handling high volume."}'
+                    return state
         return state
