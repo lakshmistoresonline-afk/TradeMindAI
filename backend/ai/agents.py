@@ -139,7 +139,10 @@ class ContextAgent(BaseAgent):
 class ConsensusAgent(BaseAgent):
     def __init__(self): super().__init__("ConsensusLead")
     def analyze(self, state: AgentState):
-        current_price = state.get('technical_data', {}).get('indicators', {}).get('last_price', 'Unknown')
+        # Resilient price detection
+        indicators = state.get('technical_data', {}).get('indicators', {})
+        current_price = indicators.get('last_price') or indicators.get('Close') or state.get('last_price', 'Unknown')
+
         prompt = f"""
         Final synthesis for {state['symbol']}. CURRENT PRICE: {current_price}
         Analyst Reports: {state['recommendations']}

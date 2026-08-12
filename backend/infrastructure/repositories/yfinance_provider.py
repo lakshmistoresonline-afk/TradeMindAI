@@ -161,6 +161,17 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
     async def get_option_chain(self, symbol: str, expiry: Optional[datetime] = None) -> OptionsChain:
         from backend.domain.models.data_platform import OptionsChain
         ticker = yf.Ticker(f"{symbol}.NS")
+
+        if not ticker.options:
+            # Return a valid empty chain if no options exist (e.g. for non-F&O stocks)
+            return OptionsChain(
+                symbol=symbol,
+                expiry=expiry or datetime.datetime.utcnow(),
+                underlying_price=ticker.fast_info.last_price,
+                pcr=1.0, max_pain=0.0, total_oi=0, iv_atm=0.0, greeks_aggregate={},
+                last_updated=datetime.datetime.utcnow()
+            )
+
         exp_str = expiry.strftime("%Y-%m-%d") if expiry else ticker.options[0]
         chain = ticker.option_chain(exp_str)
 

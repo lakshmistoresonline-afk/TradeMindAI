@@ -57,8 +57,23 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   };
 
   const entry = parseNum(structured.entry) || stock.last_price;
-  const target = parseNum(structured.target);
-  const stopLoss = parseNum(structured.stop_loss);
+  let target = parseNum(structured.target);
+  let stopLoss = parseNum(structured.stop_loss);
+
+  // 6.1 Heuristic Fallback for Missing Targets/Stops (Vision 2.2 Alignment)
+  if (!target && rating.includes('BUY') && entry) {
+    const multiplier = rating.includes('STRONG') ? 1.15 : 1.08;
+    target = entry * multiplier;
+  } else if (!target && rating.includes('SELL') && entry) {
+    const multiplier = rating.includes('STRONG') ? 0.85 : 0.92;
+    target = entry * multiplier;
+  }
+
+  if (!stopLoss && rating.includes('BUY') && entry) {
+    stopLoss = entry * 0.95;
+  } else if (!stopLoss && rating.includes('SELL') && entry) {
+    stopLoss = entry * 1.05;
+  }
 
   // 7. Drivers (Explainability)
   let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];

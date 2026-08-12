@@ -6,18 +6,36 @@ import { useNavigate } from 'react-router-dom';
 export default function ResearchHub() {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<any[]>([]);
+  const [filterTag, setFilterTag] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
      // Fetch from backend
      import('../api/client').then(c => c.getTradeJournal().then(() => {
         // Map trades or other logic to show notes
-        setNotes([
-          { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily.', tags: ['SMC', 'BULLISH'], date: 'Aug 04' },
-          { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800.', tags: ['FUNDAMENTAL'], date: 'Jul 28' },
-          { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter.', tags: ['INSTITUTIONAL'], date: 'Jul 25' },
-        ].map(n => ({...n, isSample: true})));
+        const initialNotes = [
+          { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily.', tags: ['SMC', 'BULLISH'], date: 'Aug 04', category: 'Market Structure Analysis' },
+          { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800.', tags: ['FUNDAMENTAL'], date: 'Jul 28', category: 'Fundamental Audits' },
+          { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter.', tags: ['INSTITUTIONAL'], date: 'Jul 25', category: 'Institutional Flow Reports' },
+          { symbol: 'HDFCBANK', content: 'Volatility expansion expected following bank results.', tags: ['TECHNICAL'], date: 'Aug 10', category: 'Quant Performance Reports' },
+        ];
+        setNotes(initialNotes.map(n => ({...n, isSample: true})));
      }));
   }, []);
+
+  const filteredNotes = notes.filter(n => {
+     const matchesTag = !filterTag || n.tags.includes(filterTag) || n.category === filterTag;
+     const matchesSearch = n.symbol.toLowerCase().includes(search.toLowerCase()) || n.content.toLowerCase().includes(search.toLowerCase());
+     return matchesTag && matchesSearch;
+  });
+
+  const tags = ['SMC', 'FUNDAMENTAL', 'TECHNICAL', 'INSTITUTIONAL'];
+  const categories = [
+    'Market Structure Analysis',
+    'Fundamental Audits',
+    'Quant Performance Reports',
+    'Institutional Flow Reports'
+  ];
 
   return (
     <Box>
@@ -34,20 +52,33 @@ export default function ResearchHub() {
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ fontWeight: 800 }}>FILTER BY TAG</Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
-               <Chip label="SMC" clickable variant="filled" color="primary" sx={{ fontWeight: 800 }} />
-               <Chip label="FUNDAMENTAL" clickable variant="outlined" sx={{ fontWeight: 800 }} />
-               <Chip label="TECHNICAL" clickable variant="outlined" sx={{ fontWeight: 800 }} />
-               <Chip label="INSTITUTIONAL" clickable variant="outlined" sx={{ fontWeight: 800 }} />
+               {tags.map(tag => (
+                 <Chip
+                   key={tag}
+                   label={tag}
+                   clickable
+                   variant={filterTag === tag ? "filled" : "outlined"}
+                   color={filterTag === tag ? "primary" : "default"}
+                   onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+                   sx={{ fontWeight: 800 }}
+                 />
+               ))}
             </Stack>
           </Paper>
 
           <Paper sx={{ p: 3 }}>
              <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ fontWeight: 800 }}>RESEARCH CATEGORIES</Typography>
              <List dense>
-                <ListItemButton sx={{ borderRadius: 1 }}><ListItemText primary="Market Structure Analysis" primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }} /></ListItemButton>
-                <ListItemButton sx={{ borderRadius: 1 }}><ListItemText primary="Fundamental Audits" primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }} /></ListItemButton>
-                <ListItemButton sx={{ borderRadius: 1 }}><ListItemText primary="Quant Performance Reports" primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }} /></ListItemButton>
-                <ListItemButton sx={{ borderRadius: 1 }}><ListItemText primary="Institutional Flow Reports" primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }} /></ListItemButton>
+                {categories.map(cat => (
+                  <ListItemButton
+                    key={cat}
+                    selected={filterTag === cat}
+                    onClick={() => setFilterTag(filterTag === cat ? null : cat)}
+                    sx={{ borderRadius: 1 }}
+                  >
+                    <ListItemText primary={cat} primaryTypographyProps={{ fontWeight: 600, fontSize: '0.85rem' }} />
+                  </ListItemButton>
+                ))}
              </List>
           </Paper>
         </Grid>
@@ -59,11 +90,13 @@ export default function ResearchHub() {
                  <TextField
                   size="small"
                   placeholder="Search hub..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   InputProps={{ startAdornment: <InputAdornment position="start"><Search size={16} /></InputAdornment> }}
                  />
               </Box>
               <List>
-                 {notes.map((n, i) => (
+                 {filteredNotes.length > 0 ? filteredNotes.map((n, i) => (
                    <Box key={i}>
                      <ListItemButton sx={{ display: 'block', p: 3 }} onClick={() => navigate('/analysis', { state: { symbol: n.symbol } })}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
@@ -81,7 +114,12 @@ export default function ResearchHub() {
                      </ListItemButton>
                      <Divider sx={{ opacity: 0.05 }} />
                    </Box>
-                 ))}
+                 )) : (
+                   <Box sx={{ p: 10, textAlign: 'center', opacity: 0.5 }}>
+                      <BookOpen size={48} style={{ margin: '0 auto 16px' }} />
+                      <Typography variant="h6">No research matches your filters</Typography>
+                   </Box>
+                 )}
               </List>
            </Paper>
         </Grid>

@@ -39,6 +39,21 @@ class StockService:
 
         # 3. Map to Domain & Persist
         stock = Stock(symbol=symbol, **info)
+
+        # Vision 2.2: Deep Options Intelligence
+        try:
+            opt_chain = await self.provider.get_option_chain(symbol)
+            if opt_chain:
+                print(f"DEBUG: Found options for {symbol}")
+                stock.options_data = opt_chain.model_dump()
+                stock.options_data['available'] = True
+            else:
+                print(f"DEBUG: No options returned for {symbol}")
+        except Exception:
+            import traceback
+            print(f"DEBUG: Options fetch error for {symbol}:")
+            traceback.print_exc()
+
         await self.repository.save_stock(stock)
 
         # 4. Sync Earnings (Vision 2.0)
