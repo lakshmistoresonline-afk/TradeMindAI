@@ -183,6 +183,29 @@ async def get_live_signals_audit(limit: int = 100):
         print(f"Error fetching live signals: {e}")
         return []
 
+@router.get("/deals", response_model=List[Dict[str, Any]])
+async def get_bulk_deals(symbol: Optional[str] = None):
+    """
+    Vision 2.2: Institutional Bulk Deal Feed.
+    Returns latest heavy-weight transactions for the specified symbol or entire universe.
+    """
+    from backend.core.postgres import SessionLocal, BulkDealDB
+    with SessionLocal() as session:
+        query = session.query(BulkDealDB)
+        if symbol:
+            query = query.filter(BulkDealDB.symbol == symbol)
+
+        deals = query.order_by(BulkDealDB.date.desc()).limit(50).all()
+        return [{
+            "symbol": d.symbol,
+            "client_name": d.client_name,
+            "deal_type": d.deal_type,
+            "quantity": d.quantity,
+            "price": d.price,
+            "value_cr": d.value_cr,
+            "date": d.date.isoformat()
+        } for d in deals]
+
 @router.get("/calendar")
 async def get_economic_calendar():
     return [

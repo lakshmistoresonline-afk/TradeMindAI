@@ -46,6 +46,12 @@ export default function StockIntelligence() {
   const [loadingBacktest, setLoadingBacktest] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
+  useEffect(() => {
+    if (selectedStock) {
+      // Logic for any global page state needed when stock changes
+    }
+  }, [selectedStock]);
+
   const fromPortfolio = location.state?.fromPortfolio || false;
 
   const generateReport = () => {

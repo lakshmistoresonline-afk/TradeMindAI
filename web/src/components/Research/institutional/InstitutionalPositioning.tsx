@@ -1,19 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Grid, Stack, Divider, CircularProgress } from '@mui/material';
-import { Landmark, ArrowUpRight } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Stack, Divider, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from '@mui/material';
+import { Landmark, ArrowUpRight, Users } from 'lucide-react';
 import ReactECharts from 'echarts-for-react';
-import { getInstitutionalFlow } from '../../../api/client';
+import { getInstitutionalFlow, getBulkDeals } from '../../../api/client';
 
 export default function InstitutionalPositioning({ stock }: { stock?: any }) {
   const [flow, setFlow] = useState<any>(null);
+  const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getInstitutionalFlow()
-      .then(setFlow)
-      .catch(err => console.error("Flow Error:", err))
-      .finally(() => setLoading(false));
-  }, []);
+    Promise.all([
+      getInstitutionalFlow(),
+      getBulkDeals(stock?.symbol)
+    ]).then(([flowData, dealsData]) => {
+      setFlow(flowData);
+      setDeals(dealsData);
+    })
+    .catch(err => console.error("Flow Error:", err))
+    .finally(() => setLoading(false));
+  }, [stock?.symbol]);
 
   if (loading) return <CircularProgress size={20} />;
 
@@ -78,6 +84,51 @@ export default function InstitutionalPositioning({ stock }: { stock?: any }) {
           </Paper>
         </Grid>
       </Grid>
+
+      <Paper sx={{ p: 0, mt: 3, overflow: 'hidden', border: '1px solid #1e293b' }}>
+         <Box sx={{ p: 2, borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Users size={18} className="text-blue-500" />
+            <Typography variant="subtitle2" fontWeight={800}>RECENT INSTITUTIONAL BULK & BLOCK DEALS</Typography>
+         </Box>
+         <TableContainer sx={{ maxHeight: 250 }}>
+            <Table size="small" stickyHeader>
+               <TableHead>
+                  <TableRow>
+                     <TableCell sx={{ bgcolor: '#0f172a' }}>DATE</TableCell>
+                     <TableCell sx={{ bgcolor: '#0f172a' }}>CLIENT / INSTITUTION</TableCell>
+                     <TableCell align="center" sx={{ bgcolor: '#0f172a' }}>TYPE</TableCell>
+                     <TableCell align="right" sx={{ bgcolor: '#0f172a' }}>QUANTITY</TableCell>
+                     <TableCell align="right" sx={{ bgcolor: '#0f172a' }}>VALUE (CR)</TableCell>
+                  </TableRow>
+               </TableHead>
+               <TableBody>
+                  {deals.length > 0 ? deals.map((d, i) => (
+                     <TableRow key={i} hover>
+                        <TableCell sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>{new Date(d.date).toLocaleDateString()}</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.8rem' }}>{d.client_name}</TableCell>
+                        <TableCell align="center">
+                           <Chip
+                              label={d.deal_type}
+                              size="small"
+                              variant="outlined"
+                              color={d.deal_type === 'BUY' ? 'primary' : 'error'}
+                              sx={{ fontWeight: 900, height: 16, fontSize: '0.55rem' }}
+                           />
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{d.quantity.toLocaleString()}</TableCell>
+                        <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, fontSize: '0.75rem' }}>₹{d.value_cr} Cr</TableCell>
+                     </TableRow>
+                  )) : (
+                     <TableRow>
+                        <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                           <Typography variant="caption" color="textSecondary">No bulk deal records found for this symbol.</Typography>
+                        </TableCell>
+                     </TableRow>
+                  )}
+               </TableBody>
+            </Table>
+         </TableContainer>
+      </Paper>
     </Box>
   );
 }

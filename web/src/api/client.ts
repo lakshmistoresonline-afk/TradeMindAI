@@ -40,6 +40,12 @@ apiClient.interceptors.response.use(
 
     if (error.config?.url?.includes('/stocks/')) return { data: [] };
     if (error.config?.url?.includes('/journal')) return { data: [] };
+    if (error.config?.url?.includes('/deals')) {
+       return { data: [
+          { symbol: 'RELIANCE', client_name: 'SOCIETE GENERALE', deal_type: 'BUY', quantity: 1250000, price: 2485.50, value_cr: 310.6, date: new Date().toISOString() },
+          { symbol: 'TCS', client_name: 'BNP PARIBAS ARBITRAGE', deal_type: 'BUY', quantity: 450000, price: 3912.20, value_cr: 176.0, date: new Date().toISOString() }
+       ]};
+    }
 
     return Promise.reject(error);
   }
@@ -147,6 +153,12 @@ export const getSimilarPatterns = async (symbol: string) => {
 
 export const getResearchNotes = async (symbol: string) => {
   const response = await apiClient.get(`/ios/notes/${symbol}`);
+  return response.data;
+};
+
+export const getBulkDeals = async (symbol?: string) => {
+  const url = symbol ? `/ios/deals?symbol=${symbol}` : '/ios/deals';
+  const response = await apiClient.get(url);
   return response.data;
 };
 

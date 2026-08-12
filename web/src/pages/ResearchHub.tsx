@@ -5,22 +5,31 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ResearchHub() {
   const navigate = useNavigate();
-  const [notes, setNotes] = useState<any[]>([]);
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
+  // Institutional Intelligence Feed - Seeded for immediate population
+  const [notes, setNotes] = useState<any[]>([
+    { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily. BOS detected at 2450.', tags: ['SMC', 'BULLISH'], date: 'Aug 12', category: 'Market Structure Analysis' },
+    { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800. Institutional holding stable.', tags: ['FUNDAMENTAL'], date: 'Aug 12', category: 'Fundamental Audits' },
+    { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter. High precision FVG at 1520.', tags: ['INSTITUTIONAL'], date: 'Aug 11', category: 'Institutional Flow Reports' },
+    { symbol: 'HDFCBANK', content: 'Volatility expansion expected following bank results. EMA 20/50 cross confirmed.', tags: ['TECHNICAL'], date: 'Aug 10', category: 'Quant Performance Reports' },
+  ].map(n => ({...n, isSample: true})));
+
   useEffect(() => {
-     // Fetch from backend
-     import('../api/client').then(c => c.getTradeJournal().then(() => {
-        // Map trades or other logic to show notes
-        const initialNotes = [
-          { symbol: 'RELIANCE', content: 'Bullish SMC breakout confirmed on daily.', tags: ['SMC', 'BULLISH'], date: 'Aug 04', category: 'Market Structure Analysis' },
-          { symbol: 'TCS', content: 'PE 32x is slightly high, wait for correction to 3800.', tags: ['FUNDAMENTAL'], date: 'Jul 28', category: 'Fundamental Audits' },
-          { symbol: 'INFY', content: 'Institutional accumulation detected in last quarter.', tags: ['INSTITUTIONAL'], date: 'Jul 25', category: 'Institutional Flow Reports' },
-          { symbol: 'HDFCBANK', content: 'Volatility expansion expected following bank results.', tags: ['TECHNICAL'], date: 'Aug 10', category: 'Quant Performance Reports' },
-        ];
-        setNotes(initialNotes.map(n => ({...n, isSample: true})));
-     }));
+     // Enrich with live trade journal notes if available
+     import('../api/client').then(c => c.getTradeJournal().then(trades => {
+        if (Array.isArray(trades) && trades.length > 0) {
+           const liveNotes = trades.map((t: any) => ({
+              symbol: t.symbol,
+              content: t.feedback || 'Trade session notes synced.',
+              tags: t.lessons || ['JOURNAL'],
+              date: new Date(t.entry_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+              category: 'Trading Memory'
+           }));
+           setNotes(prev => [...liveNotes, ...prev]);
+        }
+     }).catch(() => {}));
   }, []);
 
   const filteredNotes = notes.filter(n => {
@@ -86,7 +95,7 @@ export default function ResearchHub() {
         <Grid item xs={12} md={9}>
            <Paper sx={{ p: 0, overflow: 'hidden' }}>
               <Box sx={{ p: 2, borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                 <Typography variant="h6" fontWeight={800}>Centralized Research Feed</Typography>
+                 <Typography variant="h6" fontWeight={800}>Terminal Intelligence Feed</Typography>
                  <TextField
                   size="small"
                   placeholder="Search hub..."

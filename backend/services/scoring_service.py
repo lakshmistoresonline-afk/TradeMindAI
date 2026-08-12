@@ -29,8 +29,21 @@ class ScoringService:
         # 3. ML Bias
         ml_score = ml_prediction.get("confidence", 0) if ml_prediction.get("prediction") == "UP" else (100 - ml_prediction.get("confidence", 0)) if ml_prediction.get("prediction") == "DOWN" else 50
 
-        # 4. Institutional Bias (RC-2: Derived from feature store)
+        # 4. Institutional Bias (RC-2: Derived from feature store + Bulk Deals)
         inst_score = 50 + (features.get("fii_net_bias", 0) * 50)
+
+        # Check for heavy buying in bulk deals
+        from backend.core.postgres import SessionLocal, BulkDealDB
+        from datetime import datetime, timedelta
+        with SessionLocal() as session:
+            recent_buys = session.query(BulkDealDB).filter(
+                BulkDealDB.symbol == analysis.get('symbol'),
+                BulkDealDB.deal_type == 'BUY',
+                BulkDealDB.date >= datetime.utcnow() - timedelta(days=7)
+            ).count()
+            if recent_buys > 0:
+                inst_score += 15 # Heavy boost for verified institutional entry
+                print(f"   [Institutional Boost] Found {recent_buys} recent bulk buys for {analysis.get('symbol')}")
 
         # Aggregate
         total_score = (

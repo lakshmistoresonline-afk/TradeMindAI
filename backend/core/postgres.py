@@ -205,6 +205,18 @@ class TradeJournalDB(Base):
     mistakes = Column(JSON)
     lessons = Column(JSON)
 
+class BulkDealDB(Base):
+    __tablename__ = "bulk_deals"
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String, index=True)
+    date = Column(DateTime, index=True)
+    client_name = Column(String)
+    deal_type = Column(String) # BUY / SELL
+    quantity = Column(BigInteger)
+    price = Column(Float)
+    value_cr = Column(Float)
+    source = Column(String, default="NSE")
+
 class InstrumentDB(Base):
     __tablename__ = "instruments"
     id = Column(String, primary_key=True)
