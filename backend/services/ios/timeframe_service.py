@@ -8,23 +8,26 @@ class MultiTimeframeService:
 
     async def analyze_alignment(self, symbol: str) -> Dict[str, Any]:
         """
-        Vision 2.0: Optimized Multi-Timeframe Bias Alignment.
-        Uses tail data to stay under 512MB RAM.
+        Vision 2.2: Deep Multi-Timeframe Alignment Matrix.
+        Calculates fractal bias from 15m to 1W.
         """
-        # 1. Fetch data with optimized periods
-        # We only need enough history for SMA (50) and RSI (14)
-        df_1h = await self.provider.fetch_history(symbol, period="1mo")
-        df_1d = await self.provider.fetch_history(symbol, period="1y") # Reduced from 2y
-        df_1w = await self.provider.fetch_history(symbol, period="2y") # Reduced from 5y
+        # 1. Fetch data for all fractal layers
+        df_15m = await self.provider.fetch_history(symbol, period="5d", interval="15m")
+        df_1h = await self.provider.fetch_history(symbol, period="1mo", interval="1h")
+        df_4h = await self.provider.fetch_history(symbol, period="3mo", interval="1h") # 1h is proxy if 4h not supported
+        df_1d = await self.provider.fetch_history(symbol, period="1y", interval="1D")
+        df_1w = await self.provider.fetch_history(symbol, period="2y", interval="1W")
 
         results = {
+            "15M": self._get_bias(df_15m, window=20),
             "1H": self._get_bias(df_1h, window=20),
+            "4H": self._get_bias(df_4h, window=50),
             "1D": self._get_bias(df_1d, window=50),
             "1W": self._get_bias(df_1w, window=20)
         }
 
         # Memory Cleanup
-        del df_1h, df_1d, df_1w
+        del df_15m, df_1h, df_4h, df_1d, df_1w
         gc.collect()
 
         # 2. Alignment Logic

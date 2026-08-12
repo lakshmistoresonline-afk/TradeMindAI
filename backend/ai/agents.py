@@ -16,6 +16,7 @@ class AgentResponse(BaseModel):
 
 class AgentState(TypedDict):
     symbol: str
+    regime: str # BULLISH, BEARISH, VOLATILE, SIDEWAYS
     technical_data: dict
     fundamental_data: dict
     news_sentiment: dict
@@ -142,10 +143,18 @@ class ConsensusAgent(BaseAgent):
         # Resilient price detection
         indicators = state.get('technical_data', {}).get('indicators', {})
         current_price = indicators.get('last_price') or indicators.get('Close') or state.get('last_price', 'Unknown')
+        regime = state.get('regime', 'NEUTRAL')
 
         prompt = f"""
         Final synthesis for {state['symbol']}. CURRENT PRICE: {current_price}
+        CURRENT MARKET REGIME: {regime}
+
         Analyst Reports: {state['recommendations']}
+
+        INSTRUCTION FOR {regime} REGIME:
+        - If BULLISH: Prioritize growth targets and trend following.
+        - If VOLATILE: Prioritize capital preservation (tight stops, conservative targets).
+        - If SIDEWAYS: Focus on reversal zones and mean reversion.
 
         Return ONLY a clean JSON object.
         DO NOT return Python code.

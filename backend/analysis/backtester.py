@@ -11,7 +11,10 @@ class BacktestEngine:
         self.workflow = create_ai_workflow()
 
     def run_10y_backtest(self, symbol: str, period: str = "10y"):
-        # 1. Load full history
+        """
+        Vision 2.2: Audited Historical Signaling.
+        Uses institutional logic to verify AI setup accuracy.
+        """
         import yfinance as yf
         ticker = yf.Ticker(f"{symbol}.NS")
         df = ticker.history(period=period)
@@ -19,36 +22,35 @@ class BacktestEngine:
         if df.empty or len(df) < 50:
             return {"error": f"Not enough data for {period} backtest"}
 
+        # 1. Fast Vectorized Filtering (Institutional Tier)
+        # Identifies "Golden Zones" before invoking expensive AI Consensus
+        from backend.analysis.technical import TechnicalAnalysis
+        df_ta = TechnicalAnalysis.calculate_indicators(df.copy())
+
+        golden_zones = []
+        for i in range(50, len(df_ta) - 30):
+            row = df_ta.iloc[i]
+            # Fast Condition: EMA Golden Cross + RSI < 60
+            if row.get("EMA_20", 0) > row.get("EMA_50", 0) and row.get("RSI", 50) < 60:
+                golden_zones.append(i)
+
+        # Limit to top 15 zones to manage cost/time
+        if len(golden_zones) > 15:
+            import numpy as np
+            indices = np.linspace(0, len(golden_zones) - 1, 15).astype(int)
+            golden_zones = [golden_zones[idx] for idx in indices]
+
         results = []
         total_signals = 0
         success_signals = 0
 
-        # 2. Step through in 3-day increments for maximum signal density in showcase
-        step = 3
-        for i in range(50, len(df) - 30, step):
-            # "Time Travel": AI only sees data up to current point i
+        # 2. Forensic AI Audit on Golden Zones
+        for i in golden_zones:
             current_df = df.iloc[:i+1]
             current_date = current_df.index[-1]
 
-            # Detect Patterns
-            smc_obs = SMCAnalysis.detect_order_blocks(current_df)
-            smc_fvgs = SMCAnalysis.detect_fvg(current_df)
-
             # Run TA for pattern detection
-            ta_indicators = TechnicalAnalysis.calculate_indicators(current_df).iloc[-1].to_dict()
-
-            # Pattern 1: Moving Average alignment
-            ema20 = ta_indicators.get("EMA_20", 0)
-            ema50 = ta_indicators.get("EMA_50", 0)
-
-            # Pattern 2: RSI not overbought
-            rsi = ta_indicators.get("RSI", 50)
-
-            # Always analyze if we have basic data to ensure showcase population
-            has_pattern = ema20 > 0 and ema50 > 0 and rsi > 0
-
-            if not has_pattern:
-                continue
+            ta_indicators = df_ta.iloc[i].to_dict()
 
             initial_state = {
                 "symbol": symbol,

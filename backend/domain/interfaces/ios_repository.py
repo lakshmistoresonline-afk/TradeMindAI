@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback, LiveSignal
 
 class IIOSRepository(ABC):
@@ -41,6 +42,10 @@ class IIOSRepository(ABC):
 
     @abstractmethod
     async def get_active_live_signals(self) -> List[LiveSignal]:
+        pass
+
+    @abstractmethod
+    async def get_all_live_signals(self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None) -> List[LiveSignal]:
         pass
 
     @abstractmethod

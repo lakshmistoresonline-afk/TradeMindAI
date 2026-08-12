@@ -161,8 +161,14 @@ async def _analyze_stock_ai_logic(symbol: str):
         workflow = create_ai_workflow()
         mtf_results = await container.timeframe_service.analyze_alignment(symbol)
 
+        # Detect current regime
+        from backend.core.container import container
+        regime_obj = await container.ios_repo.get_latest_regime()
+        regime_label = regime_obj.regime if regime_obj else "NEUTRAL"
+
         initial_state = {
             "symbol": symbol,
+            "regime": regime_label,
             "technical_data": {
                 "indicators": ai_features,
                 "smc": stock.analysis.get("technical_data", {}).get("smc") if stock.analysis else {},

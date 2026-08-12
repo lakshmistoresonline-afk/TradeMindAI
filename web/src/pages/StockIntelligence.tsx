@@ -14,6 +14,7 @@ import DecisionHistory from '../components/Research/decision/DecisionHistory';
 
 import TechnicalAnalysis from '../components/Research/market/TechnicalAnalysis';
 import MarketStructure from '../components/Research/market/MarketStructure';
+import MTFAlignmentMatrix from '../components/Research/market/MTFAlignmentMatrix';
 import CorrelationAndHedging from '../components/Research/market/CorrelationAndHedging';
 
 import FundamentalAnalysis from '../components/Research/fundamentals/FundamentalAnalysis';
@@ -221,6 +222,7 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
                {activeTab === 1 && (
                  <Box>
                     <TechnicalAnalysis data={selectedStock.analysis?.technical_data} />
+                    <MTFAlignmentMatrix symbol={selectedStock.symbol} />
                     <MarketStructure smc={selectedStock.analysis?.technical_data?.smc} />
                     <InstitutionalPositioning stock={selectedStock} />
                     <OptionsIntelligence stock={selectedStock} />

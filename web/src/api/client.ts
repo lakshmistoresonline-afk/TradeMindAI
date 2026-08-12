@@ -116,6 +116,11 @@ export const getCalibrationData = async () => {
   return response.data;
 };
 
+export const getCorrelations = async (symbol: string) => {
+  const response = await apiClient.get(`/analysis/correlation/${symbol}`);
+  return response.data;
+};
+
 export const getMarketRegime = async () => {
   const response = await apiClient.get('/ios/regime');
   return response.data;
@@ -207,6 +212,11 @@ export const getPortfolioHealth = async () => {
   return response.data;
 };
 
+export const getPortfolioHedge = async () => {
+  const response = await apiClient.get('/ios/portfolio/hedge');
+  return response.data;
+};
+
 export const getAPIKeys = async () => {
   const response = await apiClient.get('/ios/api-keys');
   return response.data;
@@ -229,6 +239,33 @@ export const chatWithAssistant = async (message: string) => {
 
 export const getLiveSignalsAudit = async () => {
   const response = await apiClient.get('/ios/signals/live');
+  return response.data;
+};
+
+export const getPerformanceSummary = async (startDate?: string, endDate?: string, timeframe?: string) => {
+  let url = '/analysis/performance/summary';
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  if (timeframe) params.append('timeframe', timeframe);
+
+  if (params.toString()) url += `?${params.toString()}`;
+
+  const response = await apiClient.get(url);
+  return response.data;
+};
+
+export const getPerformanceSignals = async (startDate?: string, endDate?: string, timeframe?: string, dataset?: string) => {
+  let url = '/analysis/performance/signals';
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  if (timeframe) params.append('timeframe', timeframe);
+  if (dataset) params.append('dataset', dataset);
+
+  if (params.toString()) url += `?${params.toString()}`;
+
+  const response = await apiClient.get(url);
   return response.data;
 };
 

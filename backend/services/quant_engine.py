@@ -62,3 +62,32 @@ class QuantEngine:
             alpha=float(alpha),
             volatility=float(vol)
         )
+
+    @staticmethod
+    def calculate_correlations(symbol: str, df: Any, benchmarks: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Vision 2.2: Calculates Pearson correlation coefficients against macro benchmarks.
+        """
+        if df is None or len(df) < 30: return []
+
+        import pandas as pd
+        import numpy as np
+
+        results = []
+        s_returns = df["Close"].pct_change().dropna()
+
+        for name, b_df in benchmarks.items():
+            if b_df is None or b_df.empty: continue
+
+            b_returns = b_df["Close"].pct_change().dropna()
+            # Align
+            common = s_returns.index.intersection(b_returns.index)
+            if len(common) > 20:
+                corr = np.corrcoef(s_returns.loc[common], b_returns.loc[common])[0][1]
+                results.append({
+                    "target": name,
+                    "value": float(corr),
+                    "type": "MARKET" if "Nifty" in name else "SECTOR" if "Sector" in name else "CURRENCY"
+                })
+
+        return results

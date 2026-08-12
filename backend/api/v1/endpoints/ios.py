@@ -157,6 +157,15 @@ async def get_portfolio_optimizations(current_user: dict = Depends(get_current_u
     # 2. Optimize
     return PortfolioEngine.optimize_weights(stocks)
 
+@router.get("/portfolio/hedge")
+async def get_portfolio_hedging(current_user: dict = Depends(get_current_user)):
+    """
+    Vision 2.2: Delta-Neutral Hedging Advisor.
+    """
+    from backend.services.portfolio_engine import PortfolioEngine
+    stocks = await container.repository.get_all_stocks(limit=5)
+    return PortfolioEngine.calculate_hedging_strategy(stocks)
+
 @router.post("/journal")
 async def add_trade_to_journal(trade_data: Dict[str, Any], current_user: dict = Depends(get_current_user)):
     try:

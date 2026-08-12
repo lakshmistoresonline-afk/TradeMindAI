@@ -366,6 +366,16 @@ class HybridIOSRepository(IIOSRepository):
             res = pg.query(LiveSignalDB).filter(LiveSignalDB.status == "ACTIVE").all()
             return [LiveSignal(**{c.name: getattr(r, c.name) for c in r.__table__.columns}) for r in res]
 
+    async def get_all_live_signals(self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None) -> List[LiveSignal]:
+        with self.session_factory() as pg:
+            query = pg.query(LiveSignalDB)
+            if start_date:
+                query = query.filter(LiveSignalDB.timestamp >= start_date)
+            if end_date:
+                query = query.filter(LiveSignalDB.timestamp <= end_date)
+            res = query.order_by(LiveSignalDB.timestamp.desc()).all()
+            return [LiveSignal(**{c.name: getattr(r, c.name) for c in r.__table__.columns}) for r in res]
+
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         from backend.core.postgres import IntelReportDB
         with self.session_factory() as pg:

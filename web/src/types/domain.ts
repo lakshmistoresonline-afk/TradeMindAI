@@ -15,7 +15,9 @@ export interface AITradeDecision {
   entryHigh?: number;
   entry?: number;
   target?: number;
+  targetRange?: [number, number];
   stopLoss?: number;
+  stopRange?: [number, number];
   riskReward?: string;
 
   primaryCatalyst?: string;
