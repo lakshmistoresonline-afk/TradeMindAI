@@ -52,6 +52,10 @@ class BacktestEngine:
             # Run TA for pattern detection
             ta_indicators = df_ta.iloc[i].to_dict()
 
+            # Detect Patterns for AI Context
+            smc_obs = SMCAnalysis.detect_order_blocks(current_df)
+            smc_fvgs = SMCAnalysis.detect_fvg(current_df)
+
             initial_state = {
                 "symbol": symbol,
                 "technical_data": {

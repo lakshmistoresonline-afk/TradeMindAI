@@ -49,11 +49,13 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                         combineSummaries(summary?.live_signals, summary?.backtest_signals);
 
   function combineSummaries(live: any, bt: any) {
-     if (!live || !bt) return live || bt;
-     const total = live.total + bt.total;
-     const resolved = live.resolved + bt.resolved;
-     const win_rate = ((live.win_rate * live.resolved) + (bt.win_rate * bt.resolved)) / (resolved || 1);
-     const avg_profit = ((live.avg_profit * live.resolved) + (bt.avg_profit * bt.resolved)) / (resolved || 1);
+     if (!live && !bt) return { total: 0, resolved: 0, win_rate: 0, avg_profit: 0, sample_size: 0 };
+     if (!live) return bt;
+     if (!bt) return live;
+     const total = (live.total || 0) + (bt.total || 0);
+     const resolved = (live.resolved || 0) + (bt.resolved || 0);
+     const win_rate = (((live.win_rate || 0) * (live.resolved || 0)) + ((bt.win_rate || 0) * (bt.resolved || 0))) / (resolved || 1);
+     const avg_profit = (((live.avg_profit || 0) * (live.resolved || 0)) + ((bt.avg_profit || 0) * (bt.resolved || 0))) / (resolved || 1);
      return { total, resolved, win_rate, avg_profit, sample_size: total };
   }
 
@@ -88,14 +90,14 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
     <Box>
       {!isConsolidated && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5, flexWrap: 'wrap', gap: 2 }}>
-           <Box>
+             <Box>
               <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1 }}>Historical Performance</Typography>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
                  <Calendar size={14} className="text-emerald-500" />
                  <Typography variant="caption" color="primary" sx={{ fontWeight: 900, letterSpacing: 1 }}>
-                    {new Date(summary?.range.start).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {summary?.range.start ? new Date(summary.range.start).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '---'}
                     {' — '}
-                    {new Date(summary?.range.end).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {summary?.range.end ? new Date(summary.range.end).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '---'}
                  </Typography>
                  <Chip
                     label={summary?.range.is_complete_history ? "ALL AVAILABLE HISTORY" : "FILTERED RANGE"}
@@ -177,16 +179,16 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
       {/* 3. Performance Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
          <Grid item xs={12} md={3}>
-            <StatCard label="TOTAL SIGNALS" value={activeSummary?.total} subValue={`n = ${activeSummary?.sample_size}`} icon={<History size={20} />} color="#3b82f6" />
+            <StatCard label="TOTAL SIGNALS" value={activeSummary?.total ?? '---'} subValue={`n = ${activeSummary?.sample_size ?? 0}`} icon={<History size={20} />} color="#3b82f6" />
          </Grid>
          <Grid item xs={12} md={3}>
-            <StatCard label="WIN RATE (RESOLVED)" value={`${activeSummary?.win_rate}%`} subValue={`${activeSummary?.resolved} resolved setups`} icon={<ShieldCheck size={20} />} color="#10b981" />
+            <StatCard label="WIN RATE (RESOLVED)" value={activeSummary?.win_rate !== undefined ? `${activeSummary.win_rate}%` : '---'} subValue={`${activeSummary?.resolved ?? 0} resolved setups`} icon={<ShieldCheck size={20} />} color="#10b981" />
          </Grid>
          <Grid item xs={12} md={3}>
-            <StatCard label="AVERAGE RETURN" value={`${activeSummary?.avg_profit > 0 ? '+' : ''}${activeSummary?.avg_profit}%`} subValue="Per resolved trade" icon={<TrendingUp size={20} />} color="#fbbf24" />
+            <StatCard label="AVERAGE RETURN" value={activeSummary?.avg_profit !== undefined ? `${activeSummary.avg_profit > 0 ? '+' : ''}${activeSummary.avg_profit}%` : '---'} subValue="Per resolved trade" icon={<TrendingUp size={20} />} color="#fbbf24" />
          </Grid>
          <Grid item xs={12} md={3}>
-            <StatCard label="PROFIT FACTOR" value={(activeSummary?.win_rate / (100 - activeSummary?.win_rate)).toFixed(2)} subValue="Model Efficiency" icon={<Target size={20} />} color="#8b5cf6" />
+            <StatCard label="PROFIT FACTOR" value={activeSummary?.win_rate !== undefined && activeSummary.win_rate < 100 ? (activeSummary.win_rate / (100 - activeSummary.win_rate)).toFixed(2) : '---'} subValue="Model Efficiency" icon={<Target size={20} />} color="#8b5cf6" />
          </Grid>
       </Grid>
 
@@ -242,7 +244,7 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                               </TableRow>
                            </TableHead>
                            <TableBody>
-                              {Object.entries(activeSummary?.breakdown || {}).map(([tf, stats]: any) => (
+                              {activeSummary?.breakdown && Object.entries(activeSummary.breakdown).map(([tf, stats]: any) => (
                                  <TableRow key={tf}>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>{tf}</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 700 }}>{stats.total}</TableCell>
@@ -262,7 +264,7 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                      <Divider sx={{ my: 2, opacity: 0.05 }} />
                      <Typography variant="subtitle2" fontWeight={900} sx={{ mb: 3 }}>OUTCOME BREAKDOWN</Typography>
                      <Grid container spacing={2}>
-                        {Object.entries(activeSummary?.outcomes || {}).map(([outcome, count]: any) => (
+                        {activeSummary?.outcomes && Object.entries(activeSummary.outcomes).map(([outcome, count]: any) => (
                            <Grid item xs={6} sm={3} md={2.4} key={outcome}>
                               <Box sx={{ p: 2, textAlign: 'center', border: '1px solid #1e293b', borderRadius: 1 }}>
                                  <Typography variant="h5" fontWeight={900}>{count}</Typography>
