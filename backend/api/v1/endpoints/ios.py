@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional
 from backend.core.container import container
 from backend.core.auth import get_current_user
 from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback, LiveSignal
+from backend.domain.models.data_platform import PortfolioHealth
 from google.cloud import firestore
 import uuid
 import datetime
