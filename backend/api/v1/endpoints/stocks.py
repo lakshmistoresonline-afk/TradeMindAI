@@ -5,7 +5,7 @@ from backend.services.portfolio_engine import PortfolioEngine
 from backend.core.auth import get_current_user
 from fastapi_cache.decorator import cache
 import yfinance as yf
-from typing import List
+from typing import List, Optional
 import datetime
 import requests
 import json
