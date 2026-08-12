@@ -3,7 +3,7 @@ import { Box, Typography, Paper, Grid, Stack, Chip, LinearProgress, Divider } fr
 import { ShieldCheck, AlertTriangle, Crosshair, Activity, Info } from 'lucide-react';
 import { getStocks, getPortfolioHealth } from '../api/client';
 
-export default function RiskGuard() {
+export default function RiskGuard({ isConsolidated = false }: { isConsolidated?: boolean }) {
   const [holdings, setHoldings] = useState<any[]>([]);
   const [health, setHealth] = useState<any>(null);
 
@@ -19,19 +19,21 @@ export default function RiskGuard() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <ShieldCheck size={32} className="text-emerald-500" />
-            <Box>
-               <Typography variant="h4" sx={{ fontWeight: 900 }}>Risk Guard</Typography>
-               <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>PORTFOLIO INTEGRITY & EXPOSURE MONITOR</Typography>
-            </Box>
-         </Box>
-         <Stack direction="row" spacing={2}>
-            <Chip label="RISK MODE: BALANCED" color="primary" variant="outlined" sx={{ fontWeight: 900 }} />
-            <Chip icon={<Activity size={14} />} label="HEDGING ACTIVE" color="info" sx={{ fontWeight: 900 }} />
-         </Stack>
-      </Box>
+      {!isConsolidated && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <ShieldCheck size={32} className="text-emerald-500" />
+              <Box>
+                 <Typography variant="h4" sx={{ fontWeight: 900 }}>Risk Guard</Typography>
+                 <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>PORTFOLIO INTEGRITY & EXPOSURE MONITOR</Typography>
+              </Box>
+           </Box>
+           <Stack direction="row" spacing={2}>
+              <Chip label="RISK MODE: BALANCED" color="primary" variant="outlined" sx={{ fontWeight: 900 }} />
+              <Chip icon={<Activity size={14} />} label="HEDGING ACTIVE" color="info" sx={{ fontWeight: 900 }} />
+           </Stack>
+        </Box>
+      )}
 
       <Grid container spacing={3}>
          {/* 1. Portfolio Risk Score Card */}

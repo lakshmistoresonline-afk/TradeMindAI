@@ -123,10 +123,18 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
     keyRisks: structured.key_risks || (analysis.recommendations?.[0] as any)?.risks,
     thesis,
     invalidation: structured.invalidation_point,
-    generatedAt: stock.updated_at,
+    generatedAt: stock.timestamp,
+    validatedAt: stock.validated_at,
+    triggeredAt: stock.triggered_at,
+    triggerPrice: stock.trigger_price,
+    outcomeDate: stock.outcome_date,
+    profitPct: stock.profit_pct,
+    mfe: stock.mfe,
+    mae: stock.mae,
     updatedAt: stock.updated_at,
-    modelVersion: structured.modelVersion || 'TradeMind Core v2.0',
-    drivers
+    modelVersion: structured.modelVersion || 'TradeMind Core v2.2',
+    drivers,
+    events: stock.events || []
   };
 };
 

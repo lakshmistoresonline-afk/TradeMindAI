@@ -4,8 +4,8 @@ import { TrendingUp, History, Activity, ShieldCheck, Target, Calendar, Filter, D
 import { getPerformanceSummary, getPerformanceSignals, getCalibrationData } from '../../api/client';
 import ReactECharts from 'echarts-for-react';
 
-export default function SignalValidation() {
-  const [tab, setTab] = useState(0); // 0: Dashboard, 1: Execution Log
+export default function SignalValidation({ isConsolidated = false, initialTab = 0 }: { isConsolidated?: boolean, initialTab?: number }) {
+  const [tab, setTab] = useState(initialTab); // 0: Dashboard, 1: Execution Log
   const [dataset, setDataset] = useState('ALL'); // ALL, LIVE, BACKTEST
   const [timeframe, setTimeframe] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -15,6 +15,10 @@ export default function SignalValidation() {
   const [signals, setSignals] = useState<any[]>([]);
   const [calibration, setCalibration] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+     setTab(initialTab);
+  }, [initialTab]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -82,29 +86,30 @@ export default function SignalValidation() {
 
   return (
     <Box>
-      {/* 1. Header with Range Context */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5, flexWrap: 'wrap', gap: 2 }}>
-         <Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1 }}>Historical Performance</Typography>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-               <Calendar size={14} className="text-emerald-500" />
-               <Typography variant="caption" color="primary" sx={{ fontWeight: 900, letterSpacing: 1 }}>
-                  {new Date(summary?.range.start).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                  {' — '}
-                  {new Date(summary?.range.end).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-               </Typography>
-               <Chip
-                  label={summary?.range.is_complete_history ? "ALL AVAILABLE HISTORY" : "FILTERED RANGE"}
-                  size="small"
-                  sx={{ height: 18, fontSize: '0.55rem', fontWeight: 900, bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}
-               />
-            </Stack>
-         </Box>
-         <Stack direction="row" spacing={2}>
-            <Button variant="outlined" startIcon={<Download size={16} />} sx={{ fontWeight: 900, borderRadius: 1 }}>EXPORT AUDIT</Button>
-            <Chip icon={<Activity size={14} />} label="V2.2 INSTITUTIONAL GRADE" color="info" variant="outlined" sx={{ fontWeight: 900 }} />
-         </Stack>
-      </Box>
+      {!isConsolidated && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5, flexWrap: 'wrap', gap: 2 }}>
+           <Box>
+              <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1 }}>Historical Performance</Typography>
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+                 <Calendar size={14} className="text-emerald-500" />
+                 <Typography variant="caption" color="primary" sx={{ fontWeight: 900, letterSpacing: 1 }}>
+                    {new Date(summary?.range.start).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {' — '}
+                    {new Date(summary?.range.end).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                 </Typography>
+                 <Chip
+                    label={summary?.range.is_complete_history ? "ALL AVAILABLE HISTORY" : "FILTERED RANGE"}
+                    size="small"
+                    sx={{ height: 18, fontSize: '0.55rem', fontWeight: 900, bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}
+                 />
+              </Stack>
+           </Box>
+           <Stack direction="row" spacing={2}>
+              <Button variant="outlined" startIcon={<Download size={16} />} sx={{ fontWeight: 900, borderRadius: 1 }}>EXPORT AUDIT</Button>
+              <Chip icon={<Activity size={14} />} label="V2.2 INSTITUTIONAL GRADE" color="info" variant="outlined" sx={{ fontWeight: 900 }} />
+           </Stack>
+        </Box>
+      )}
 
       {/* 2. Global Filters Bar */}
       <Paper sx={{ p: 2.5, mb: 4, bgcolor: 'rgba(15, 23, 42, 0.3)', border: '1px solid #1e293b' }}>

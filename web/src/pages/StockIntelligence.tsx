@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Grid, Autocomplete, TextField, Stack, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tabs, Tab, Divider } from '@mui/material';
-import { Search, History, FileText, Database, Activity, Brain, LineChart, BarChart4, ShieldAlert, Briefcase } from 'lucide-react';
+import { Search, History, FileText, Database, Activity, Brain, LineChart, BarChart4, Briefcase, Book, Clock } from 'lucide-react';
 import {
   getStocks, triggerBacktest, getBacktestResults,
-  getBacktestSignals, getStockTimeline
+  getBacktestSignals
 } from '../api/client';
 
 import ResearchHeader from '../components/Research/ResearchHeader';
@@ -11,6 +11,8 @@ import DecisionPanel from '../components/Research/decision/DecisionPanel';
 import AIInvestmentThesis from '../components/Research/decision/AIInvestmentThesis';
 import HistoricalPatternMatch from '../components/Research/decision/HistoricalPatternMatch';
 import DecisionHistory from '../components/Research/decision/DecisionHistory';
+import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
+import ResearchHub from './ResearchHub';
 
 import TechnicalAnalysis from '../components/Research/market/TechnicalAnalysis';
 import MarketStructure from '../components/Research/market/MarketStructure';
@@ -32,9 +34,6 @@ import AIPerformance from '../components/Research/quant/AIPerformance';
 import AIResearchTimeline from '../components/Research/AIResearchTimeline';
 import ResearchNotebook from '../components/Research/ResearchNotebook';
 
-import RiskAssessment from '../components/Research/risk/RiskAssessment';
-import AICopilot from '../components/AICopilot';
-
 import { useLocation } from 'react-router-dom';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 
@@ -46,12 +45,6 @@ export default function StockIntelligence() {
   const [backtestSignals, setBacktestSignals] = useState<any[]>([]);
   const [loadingBacktest, setLoadingBacktest] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-
-  useEffect(() => {
-    if (selectedStock) {
-      // Logic for any global page state needed when stock changes
-    }
-  }, [selectedStock]);
 
   const fromPortfolio = location.state?.fromPortfolio || false;
 
@@ -71,7 +64,7 @@ export default function StockIntelligence() {
 ${decision.thesis || 'Analysis pending for latest session dynamics.'}
 
 ### AI THESIS & DRIVERS
-${decision.drivers?.map(d => `- ${d}`).join('\n') || '- Technical structure alignment\n- Institutional flow bias'}
+${decision.drivers?.map((d: any) => `- ${d}`).join('\n') || '- Technical structure alignment\n- Institutional flow bias'}
 
 ### KEY CATALYST
 ${decision.primaryCatalyst || 'Breakout above major structural resistance.'}
@@ -107,7 +100,6 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
     if (selectedStock) {
       fetchBacktest(selectedStock.symbol);
       fetchSignals(selectedStock.symbol);
-      getStockTimeline(selectedStock.symbol);
     }
   }, [selectedStock]);
 
@@ -202,11 +194,12 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
                scrollButtons="auto"
              >
                 <Tab icon={<Brain size={18} />} iconPosition="start" label="DECISION" sx={{ fontWeight: 700 }} />
+                <Tab icon={<Clock size={18} />} iconPosition="start" label="LIFECYCLE" sx={{ fontWeight: 700 }} />
                 <Tab icon={<LineChart size={18} />} iconPosition="start" label="MARKET" sx={{ fontWeight: 700 }} />
                 <Tab icon={<BarChart4 size={18} />} iconPosition="start" label="FUNDAMENTALS" sx={{ fontWeight: 700 }} />
                 <Tab icon={<Activity size={18} />} iconPosition="start" label="ANALYTICS" sx={{ fontWeight: 700 }} />
-                <Tab icon={<ShieldAlert size={18} />} iconPosition="start" label="RISK" sx={{ fontWeight: 700 }} />
                 <Tab icon={<History size={18} />} iconPosition="start" label="HISTORY" sx={{ fontWeight: 700 }} />
+                <Tab icon={<Book size={18} />} iconPosition="start" label="RESEARCH EVIDENCE" sx={{ fontWeight: 700 }} />
              </Tabs>
           </Box>
 
@@ -221,6 +214,15 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
 
                {activeTab === 1 && (
                  <Box>
+                    <SignalLifecycleTimeline
+                      events={normalizeAITradeDecision(selectedStock).events || []}
+                      currentStatus={normalizeAITradeDecision(selectedStock).status}
+                    />
+                 </Box>
+               )}
+
+               {activeTab === 2 && (
+                 <Box>
                     <TechnicalAnalysis data={selectedStock.analysis?.technical_data} />
                     <MTFAlignmentMatrix symbol={selectedStock.symbol} />
                     <MarketStructure smc={selectedStock.analysis?.technical_data?.smc} />
@@ -230,7 +232,7 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
                  </Box>
                )}
 
-               {activeTab === 2 && (
+               {activeTab === 3 && (
                  <Box>
                     <FundamentalAnalysis stock={selectedStock} />
                     <EarningsIntelligence symbol={selectedStock.symbol} />
@@ -239,17 +241,11 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
                  </Box>
                )}
 
-               {activeTab === 3 && (
+               {activeTab === 4 && (
                  <Box>
                     <QuantAnalytics metrics={selectedStock.analysis?.technical_data?.quant_metrics || {}} />
                     <ScenarioStressLab stock={selectedStock} />
                     <AIPerformance />
-                 </Box>
-               )}
-
-               {activeTab === 4 && (
-                 <Box>
-                    <RiskAssessment stock={selectedStock} />
                  </Box>
                )}
 
@@ -318,6 +314,12 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
                     </Paper>
                  </Box>
                )}
+
+               {activeTab === 6 && (
+                 <Box>
+                    <ResearchHub isContextual symbol={selectedStock.symbol} />
+                 </Box>
+               )}
             </Grid>
 
             <Grid item xs={12} lg={3}>
@@ -361,7 +363,6 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
           <Typography color="textSecondary" sx={{ fontWeight: 500 }}>Search for a Nifty 100 stock to begin institutional research.</Typography>
         </Paper>
       )}
-      <AICopilot stockContext={selectedStock} />
     </Box>
   );
 }

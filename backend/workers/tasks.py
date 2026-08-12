@@ -2,7 +2,7 @@
 from celery import Celery, group
 from celery.schedules import crontab
 from backend.core.config import settings
-from backend.domain.models.ios import LiveSignal, MarketRegime, MarketIntelligenceReport, ResearchNote
+from backend.domain.models.ios import LiveSignal, MarketRegime, MarketIntelligenceReport, ResearchNote, SignalEvent
 from backend.core.websocket import manager
 import datetime
 import json
@@ -211,6 +211,10 @@ async def _analyze_stock_ai_logic(symbol: str):
             sig_id = f"sig_{symbol}_{datetime.datetime.utcnow().strftime('%Y%m%d%H%M')}"
             direction = "LONG" if "BUY" in rating_upper else "SHORT"
 
+            # Initial Events
+            gen_event = SignalEvent(type="GENERATED", message=f"Signal identified via {direction} multi-agent consensus.")
+            val_event = SignalEvent(type="VALIDATED", message=f"Consensus reached with {scoring_results.get('score', 50)}% conviction.")
+
             live_sig = LiveSignal(
                 id=sig_id,
                 symbol=symbol,
@@ -222,8 +226,10 @@ async def _analyze_stock_ai_logic(symbol: str):
                 target_price=structured_consensus.get("target"),
                 stop_loss_price=structured_consensus.get("stop_loss"),
                 timeframe=str(structured_consensus.get("timeframe", "SWING")),
-                status="ACTIVE",
-                model_version="TradeMind Core v2.2"
+                status="WAITING_FOR_ENTRY",
+                validated_at=datetime.datetime.utcnow(),
+                model_version="TradeMind Core v2.2",
+                events=[gen_event, val_event]
             )
             await container.ios_repo.save_live_signal(live_sig)
 

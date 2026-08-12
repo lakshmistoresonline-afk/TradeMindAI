@@ -3,7 +3,7 @@ import { Box, Typography, Paper, TextField, IconButton, List, ListItem, Avatar, 
 import { Send, Bot, User, Sparkles, BrainCircuit, TrendingUp, Info } from 'lucide-react';
 import { chatWithAssistant } from '../api/client';
 
-export default function AICopilot() {
+export default function AICopilot({ isDrawer = false }: { isDrawer?: boolean }) {
   const [messages, setMessages] = useState<any[]>([
     { role: 'assistant', content: 'TRADEMIND AI Copilot active. How can I assist your institutional research today?' }
   ]);
@@ -33,24 +33,35 @@ export default function AICopilot() {
   };
 
   return (
-    <Box sx={{ height: 'calc(100vh - 140px)', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ p: 1, bgcolor: 'primary.main', borderRadius: 1, color: 'black' }}>
-               <Bot size={24} />
-            </Box>
-            <Box>
-               <Typography variant="h5" sx={{ fontWeight: 800 }}>AI Copilot</Typography>
-               <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>LLAMA 3.1 INSTITUTIONAL ENGINE</Typography>
-            </Box>
-         </Box>
-         <Stack direction="row" spacing={1}>
-            <Chip icon={<Sparkles size={14} />} label="Context: Terminal" size="small" variant="outlined" sx={{ fontWeight: 800 }} />
-            <Chip icon={<BrainCircuit size={14} />} label="Agent: Lead Analyst" size="small" variant="outlined" sx={{ fontWeight: 800 }} />
-         </Stack>
-      </Box>
+    <Box sx={{ height: isDrawer ? '100%' : 'calc(100vh - 140px)', display: 'flex', flexDirection: 'column' }}>
+      {!isDrawer && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ p: 1, bgcolor: 'primary.main', borderRadius: 1, color: 'black' }}>
+                 <Bot size={24} />
+              </Box>
+              <Box>
+                 <Typography variant="h5" sx={{ fontWeight: 800 }}>AI Copilot</Typography>
+                 <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>LLAMA 3.1 INSTITUTIONAL ENGINE</Typography>
+              </Box>
+           </Box>
+           <Stack direction="row" spacing={1}>
+              <Chip icon={<Sparkles size={14} />} label="Context: Terminal" size="small" variant="outlined" sx={{ fontWeight: 800 }} />
+              <Chip icon={<BrainCircuit size={14} />} label="Agent: Lead Analyst" size="small" variant="outlined" sx={{ fontWeight: 800 }} />
+           </Stack>
+        </Box>
+      )}
 
-      <Paper sx={{ flexGrow: 1, mb: 2, overflowY: 'auto', p: 3, display: 'flex', flexDirection: 'column', bgcolor: 'rgba(15, 23, 42, 0.3)' }}>
+      <Paper sx={{
+        flexGrow: 1,
+        mb: 2,
+        overflowY: 'auto',
+        p: isDrawer ? 2 : 3,
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: isDrawer ? 'transparent' : 'rgba(15, 23, 42, 0.3)',
+        border: isDrawer ? 'none' : '1px solid #1e293b'
+      }}>
         <List sx={{ flexGrow: 1 }}>
           {messages.map((m, i) => (
             <ListItem key={i} sx={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start', mb: 3, px: 0 }}>

@@ -118,7 +118,18 @@ export default function LiveSignalsBoard({ stocks }: LiveSignalsBoardProps) {
                         {s.decision.stopLoss ? `₹${Math.round(s.decision.stopLoss).toLocaleString()}` : '---'}
                      </TableCell>
                      <TableCell align="center">
-                        <Chip label={s.decision.status} size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }} />
+                        <Chip
+                           label={s.decision.status.replace('_', ' ')}
+                           size="small"
+                           variant="outlined"
+                           color={s.decision.status === 'ACTIVE' ? 'primary' : s.decision.status.includes('HIT') ? 'success' : 'default'}
+                           sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }}
+                        />
+                        {s.decision.status === 'ACTIVE' && (
+                           <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontWeight: 900, color: 'primary.main', fontSize: '0.5rem' }}>
+                              {s.decision.profitPct !== undefined ? `${s.decision.profitPct >= 0 ? '+' : ''}${s.decision.profitPct.toFixed(2)}%` : 'TRACKING'}
+                           </Typography>
+                        )}
                      </TableCell>
                      <TableCell align="center">
                         <Button

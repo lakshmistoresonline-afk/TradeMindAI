@@ -1,8 +1,17 @@
 export type AIRating = 'STRONG BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG SELL';
 export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH';
 export type TimeHorizon = 'INTRADAY' | 'SWING' | 'POSITION' | 'LONG TERM';
-export type DecisionStatus = 'PENDING' | 'ANALYZING' | 'VALIDATED' | 'ACTIVE' | 'EXPIRED' | 'UNAVAILABLE';
+export type DecisionStatus = 'GENERATED' | 'VALIDATED' | 'WAITING_FOR_ENTRY' | 'ENTRY_TRIGGERED' | 'ACTIVE' | 'TARGET_HIT' | 'STOP_LOSS' | 'EXPIRED' | 'CANCELLED' | 'UNAVAILABLE';
 export type DataProvenance = 'LIVE' | 'CALCULATED' | 'AI GENERATED' | 'HISTORICAL' | 'PRELIMINARY' | 'DEMO';
+
+export interface SignalEvent {
+  id: string;
+  type: string;
+  timestamp: string;
+  price?: number;
+  message?: string;
+  metadata?: any;
+}
 
 export interface AITradeDecision {
   rating: AIRating;
@@ -26,9 +35,19 @@ export interface AITradeDecision {
   invalidation?: string;
 
   generatedAt?: string;
+  validatedAt?: string;
+  triggeredAt?: string;
+  triggerPrice?: number;
+
+  outcomeDate?: string;
+  profitPct?: number;
+  mfe?: number;
+  mae?: number;
+
   updatedAt?: string;
   modelVersion?: string;
   drivers?: string[];
+  events?: SignalEvent[];
 }
 
 export interface MarketSnapshot {

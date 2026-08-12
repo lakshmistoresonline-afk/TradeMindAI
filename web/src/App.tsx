@@ -1,26 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
-import MarketCommandCenter from './pages/MarketCommandCenter'
-import MarketPulse from './pages/MarketPulse'
+import SignalsDashboard from './pages/SignalsDashboard'
+import MarketDashboard from './pages/MarketDashboard'
+import PortfolioDashboard from './pages/PortfolioDashboard'
+import HistoryDashboard from './pages/HistoryDashboard'
 import StockIntelligence from './pages/StockIntelligence'
 import Settings from './pages/Settings'
-import Portfolio from './pages/Portfolio'
-import ResearchHub from './pages/ResearchHub'
 import Login from './pages/Login'
-import SectorRotation from './pages/SectorRotation'
-import AICopilot from './pages/AICopilot'
-import MarketTreemap from './pages/MarketIntel/MarketTreemap'
-import MarketHeatmap from './pages/MarketIntel/MarketHeatmap'
-import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilderPage'
-import SignalValidation from './pages/StrategyBuilder/SignalValidation'
-import MacroCalendar from './pages/Calendar/MacroCalendar'
-import Journal from './pages/Journal'
-import OpportunityScanner from './pages/OpportunityScanner'
 import SystemControl from './pages/SystemControl'
-import PortfolioStressTest from './pages/PortfolioStressTest'
-import OptionsIntelligence from './pages/Options/OptionsIntelligence'
-import RiskGuard from './pages/RiskGuard'
+import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilderPage'
 
 const darkTheme = createTheme({
   palette: {
@@ -91,24 +80,15 @@ function App() {
           <Route path="/*" element={
             <Layout>
               <Routes>
-                <Route path="/" element={<MarketCommandCenter />} />
-                <Route path="/market" element={<MarketPulse />} />
-                <Route path="/treemap" element={<MarketTreemap />} />
-                <Route path="/heatmap" element={<MarketHeatmap />} />
-                <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/risk" element={<RiskGuard />} />
-                <Route path="/research" element={<ResearchHub />} />
-                <Route path="/stress-test" element={<PortfolioStressTest />} />
+                <Route path="/" element={<SignalsDashboard />} />
+                <Route path="/market" element={<MarketDashboard />} />
+                <Route path="/portfolio" element={<PortfolioDashboard />} />
+                <Route path="/history" element={<HistoryDashboard />} />
+
+                {/* Contextual / Advanced */}
                 <Route path="/analysis" element={<StockIntelligence />} />
-                <Route path="/chat" element={<AICopilot />} />
-                <Route path="/options" element={<OptionsIntelligence />} />
                 <Route path="/strategy" element={<StrategyBuilder />} />
-                <Route path="/paper-trading" element={<SignalValidation />} />
-                <Route path="/journal" element={<Journal />} />
-                <Route path="/calendar" element={<MacroCalendar />} />
-                <Route path="/ranking" element={<OpportunityScanner />} />
                 <Route path="/admin" element={<SystemControl />} />
-                <Route path="/sectors" element={<SectorRotation />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider } from '@mui/material';
-import { LayoutDashboard, LineChart, BrainCircuit, Settings, TrendingUp, PieChart, Bot, Wallet, Calendar, Code, Trophy, Star, Book, ShieldCheck, Home, Activity, Zap } from 'lucide-react';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Button } from '@mui/material';
+import { LineChart, Wallet, History, Bot, Star, Activity, Zap, X, TrendingUp, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useMediaQuery, useTheme, IconButton, BottomNavigation, BottomNavigationAction, Paper as MuiPaper } from '@mui/material';
+import { useMediaQuery, useTheme, IconButton, BottomNavigation, BottomNavigationAction, Paper as MuiPaper, Fab } from '@mui/material';
 import { Menu as MenuIcon } from 'lucide-react';
 import CommandPalette from './CommandPalette';
-import { API_BASE_URL } from '../api/client';
+import AICopilot from '../pages/AICopilot';
+import { API_BASE_URL, getMarketStats } from '../api/client';
 
 const drawerWidth = 240;
 
@@ -16,48 +17,11 @@ export const NotificationContext = createContext({
 
 export const useNotification = () => useContext(NotificationContext);
 
-const menuGroups = [
-  {
-    title: 'MARKET',
-    items: [
-      { text: 'Command Center', icon: <LayoutDashboard size={18} />, path: '/' },
-      { text: 'Market Pulse', icon: <LineChart size={18} />, path: '/market' },
-      { text: 'Macro Calendar', icon: <Calendar size={18} />, path: '/calendar' },
-      { text: 'Sector Rotation', icon: <PieChart size={18} />, path: '/sectors' },
-    ]
-  },
-  {
-    title: 'INTELLIGENCE',
-    items: [
-      { text: 'Opportunity Scanner', icon: <Trophy size={18} />, path: '/ranking' },
-      { text: 'Stock Intelligence', icon: <BrainCircuit size={18} />, path: '/analysis' },
-      { text: 'Research Hub', icon: <Book size={18} />, path: '/research' },
-      { text: 'AI Copilot', icon: <Bot size={18} />, path: '/chat' },
-    ]
-  },
-  {
-    title: 'PORTFOLIO',
-    items: [
-      { text: 'Overview', icon: <Wallet size={18} />, path: '/portfolio' },
-      { text: 'Risk Guard', icon: <ShieldCheck size={18} />, path: '/risk' },
-      { text: 'Stress Test', icon: <Activity size={18} />, path: '/stress-test' },
-    ]
-  },
-  {
-    title: 'TRADING',
-    items: [
-      { text: 'Strategy Lab', icon: <Code size={18} />, path: '/strategy' },
-      { text: 'Signal Audit', icon: <Star size={18} />, path: '/paper-trading' },
-      { text: 'Trade Journal', icon: <Book size={18} />, path: '/journal' },
-    ]
-  },
-  {
-    title: 'SYSTEM',
-    items: [
-      { text: 'Data Health', icon: <Activity size={18} />, path: '/admin' },
-      { text: 'Settings', icon: <Settings size={18} />, path: '/settings' },
-    ]
-  }
+const primaryMenu = [
+  { text: 'SIGNALS', icon: <Zap size={20} />, path: '/' },
+  { text: 'MARKET', icon: <LineChart size={20} />, path: '/market' },
+  { text: 'PORTFOLIO', icon: <Wallet size={20} />, path: '/portfolio' },
+  { text: 'HISTORY', icon: <History size={20} />, path: '/history' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -67,8 +31,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [copilotOpen, setCopilotOpen] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
+  const [marketBrief, setMarketBrief] = useState<any>(null);
   const [pinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
+
+  useEffect(() => {
+    getMarketStats().then(data => {
+       const nifty = data?.['NIFTY 50'];
+       if (nifty) setMarketBrief(nifty);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     // Vision 2.2: Real-time Forensic Signal Stream
@@ -128,7 +101,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                <Stack direction="row" spacing={2} alignItems="center">
                   <Box sx={{ bgcolor: 'rgba(255,255,255,0.03)', px: 2, py: 0.75, borderRadius: 1, border: '1px solid #1e293b' }}>
                      <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', fontFamily: 'JetBrains Mono', letterSpacing: 1 }}>
-                        NIFTY 24,560.15 (+0.6%)
+                        NIFTY {marketBrief ? `${marketBrief.value.toLocaleString()} (${marketBrief.change >= 0 ? '+' : ''}${marketBrief.change}%)` : '24,560.15 (+0.6%)'}
                      </Typography>
                   </Box>
                   <Box sx={{ bgcolor: 'rgba(255,255,255,0.05)', px: 1.5, py: 0.5, borderRadius: 1, border: '1px solid #334155' }}>
@@ -151,57 +124,47 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto', mt: 2 }}>
-            {menuGroups.map((group) => (
-              <List
-                key={group.title}
-                subheader={
-                  <Typography
-                    variant="caption"
-                    sx={{ p: 2, pb: 1, color: 'slategray', fontWeight: 800, letterSpacing: 1.5, display: 'block', fontSize: '0.65rem' }}
-                  >
-                    {group.title}
-                  </Typography>
-                }
-              >
-                {group.items.map((item) => (
-                  <ListItem key={item.text} disablePadding>
+          <Box sx={{ overflow: 'auto', mt: 4 }}>
+            <List>
+               {primaryMenu.map((item) => (
+                 <ListItem key={item.text} disablePadding>
                     <ListItemButton
                       onClick={() => navigate(item.path)}
-                      selected={location.pathname === item.path}
+                      selected={location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path))}
                       sx={{
-                        '&.Mui-selected': { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' },
+                        '&.Mui-selected': { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981' },
                         '&.Mui-selected .MuiListItemIcon-root': { color: '#10b981' },
-                        mx: 1,
+                        mx: 1.5,
                         borderRadius: 1,
-                        mb: 0.5,
-                        py: 0.5
+                        mb: 1.5,
+                        py: 1
                       }}
                     >
-                      <ListItemIcon sx={{ color: 'slategray', minWidth: 32 }}>
+                      <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
                         {item.icon}
                       </ListItemIcon>
                       <ListItemText
                         primary={item.text}
                         primaryTypographyProps={{
                           variant: 'body2',
-                          fontWeight: location.pathname === item.path ? 800 : 500,
+                          fontWeight: 800,
+                          letterSpacing: 1.5,
                           fontSize: '0.8rem'
                         }}
                       />
                     </ListItemButton>
                   </ListItem>
-                ))}
-                <Divider sx={{ mx: 2, my: 1, opacity: 0.05 }} />
-              </List>
-            ))}
+               ))}
+            </List>
 
-            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 800, letterSpacing: 1, fontSize: '0.65rem' }}>PINNED</Typography>}>
+            <Divider sx={{ mx: 2, my: 3, opacity: 0.1 }} />
+
+            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 800, letterSpacing: 1.5, fontSize: '0.65rem' }}>FAVORITES</Typography>}>
                {pinnedStocks.map(symbol => (
                  <ListItem key={symbol} disablePadding>
                     <ListItemButton
                       onClick={() => navigate('/analysis', { state: { symbol } })}
-                      sx={{ mx: 1, borderRadius: 1, mb: 0.5 }}
+                      sx={{ mx: 1.5, borderRadius: 1, mb: 1 }}
                     >
                        <ListItemIcon sx={{ color: 'primary.main', minWidth: 32 }}><Star size={16} /></ListItemIcon>
                        <ListItemText primary={symbol} primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
@@ -209,8 +172,58 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                  </ListItem>
                ))}
             </List>
+
+            <Box sx={{ mt: 'auto', pb: 2 }}>
+               <Divider sx={{ mx: 2, mb: 2, opacity: 0.05 }} />
+               <List>
+                  <ListItem disablePadding>
+                     <ListItemButton onClick={() => navigate('/admin')} sx={{ mx: 1.5, borderRadius: 1 }}>
+                        <ListItemIcon sx={{ color: 'slategray', minWidth: 32 }}><Activity size={18} /></ListItemIcon>
+                        <ListItemText primary="Data Health" primaryTypographyProps={{ variant: 'caption', fontWeight: 800 }} />
+                     </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                     <ListItemButton onClick={() => navigate('/settings')} sx={{ mx: 1.5, borderRadius: 1 }}>
+                        <ListItemIcon sx={{ color: 'slategray', minWidth: 32 }}><Settings size={18} /></ListItemIcon>
+                        <ListItemText primary="Settings" primaryTypographyProps={{ variant: 'caption', fontWeight: 800 }} />
+                     </ListItemButton>
+                  </ListItem>
+               </List>
+
+               <Box sx={{ px: 2, mt: 2 }}>
+                  <Button
+                     fullWidth
+                     variant="outlined"
+                     startIcon={<Bot size={18} />}
+                     onClick={() => setCopilotOpen(true)}
+                     sx={{ borderColor: 'rgba(255,255,255,0.1)', color: 'slategray', fontWeight: 800, '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}
+                  >
+                     ASK TRADEMIND
+                  </Button>
+               </Box>
+            </Box>
           </Box>
         </Drawer>
+
+        {/* Global AI Copilot Drawer */}
+        <Drawer
+          anchor="right"
+          open={copilotOpen}
+          onClose={() => setCopilotOpen(false)}
+          sx={{ [`& .MuiDrawer-paper`]: { width: { xs: '100%', sm: 450 }, backgroundColor: '#020617', borderLeft: '1px solid #334155' } }}
+        >
+           <Box sx={{ p: 2, borderBottom: '1px solid #334155', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#0f172a' }}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                 <Bot size={20} className="text-emerald-500" />
+                 <Typography variant="h6" fontWeight={900}>AI COPILOT</Typography>
+              </Stack>
+              <IconButton onClick={() => setCopilotOpen(false)}><X size={20} /></IconButton>
+           </Box>
+           <Box sx={{ height: 'calc(100% - 60px)', p: 0 }}>
+              <AICopilot isDrawer />
+           </Box>
+        </Drawer>
+
         <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, backgroundColor: '#020617', minHeight: '100vh', width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
           <Toolbar />
           <Container maxWidth="xl" disableGutters={isMobile}>
@@ -228,17 +241,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <MuiPaper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1200 }} elevation={3}>
             <BottomNavigation
               showLabels
-              value={location.pathname}
+              value={location.pathname === '/' ? '/' : `/${location.pathname.split('/')[1]}`}
               onChange={(_, newValue) => navigate(newValue)}
               sx={{ bgcolor: '#0f172a', borderTop: '1px solid #1e293b' }}
             >
-              <BottomNavigationAction label="Home" value="/" icon={<Home size={20} />} />
-              <BottomNavigationAction label="Markets" value="/market" icon={<LineChart size={20} />} />
-              <BottomNavigationAction label="Signals" value="/ranking" icon={<Trophy size={20} />} />
+              <BottomNavigationAction label="Signals" value="/" icon={<Zap size={20} />} />
+              <BottomNavigationAction label="Market" value="/market" icon={<LineChart size={20} />} />
               <BottomNavigationAction label="Portfolio" value="/portfolio" icon={<Wallet size={20} />} />
-              <BottomNavigationAction label="AI" value="/chat" icon={<Bot size={20} />} />
+              <BottomNavigationAction label="History" value="/history" icon={<History size={20} />} />
             </BottomNavigation>
           </MuiPaper>
+        )}
+
+        {/* Global Floating Copilot Action */}
+        {!isMobile && (
+           <Fab
+             color="primary"
+             aria-label="copilot"
+             onClick={() => setCopilotOpen(true)}
+             sx={{ position: 'fixed', bottom: 32, right: 32, zIndex: 1000, boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)' }}
+           >
+             <Bot size={24} color="black" />
+           </Fab>
         )}
       </Box>
     </NotificationContext.Provider>

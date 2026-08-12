@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime
+import uuid
 
 class WorkspaceState(BaseModel):
     id: str
@@ -39,6 +40,14 @@ class MarketOpportunity(BaseModel):
     indicators: List[str]
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
+class SignalEvent(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type: str # GENERATED, VALIDATED, ENTRY_TRIGGERED, POSITION_ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    price: Optional[float] = None
+    message: Optional[str] = None
+    metadata: Dict[str, Any] = {}
+
 class LiveSignal(BaseModel):
     id: str
     symbol: str
@@ -50,12 +59,18 @@ class LiveSignal(BaseModel):
     target_price: Optional[float] = None
     stop_loss_price: Optional[float] = None
     timeframe: str
-    status: str # ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
+    status: str # WAITING_FOR_ENTRY, ENTRY_TRIGGERED, ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
+
+    validated_at: Optional[datetime] = None
+    triggered_at: Optional[datetime] = None
+    trigger_price: Optional[float] = None
+
     outcome_date: Optional[datetime] = None
     profit_pct: Optional[float] = None
     mfe: float = 0.0
     mae: float = 0.0
     model_version: str = "TradeMind Core v2.2"
+    events: List[SignalEvent] = []
 
 class TradeFeedback(BaseModel):
     id: str

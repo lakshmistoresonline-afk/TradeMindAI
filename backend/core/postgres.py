@@ -161,11 +161,17 @@ class LiveSignalDB(Base):
     stop_loss_price = Column(Float)
     timeframe = Column(String)
     status = Column(String)
+
+    validated_at = Column(DateTime)
+    triggered_at = Column(DateTime)
+    trigger_price = Column(Float)
+
     outcome_date = Column(DateTime)
     profit_pct = Column(Float)
     mfe = Column(Float)
     mae = Column(Float)
     model_version = Column(String)
+    events = Column(JSON) # List of event objects
 
 class WorkspaceDB(Base):
     __tablename__ = "workspaces"

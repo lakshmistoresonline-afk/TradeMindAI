@@ -6,7 +6,7 @@ import { normalizeAITradeDecision } from '../hooks/useAITradeDecision'
 import { useNavigate } from 'react-router-dom';
 import LiveSignalsBoard from '../components/Research/shared/LiveSignalsBoard';
 
-export default function MarketCommandCenter() {
+export default function MarketCommandCenter({ isConsolidated = false }: { isConsolidated?: boolean }) {
   const navigate = useNavigate();
   const [stocks, setStocks] = useState<any[]>([])
   const [marketStats, setMarketStats] = useState<any>(null)
@@ -38,19 +38,20 @@ export default function MarketCommandCenter() {
 
   return (
     <Box>
-      {/* 1. Terminal Cockpit Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1.5 }}>Trading Command Center</Typography>
-          <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, letterSpacing: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-             <Activity size={12} className="text-emerald-500" /> INSTITUTIONAL SESSION DATA • {new Date().toLocaleTimeString()}
-          </Typography>
+      {!isConsolidated && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5, flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1.5 }}>Trading Command Center</Typography>
+            <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, letterSpacing: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+               <Activity size={12} className="text-emerald-500" /> INSTITUTIONAL SESSION DATA • {new Date().toLocaleTimeString()}
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={2}>
+             <Button variant="outlined" onClick={() => navigate('/portfolio')} sx={{ borderRadius: 1, fontWeight: 900 }}>PORTFOLIO</Button>
+             <Button variant="contained" onClick={() => navigate('/ranking')} sx={{ borderRadius: 1, px: 3, fontWeight: 900 }} startIcon={<Target size={18} />}>ALPHA HUB</Button>
+          </Stack>
         </Box>
-        <Stack direction="row" spacing={2}>
-           <Button variant="outlined" onClick={() => navigate('/portfolio')} sx={{ borderRadius: 1, fontWeight: 900 }}>PORTFOLIO</Button>
-           <Button variant="contained" onClick={() => navigate('/ranking')} sx={{ borderRadius: 1, px: 3, fontWeight: 900 }} startIcon={<Target size={18} />}>ALPHA HUB</Button>
-        </Stack>
-      </Box>
+      )}
 
       {loading ? (
         <Box sx={{ py: 20, textAlign: 'center' }}><CircularProgress size={32} /><Typography sx={{ mt: 2, fontWeight: 800, color: 'text.secondary', fontSize: '0.8rem' }}>Reconciling multi-agent terminal state...</Typography></Box>
@@ -125,16 +126,18 @@ export default function MarketCommandCenter() {
              </Paper>
           </Grid>
 
-          {/* Tier 2: Live Actionable Signals Board */}
-          <Grid item xs={12}>
-             <LiveSignalsBoard stocks={stocks} />
-          </Grid>
+          {/* Tier 2: Live Actionable Signals Board (Remove if consolidated since SIGNALS is now landing) */}
+          {!isConsolidated && (
+            <Grid item xs={12}>
+               <LiveSignalsBoard stocks={stocks} />
+            </Grid>
+          )}
 
           {/* Tier 3: High-Conviction Alpha Snapshot */}
           <Grid item xs={12}>
              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Zap size={18} className="text-amber-500" />
-                <Typography variant="subtitle2" sx={{ fontWeight: 900, letterSpacing: 1 }}>HIGH-CONVICTION ALPHA SNAPSHOT</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, letterSpacing: 1 }}>{isConsolidated ? 'SESSION ALPHA LEADERS' : 'HIGH-CONVICTION ALPHA SNAPSHOT'}</Typography>
              </Box>
              <Grid container spacing={2}>
                 {topAlpha.map(s => (

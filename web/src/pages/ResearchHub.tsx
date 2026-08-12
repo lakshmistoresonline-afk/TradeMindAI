@@ -3,7 +3,7 @@ import { Box, Typography, Paper, Grid, List, ListItemText, Chip, Button, TextFie
 import { Search, FileText, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function ResearchHub() {
+export default function ResearchHub({ isContextual = false, symbol }: { isContextual?: boolean, symbol?: string }) {
   const navigate = useNavigate();
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -33,9 +33,10 @@ export default function ResearchHub() {
   }, []);
 
   const filteredNotes = notes.filter(n => {
+     const matchesSymbol = !isContextual || n.symbol === symbol;
      const matchesTag = !filterTag || n.tags.includes(filterTag) || n.category === filterTag;
      const matchesSearch = n.symbol.toLowerCase().includes(search.toLowerCase()) || n.content.toLowerCase().includes(search.toLowerCase());
-     return matchesTag && matchesSearch;
+     return matchesSymbol && matchesTag && matchesSearch;
   });
 
   const tags = ['SMC', 'FUNDAMENTAL', 'TECHNICAL', 'INSTITUTIONAL'];
@@ -47,14 +48,16 @@ export default function ResearchHub() {
   ];
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <BookOpen size={32} className="text-emerald-500" />
-            <Typography variant="h4" sx={{ fontWeight: 900 }}>Research Hub</Typography>
-         </Box>
-         <Button variant="contained" startIcon={<FileText size={18} />}>Export Research</Button>
-      </Box>
+    <Box sx={{ p: isContextual ? 0 : 0 }}>
+      {!isContextual && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <BookOpen size={32} className="text-emerald-500" />
+              <Typography variant="h4" sx={{ fontWeight: 900 }}>Research Hub</Typography>
+           </Box>
+           <Button variant="contained" startIcon={<FileText size={18} />}>Export Research</Button>
+        </Box>
+      )}
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={3}>
