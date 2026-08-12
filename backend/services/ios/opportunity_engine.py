@@ -51,5 +51,3 @@ class OpportunityEngine:
                 ))
 
         return sorted(opportunities, key=lambda x: x.conviction_score, reverse=True)
-
-        return sorted(opportunities, key=lambda x: x.conviction_score, reverse=True)

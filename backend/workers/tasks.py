@@ -89,6 +89,7 @@ async def _sync_stock_data_logic(symbol: str, period: str):
         df_ta = TechnicalAnalysis.calculate_indicators(df)
         smc_obs = SMCAnalysis.detect_order_blocks(df)
         smc_fvgs = SMCAnalysis.detect_fvg(df)
+        smc_structure = SMCAnalysis.detect_structure_change(df)
         wyckoff_phase = WyckoffAnalysis.detect_phase(df)
 
         last = df_ta.iloc[-1]
@@ -102,6 +103,7 @@ async def _sync_stock_data_logic(symbol: str, period: str):
         smc_data = {
             "order_blocks": smc_obs[-5:],
             "fvgs": smc_fvgs[-5:],
+            "structure": smc_structure,
             "wyckoff": wyckoff_phase,
             "elliott": wave
         }

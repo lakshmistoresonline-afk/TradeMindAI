@@ -144,6 +144,19 @@ async def get_portfolio_health_dashboard(current_user: dict = Depends(get_curren
     health = PortfolioEngine.analyze_health(current_user["uid"], stocks)
     return health
 
+@router.get("/portfolio/optimize")
+async def get_portfolio_optimizations(current_user: dict = Depends(get_current_user)):
+    """
+    Vision 2.2: Institutional Portfolio Optimizer.
+    Suggests rebalancing weights using Mean-Variance baseline.
+    """
+    from backend.services.portfolio_engine import PortfolioEngine
+    # 1. Fetch current holdings
+    stocks = await container.repository.get_all_stocks(limit=5)
+
+    # 2. Optimize
+    return PortfolioEngine.optimize_weights(stocks)
+
 @router.post("/journal")
 async def add_trade_to_journal(trade_data: Dict[str, Any], current_user: dict = Depends(get_current_user)):
     try:

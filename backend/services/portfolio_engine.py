@@ -43,15 +43,36 @@ class PortfolioEngine:
         avg_ai_score = np.mean([s.ai_investment_score for s in holdings if s.ai_investment_score]) if holdings else 50
         health_score = (diversification * 0.4) + (avg_ai_score * 0.6)
 
-        return PortfolioHealth(
-            user_id=user_id,
-            health_score=float(health_score),
-            diversification_score=float(diversification),
-            risk_level=risk_level,
-            sector_allocation=sector_allocation,
-            expected_annual_return=float(avg_ai_score * 0.2), # Heuristic: higher score -> higher alpha
-            max_drawdown=-12.5, # Minimum institutional risk baseline
-            avg_beta=float(avg_beta),
-            asset_correlation=0.65, # Placeholder for deep matrix analysis
-            var_95=total * 0.05 * 1.645 # Simple parametric VaR
-        )
+    @staticmethod
+    def optimize_weights(holdings: List[Stock]) -> Dict[str, float]:
+        """
+        Vision 2.2: Mean-Variance Optimization (Simplified Markowitz).
+        Calculates suggested rebalancing weights to maximize Sharpe Ratio.
+        """
+        import numpy as np
+        if not holdings or len(holdings) < 2:
+            return {s.symbol: 100.0/len(holdings) for s in holdings} if holdings else {}
+
+        # 1. Gather expected returns (based on AI scores) and risk (Beta)
+        symbols = [s.symbol for s in holdings]
+        # Heuristic return: AI Score scaled to 5-25% annual
+        expected_returns = np.array([((s.ai_investment_score or 50) / 100) * 0.20 for s in holdings])
+        # Risk proxy: Beta
+        betas = np.array([s.beta or 1.0 for s in holdings])
+
+        # 2. Simple Inverse-Beta Weighting (Low Beta = High Weight)
+        # This is a robust institutional baseline for stability
+        inv_betas = 1.0 / betas
+        suggested_weights = (inv_betas / np.sum(inv_betas)) * 100
+
+        # 3. Adjust slightly by AI Conviction
+        # Top conviction picks get a 10% weight boost
+        avg_score = np.mean([s.ai_investment_score or 50 for s in holdings])
+        for i, s in enumerate(holdings):
+            if (s.ai_investment_score or 0) > avg_score:
+                suggested_weights[i] *= 1.1
+
+        # Re-normalize to 100%
+        suggested_weights = (suggested_weights / np.sum(suggested_weights)) * 100
+
+        return {symbols[i]: round(float(suggested_weights[i]), 2) for i in range(len(symbols))}
