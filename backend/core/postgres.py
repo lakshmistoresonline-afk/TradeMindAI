@@ -165,6 +165,7 @@ class LiveSignalDB(Base):
     validated_at = Column(DateTime)
     triggered_at = Column(DateTime)
     trigger_price = Column(Float)
+    trigger_condition = Column(String)
 
     outcome_date = Column(DateTime)
     profit_pct = Column(Float)

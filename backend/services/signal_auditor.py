@@ -75,6 +75,7 @@ class SignalAuditor:
                     current_status = "ENTRY_TRIGGERED"
                     signal.triggered_at = date.to_pydatetime()
                     signal.trigger_price = trigger_price
+                    signal.trigger_condition = "Price Action Trigger"
                     events.append(SignalEvent(
                         type="ENTRY_TRIGGERED",
                         timestamp=date.to_pydatetime(),

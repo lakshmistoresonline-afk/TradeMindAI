@@ -155,6 +155,13 @@ function SignalCard({ stock }: { stock: any }) {
           <Stack direction="row" spacing={1}>
              {stock.isOpportunity && <Chip icon={<Star size={12} />} label="HIGH CONVICTION" size="small" color="primary" sx={{ height: 20, fontSize: '0.6rem', fontWeight: 900 }} />}
              <Chip
+               label={decision.status.replace('_', ' ')}
+               variant="outlined"
+               color={decision.status === 'ACTIVE' ? 'primary' : decision.status === 'WAITING_FOR_ENTRY' ? 'warning' : 'default'}
+               size="small"
+               sx={{ fontWeight: 900, height: 20, fontSize: '0.55rem' }}
+             />
+             <Chip
                label={decision.rating}
                color={isBuy ? 'primary' : decision.rating.includes('SELL') ? 'error' : 'default'}
                size="small"
@@ -162,6 +169,14 @@ function SignalCard({ stock }: { stock: any }) {
              />
           </Stack>
        </Box>
+
+       {decision.status === 'ACTIVE' && decision.profitPct !== undefined && (
+          <Box sx={{ mb: 2, p: 1, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 1, textAlign: 'center' }}>
+             <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', letterSpacing: 1 }}>
+                CURRENT RETURN: {decision.profitPct >= 0 ? '+' : ''}{decision.profitPct.toFixed(2)}%
+             </Typography>
+          </Box>
+       )}
 
        <Box sx={{ mb: 3 }}>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>

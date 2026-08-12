@@ -127,6 +127,7 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
     validatedAt: stock.validated_at,
     triggeredAt: stock.triggered_at,
     triggerPrice: stock.trigger_price,
+    triggerCondition: stock.trigger_condition,
     outcomeDate: stock.outcome_date,
     profitPct: stock.profit_pct,
     mfe: stock.mfe,

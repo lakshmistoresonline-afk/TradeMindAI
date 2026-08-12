@@ -38,6 +38,7 @@ export interface AITradeDecision {
   validatedAt?: string;
   triggeredAt?: string;
   triggerPrice?: number;
+  triggerCondition?: string;
 
   outcomeDate?: string;
   profitPct?: number;

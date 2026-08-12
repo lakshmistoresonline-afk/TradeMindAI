@@ -285,43 +285,91 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                         sx={{ width: 200, '& .MuiInputBase-input': { fontSize: '0.75rem', fontWeight: 700 } }}
                      />
                   </Box>
-                  <TableContainer>
-                     <Table size="small">
-                        <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
-                           <TableRow>
-                              <TableCell sx={{ pl: 3 }}>DATE</TableCell>
-                              <TableCell>SYMBOL</TableCell>
-                              <TableCell>SOURCE</TableCell>
-                              <TableCell align="right">ENTRY</TableCell>
-                              <TableCell align="right">TARGET</TableCell>
-                              <TableCell align="right">P&L %</TableCell>
-                              <TableCell align="center">OUTCOME</TableCell>
-                           </TableRow>
-                        </TableHead>
-                        <TableBody>
-                           {signals.map((sig: any, idx: number) => (
-                              <TableRow key={idx} hover sx={{ cursor: 'pointer' }}>
-                                 <TableCell sx={{ pl: 3, color: 'text.secondary', fontWeight: 600 }}>{new Date(sig.timestamp || sig.date).toLocaleDateString()}</TableCell>
-                                 <TableCell sx={{ fontWeight: 900 }}>
-                                    {sig.symbol}
-                                    <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontSize: '0.6rem' }}>{sig.timeframe}</Typography>
-                                 </TableCell>
-                                 <TableCell>
-                                    <Chip label={sig.dataset} size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 800, opacity: 0.7 }} />
-                                 </TableCell>
-                                 <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{(sig.entry_price || sig.entry)?.toLocaleString()}</TableCell>
-                                 <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{(sig.target_price || sig.target)?.toLocaleString()}</TableCell>
-                                 <TableCell align="right" sx={{ fontWeight: 800, color: (sig.profit_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
-                                    {(sig.profit_pct || 0) >= 0 ? '+' : ''}{(sig.profit_pct || 0).toFixed(2)}%
-                                 </TableCell>
-                                 <TableCell align="center">
-                                    <StatusChip status={sig.status || sig.outcome} />
-                                 </TableCell>
+
+                  {/* Current Active/Waiting Calls */}
+                  <Box sx={{ mb: 6 }}>
+                     <Typography variant="caption" color="primary" sx={{ fontWeight: 800, mb: 1.5, display: 'block', letterSpacing: 1.5 }}>
+                        ● CURRENT CALLS (WAITING / TRIGGERED / ACTIVE)
+                     </Typography>
+                     <TableContainer component={Paper} variant="outlined" sx={{ bgcolor: 'transparent' }}>
+                        <Table size="small">
+                           <TableHead>
+                              <TableRow>
+                                 <TableCell sx={{ pl: 3 }}>GENERATED</TableCell>
+                                 <TableCell>SYMBOL</TableCell>
+                                 <TableCell align="right">ENTRY</TableCell>
+                                 <TableCell align="right">TARGET</TableCell>
+                                 <TableCell align="center">LIFECYCLE STATE</TableCell>
+                                 <TableCell align="right">CURRENT P&L</TableCell>
                               </TableRow>
-                           ))}
-                        </TableBody>
-                     </Table>
-                  </TableContainer>
+                           </TableHead>
+                           <TableBody>
+                              {signals.filter(s => ['WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED', 'ACTIVE'].includes(s.status)).length > 0 ? (
+                                 signals.filter(s => ['WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED', 'ACTIVE'].includes(s.status)).map((sig, i) => (
+                                    <TableRow key={i} hover>
+                                       <TableCell sx={{ pl: 3, fontSize: '0.75rem' }}>{new Date(sig.timestamp).toLocaleDateString()}</TableCell>
+                                       <TableCell sx={{ fontWeight: 900 }}>{sig.symbol}</TableCell>
+                                       <TableCell align="right">₹{sig.entry_price?.toLocaleString()}</TableCell>
+                                       <TableCell align="right">₹{sig.target_price?.toLocaleString()}</TableCell>
+                                       <TableCell align="center">
+                                          <Chip label={sig.status.replace('_', ' ')} size="small" variant="outlined" color="primary" sx={{ height: 18, fontSize: '0.55rem', fontWeight: 900 }} />
+                                       </TableCell>
+                                       <TableCell align="right" sx={{ fontWeight: 900, color: (sig.profit_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
+                                          {sig.status === 'ACTIVE' ? `${(sig.profit_pct || 0) >= 0 ? '+' : ''}${sig.profit_pct?.toFixed(2)}%` : '---'}
+                                       </TableCell>
+                                    </TableRow>
+                                 ))
+                              ) : (
+                                 <TableRow><TableCell colSpan={6} align="center" sx={{ py: 4 }}><Typography variant="caption" color="textSecondary">No active signals in selected range.</Typography></TableCell></TableRow>
+                              )}
+                           </TableBody>
+                        </Table>
+                     </TableContainer>
+                  </Box>
+
+                  {/* Historical Resolved Calls */}
+                  <Box>
+                     <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, mb: 1.5, display: 'block', letterSpacing: 1.5 }}>
+                        ✓ RESOLVED HISTORICAL CALLS
+                     </Typography>
+                     <TableContainer>
+                        <Table size="small">
+                           <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
+                              <TableRow>
+                                 <TableCell sx={{ pl: 3 }}>DATE</TableCell>
+                                 <TableCell>SYMBOL</TableCell>
+                                 <TableCell>SOURCE</TableCell>
+                                 <TableCell align="right">ENTRY</TableCell>
+                                 <TableCell align="right">OUTCOME PRICE</TableCell>
+                                 <TableCell align="right">FINAL P&L %</TableCell>
+                                 <TableCell align="center">OUTCOME</TableCell>
+                              </TableRow>
+                           </TableHead>
+                           <TableBody>
+                              {signals.filter(s => !['WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED', 'ACTIVE'].includes(s.status)).map((sig: any, idx: number) => (
+                                 <TableRow key={idx} hover sx={{ cursor: 'pointer' }}>
+                                    <TableCell sx={{ pl: 3, color: 'text.secondary', fontWeight: 600 }}>{new Date(sig.timestamp || sig.date).toLocaleDateString()}</TableCell>
+                                    <TableCell sx={{ fontWeight: 900 }}>
+                                       {sig.symbol}
+                                       <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontSize: '0.6rem' }}>{sig.timeframe}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                       <Chip label={sig.dataset} size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 800, opacity: 0.7 }} />
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{(sig.entry_price || sig.entry)?.toLocaleString()}</TableCell>
+                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{(sig.outcome_price || sig.target)?.toLocaleString()}</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 800, color: (sig.profit_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
+                                       {(sig.profit_pct || 0) >= 0 ? '+' : ''}{(sig.profit_pct || 0).toFixed(2)}%
+                                    </TableCell>
+                                    <TableCell align="center">
+                                       <StatusChip status={sig.status || sig.outcome} />
+                                    </TableCell>
+                                 </TableRow>
+                              ))}
+                           </TableBody>
+                        </Table>
+                     </TableContainer>
+                  </Box>
                </Box>
             )}
          </Box>

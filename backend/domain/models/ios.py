@@ -64,6 +64,7 @@ class LiveSignal(BaseModel):
     validated_at: Optional[datetime] = None
     triggered_at: Optional[datetime] = None
     trigger_price: Optional[float] = None
+    trigger_condition: Optional[str] = None
 
     outcome_date: Optional[datetime] = None
     profit_pct: Optional[float] = None
