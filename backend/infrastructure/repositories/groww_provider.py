@@ -282,8 +282,6 @@ class GrowwProvider(IMarketDataProvider):
             "^INDIAVIX": "INDIAVIX"
         }
         if symbol in mapping: return mapping[symbol]
-        }
-        if symbol in mapping: return mapping[symbol]
 
         # Heuristic for Equities
         if "-" in symbol: return symbol # Already mapped?
