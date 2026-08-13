@@ -12,7 +12,16 @@ except ValueError:
     firebase_creds_json = os.getenv("FIREBASE_SERVICE_ACCOUNT")
 
     if firebase_creds_json:
-        creds_dict = json.loads(firebase_creds_json)
+        # Vision 2.2: Resilient parsing for Base64 or Raw JSON
+        try:
+            import base64
+            # Attempt base64 decode first
+            decoded = base64.b64decode(firebase_creds_json).decode('utf-8')
+            creds_dict = json.loads(decoded)
+        except:
+            # Fallback to raw JSON if not base64
+            creds_dict = json.loads(firebase_creds_json)
+
         cred = credentials.Certificate(creds_dict)
         app = firebase_admin.initialize_app(cred)
     # 2. Try to load from local file (Best for Development)
