@@ -15,8 +15,8 @@ except ValueError:
         # Vision 2.2: Ultra-resilient parsing (Minified JSON or Base64)
         creds_dict = None
 
-        # 1. Clean the input (Remove potential surrounding quotes and whitespace)
-        clean_input = firebase_creds_json.strip().strip("'").strip('"')
+        # 1. Clean the input (Remove potential surrounding quotes, whitespace and newlines)
+        clean_input = firebase_creds_json.strip().strip("'").strip('"').replace("\\n", "\n")
 
         try:
             # A. Try raw JSON parse first
@@ -34,7 +34,15 @@ except ValueError:
                 print("[+] Firebase Credentials decoded from Base64")
             except Exception as e:
                 print(f"[!] Critical: Firebase Credential Parsing Failed: {e}")
-                creds_dict = {}
+                # Fallback: Attempt to fix common JSON escaping in the private key string directly
+                try:
+                    if '"private_key":' in clean_input:
+                        # Attempt a "lazy" fix for common shell escaping issues
+                        fixed_json = clean_input.replace("\n", "\\n").replace("\r", "")
+                        creds_dict = json.loads(fixed_json)
+                        print("[+] Firebase Credentials loaded via Escaping Repair")
+                except:
+                    creds_dict = {}
 
         if creds_dict:
             cred = credentials.Certificate(creds_dict)
