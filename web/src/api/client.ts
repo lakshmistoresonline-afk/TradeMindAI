@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'https://trademind-api-m8jg.onrender.com/api/v1';
+export const API_BASE_URL = 'https://trademind-api-production.up.railway.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

@@ -47,12 +47,20 @@ async def startup():
         print(f"Database Initialization Failed: {e}")
 
 # Set all CORS enabled origins
+origins = [
+    "https://com-webcraft-trademindai-c8f75.web.app",
+    "https://com-webcraft-trademindai-c8f75.firebaseapp.com",
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # For development/testing, allow all. You can restrict to your web.app later.
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
