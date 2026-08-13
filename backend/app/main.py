@@ -96,16 +96,23 @@ async def health():
     return {"status": "healthy", "timestamp": datetime.datetime.utcnow()}
 
 @app.get("/debug/db")
-async def debug_db():
+async def debug_db(limit: int = 5):
     from backend.core.container import container
+    from backend.core.database import db_client
     try:
-        stocks = await container.repository.get_all_stocks(limit=5)
-        return {"status": "SUCCESS", "count": len(stocks), "samples": [s.symbol for s in stocks]}
+        stocks = await container.repository.get_all_stocks(limit=limit)
+        return {
+            "status": "SUCCESS",
+            "count": len(stocks),
+            "firebase_status": "READY" if db_client else "MISSING",
+            "samples": [s.symbol for s in stocks],
+            "version": "RC4.18-DIAGNOSTIC"
+        }
     except Exception as e:
         import traceback
         return {
             "status": "ERROR",
             "error": str(e),
             "trace": traceback.format_exc(),
-            "version": "RC4.18-HARDENED"
+            "version": "RC4.18-DIAGNOSTIC"
         }
