@@ -12,41 +12,42 @@ except ValueError:
     firebase_creds_json = os.getenv("FIREBASE_SERVICE_ACCOUNT")
 
     if firebase_creds_json:
-        # Vision 2.2: Ultra-resilient parsing (Minified JSON or Base64)
+        # Vision 2.2: Ultra-resilient Base64 & Minified JSON Parser
         creds_dict = None
-
-        # 1. Clean the input (Remove potential surrounding quotes, whitespace and newlines)
-        clean_input = firebase_creds_json.strip().strip("'").strip('"').replace("\\n", "\n")
+        print(f"[*] Raw Credential Length: {len(firebase_creds_json)}")
 
         try:
-            # A. Try raw JSON parse first
-            creds_dict = json.loads(clean_input)
-            print("[+] Firebase Credentials loaded from Raw JSON")
-        except:
+            import base64
+            import re
+            # Strip anything that isn't a Base64 character to avoid truncation artifacts
+            clean_b64 = re.sub(r'[^A-Za-z0-9+/=]', '', firebase_creds_json)
+            print(f"[*] Cleaned Base64 Length: {len(clean_b64)}")
+
+            decoded = base64.b64decode(clean_b64).decode('utf-8')
+            creds_dict = json.loads(decoded)
+            print("[+] Firebase Credentials decoded from Base64")
+        except Exception as e:
+            print(f"[*] Base64 decode failed, trying raw minified JSON: {e}")
             try:
-                # B. Try Base64 decode (Remove ALL internal whitespace/newlines first)
-                import base64
-                import re
-                # Base64 should not contain whitespace. Strip everything except valid B64 chars.
-                pure_b64 = re.sub(r'[^A-Za-z0-9+/=]', '', clean_input)
-                decoded = base64.b64decode(pure_b64).decode('utf-8')
-                creds_dict = json.loads(decoded)
-                print("[+] Firebase Credentials decoded from Base64")
-            except Exception as e:
-                print(f"[!] Critical: Firebase Credential Parsing Failed: {e}")
-                # Fallback: Attempt to fix common JSON escaping in the private key string directly
-                try:
-                    if '"private_key":' in clean_input:
-                        # Attempt a "lazy" fix for common shell escaping issues
-                        fixed_json = clean_input.replace("\n", "\\n").replace("\r", "")
-                        creds_dict = json.loads(fixed_json)
-                        print("[+] Firebase Credentials loaded via Escaping Repair")
-                except:
-                    creds_dict = {}
+                # Handle minified JSON with escaped newlines
+                clean_json = firebase_creds_json.replace("\\n", "\n")
+                creds_dict = json.loads(clean_json)
+                print("[+] Firebase Credentials loaded from Raw JSON")
+            except:
+                print("[!] All Firebase credential parsing failed.")
 
         if creds_dict:
-            cred = credentials.Certificate(creds_dict)
-            app = firebase_admin.initialize_app(cred)
+            try:
+                cred = credentials.Certificate(creds_dict)
+                app = firebase_admin.initialize_app(cred)
+                print("[+] Firebase Admin initialized successfully.")
+            except Exception as e:
+                print(f"[!] Firebase App Initialization Failed: {e}")
+                # Last stand fallback: Default credentials
+                try:
+                    app = firebase_admin.initialize_app(options={'projectId': settings.FIREBASE_PROJECT_ID})
+                    print("[+] Firebase Fallback initialized.")
+                except: pass
     # 2. Try to load from local file (Best for Development)
     elif os.path.exists("service-account.json"):
         cred = credentials.Certificate("service-account.json")
