@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
@@ -52,12 +53,12 @@ class StockDB(Base):
     ai_investment_grade = Column(String)
     ai_status = Column(String, default="PENDING")
     ai_last_error = Column(String)
-    analysis = Column(JSON) # Consensus Agent results
-    structured_consensus = Column(JSON)
-    options_data = Column(JSON)
-    financial_history = Column(JSON)
-    health_metrics = Column(JSON)
-    confidence_metrics = Column(JSON)
+    analysis = Column(String) # JSON string
+    structured_consensus = Column(String)
+    options_data = Column(String)
+    financial_history = Column(String)
+    health_metrics = Column(String)
+    confidence_metrics = Column(String)
 
 class PriceDB(Base):
     __tablename__ = "historical_prices"
@@ -71,7 +72,7 @@ class PriceDB(Base):
     volume = Column(BigInteger)
     open_interest = Column(BigInteger)
     source = Column(String)
-    indicators = Column(JSON) # EMA, RSI, MACD, etc.
+    indicators = Column(String) # JSON string
 
 class FeatureDefinitionDB(Base):
     __tablename__ = "feature_definitions"
@@ -82,8 +83,8 @@ class FeatureDefinitionDB(Base):
     min_value = Column(Float)
     max_value = Column(Float)
     version = Column(String)
-    dependencies = Column(JSON)
-    lineage = Column(JSON)
+    dependencies = Column(String)
+    lineage = Column(String)
     last_updated = Column(DateTime, default=datetime.datetime.utcnow)
 
 class RegimeDB(Base):
@@ -104,7 +105,7 @@ class PredictionDB(Base):
     model_version = Column(String)
     prediction = Column(String)
     confidence = Column(Float)
-    metadata_json = Column(JSON) # renmaed to avoid collision with pydantic
+    metadata_json = Column(String) # JSON string
 
 class IntelReportDB(Base):
     __tablename__ = "intel_reports"
@@ -112,7 +113,7 @@ class IntelReportDB(Base):
     type = Column(String)
     date = Column(DateTime)
     summary = Column(String)
-    key_events = Column(JSON)
+    key_events = Column(String) # JSON string
     ai_bias = Column(String)
 
 class NewsDB(Base):
@@ -145,7 +146,7 @@ class OpportunityDB(Base):
     type = Column(String)
     conviction_score = Column(Float)
     ai_thesis = Column(String)
-    indicators = Column(JSON)
+    indicators = Column(String) # JSON string
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
 class LiveSignalDB(Base):
@@ -172,7 +173,7 @@ class LiveSignalDB(Base):
     mfe = Column(Float)
     mae = Column(Float)
     model_version = Column(String)
-    events = Column(JSON) # List of event objects
+    events = Column(String) # JSON string
 
 class WorkspaceDB(Base):
     __tablename__ = "workspaces"
@@ -180,9 +181,9 @@ class WorkspaceDB(Base):
     user_id = Column(String, index=True)
     name = Column(String)
     type = Column(String)
-    layout_config = Column(JSON)
-    active_stocks = Column(JSON)
-    saved_indicators = Column(JSON)
+    layout_config = Column(String) # JSON string
+    active_stocks = Column(String) # JSON string
+    saved_indicators = Column(String) # JSON string
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class ResearchNoteDB(Base):
@@ -191,8 +192,8 @@ class ResearchNoteDB(Base):
     user_id = Column(String, index=True)
     symbol = Column(String, index=True)
     content = Column(String)
-    tags = Column(JSON)
-    attachments = Column(JSON)
+    tags = Column(String) # JSON string
+    attachments = Column(String) # JSON string
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow)
 
@@ -209,8 +210,8 @@ class TradeJournalDB(Base):
     pnl = Column(Float)
     ai_score_at_entry = Column(Float)
     feedback = Column(String)
-    mistakes = Column(JSON)
-    lessons = Column(JSON)
+    mistakes = Column(String) # JSON string
+    lessons = Column(String) # JSON string
 
 class BulkDealDB(Base):
     __tablename__ = "bulk_deals"

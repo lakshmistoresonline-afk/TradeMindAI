@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Tab, Tabs } from '@mui/material';
+import { Box, Typography, Paper, Tab, Tabs, Grid } from '@mui/material';
 import { History, Activity, BarChart2 } from 'lucide-react';
 import SignalValidation from './StrategyBuilder/SignalValidation';
+import VarianceMap from '../components/Research/history/VarianceMap';
 
 export default function HistoryDashboard() {
   const [activeTab, setActiveTab] = useState(0);
@@ -27,10 +28,17 @@ export default function HistoryDashboard() {
       </Paper>
 
       <Box>
-         {/* SignalValidation handles Signal History (tab 1) and Performance (tab 0) internal logic */}
-         {/* We wrap it to match the new consolidated structure */}
          {activeTab === 0 && <SignalValidation isConsolidated initialTab={1} />}
-         {activeTab === 1 && <SignalValidation isConsolidated initialTab={0} />}
+         {activeTab === 1 && (
+            <Grid container spacing={3}>
+               <Grid item xs={12} lg={8}>
+                  <SignalValidation isConsolidated initialTab={0} />
+               </Grid>
+               <Grid item xs={12} lg={4}>
+                  <VarianceMap />
+               </Grid>
+            </Grid>
+         )}
          {activeTab === 2 && (
             <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
                <BarChart2 size={48} style={{ margin: '0 auto 16px' }} />

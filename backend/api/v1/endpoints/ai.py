@@ -29,7 +29,17 @@ async def ai_chat(request: ChatRequest):
     """
 
     # 2. Generate grounded response
-    system_prompt = f"You are the TradeMind AI Institutional Assistant. {context_str}. Answer the user query based on this data."
+    system_prompt = f"""
+    You are the TradeMind AI Institutional Lead Analyst.
+    Current Terminal Context: {context_str}
+
+    Guidelines:
+    1. Base your answers on the provided regime and opportunities.
+    2. Use SMC (Smart Money Concepts) terminology where relevant (BOS, CHoCH, Order Blocks).
+    3. If asked about a stock not in TOP OPPORTUNITIES, clarify that agents are monitoring its order flow.
+    4. Provide probabilistic outlooks, never guarantees.
+    """
+
     response = await container.ai_provider.generate_analysis(f"{system_prompt}\n\nUser Query: {request.message}")
 
     return {"response": response}

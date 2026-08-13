@@ -229,9 +229,9 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                      </Paper>
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid item xs={12} md={6}>
                      <Divider sx={{ my: 2, opacity: 0.05 }} />
-                     <Typography variant="subtitle2" fontWeight={900} sx={{ mb: 3 }}>TIMEFRAME EFFICIENCY (COMPLETE HISTORY)</Typography>
+                     <Typography variant="subtitle2" fontWeight={900} sx={{ mb: 3 }}>TIMEFRAME EFFICIENCY</Typography>
                      <TableContainer component={Paper} variant="outlined" sx={{ bgcolor: 'transparent' }}>
                         <Table size="small">
                            <TableHead>
@@ -239,8 +239,6 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                                  <TableCell>TIMEFRAME</TableCell>
                                  <TableCell align="center">SIGNALS</TableCell>
                                  <TableCell align="right">WIN RATE</TableCell>
-                                 <TableCell align="right">AVG PROFIT</TableCell>
-                                 <TableCell align="center">PRIMARY OUTCOME</TableCell>
                               </TableRow>
                            </TableHead>
                            <TableBody>
@@ -249,12 +247,35 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>{tf}</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 700 }}>{stats.total}</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 900, color: 'primary.main' }}>{stats.win_rate}%</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 900 }}>{stats.avg_profit > 0 ? '+' : ''}{stats.avg_profit}%</TableCell>
-                                    <TableCell align="center">
-                                       <Chip label="VERIFIED" size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }} color="primary" />
-                                    </TableCell>
                                  </TableRow>
                               ))}
+                           </TableBody>
+                        </Table>
+                     </TableContainer>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                     <Divider sx={{ my: 2, opacity: 0.05 }} />
+                     <Typography variant="subtitle2" fontWeight={900} sx={{ mb: 3 }}>SECTOR STRENGTH MATRIX</Typography>
+                     <TableContainer component={Paper} variant="outlined" sx={{ bgcolor: 'transparent' }}>
+                        <Table size="small">
+                           <TableHead>
+                              <TableRow>
+                                 <TableCell>SECTOR</TableCell>
+                                 <TableCell align="center">SIGNALS</TableCell>
+                                 <TableCell align="right">WIN RATE</TableCell>
+                              </TableRow>
+                           </TableHead>
+                           <TableBody>
+                              {activeSummary?.sector_breakdown ? Object.entries(activeSummary.sector_breakdown).map(([sec, stats]: any) => (
+                                 <TableRow key={sec}>
+                                    <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>{sec}</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 700 }}>{stats.total}</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 900, color: stats.win_rate > 50 ? 'primary.main' : 'warning.main' }}>{stats.win_rate}%</TableCell>
+                                 </TableRow>
+                              )) : (
+                                 <TableRow><TableCell colSpan={3} align="center"><Typography variant="caption">Sector attribution pending...</Typography></TableCell></TableRow>
+                              )}
                            </TableBody>
                         </Table>
                      </TableContainer>

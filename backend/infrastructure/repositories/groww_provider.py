@@ -52,14 +52,22 @@ class GrowwProvider(IMarketDataProvider):
     async def fetch_history(self, symbol: str, period: str, interval: str = "1D") -> Any:
         """
         Fetches historical data for a period.
-        Note: Simple implementation using get_historical_candles.
+        Supports: 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y
         """
         # Convert period to start/end dates
         end_date = datetime.utcnow()
-        if period == "1mo": start_date = end_date - timedelta(days=30)
-        elif period == "1y": start_date = end_date - timedelta(days=365)
-        elif period == "10y": start_date = end_date - timedelta(days=3650)
-        else: start_date = end_date - timedelta(days=30)
+
+        # Robust period parsing
+        import re
+        match = re.match(r"(\d+)(\w+)", period)
+        if match:
+            val, unit = int(match.group(1)), match.group(2)
+            if unit == "mo": start_date = end_date - timedelta(days=val * 30)
+            elif unit == "y": start_date = end_date - timedelta(days=val * 365)
+            elif unit == "d": start_date = end_date - timedelta(days=val)
+            else: start_date = end_date - timedelta(days=30)
+        else:
+            start_date = end_date - timedelta(days=30)
 
         prices = await self.get_historical_candles(symbol, start_date, end_date, interval)
         if not prices:

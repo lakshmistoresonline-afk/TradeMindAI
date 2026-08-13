@@ -4,6 +4,9 @@ import { Wallet, Briefcase, ShieldCheck, History } from 'lucide-react';
 import Portfolio from './Portfolio';
 import RiskGuard from './RiskGuard';
 import Journal from './Journal';
+import HedgeCommander from '../components/Research/portfolio/HedgeCommander';
+import StressLab from '../components/Research/portfolio/StressLab';
+import { Grid } from '@mui/material';
 
 export default function PortfolioDashboard() {
   const [activeTab, setActiveTab] = useState(0);
@@ -32,7 +35,19 @@ export default function PortfolioDashboard() {
       <Box>
          {activeTab === 0 && <Portfolio isOverviewOnly />}
          {activeTab === 1 && <Portfolio isHoldingsOnly />}
-         {activeTab === 2 && <RiskGuard isConsolidated />}
+         {activeTab === 2 && (
+            <Grid container spacing={3}>
+               <Grid item xs={12} lg={6}>
+                  <HedgeCommander />
+               </Grid>
+               <Grid item xs={12} lg={6}>
+                  <StressLab />
+               </Grid>
+               <Grid item xs={12}>
+                  <RiskGuard isConsolidated />
+               </Grid>
+            </Grid>
+         )}
          {activeTab === 3 && <Journal />}
       </Box>
     </Box>

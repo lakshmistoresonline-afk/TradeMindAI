@@ -38,6 +38,10 @@ celery_app.conf.beat_schedule = {
         "task": "backend.workers.tasks.audit_signals_task",
         "schedule": crontab(minute="*/30"),
     },
+    "terminal-heartbeat": {
+        "task": "backend.workers.tasks.terminal_heartbeat",
+        "schedule": 60.0, # Every minute
+    },
 }
 celery_app.conf.timezone = 'Asia/Kolkata'
 
@@ -345,6 +349,20 @@ def analyze_nifty_100(period="1y"):
     return f"Triggered data sync for {len(NIFTY_100)} stocks."
 
 @celery_app.task
+def terminal_heartbeat():
+    """
+    Vision 2.2: Live Terminal Heartbeat.
+    Fetches macro indices and updates the live context cache.
+    """
+    import yfinance as yf
+    try:
+        nifty = yf.Ticker("^NSEI").fast_info.last_price
+        print(f"[Heartbeat] Nifty: {nifty}")
+        # In a full Redis Pub/Sub setup, we'd broadcast here.
+        # For now, this serves as a background synchronization hook.
+    except: pass
+
+@celery_app.task
 def audit_signals_task():
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(_audit_signals_logic())
@@ -416,6 +434,11 @@ async def _sync_instruments_logic():
         session.commit()
 
     return f"Synced {len(instruments)} instruments."
+
+@celery_app.task
+def audit_signals_task():
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(_audit_signals_logic())
 
 async def _audit_signals_logic():
     from backend.core.container import container

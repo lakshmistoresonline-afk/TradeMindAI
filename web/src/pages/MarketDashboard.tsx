@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Tab, Tabs } from '@mui/material';
+import { Box, Typography, Paper, Tab, Tabs, Grid } from '@mui/material';
 import { Globe, PieChart, Activity, Calendar } from 'lucide-react';
 import MarketCommandCenter from './MarketCommandCenter';
 import SectorRotation from './SectorRotation';
+import SectorRotationGraph from '../components/Research/market/SectorRotationGraph';
 import OptionsIntelligence from './Options/OptionsIntelligence';
 import MacroCalendar from './Calendar/MacroCalendar';
 
@@ -32,7 +33,16 @@ export default function MarketDashboard() {
 
       <Box>
          {activeTab === 0 && <MarketCommandCenter isConsolidated />}
-         {activeTab === 1 && <SectorRotation />}
+         {activeTab === 1 && (
+            <Grid container spacing={3}>
+               <Grid item xs={12} lg={8}>
+                  <SectorRotationGraph />
+               </Grid>
+               <Grid item xs={12} lg={4}>
+                  <SectorRotation />
+               </Grid>
+            </Grid>
+         )}
          {activeTab === 2 && <OptionsIntelligence />}
          {activeTab === 3 && <MacroCalendar />}
       </Box>

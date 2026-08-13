@@ -12,7 +12,8 @@ const drawerWidth = 240;
 
 // Notification Context
 export const NotificationContext = createContext({
-  showNotification: (_message: string, _severity: 'success' | 'error' | 'info' | 'warning') => {}
+  showNotification: (_message: string, _severity: 'success' | 'error' | 'info' | 'warning') => {},
+  setCopilotContext: (_context: any) => {}
 });
 
 export const useNotification = () => useContext(NotificationContext);
@@ -32,6 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [copilotOpen, setCopilotOpen] = useState(false);
+  const [copilotContext, setCopilotContext] = useState<any>(null);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [marketBrief, setMarketBrief] = useState<any>(null);
   const [pinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
@@ -69,7 +71,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const handleClose = () => setNotification({ ...notification, open: false });
 
   return (
-    <NotificationContext.Provider value={{ showNotification }}>
+    <NotificationContext.Provider value={{ showNotification, setCopilotContext }}>
       <Box sx={{ display: 'flex' }}>
         <CommandPalette />
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#0f172a', borderBottom: '1px solid #334155' }} elevation={0}>
@@ -220,7 +222,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <IconButton onClick={() => setCopilotOpen(false)}><X size={20} /></IconButton>
            </Box>
            <Box sx={{ height: 'calc(100% - 60px)', p: 0 }}>
-              <AICopilot isDrawer />
+              <AICopilot isDrawer stockContext={copilotContext} />
            </Box>
         </Drawer>
 

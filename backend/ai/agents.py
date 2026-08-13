@@ -173,7 +173,12 @@ class ConsensusAgent(BaseAgent):
             "risk_reward": "e.g. 1:2.5",
             "key_catalysts": ["catalyst"],
             "key_risks": ["risk"],
-            "invalidation_point": "price level"
+            "invalidation_point": "price level",
+            "agent_debate": [
+                {"agent": "MarketAnalyst", "summary": "..."},
+                {"agent": "CompanyAnalyst", "summary": "..."},
+                {"agent": "ContextAnalyst", "summary": "..."}
+            ]
         }}
         """
         retries = 0

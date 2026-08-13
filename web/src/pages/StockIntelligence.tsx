@@ -12,6 +12,7 @@ import AIInvestmentThesis from '../components/Research/decision/AIInvestmentThes
 import HistoricalPatternMatch from '../components/Research/decision/HistoricalPatternMatch';
 import DecisionHistory from '../components/Research/decision/DecisionHistory';
 import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
+import ForensicPlayback from '../components/Research/history/ForensicPlayback';
 import ResearchHub from './ResearchHub';
 
 import TechnicalAnalysis from '../components/Research/market/TechnicalAnalysis';
@@ -36,9 +37,11 @@ import ResearchNotebook from '../components/Research/ResearchNotebook';
 
 import { useLocation } from 'react-router-dom';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
+import { useNotification } from '../components/Layout';
 
 export default function StockIntelligence() {
   const location = useLocation();
+  const { setCopilotContext } = useNotification();
   const [stocks, setStocks] = useState<any[]>([]);
   const [selectedStock, setSelectedStock] = useState<any | null>(null);
   const [backtestReport, setBacktestReport] = useState<any | null>(null);
@@ -98,10 +101,13 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
 
   useEffect(() => {
     if (selectedStock) {
+      setCopilotContext(selectedStock);
       fetchBacktest(selectedStock.symbol);
       fetchSignals(selectedStock.symbol);
+    } else {
+      setCopilotContext(null);
     }
-  }, [selectedStock]);
+  }, [selectedStock, setCopilotContext]);
 
   const fetchBacktest = async (symbol: string) => {
     try {
@@ -252,6 +258,9 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
                {activeTab === 5 && (
                  <Box>
                     <DecisionHistory history={selectedStock.analysis?.recommendation_history || []} />
+                    <Box sx={{ mt: 4 }}>
+                       <ForensicPlayback signal={selectedStock} />
+                    </Box>
                     <AIPerformance />
                     <AIResearchTimeline symbol={selectedStock.symbol} />
 

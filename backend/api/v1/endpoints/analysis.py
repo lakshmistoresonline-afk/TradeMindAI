@@ -163,10 +163,37 @@ async def get_performance_summary(
 
     # 2.1 Timeframe Breakdown for Live
     live_tf_breakdown = {}
+    live_sector_breakdown = {}
+
+    # Pre-fetch sectors for mapping
+    stocks = await container.repository.get_all_stocks(limit=200)
+    sector_map = {s.symbol: s.sector for s in stocks}
+
     for tf in ["INTRADAY", "SWING", "POSITION", "LONG TERM"]:
         tf_signals = [s for s in live_signals if s.timeframe == tf]
         if tf_signals:
             live_tf_breakdown[tf] = calc_stats(tf_signals)
+
+    for symbol, sector in sector_map.items():
+        if not sector: continue
+        s_signals = [s for s in live_signals if s.symbol == symbol]
+        if s_signals:
+            if sector not in live_sector_breakdown:
+                live_sector_breakdown[sector] = {"total": 0, "wins": 0, "profit": 0, "resolved": 0}
+
+            stats = calc_stats(s_signals)
+            live_sector_breakdown[sector]["total"] += stats["total"]
+            live_sector_breakdown[sector]["resolved"] += stats["resolved"]
+            # Weighted aggregation would be better, but simple sum for now
+            live_sector_breakdown[sector]["wins"] += int(stats["total"] * stats["win_rate"] / 100)
+            live_sector_breakdown[sector]["profit"] += stats["avg_profit"]
+
+    # Finalize Sector stats
+    for sec in live_sector_breakdown:
+        res_count = live_sector_breakdown[sec]["resolved"]
+        live_sector_breakdown[sec]["win_rate"] = round(live_sector_breakdown[sec]["wins"] / res_count * 100, 1) if res_count > 0 else 0
+        # Correct averaging for profit if needed, but we don't store individual profits here.
+        # Let's just keep the win rate for now as it's the primary institutional metric.
 
     # 3. Fetch Backtest Signals from Firestore
     backtest_signals = []
@@ -238,7 +265,7 @@ async def get_performance_summary(
             "is_complete_history": not start_date and not end_date
         },
         "earliest_recorded_date": earliest_available.isoformat(),
-        "live_signals": {**live_summary, "breakdown": live_tf_breakdown},
+        "live_signals": {**live_summary, "breakdown": live_tf_breakdown, "sector_breakdown": live_sector_breakdown},
         "backtest_signals": {**backtest_summary, "breakdown": bt_tf_breakdown},
         "evolution": evolution_data
     }

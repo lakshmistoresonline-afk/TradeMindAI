@@ -58,7 +58,7 @@ class HybridStockRepository(IStockRepository):
             for k, v in data.items():
                 if k in db_columns:
                     if k in json_cols:
-                        filtered_data[k] = json_serializable(v)
+                        filtered_data[k] = json.dumps(json_serializable(v)) if v is not None else None
                     else:
                         filtered_data[k] = v
 
@@ -109,7 +109,7 @@ class HybridStockRepository(IStockRepository):
                         volume=p.volume,
                         open_interest=p.open_interest,
                         source=p.source,
-                        indicators=clean_indicators(p.indicators)
+                        indicators=json.dumps(clean_indicators(p.indicators)) if p.indicators else None
                     ))
 
             # 2. Bulk insert new records
@@ -121,7 +121,15 @@ class HybridStockRepository(IStockRepository):
     async def get_recent_prices(self, symbol: str, limit: int = 250) -> List[StockPrice]:
         with self.session_factory() as pg:
             prices = pg.query(PriceDB).filter(PriceDB.symbol == symbol).order_by(PriceDB.date.desc()).limit(limit).all()
-            results = [StockPrice(**{c.name: getattr(p, c.name) for c in p.__table__.columns}) for p in prices]
+
+            results = []
+            for p in prices:
+                p_data = {c.name: getattr(p, c.name) for c in p.__table__.columns}
+                if p_data.get('indicators') and isinstance(p_data['indicators'], str):
+                    try: p_data['indicators'] = json.loads(p_data['indicators'])
+                    except: pass
+                results.append(StockPrice(**p_data))
+
             return sorted(results, key=lambda x: x.date)
 
     async def update_analysis(self, symbol: str, analysis: Dict[str, Any]) -> None:
@@ -139,6 +147,13 @@ class HybridStockRepository(IStockRepository):
 
     def _map_db_to_stock(self, db_obj: StockDB) -> Stock:
         data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
+
+        json_cols = {"analysis", "structured_consensus", "health_metrics", "confidence_metrics", "options_data", "financial_history"}
+        for col in json_cols:
+            if data.get(col) and isinstance(data[col], str):
+                try: data[col] = json.loads(data[col])
+                except: pass
+
         # Ensure BigInt market_cap fits into float
         if data.get('market_cap'):
             data['market_cap'] = float(data['market_cap'])
@@ -216,6 +231,11 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         with self.session_factory() as pg:
             db_def = pg.query(FeatureDefinitionDB).filter(FeatureDefinitionDB.name == definition.name).first()
             data = definition.model_dump()
+
+            # Manual Serialize
+            for col in ["dependencies", "lineage"]:
+                if data.get(col): data[col] = json.dumps(data[col])
+
             if db_def:
                 for k, v in data.items():
                     if hasattr(db_def, k): setattr(db_def, k, v)
@@ -227,7 +247,16 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         with self.session_factory() as pg:
             query = pg.query(FeatureDefinitionDB)
             if category: query = query.filter(FeatureDefinitionDB.category == category)
-            return [FeatureDefinition(**{c.name: getattr(d, c.name) for c in d.__table__.columns}) for d in query.all()]
+
+            results = []
+            for d in query.all():
+                d_data = {c.name: getattr(d, c.name) for c in d.__table__.columns}
+                for col in ["dependencies", "lineage"]:
+                    if d_data.get(col) and isinstance(d_data[col], str):
+                        try: d_data[col] = json.loads(d_data[col])
+                        except: pass
+                results.append(FeatureDefinition(**d_data))
+            return results
 
     async def save_strategy(self, strategy: UserStrategy) -> None: self.fs.collection("strategies").document(strategy.id).set(strategy.model_dump())
     async def get_user_strategies(self, user_id: str) -> List[UserStrategy]:
@@ -261,48 +290,60 @@ class HybridIOSRepository(IIOSRepository):
     async def save_workspace(self, workspace: WorkspaceState) -> None:
         with self.session_factory() as pg:
             db_ws = pg.query(WorkspaceDB).filter(WorkspaceDB.id == workspace.id).first()
+            data = workspace.model_dump()
+
+            # Manual Serialize
+            for col in ["layout_config", "active_stocks", "saved_indicators"]:
+                if data.get(col): data[col] = json.dumps(data[col])
+
             if db_ws:
-                for k, v in workspace.model_dump().items(): setattr(db_ws, k, v)
+                for k, v in data.items(): setattr(db_ws, k, v)
             else:
-                pg.add(WorkspaceDB(**workspace.model_dump()))
+                pg.add(WorkspaceDB(**data))
             pg.commit()
 
     async def get_user_workspaces(self, user_id: str) -> List[WorkspaceState]:
         with self.session_factory() as pg:
             res = pg.query(WorkspaceDB).filter(WorkspaceDB.user_id == user_id).all()
-            return [WorkspaceState(
-                id=r.id,
-                user_id=r.user_id,
-                name=r.name,
-                type=r.type,
-                layout_config=r.layout_config or {},
-                active_stocks=r.active_stocks or [],
-                saved_indicators=r.saved_indicators or [],
-                updated_at=r.updated_at
-            ) for r in res]
+
+            results = []
+            for r in res:
+                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
+                for col in ["layout_config", "active_stocks", "saved_indicators"]:
+                    if data.get(col) and isinstance(data[col], str):
+                        try: data[col] = json.loads(data[col])
+                        except: pass
+                results.append(WorkspaceState(**data))
+            return results
 
     async def save_research_note(self, note: ResearchNote) -> None:
         with self.session_factory() as pg:
             db_note = pg.query(ResearchNoteDB).filter(ResearchNoteDB.id == note.id).first()
+            data = note.model_dump()
+
+            # Manual Serialize
+            for col in ["tags", "attachments"]:
+                if data.get(col): data[col] = json.dumps(data[col])
+
             if db_note:
-                for k, v in note.model_dump().items(): setattr(db_note, k, v)
+                for k, v in data.items(): setattr(db_note, k, v)
             else:
-                pg.add(ResearchNoteDB(**note.model_dump()))
+                pg.add(ResearchNoteDB(**data))
             pg.commit()
 
     async def get_stock_notes(self, user_id: str, symbol: str) -> List[ResearchNote]:
         with self.session_factory() as pg:
             res = pg.query(ResearchNoteDB).filter(ResearchNoteDB.user_id == user_id, ResearchNoteDB.symbol == symbol).all()
-            return [ResearchNote(
-                id=r.id,
-                user_id=r.user_id,
-                symbol=r.symbol,
-                content=r.content,
-                tags=r.tags or [],
-                attachments=r.attachments or [],
-                created_at=r.created_at,
-                updated_at=r.updated_at
-            ) for r in res]
+
+            results = []
+            for r in res:
+                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
+                for col in ["tags", "attachments"]:
+                    if data.get(col) and isinstance(data[col], str):
+                        try: data[col] = json.loads(data[col])
+                        except: pass
+                results.append(ResearchNote(**data))
+            return results
 
     async def save_market_regime(self, regime: MarketRegime) -> None:
         from backend.core.postgres import RegimeDB
@@ -335,36 +376,63 @@ class HybridIOSRepository(IIOSRepository):
     async def save_opportunity(self, opportunity: MarketOpportunity) -> None:
         from backend.core.postgres import OpportunityDB
         with self.session_factory() as pg:
-            pg.add(OpportunityDB(**opportunity.model_dump()))
+            data = opportunity.model_dump()
+            if data.get('indicators'): data['indicators'] = json.dumps(data['indicators'])
+            pg.add(OpportunityDB(**data))
             pg.commit()
 
     async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]:
         from backend.core.postgres import OpportunityDB
         with self.session_factory() as pg:
             res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
-            return [MarketOpportunity(
-                id=str(r.id),
-                symbol=str(r.symbol),
-                type=str(r.type),
-                conviction_score=float(r.conviction_score),
-                ai_thesis=str(r.ai_thesis),
-                indicators=r.indicators if isinstance(r.indicators, list) else [],
-                timestamp=r.timestamp
-            ) for r in res]
+
+            results = []
+            for r in res:
+                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
+                if data.get('indicators') and isinstance(data['indicators'], str):
+                    try: data['indicators'] = json.loads(data['indicators'])
+                    except: pass
+                results.append(MarketOpportunity(
+                    id=str(data['id']),
+                    symbol=str(data['symbol']),
+                    type=str(data['type']),
+                    conviction_score=float(data['conviction_score']),
+                    ai_thesis=str(data['ai_thesis']),
+                    indicators=data['indicators'] if isinstance(data['indicators'], list) else [],
+                    timestamp=data['timestamp']
+                ))
+            return results
 
     async def save_live_signal(self, signal: LiveSignal) -> None:
+        def json_serializable(data):
+            import math
+            if isinstance(data, dict):
+                return {k: json_serializable(v) for k, v in data.items()}
+            elif isinstance(data, list):
+                return [json_serializable(i) for i in data]
+            elif isinstance(data, datetime):
+                return data.isoformat()
+            elif isinstance(data, float) and (math.isnan(data) or math.isinf(data)):
+                return None
+            return data
+
         with self.session_factory() as pg:
             db_sig = pg.query(LiveSignalDB).filter(LiveSignalDB.id == signal.id).first()
+            data = signal.model_dump()
+            if data.get('events'):
+                # Deep serialize events to handle nested datetimes
+                data['events'] = json.dumps(json_serializable(data['events']))
+
             if db_sig:
-                for k, v in signal.model_dump().items(): setattr(db_sig, k, v)
+                for k, v in data.items(): setattr(db_sig, k, v)
             else:
-                pg.add(LiveSignalDB(**signal.model_dump()))
+                pg.add(LiveSignalDB(**data))
             pg.commit()
 
     async def get_active_live_signals(self) -> List[LiveSignal]:
         with self.session_factory() as pg:
             res = pg.query(LiveSignalDB).filter(LiveSignalDB.status == "ACTIVE").all()
-            return [LiveSignal(**{c.name: getattr(r, c.name) for c in r.__table__.columns}) for r in res]
+            return [self._map_db_to_live_signal(r) for r in res]
 
     async def get_all_live_signals(self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None) -> List[LiveSignal]:
         with self.session_factory() as pg:
@@ -374,7 +442,18 @@ class HybridIOSRepository(IIOSRepository):
             if end_date:
                 query = query.filter(LiveSignalDB.timestamp <= end_date)
             res = query.order_by(LiveSignalDB.timestamp.desc()).all()
-            return [LiveSignal(**{c.name: getattr(r, c.name) for c in r.__table__.columns}) for r in res]
+            return [self._map_db_to_live_signal(r) for r in res]
+
+    def _map_db_to_live_signal(self, db_obj: LiveSignalDB) -> LiveSignal:
+        data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
+        if data.get('events') and isinstance(data['events'], str):
+            try: data['events'] = json.loads(data['events'])
+            except: data['events'] = []
+
+        if not data.get('events'): data['events'] = []
+        if data.get('mfe') is None: data['mfe'] = 0.0
+        if data.get('mae') is None: data['mae'] = 0.0
+        return LiveSignal(**data)
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         from backend.core.postgres import IntelReportDB
@@ -409,27 +488,28 @@ class HybridIOSRepository(IIOSRepository):
     async def save_trade_feedback(self, feedback: TradeFeedback) -> None:
         with self.session_factory() as pg:
             db_trade = pg.query(TradeJournalDB).filter(TradeJournalDB.id == feedback.id).first()
+            data = feedback.model_dump()
+
+            # Manual Serialize
+            for col in ["mistakes", "lessons"]:
+                if data.get(col): data[col] = json.dumps(data[col])
+
             if db_trade:
-                for k, v in feedback.model_dump().items(): setattr(db_trade, k, v)
+                for k, v in data.items(): setattr(db_trade, k, v)
             else:
-                pg.add(TradeJournalDB(**feedback.model_dump()))
+                pg.add(TradeJournalDB(**data))
             pg.commit()
 
     async def get_user_trades(self, user_id: str) -> List[TradeFeedback]:
         with self.session_factory() as pg:
             res = pg.query(TradeJournalDB).filter(TradeJournalDB.user_id == user_id).all()
-            return [TradeFeedback(
-                id=r.id,
-                user_id=r.user_id,
-                symbol=r.symbol,
-                entry_price=r.entry_price,
-                exit_price=r.exit_price,
-                quantity=r.quantity,
-                entry_date=r.entry_date,
-                exit_date=r.exit_date,
-                pnl=r.pnl,
-                ai_score_at_entry=r.ai_score_at_entry,
-                feedback=r.feedback,
-                mistakes=r.mistakes or [],
-                lessons=r.lessons or []
-            ) for r in res]
+
+            results = []
+            for r in res:
+                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
+                for col in ["mistakes", "lessons"]:
+                    if data.get(col) and isinstance(data[col], str):
+                        try: data[col] = json.loads(data[col])
+                        except: pass
+                results.append(TradeFeedback(**data))
+            return results

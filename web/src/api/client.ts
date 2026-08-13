@@ -31,11 +31,33 @@ apiClient.interceptors.response.use(
        ]};
     }
 
-    if (error.config?.url?.includes('/performance/audit')) {
+    if (error.config?.url?.includes('/performance/summary')) {
+       return { data: {
+          range: { start: '2026-06-04T00:00:00', end: new Date().toISOString(), is_complete_history: true },
+          earliest_recorded_date: '2026-06-04T00:00:00',
+          live_signals: { total: 142, resolved: 142, win_rate: 48.2, avg_profit: 4.65, outcomes: { TARGET_HIT: 68, STOP_LOSS: 59, EXPIRED: 15 }, sample_size: 142, breakdown: { SWING: { total: 142, resolved: 142, win_rate: 48.2, avg_profit: 4.65 } } },
+          backtest_signals: { total: 166, resolved: 166, win_rate: 44.0, avg_profit: 3.82, outcomes: { TARGET_HIT: 73, STOP_LOSS: 93 }, sample_size: 166, breakdown: { SWING: { total: 85, resolved: 85, win_rate: 46.2, avg_profit: 4.1 } } },
+          evolution: { labels: ['Jun 26', 'Jul 26', 'Aug 26'], win_rates: [44.5, 46.8, 48.2], counts: [32, 85, 25] }
+       }};
+    }
+
+    if (error.config?.url?.includes('/performance/signals')) {
        return { data: [
-          { symbol: 'RELIANCE', date: new Date().toISOString(), entry: 2450, target: 2600, outcome: 'ACTIVE', profit_pct: 0, mfe: 1.2, mae: -0.5 },
-          { symbol: 'TCS', date: new Date().toISOString(), entry: 3800, target: 4100, outcome: 'TARGET_HIT', profit_pct: 7.8, mfe: 8.1, mae: -1.2 }
+          { symbol: 'RELIANCE', timestamp: '2026-08-11T11:51:00', dataset: 'LIVE', status: 'TARGET_HIT', entry_price: 2485.5, target_price: 2650, outcome_price: 2650.0, profit_pct: 6.62, timeframe: 'SWING', outcome: 'TARGET_HIT' },
+          { symbol: 'TCS', timestamp: '2026-08-05T10:30:00', dataset: 'LIVE', status: 'TARGET_HIT', entry_price: 3820, target_price: 4100, outcome_price: 4100.0, profit_pct: 7.32, timeframe: 'SWING', outcome: 'TARGET_HIT' },
+          { symbol: 'HDFCBANK', timestamp: '2026-07-28T14:15:00', dataset: 'LIVE', status: 'STOP_LOSS', entry_price: 1450, target_price: 1600, outcome_price: 1390.0, profit_pct: -4.1, timeframe: 'INTRADAY', outcome: 'STOP_LOSS' },
+          { symbol: 'INFY', timestamp: '2026-07-20T09:45:00', dataset: 'BACKTEST', status: 'TARGET_HIT', entry_price: 1540, target_price: 1680, profit_pct: 9.1, timeframe: 'SWING', outcome: 'TARGET_HIT' },
+          { symbol: 'ICICIBANK', timestamp: '2026-07-15T11:00:00', dataset: 'BACKTEST', status: 'TARGET_HIT', entry_price: 1120, target_price: 1220, profit_pct: 8.9, timeframe: 'POSITION', outcome: 'TARGET_HIT' },
+          { symbol: 'SBIN', timestamp: '2026-07-10T15:30:00', dataset: 'BACKTEST', status: 'STOP_LOSS', entry_price: 840, target_price: 920, profit_pct: -5.2, timeframe: 'SWING', outcome: 'STOP_LOSS' },
+          { symbol: 'BHARTIARTL', timestamp: '2026-07-05T11:30:00', dataset: 'LIVE', status: 'TARGET_HIT', entry_price: 1420, target_price: 1550, outcome_price: 1550.0, profit_pct: 9.15, timeframe: 'SWING', outcome: 'TARGET_HIT' },
+          { symbol: 'AXISBANK', timestamp: '2026-06-25T10:00:00', dataset: 'LIVE', status: 'TARGET_HIT', entry_price: 1180, target_price: 1300, outcome_price: 1300.0, profit_pct: 10.16, timeframe: 'POSITION', outcome: 'TARGET_HIT' },
+          { symbol: 'LT', timestamp: '2026-06-15T14:00:00', dataset: 'LIVE', status: 'TARGET_HIT', entry_price: 3450, target_price: 3750, outcome_price: 3750.0, profit_pct: 8.7, timeframe: 'SWING', outcome: 'TARGET_HIT' },
+          { symbol: 'ITC', timestamp: '2026-06-08T09:30:00', dataset: 'LIVE', status: 'STOP_LOSS', entry_price: 435, target_price: 480, outcome_price: 410.0, profit_pct: -5.7, timeframe: 'SWING', outcome: 'STOP_LOSS' },
        ]};
+    }
+
+    if (error.config?.url?.includes('/calibration')) {
+       return { data: { labels: ["50-60", "60-70", "70-80", "80-90", "90-100"], win_rates: [45, 52, 68, 75, 84] } };
     }
 
     if (error.config?.url?.includes('/stocks/')) return { data: [] };
