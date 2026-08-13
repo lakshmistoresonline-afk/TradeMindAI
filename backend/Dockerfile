@@ -19,16 +19,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install "numpy==1.26.4" "pandas==2.2.2" "numba==0.59.1" "tqdm" "scikit-learn==1.5.0" "psycopg2-binary==2.9.12"
 
-# Copy requirements - handle both root and backend contexts
-COPY requirements.txt* ./
-RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+# Copy requirements first for better caching
+COPY backend/requirements.txt ./
+RUN pip install -r requirements.txt
 
-# Install pandas-ta
+# Install pandas-ta without triggering dependency resolution
 RUN pip install pandas-ta --no-deps
 
-# Copy source code
-# We want the files to end up in /app/backend/ to support 'from backend...' imports
-COPY . ./backend/
+# Copy entire backend source explicitly
+# This ensures /app/backend/ exists for imports to work
+COPY backend/ backend/
 
 # Ensure start script is executable
 RUN chmod +x backend/start.sh
