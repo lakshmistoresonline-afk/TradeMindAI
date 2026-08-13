@@ -15,11 +15,14 @@ except ValueError:
         # Vision 2.2: Resilient parsing for Base64 or Raw JSON
         try:
             import base64
-            # Attempt base64 decode first
-            decoded = base64.b64decode(firebase_creds_json).decode('utf-8')
+            # Attempt base64 decode (Strip potential surrounding quotes)
+            clean_b64 = firebase_creds_json.strip("'").strip('"')
+            decoded = base64.b64decode(clean_b64).decode('utf-8')
             creds_dict = json.loads(decoded)
-        except:
+            print("[+] Firebase Credentials Decoded from Base64")
+        except Exception as e:
             # Fallback to raw JSON if not base64
+            print(f"[*] Base64 Decode Failed ({e}), attempting raw JSON parse...")
             creds_dict = json.loads(firebase_creds_json)
 
         cred = credentials.Certificate(creds_dict)
