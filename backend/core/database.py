@@ -12,21 +12,26 @@ except ValueError:
     firebase_creds_json = os.getenv("FIREBASE_SERVICE_ACCOUNT")
 
     if firebase_creds_json:
-        # Vision 2.2: Resilient parsing for Base64 or Raw JSON
+        # Vision 2.2: Ultra-resilient parsing (Minified JSON or Base64)
         try:
-            import base64
-            # Attempt base64 decode (Strip potential surrounding quotes)
-            clean_b64 = firebase_creds_json.strip("'").strip('"')
-            decoded = base64.b64decode(clean_b64).decode('utf-8')
-            creds_dict = json.loads(decoded)
-            print("[+] Firebase Credentials Decoded from Base64")
-        except Exception as e:
-            # Fallback to raw JSON if not base64
-            print(f"[*] Base64 Decode Failed ({e}), attempting raw JSON parse...")
+            # 1. Try raw JSON parse
             creds_dict = json.loads(firebase_creds_json)
+            print("[+] Firebase Credentials loaded from Raw JSON")
+        except:
+            try:
+                # 2. Try Base64 decode
+                import base64
+                clean_b64 = firebase_creds_json.strip("'").strip('"')
+                decoded = base64.b64decode(clean_b64).decode('utf-8')
+                creds_dict = json.loads(decoded)
+                print("[+] Firebase Credentials decoded from Base64")
+            except Exception as e:
+                print(f"[!] Critical: Firebase Credential Parsing Failed: {e}")
+                creds_dict = {}
 
-        cred = credentials.Certificate(creds_dict)
-        app = firebase_admin.initialize_app(cred)
+        if creds_dict:
+            cred = credentials.Certificate(creds_dict)
+            app = firebase_admin.initialize_app(cred)
     # 2. Try to load from local file (Best for Development)
     elif os.path.exists("service-account.json"):
         cred = credentials.Certificate("service-account.json")
