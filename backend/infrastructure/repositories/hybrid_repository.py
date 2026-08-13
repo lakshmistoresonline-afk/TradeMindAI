@@ -146,18 +146,30 @@ class HybridStockRepository(IStockRepository):
             return None
 
     def _map_db_to_stock(self, db_obj: StockDB) -> Stock:
-        data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
+        try:
+            data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
 
-        json_cols = {"analysis", "structured_consensus", "health_metrics", "confidence_metrics", "options_data", "financial_history"}
-        for col in json_cols:
-            if data.get(col) and isinstance(data[col], str):
-                try: data[col] = json.loads(data[col])
-                except: pass
+            json_cols = {"analysis", "structured_consensus", "health_metrics", "confidence_metrics", "options_data", "financial_history"}
+            for col in json_cols:
+                if data.get(col) and isinstance(data[col], str):
+                    try:
+                        data[col] = json.loads(data[col])
+                    except Exception as e:
+                        print(f"[*] JSON Load Error in column {col} for {data.get('symbol')}: {e}")
+                        data[col] = None
 
-        # Ensure BigInt market_cap fits into float
-        if data.get('market_cap'):
-            data['market_cap'] = float(data['market_cap'])
-        return Stock(**data)
+            # Ensure BigInt market_cap fits into float
+            if data.get('market_cap'):
+                try: data['market_cap'] = float(data['market_cap'])
+                except: data['market_cap'] = 0.0
+
+            return Stock(**data)
+        except Exception as e:
+            print(f"[!] Critical Mapping Error for symbol {getattr(db_obj, 'symbol', 'UNKNOWN')}: {e}")
+            import traceback
+            traceback.print_exc()
+            # Return a minimal valid stock object to prevent crashing the entire list
+            return Stock(symbol=getattr(db_obj, 'symbol', 'ERROR'), name="Data Corrupted")
 
 class HybridDataPlatformRepository(IDataPlatformRepository):
     def __init__(self, session_factory: Callable[[], Session], firestore_db: Any):
