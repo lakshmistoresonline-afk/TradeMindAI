@@ -384,24 +384,29 @@ class HybridIOSRepository(IIOSRepository):
     async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]:
         from backend.core.postgres import OpportunityDB
         with self.session_factory() as pg:
-            res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
+            try:
+                res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
 
-            results = []
-            for r in res:
-                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
-                if data.get('indicators') and isinstance(data['indicators'], str):
-                    try: data['indicators'] = json.loads(data['indicators'])
-                    except: pass
-                results.append(MarketOpportunity(
-                    id=str(data['id']),
-                    symbol=str(data['symbol']),
-                    type=str(data['type']),
-                    conviction_score=float(data['conviction_score']),
-                    ai_thesis=str(data['ai_thesis']),
-                    indicators=data['indicators'] if isinstance(data['indicators'], list) else [],
-                    timestamp=data['timestamp']
-                ))
-            return results
+                results = []
+                for r in res:
+                    data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
+                    if data.get('indicators') and isinstance(data['indicators'], str):
+                        try: data['indicators'] = json.loads(data['indicators'])
+                        except: data['indicators'] = []
+
+                    results.append(MarketOpportunity(
+                        id=str(data.get('id', uuid.uuid4())),
+                        symbol=str(data.get('symbol', 'UNKNOWN')),
+                        type=str(data.get('type', 'BREAKOUT')),
+                        conviction_score=float(data.get('conviction_score', 0.0)),
+                        ai_thesis=str(data.get('ai_thesis', 'Analysis pending.')),
+                        indicators=data.get('indicators') if isinstance(data.get('indicators'), list) else [],
+                        timestamp=data.get('timestamp', datetime.utcnow())
+                    ))
+                return results
+            except Exception as e:
+                print(f"Error fetching opportunities: {e}")
+                return []
 
     async def save_live_signal(self, signal: LiveSignal) -> None:
         def json_serializable(data):

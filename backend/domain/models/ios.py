@@ -43,7 +43,7 @@ class MarketOpportunity(BaseModel):
 class SignalEvent(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     type: str # GENERATED, VALIDATED, ENTRY_TRIGGERED, POSITION_ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
     price: Optional[float] = None
     message: Optional[str] = None
     metadata: Dict[str, Any] = {}
@@ -51,7 +51,7 @@ class SignalEvent(BaseModel):
 class LiveSignal(BaseModel):
     id: str
     symbol: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
     rating: str
     direction: str # LONG or SHORT
     conviction: float

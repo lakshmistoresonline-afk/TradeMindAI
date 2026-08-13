@@ -147,6 +147,15 @@ async def get_stock_earnings(symbol: str):
 @router.get("/{symbol}/timeline")
 async def get_stock_timeline(symbol: str):
     from google.cloud import firestore
-    docs = container.repository.db.collection("stocks").document(symbol).collection("timeline")\
-        .order_by("date", direction=firestore.Query.DESCENDING).limit(20).stream()
-    return [doc.to_dict() for doc in docs]
+    from backend.core.database import db_client
+
+    if db_client is None:
+        return []
+
+    try:
+        docs = db_client.collection("stocks").document(symbol).collection("timeline")\
+            .order_by("date", direction=firestore.Query.DESCENDING).limit(20).stream()
+        return [doc.to_dict() for doc in docs]
+    except Exception as e:
+        print(f"Firestore timeline error: {e}")
+        return []

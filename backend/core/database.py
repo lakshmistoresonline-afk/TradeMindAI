@@ -13,16 +13,23 @@ except ValueError:
 
     if firebase_creds_json:
         # Vision 2.2: Ultra-resilient parsing (Minified JSON or Base64)
+        creds_dict = None
+
+        # 1. Clean the input (Remove potential surrounding quotes and whitespace)
+        clean_input = firebase_creds_json.strip().strip("'").strip('"')
+
         try:
-            # 1. Try raw JSON parse
-            creds_dict = json.loads(firebase_creds_json)
+            # A. Try raw JSON parse first
+            creds_dict = json.loads(clean_input)
             print("[+] Firebase Credentials loaded from Raw JSON")
         except:
             try:
-                # 2. Try Base64 decode
+                # B. Try Base64 decode (Remove ALL internal whitespace/newlines first)
                 import base64
-                clean_b64 = firebase_creds_json.strip("'").strip('"')
-                decoded = base64.b64decode(clean_b64).decode('utf-8')
+                import re
+                # Base64 should not contain whitespace. Strip everything except valid B64 chars.
+                pure_b64 = re.sub(r'[^A-Za-z0-9+/=]', '', clean_input)
+                decoded = base64.b64decode(pure_b64).decode('utf-8')
                 creds_dict = json.loads(decoded)
                 print("[+] Firebase Credentials decoded from Base64")
             except Exception as e:

@@ -52,11 +52,12 @@ origins = [
     "https://com-webcraft-trademindai-c8f75.firebaseapp.com",
     "http://localhost:5173",
     "http://localhost:3000",
+    "https://trademind-api-production.up.railway.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"] if settings.DEBUG else origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

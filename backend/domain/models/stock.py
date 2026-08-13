@@ -51,7 +51,7 @@ class Stock(BaseModel):
     ai_last_error: Optional[str] = None
     health_metrics: Optional[Dict[str, str]] = None # "Financial": "GOOD", etc.
     confidence_metrics: Optional[Dict[str, Any]] = None
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     def to_dict(self):
         return self.model_dump()

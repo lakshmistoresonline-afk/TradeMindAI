@@ -15,30 +15,32 @@ async def stream_signals(request: Request):
     """
     async def event_generator():
         while True:
-            # If client closes connection, stop sending
-            if await request.is_disconnected():
-                break
+            try:
+                # If client closes connection, stop sending
+                if await request.is_disconnected():
+                    break
 
-            # 1. Fetch latest opportunities from repo
-            # In a full production setup, this would listen to a Redis Pub/Sub channel
-            # to avoid frequent DB polling.
-            opps = await container.ios_repo.get_active_opportunities(limit=3)
+                # 1. Fetch latest opportunities from repo
+                opps = await container.ios_repo.get_active_opportunities(limit=3)
 
-            if opps:
-                yield {
-                    "event": "opportunity_update",
-                    "id": str(datetime.datetime.utcnow().timestamp()),
-                    "retry": 15000, # Retry every 15s if disconnected
-                    "data": json.dumps([{
-                        "symbol": o.symbol,
-                        "type": o.type,
-                        "conviction": o.conviction_score,
-                        "thesis": o.ai_thesis,
-                        "timestamp": o.timestamp.isoformat()
-                    } for o in opps])
-                }
+                if opps:
+                    yield {
+                        "event": "opportunity_update",
+                        "id": str(datetime.datetime.utcnow().timestamp()),
+                        "retry": 15000, # Retry every 15s if disconnected
+                        "data": json.dumps([{
+                            "symbol": o.symbol,
+                            "type": o.type,
+                            "conviction": o.conviction_score,
+                            "thesis": o.ai_thesis,
+                            "timestamp": o.timestamp.isoformat()
+                        } for o in opps])
+                    }
 
-            # Wait before next check (Sub-second sync)
-            await asyncio.sleep(5)
+                # Wait before next check (Sub-second sync)
+                await asyncio.sleep(5)
+            except Exception as e:
+                print(f"SSE Stream Error: {e}")
+                await asyncio.sleep(5)
 
     return EventSourceResponse(event_generator())
