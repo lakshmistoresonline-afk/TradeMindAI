@@ -30,6 +30,7 @@ async def analyze_portfolio(
     return health
 
 @router.get("/market-stats")
+@cache(expire=300) # Cache indices for 5 minutes
 async def get_market_stats():
     indices = {
         "^NSEI": "NIFTY 50",
@@ -103,6 +104,7 @@ async def get_institutional_flow():
     return container.intel_service.estimate_institutional_flow(stats)
 
 @router.get("/")
+@cache(expire=600)
 async def get_stocks(
     limit: int = 50,
     offset: int = 0,
@@ -111,6 +113,7 @@ async def get_stocks(
     return await service.get_market_overview(limit, offset)
 
 @router.get("/{symbol}")
+@cache(expire=600)
 async def get_stock_detail(
     symbol: str,
     service: StockService = Depends(get_stock_service)

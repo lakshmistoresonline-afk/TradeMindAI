@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
     POSTGRES_URL: str = "sqlite:///./local_operational.db"
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     @validator("POSTGRES_URL", pre=True)
     def fix_postgres_prefix(cls, v: str) -> str:
