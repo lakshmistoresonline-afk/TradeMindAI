@@ -1,5 +1,7 @@
 fastapi==0.111.0
 uvicorn==0.30.1
+sse-starlette==2.1.0
+pytz==2024.1
 sqlalchemy==2.0.31
 psycopg2-binary==2.9.12
 redis==4.6.0
