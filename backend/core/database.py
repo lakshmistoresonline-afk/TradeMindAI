@@ -52,10 +52,17 @@ except ValueError:
             'projectId': settings.FIREBASE_PROJECT_ID,
         })
 
-db_client = firestore.client()
+db_client = None
+
+try:
+    db_client = firestore.client()
+except Exception as e:
+    print(f"[!] Firestore Client Initialization Failed: {e}")
 
 def get_db():
     """
     Dependency to get Firestore client.
     """
+    if db_client is None:
+        print("[!] Warning: get_db called but db_client is None")
     return db_client

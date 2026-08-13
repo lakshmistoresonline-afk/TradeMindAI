@@ -1,4 +1,5 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from typing import List
@@ -9,17 +10,26 @@ from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 import datetime
 import json
+import traceback
 
 app = FastAPI(
     title="TradeMind AI-IOS (Vision 2.0)",
     description="Institutional AI Investment Operating System API. Supports multi-agent consensus, predictive ML, and enterprise risk analytics.",
     version="2.0.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    contact={
-        "name": "TradeMind AI Enterprise Support",
-        "url": "https://trademindai.com",
-    },
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    print(f"CRITICAL ERROR: {exc}")
+    print(traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": str(exc),
+            "trace": traceback.format_exc() if settings.DEBUG else "Check server logs"
+        },
+    )
 
 from backend.core.websocket import manager
 
@@ -46,18 +56,9 @@ async def startup():
     except Exception as e:
         print(f"Database Initialization Failed: {e}")
 
-# Set all CORS enabled origins
-origins = [
-    "https://com-webcraft-trademindai-c8f75.web.app",
-    "https://com-webcraft-trademindai-c8f75.firebaseapp.com",
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://trademind-api-production.up.railway.app",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.DEBUG else origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,7 +88,7 @@ async def root():
             "engine": db_type,
             "status": db_status
         },
-        "version": "2.0.0-RC4.16"
+        "version": "2.0.0-RC4.17"
     }
 
 @app.get("/health")
