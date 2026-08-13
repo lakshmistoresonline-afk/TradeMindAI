@@ -36,7 +36,7 @@ creds = {
   "type": "service_account",
   "project_id": "com-webcraft-trademindai-c8f75",
   "private_key_id": "5a2ecbcb1a6f713944795093f7201dafc81c31be",
-  "private_key": pk.replace("\n", "\\n"), # Crucial: Convert literal newlines to JSON escaped \n
+  "private_key": pk.strip(), # json.dump handles escaping newlines automatically
   "client_email": "firebase-adminsdk-fbsvc@com-webcraft-trademindai-c8f75.iam.gserviceaccount.com",
   "client_id": "104590117655426687280",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
