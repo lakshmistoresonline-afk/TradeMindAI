@@ -273,11 +273,15 @@ class GrowwProvider(IMarketDataProvider):
     def _map_to_groww_symbol(self, symbol: str) -> str:
         # Predefined mappings for common indices
         mapping = {
-            "NIFTY": "NSE-NIFTY",
-            "BANKNIFTY": "NSE-BANKNIFTY",
-            "FINNIFTY": "NSE-FINNIFTY",
-            "^NSEI": "NSE-NIFTY",
-            "^NSEBANK": "NSE-BANKNIFTY"
+            "NIFTY": "NIFTY", # Groww index format
+            "BANKNIFTY": "BANKNIFTY",
+            "FINNIFTY": "FINNIFTY",
+            "^NSEI": "NIFTY",
+            "^NSEBANK": "BANKNIFTY",
+            "INDIAVIX": "INDIAVIX",
+            "^INDIAVIX": "INDIAVIX"
+        }
+        if symbol in mapping: return mapping[symbol]
         }
         if symbol in mapping: return mapping[symbol]
 
