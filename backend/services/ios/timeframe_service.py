@@ -15,8 +15,8 @@ class MultiTimeframeService:
         df_15m = await self.provider.fetch_history(symbol, period="5d", interval="15m")
         df_1h = await self.provider.fetch_history(symbol, period="1mo", interval="1h")
         df_4h = await self.provider.fetch_history(symbol, period="3mo", interval="1h") # 1h is proxy if 4h not supported
-        df_1d = await self.provider.fetch_history(symbol, period="1y", interval="1D")
-        df_1w = await self.provider.fetch_history(symbol, period="2y", interval="1W")
+        df_1d = await self.provider.fetch_history(symbol, period="1y", interval="1d")
+        df_1w = await self.provider.fetch_history(symbol, period="2y", interval="1wk")
 
         results = {
             "15M": self._get_bias(df_15m, window=20),

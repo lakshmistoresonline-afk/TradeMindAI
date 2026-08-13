@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Button } from '@mui/material';
-import { LineChart, Wallet, History, Bot, Star, Activity, Zap, X, TrendingUp, Settings } from 'lucide-react';
+import { LineChart, History, Bot, Activity, Zap, X, TrendingUp, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme, IconButton, BottomNavigation, BottomNavigationAction, Paper as MuiPaper, Fab } from '@mui/material';
 import { Menu as MenuIcon } from 'lucide-react';
@@ -21,7 +21,6 @@ export const useNotification = () => useContext(NotificationContext);
 const primaryMenu = [
   { text: 'SIGNALS', icon: <Zap size={20} />, path: '/' },
   { text: 'MARKET', icon: <LineChart size={20} />, path: '/market' },
-  { text: 'PORTFOLIO', icon: <Wallet size={20} />, path: '/portfolio' },
   { text: 'HISTORY', icon: <History size={20} />, path: '/history' },
 ];
 
@@ -36,7 +35,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [copilotContext, setCopilotContext] = useState<any>(null);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [marketBrief, setMarketBrief] = useState<any>(null);
-  const [pinnedStocks] = useState<string[]>(['RELIANCE', 'TCS', 'HDFCBANK']);
 
   useEffect(() => {
     getMarketStats().then(data => {
@@ -159,22 +157,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                ))}
             </List>
 
-            <Divider sx={{ mx: 2, my: 3, opacity: 0.1 }} />
-
-            <List subheader={<Typography variant="caption" sx={{ p: 2, color: 'slategray', fontWeight: 800, letterSpacing: 1.5, fontSize: '0.65rem' }}>FAVORITES</Typography>}>
-               {pinnedStocks.map(symbol => (
-                 <ListItem key={symbol} disablePadding>
-                    <ListItemButton
-                      onClick={() => navigate('/analysis', { state: { symbol } })}
-                      sx={{ mx: 1.5, borderRadius: 1, mb: 1 }}
-                    >
-                       <ListItemIcon sx={{ color: 'primary.main', minWidth: 32 }}><Star size={16} /></ListItemIcon>
-                       <ListItemText primary={symbol} primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
-                    </ListItemButton>
-                 </ListItem>
-               ))}
-            </List>
-
             <Box sx={{ mt: 'auto', pb: 2 }}>
                <Divider sx={{ mx: 2, mb: 2, opacity: 0.05 }} />
                <List>
@@ -249,7 +231,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             >
               <BottomNavigationAction label="Signals" value="/" icon={<Zap size={20} />} />
               <BottomNavigationAction label="Market" value="/market" icon={<LineChart size={20} />} />
-              <BottomNavigationAction label="Portfolio" value="/portfolio" icon={<Wallet size={20} />} />
               <BottomNavigationAction label="History" value="/history" icon={<History size={20} />} />
             </BottomNavigation>
           </MuiPaper>

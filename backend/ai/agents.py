@@ -175,9 +175,9 @@ class ConsensusAgent(BaseAgent):
             "key_risks": ["risk"],
             "invalidation_point": "price level",
             "agent_debate": [
-                {"agent": "MarketAnalyst", "summary": "..."},
-                {"agent": "CompanyAnalyst", "summary": "..."},
-                {"agent": "ContextAnalyst", "summary": "..."}
+                {{"agent": "MarketAnalyst", "summary": "..."}},
+                {{"agent": "CompanyAnalyst", "summary": "..."}},
+                {{"agent": "ContextAnalyst", "summary": "..."}}
             ]
         }}
         """

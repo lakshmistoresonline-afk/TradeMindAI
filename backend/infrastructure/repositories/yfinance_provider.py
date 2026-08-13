@@ -19,9 +19,19 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             "greeks": False
         }
 
+    def _map_symbol(self, symbol: str) -> str:
+        mapping = {
+            "NIFTY": "^NSEI",
+            "BANKNIFTY": "^NSEBANK",
+            "FINNIFTY": "^CNXFIN",
+            "INDIAVIX": "^INDIAVIX"
+        }
+        mapped = mapping.get(symbol.upper(), symbol)
+        return f"{mapped}.NS" if not mapped.startswith("^") else mapped
+
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         try:
-            ticker = yf.Ticker(f"{symbol}.NS")
+            ticker = yf.Ticker(self._map_symbol(symbol))
             # Try to get detailed info
             info = ticker.info
 
@@ -105,9 +115,10 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
 
     async def fetch_history(self, symbol: str, period: str, interval: str = "1d") -> Any:
         try:
-            ticker_symbol = f"{symbol}.NS" if not symbol.startswith("^") else symbol
-            ticker = yf.Ticker(ticker_symbol)
-            df = ticker.history(period=period, interval=interval, auto_adjust=True)
+            ticker = yf.Ticker(self._map_symbol(symbol))
+            # Resilient interval mapping (yfinance uses 1wk, not 1w)
+            safe_interval = interval.lower() if interval.lower() != '1w' else '1wk'
+            df = ticker.history(period=period, interval=safe_interval, auto_adjust=True)
             if df.empty:
                 print(f"Warning: Empty history for {symbol}")
             return df
@@ -117,9 +128,10 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             return pd.DataFrame()
 
     async def get_historical_candles(self, symbol: str, start_date: datetime, end_date: datetime, interval: str) -> List[StockPrice]:
-        ticker_symbol = f"{symbol}.NS" if not symbol.startswith("^") else symbol
-        ticker = yf.Ticker(ticker_symbol)
-        df = ticker.history(start=start_date, end=end_date, interval=interval, auto_adjust=True)
+        ticker = yf.Ticker(self._map_symbol(symbol))
+        # Resilient interval mapping
+        safe_interval = interval.lower() if interval.lower() != '1w' else '1wk'
+        df = ticker.history(start=start_date, end=end_date, interval=safe_interval, auto_adjust=True)
         prices = []
         for index, row in df.iterrows():
             prices.append(StockPrice(
@@ -131,7 +143,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
         return prices
 
     async def get_ltp(self, symbol: str) -> float:
-        ticker = yf.Ticker(f"{symbol}.NS")
+        ticker = yf.Ticker(self._map_symbol(symbol))
         return float(ticker.fast_info.last_price)
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
@@ -151,7 +163,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
         return {}
 
     async def get_expiries(self, symbol: str) -> List[datetime]:
-        ticker = yf.Ticker(f"{symbol}.NS")
+        ticker = yf.Ticker(self._map_symbol(symbol))
         return [datetime.datetime.strptime(e, "%Y-%m-%d") for e in ticker.options]
 
     async def get_instruments(self) -> List[Dict[str, Any]]:
@@ -160,7 +172,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
 
     async def get_option_chain(self, symbol: str, expiry: Optional[datetime] = None) -> OptionsChain:
         from backend.domain.models.data_platform import OptionsChain
-        ticker = yf.Ticker(f"{symbol}.NS")
+        ticker = yf.Ticker(self._map_symbol(symbol))
 
         if not ticker.options:
             # Return a valid empty chain if no options exist (e.g. for non-F&O stocks)
@@ -192,7 +204,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
 
     async def fetch_latest_news(self, symbol: str) -> List[NewsArticle]:
         try:
-            ticker = yf.Ticker(f"{symbol}.NS")
+            ticker = yf.Ticker(self._map_symbol(symbol))
             news = ticker.news
             articles = []
             if news:
