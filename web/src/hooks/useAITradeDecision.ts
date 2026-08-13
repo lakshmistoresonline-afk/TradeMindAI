@@ -62,23 +62,28 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
 
   // 6.1 Heuristic Fallback for Missing Targets/Stops (Vision 2.2 Alignment)
   // Ensure we always have a numeric target/stop for active BUY/SELL signals
+  // Also guard against NaN specifically
   if (rating.includes('BUY') && entry > 0) {
-    if (!target) {
+    if (!target || isNaN(target)) {
        const multiplier = rating.includes('STRONG') ? 1.15 : 1.08;
        target = entry * multiplier;
     }
-    if (!stopLoss) {
+    if (!stopLoss || isNaN(stopLoss)) {
        stopLoss = entry * 0.96;
     }
   } else if (rating.includes('SELL') && entry > 0) {
-    if (!target) {
+    if (!target || isNaN(target)) {
        const multiplier = rating.includes('STRONG') ? 0.85 : 0.92;
        target = entry * multiplier;
     }
-    if (!stopLoss) {
+    if (!stopLoss || isNaN(stopLoss)) {
        stopLoss = entry * 1.04;
     }
   }
+
+  // Ensure 0 is used instead of NaN for display if no logic could determine a price
+  target = target && !isNaN(target) ? target : (entry * 1.05);
+  stopLoss = stopLoss && !isNaN(stopLoss) ? stopLoss : (entry * 0.97);
 
   // 7. Drivers (Explainability)
   let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];

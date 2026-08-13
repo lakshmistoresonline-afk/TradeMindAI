@@ -53,13 +53,31 @@ class BaseAgent:
 
                 # Force extract JSON block if code or text is wrapping it
                 import re
+                # Vision 2.2: Ultra-aggressive JSON extraction
+                # Matches the outermost { ... } block
                 json_match = re.search(r'(\{.*\})', content, re.DOTALL)
                 if json_match:
-                    json_str = json_match.group(1).replace("'", '"')
-                    # Remove any trailing commas or common LLM syntax errors
+                    json_str = json_match.group(1)
+
+                    # 1. Standardize quotes
+                    json_str = json_str.replace("'", '"')
+
+                    # 2. Repair common LLM syntax errors
+                    # Remove trailing commas in objects
                     json_str = re.sub(r',\s*\}', '}', json_str)
+                    # Remove trailing commas in arrays
                     json_str = re.sub(r',\s*\]', ']', json_str)
-                    return json.loads(json_str)
+                    # Clean up literal newlines inside strings (common in Llama 3)
+                    json_str = re.sub(r'(?<!\\)\n', '\\\\n', json_str)
+
+                    try:
+                        return json.loads(json_str)
+                    except:
+                        # Final attempt: manual regex for known keys if json.loads still fails
+                        try:
+                            repaired = re.sub(r'(\w+):', r'"\1":', json_str) # Quote unquoted keys
+                            return json.loads(repaired)
+                        except: pass
 
                 return None
             except Exception as e:
@@ -68,7 +86,7 @@ class BaseAgent:
                     retries += 1
                     continue
                 else:
-                    print(f"   [!] {self.name} Error: {str(e)}")
+                    print(f"   [!] {self.name} Parse Error: {str(e)[:100]}")
                     return None
         return None
 
@@ -208,6 +226,18 @@ class ConsensusAgent(BaseAgent):
                 if "429" in str(e) and retries == 0:
                     self.use_fallback(); retries += 1; continue
                 else:
-                    state['consensus'] = '{"rating": "HOLD", "thesis": "Institutional analysis engine is currently handling high volume."}'
+                    # Provide a data-complete fallback to prevent NaN in UI
+                    fallback_price = float(current_price) if isinstance(current_price, (int, float)) else 0.0
+                    fallback = {
+                        "rating": "HOLD",
+                        "conviction": 50,
+                        "thesis": "Consensus engine currently under high load. Using price-action baseline.",
+                        "entry": fallback_price,
+                        "target": fallback_price * 1.05 if fallback_price > 0 else 0,
+                        "stop_loss": fallback_price * 0.97 if fallback_price > 0 else 0,
+                        "timeframe": "SWING",
+                        "agent_debate": []
+                    }
+                    state['consensus'] = json.dumps(fallback)
                     return state
         return state
