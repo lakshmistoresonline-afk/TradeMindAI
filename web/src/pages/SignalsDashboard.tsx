@@ -1,15 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, Stack, Tab, Tabs, Button, Chip, CircularProgress, Divider, List } from '@mui/material';
-import { Zap, Clock, TrendingUp, ShieldAlert, ArrowRight, RefreshCw, Star } from 'lucide-react';
+import { Zap, Clock, TrendingUp, ShieldAlert, ArrowRight, RefreshCw, Star, Radio } from 'lucide-react';
 import { getStocks, getOpportunities } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useNavigate } from 'react-router-dom';
+import { useTurboSync } from '../hooks/useTurboSync';
 
 export default function SignalsDashboard() {
   const [activeTab, setActiveTab] = useState(2); // Default to SWING (index 2)
   const [stocks, setStocks] = useState<any[]>([]);
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { connectionStatus } = useTurboSync();
 
   const timeframes = [
     { label: 'INTRADAY', value: 'INTRADAY' },
@@ -73,6 +76,12 @@ export default function SignalsDashboard() {
             </Typography>
          </Box>
          <Stack direction="row" spacing={2}>
+            <Chip
+               icon={<Radio size={14} className={connectionStatus === 'ONLINE' ? 'text-emerald-500' : 'text-rose-500'} />}
+               label={`TURBO-SYNC: ${connectionStatus}`}
+               variant="outlined"
+               sx={{ fontWeight: 900, height: 32, fontSize: '0.65rem' }}
+            />
             <Button
                variant="outlined"
                startIcon={<RefreshCw size={16} className={loading ? 'animate-spin' : ''} />}

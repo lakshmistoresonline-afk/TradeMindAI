@@ -14,10 +14,8 @@ __pycache__/
 .idea/
 .vscode/
 
-# Exclude local database
+# Exclude local database and env
 *.db
 local_operational.db
-
-# Exclude local env files (Keys are provided via Railway variables)
 .env
-EOF
+service-account.json
