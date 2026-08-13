@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     FIREBASE_PROJECT_ID: str = "com-webcraft-trademindai-c8f75"
     GROQ_API_KEY: str = "YOUR_GROQ_API_KEY"
 
+    # Vision 2.2: Local LLM Support (Ollama)
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3.1:8b" # or "deepseek-v2"
+    USE_LOCAL_LLM: bool = False
+
     GROWW_API_KEY: Optional[str] = None
     GROWW_BASE_URL: str = "https://api.groww.in/v1"
 

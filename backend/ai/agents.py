@@ -31,18 +31,29 @@ class AgentState(TypedDict):
 class BaseAgent:
     def __init__(self, name: str):
         self.name = name
-        self.primary_model = "llama-3.3-70b-versatile"
-        self.fallback_model = "llama-3.1-8b-instant"
 
-        self.llm = ChatGroq(
-            groq_api_key=settings.GROQ_API_KEY,
-            model_name=self.primary_model,
-            temperature=0.1,
-            max_retries=3
-        )
+        if settings.USE_LOCAL_LLM:
+            from langchain_community.chat_models import ChatOllama
+            self.llm = ChatOllama(
+                base_url=settings.OLLAMA_BASE_URL,
+                model=settings.OLLAMA_MODEL,
+                temperature=0.1
+            )
+            print(f"   [+] {self.name} initialized with Local LLM (Ollama: {settings.OLLAMA_MODEL})")
+        else:
+            self.primary_model = "llama-3.3-70b-versatile"
+            self.fallback_model = "llama-3.1-8b-instant"
+
+            self.llm = ChatGroq(
+                groq_api_key=settings.GROQ_API_KEY,
+                model_name=self.primary_model,
+                temperature=0.1,
+                max_retries=3
+            )
 
     def use_fallback(self):
-        self.llm.model_name = self.fallback_model
+        if not settings.USE_LOCAL_LLM:
+            self.llm.model_name = self.fallback_model
 
     def call_llm(self, prompt: str) -> Optional[Dict[str, Any]]:
         retries = 0
