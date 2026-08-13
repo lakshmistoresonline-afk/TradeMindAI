@@ -50,7 +50,9 @@ export default function SignalsDashboard() {
     // Prioritize active opportunities that match timeframe
     const setups = opportunities.filter(o => {
         const stock = stocks.find(s => s.symbol === o.symbol);
-        return stock?.decision?.timeframe === currentTf || (o.type === 'MOMENTUM' && currentTf === 'INTRADAY');
+        // Guard against missing decision/timeframe
+        if (!stock?.decision) return false;
+        return stock.decision.timeframe === currentTf || (o.type === 'MOMENTUM' && currentTf === 'INTRADAY');
     }).map(o => {
         const stock = stocks.find(s => s.symbol === o.symbol);
         return { ...stock, ...o, isOpportunity: true };
@@ -58,9 +60,9 @@ export default function SignalsDashboard() {
 
     // Also include other validated signals for this timeframe
     const others = stocks.filter(s =>
-        s.decision.timeframe === currentTf &&
+        s.decision?.timeframe === currentTf &&
         !setups.find(set => set.symbol === s.symbol) &&
-        (s.decision.rating.includes('BUY') || s.decision.rating.includes('SELL'))
+        (s.decision?.rating?.includes('BUY') || s.decision?.rating?.includes('SELL'))
     );
 
     return [...setups, ...others].sort((a,b) => (b.decision?.conviction || 0) - (a.decision?.conviction || 0));
@@ -142,7 +144,10 @@ export default function SignalsDashboard() {
 function SignalCard({ stock }: { stock: any }) {
   const navigate = useNavigate();
   const decision = stock.decision;
-  const isBuy = decision.rating.includes('BUY');
+
+  if (!decision) return null; // Defensive guard
+
+  const isBuy = decision.rating?.includes('BUY');
 
   return (
     <Paper

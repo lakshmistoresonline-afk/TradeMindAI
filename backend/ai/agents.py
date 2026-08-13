@@ -145,11 +145,12 @@ class ConsensusAgent(BaseAgent):
         current_price = indicators.get('last_price') or indicators.get('Close') or state.get('last_price', 'Unknown')
         regime = state.get('regime', 'NEUTRAL')
 
-        prompt = f"""
-        Final synthesis for {state['symbol']}. CURRENT PRICE: {current_price}
+        # Use a template to avoid f-string escaping hell with complex JSON
+        template = """
+        Final synthesis for {symbol}. CURRENT PRICE: {current_price}
         CURRENT MARKET REGIME: {regime}
 
-        Analyst Reports: {state['recommendations']}
+        Analyst Reports: {reports}
 
         INSTRUCTION FOR {regime} REGIME:
         - If BULLISH: Prioritize growth targets and trend following.
@@ -181,6 +182,13 @@ class ConsensusAgent(BaseAgent):
             ]
         }}
         """
+
+        prompt = template.format(
+            symbol=state['symbol'],
+            current_price=current_price,
+            regime=regime,
+            reports=state['recommendations']
+        )
         retries = 0
         while retries < 2:
             try:
