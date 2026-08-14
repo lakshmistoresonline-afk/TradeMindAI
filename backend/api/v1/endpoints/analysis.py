@@ -323,9 +323,23 @@ async def get_performance_signals(
         except Exception as e:
             print(f"[*] Warning: Could not fetch Firestore backtests: {e}")
 
-    # Sort by date descending
-    signals.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
-    return signals
+    # Sort by date descending with safe key
+    try:
+        def get_sort_key(x):
+            ts = x.get("timestamp")
+            if ts:
+                if isinstance(ts, str):
+                    try: return datetime.datetime.fromisoformat(ts)
+                    except: return datetime.datetime.min
+                return ts
+            return datetime.datetime.min
+
+        signals.sort(key=get_sort_key, reverse=True)
+    except Exception as e:
+        print(f"[*] Sorting failed: {e}")
+
+    # Limit to last 500 for performance/memory stability
+    return signals[:500]
 
 @router.get("/performance/audit")
 async def get_performance_audit():
