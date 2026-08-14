@@ -142,7 +142,10 @@ async def get_performance_summary(
         win_rate = (len(wins) / resolved_count * 100) if resolved_count > 0 else 0
 
         profits = [get_val(s, 'profit_pct') for s in resolved if get_val(s, 'profit_pct') is not None]
+        # Vision 2.2: Hardened NaN prevention for JSON serialization
         avg_profit = np.mean(profits) if profits else 0
+        if np.isnan(avg_profit) or np.isinf(avg_profit):
+            avg_profit = 0
 
         # Outcome breakdown
         outcomes = {}
@@ -326,17 +329,18 @@ async def get_performance_signals(
     # Sort by date descending with safe key
     try:
         def get_sort_key(x):
-            ts = x.get("timestamp")
-            if ts:
-                if isinstance(ts, str):
-                    try: return datetime.datetime.fromisoformat(ts)
-                    except: return datetime.datetime.min
-                return ts
+            try:
+                ts = x.get("timestamp")
+                if ts:
+                    if isinstance(ts, str):
+                        return datetime.datetime.fromisoformat(ts)
+                    return ts
+            except: pass
             return datetime.datetime.min
 
         signals.sort(key=get_sort_key, reverse=True)
     except Exception as e:
-        print(f"[*] Sorting failed: {e}")
+        print(f"[*] Critical Sorting Error: {e}")
 
     # Limit to last 500 for performance/memory stability
     return signals[:500]
