@@ -342,8 +342,21 @@ async def get_performance_signals(
     except Exception as e:
         print(f"[*] Critical Sorting Error: {e}")
 
-    # Limit to last 500 for performance/memory stability
-    return signals[:500]
+    # Vision 2.2: Hardened JSON Sanitizer for Batch Payloads
+    # Prevents "inf" and "nan" from crashing the response
+    def sanitize_batch(data):
+        import math
+        if isinstance(data, dict):
+            return {k: sanitize_batch(v) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [sanitize_batch(i) for i in data]
+        elif isinstance(data, float):
+            if math.isinf(data) or math.isnan(data):
+                return None
+        return data
+
+    # Limit to last 500 and clean
+    return sanitize_batch(signals[:500])
 
 @router.get("/performance/audit")
 async def get_performance_audit():
