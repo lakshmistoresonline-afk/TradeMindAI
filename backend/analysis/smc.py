@@ -43,24 +43,55 @@ class SMCAnalysis:
         SMC v2.0: Market Structure Mapping (BOS/CHoCH).
         Detects Break of Structure and Change of Character.
         """
+        events = SMCAnalysis.detect_structure_change_multi(df)
+        if events:
+            return events[-1]
+        return {"type": "NONE", "level": 0.0}
+
+    @staticmethod
+    def detect_structure_change_multi(df: Any) -> list:
+        """
+        Scans full history for multiple BOS/CHoCH events.
+        """
         if df is None or len(df) < 20:
-            return {"type": "NONE", "level": 0.0}
+            return []
 
+        events = []
         try:
-            last_high = df["High"].tail(20).max()
-            last_low = df["Low"].tail(20).min()
-            current_close = df["Close"].iloc[-1]
+            # Using a sliding window to detect historical breaks
+            for i in range(20, len(df)):
+                window = df.iloc[i-20:i]
+                high = window["High"].max()
+                low = window["Low"].min()
+                current = df.iloc[i]
 
-            # Break of Structure (BOS) - Trend Continuation
-            if current_close > last_high:
-                return {"type": "BOS", "bias": "BULLISH", "level": float(last_high)}
-            if current_close < last_low:
-                return {"type": "BOS", "bias": "BEARISH", "level": float(last_low)}
+                if current["Close"] > high:
+                    events.append({
+                        "type": "BOS",
+                        "bias": "BULLISH",
+                        "level": float(high),
+                        "date": current.name,
+                        "price": float(current["Close"])
+                    })
+                elif current["Close"] < low:
+                    events.append({
+                        "type": "BOS",
+                        "bias": "BEARISH",
+                        "level": float(low),
+                        "date": current.name,
+                        "price": float(current["Close"])
+                    })
 
-            # Change of Character (CHoCH) - Trend Reversal Detection
-            # (Simplified: Close breaking internal swings)
-            return {"type": "IDM", "bias": "NEUTRAL", "level": 0.0} # Inducement
-        except: return {"type": "NONE", "level": 0.0}
+            # Filter to avoid "cluster" signals (only one per 5 days)
+            filtered = []
+            if events:
+                filtered.append(events[0])
+                for e in events[1:]:
+                    if (e['date'] - filtered[-1]['date']).days > 5:
+                        filtered.append(e)
+            return filtered
+        except:
+            return []
 
     @staticmethod
     def detect_fvg(df: Any):

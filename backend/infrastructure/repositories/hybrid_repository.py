@@ -462,15 +462,52 @@ class HybridIOSRepository(IIOSRepository):
             return [self._map_db_to_live_signal(r) for r in res]
 
     def _map_db_to_live_signal(self, db_obj: LiveSignalDB) -> LiveSignal:
-        data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
-        if data.get('events') and isinstance(data['events'], str):
-            try: data['events'] = json.loads(data['events'])
-            except: data['events'] = []
+        try:
+            data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
 
-        if not data.get('events'): data['events'] = []
-        if data.get('mfe') is None: data['mfe'] = 0.0
-        if data.get('mae') is None: data['mae'] = 0.0
-        return LiveSignal(**data)
+            # 1. Robust Event Parsing
+            if data.get('events') and isinstance(data['events'], str):
+                try:
+                    data['events'] = json.loads(data['events'])
+                except:
+                    data['events'] = []
+
+            if not isinstance(data.get('events'), list):
+                data['events'] = []
+
+            # 2. Sanitize Numeric Fields (Handle NaN/None)
+            numeric_fields = ['entry_price', 'target_price', 'stop_loss_price', 'conviction', 'profit_pct', 'mfe', 'mae', 'trigger_price']
+            import math
+            for field in numeric_fields:
+                val = data.get(field)
+                if val is None or (isinstance(val, float) and math.isnan(val)):
+                    # Provide defaults for non-optional fields or keep None for optional ones
+                    if field == 'conviction': data[field] = 50.0
+                    elif field == 'entry_price': data[field] = 0.0
+                    elif field in ['mfe', 'mae']: data[field] = 0.0
+                    else: data[field] = None
+
+            # 3. Ensure required string fields exist
+            if not data.get('direction'): data['direction'] = "LONG"
+            if not data.get('rating'): data['rating'] = "HOLD"
+            if not data.get('timeframe'): data['timeframe'] = "SWING"
+            if not data.get('status'): data['status'] = "ACTIVE"
+            if not data.get('model_version'): data['model_version'] = "TradeMind Core v2.2"
+
+            return LiveSignal(**data)
+        except Exception as e:
+            print(f"[!] Critical Signal Mapping Error for symbol {getattr(db_obj, 'symbol', 'UNK')}: {e}")
+            # Minimal fallback to prevent breaking the whole list
+            return LiveSignal(
+                id=str(getattr(db_obj, 'id', uuid.uuid4())),
+                symbol=str(getattr(db_obj, 'symbol', 'ERROR')),
+                rating="HOLD",
+                direction="LONG",
+                conviction=0,
+                entry_price=0,
+                timeframe="SWING",
+                status="ERROR"
+            )
 
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         from backend.core.postgres import IntelReportDB

@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # Vision 2.2: Local LLM Support (Ollama)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3.1:8b" # or "deepseek-v2"
+    OLLAMA_MODEL: str = "qwen3:1.7b" # Exact tag for your installed 1.7B version
     USE_LOCAL_LLM: bool = False
 
     GROWW_API_KEY: Optional[str] = None
