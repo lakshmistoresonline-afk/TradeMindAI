@@ -478,12 +478,12 @@ class HybridIOSRepository(IIOSRepository):
             if not isinstance(data.get('events'), list):
                 data['events'] = []
 
-            # 2. Sanitize Numeric Fields (Handle NaN/None)
+            # 2. Sanitize Numeric Fields (Handle NaN/Inf/None)
             numeric_fields = ['entry_price', 'target_price', 'stop_loss_price', 'conviction', 'profit_pct', 'mfe', 'mae', 'trigger_price']
             import math
             for field in numeric_fields:
                 val = data.get(field)
-                if val is None or (isinstance(val, float) and math.isnan(val)):
+                if val is None or (isinstance(val, float) and not math.isfinite(val)):
                     # Provide defaults for non-optional fields or keep None for optional ones
                     if field == 'conviction': data[field] = 50.0
                     elif field == 'entry_price': data[field] = 0.0
