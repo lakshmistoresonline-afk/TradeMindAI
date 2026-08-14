@@ -65,7 +65,6 @@ class BaseAgent:
                 # Force extract JSON block if code or text is wrapping it
                 import re
                 # Vision 2.2: Ultra-aggressive JSON extraction
-                # Matches the outermost { ... } block
                 json_match = re.search(r'(\{.*\})', content, re.DOTALL)
                 if json_match:
                     json_str = json_match.group(1)
@@ -74,21 +73,26 @@ class BaseAgent:
                     json_str = json_str.replace("'", '"')
 
                     # 2. Repair common LLM syntax errors
-                    # Remove trailing commas in objects
                     json_str = re.sub(r',\s*\}', '}', json_str)
-                    # Remove trailing commas in arrays
                     json_str = re.sub(r',\s*\]', ']', json_str)
-                    # Clean up literal newlines inside strings (common in Llama 3)
                     json_str = re.sub(r'(?<!\\)\n', '\\\\n', json_str)
 
                     try:
-                        return json.loads(json_str)
+                        data = json.loads(json_str)
+                        # Sanitize numeric fields to prevent NaN leaking
+                        for key in ['entry', 'target', 'stop_loss', 'conviction']:
+                            if key in data:
+                                try:
+                                    val = str(data[key]).replace('₹', '').replace(',', '').strip()
+                                    if val.lower() == 'nan' or val.lower() == 'null':
+                                        data[key] = None
+                                    else:
+                                        data[key] = float(val)
+                                except:
+                                    data[key] = None
+                        return data
                     except:
-                        # Final attempt: manual regex for known keys if json.loads still fails
-                        try:
-                            repaired = re.sub(r'(\w+):', r'"\1":', json_str) # Quote unquoted keys
-                            return json.loads(repaired)
-                        except: pass
+                        pass
 
                 return None
             except Exception as e:

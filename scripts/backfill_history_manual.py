@@ -9,6 +9,11 @@ from dotenv import load_dotenv
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Determine if running in local mode
+if os.getenv("TEST_LOCAL") == "True":
+    os.environ["POSTGRES_URL"] = "sqlite:///./local_operational.db"
+    print("[*] Local Mode Active: Targeting SQLite.")
+
 # Load backend environment variables
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "backend", ".env"))
 
