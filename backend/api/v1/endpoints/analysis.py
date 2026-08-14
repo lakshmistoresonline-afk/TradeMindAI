@@ -55,9 +55,6 @@ async def get_conviction_calibration():
     """
     try:
         from backend.core.database import db_client
-        # 1. Fetch all audited signals from all backtests
-        # In prod, we'd use a vectorized query. Here we aggregate.
-        backtests = db_client.collection("backtests").stream()
 
         brackets = {
             "50-60": {"total": 0, "wins": 0},
@@ -67,25 +64,28 @@ async def get_conviction_calibration():
             "90-100": {"total": 0, "wins": 0}
         }
 
-        for bt in backtests:
-            signals = db_client.collection("backtests").document(bt.id).collection("signals").stream()
-            for s in signals:
-                data = s.to_dict()
-                # Mock conviction if not present in seeded signals
-                conv = data.get("conviction", 50 + (hash(bt.id) % 50))
-                outcome = data.get("outcome")
+        if db_client is not None:
+            # 1. Fetch all audited signals from all backtests
+            backtests = db_client.collection("backtests").stream()
 
-                bracket = None
-                if 50 <= conv < 60: bracket = "50-60"
-                elif 60 <= conv < 70: bracket = "60-70"
-                elif 70 <= conv < 80: bracket = "70-80"
-                elif 80 <= conv < 90: bracket = "80-90"
-                elif 90 <= conv <= 100: bracket = "90-100"
+            for bt in backtests:
+                signals = db_client.collection("backtests").document(bt.id).collection("signals").stream()
+                for s in signals:
+                    data = s.to_dict()
+                    conv = data.get("conviction", 50 + (hash(bt.id) % 50))
+                    outcome = data.get("outcome")
 
-                if bracket:
-                    brackets[bracket]["total"] += 1
-                    if outcome == "TARGET_HIT":
-                        brackets[bracket]["wins"] += 1
+                    bracket = None
+                    if 50 <= conv < 60: bracket = "50-60"
+                    elif 60 <= conv < 70: bracket = "60-70"
+                    elif 70 <= conv < 80: bracket = "70-80"
+                    elif 80 <= conv < 90: bracket = "80-90"
+                    elif 90 <= conv <= 100: bracket = "90-100"
+
+                    if bracket:
+                        brackets[bracket]["total"] += 1
+                        if outcome == "TARGET_HIT":
+                            brackets[bracket]["wins"] += 1
 
         # 2. Format for chart
         return {
@@ -197,20 +197,24 @@ async def get_performance_summary(
 
     # 3. Fetch Backtest Signals from Firestore
     backtest_signals = []
-    backtests = db_client.collection("backtests").stream()
-    for bt in backtests:
-        symbol_signals = db_client.collection("backtests").document(bt.id).collection("signals").stream()
-        for s in symbol_signals:
-            sig = s.to_dict()
-            # Basic date filter
-            sig_date_str = sig.get("date")
-            if sig_date_str:
-                sig_dt = datetime.datetime.strptime(sig_date_str, "%Y-%m-%d")
-                if start_dt <= sig_dt <= end_dt:
-                    if not timeframe or sig.get("timeframe", "SWING") == timeframe:
-                        # Normalize backtest signals to match LiveSignal structure for helper
-                        sig["status"] = sig.get("outcome")
-                        backtest_signals.append(sig)
+    if db_client is not None:
+        try:
+            backtests = db_client.collection("backtests").stream()
+            for bt in backtests:
+                symbol_signals = db_client.collection("backtests").document(bt.id).collection("signals").stream()
+                for s in symbol_signals:
+                    sig = s.to_dict()
+                    # Basic date filter
+                    sig_date_str = sig.get("date")
+                    if sig_date_str:
+                        sig_dt = datetime.datetime.strptime(sig_date_str, "%Y-%m-%d")
+                        if start_dt <= sig_dt <= end_dt:
+                            if not timeframe or sig.get("timeframe", "SWING") == timeframe:
+                                # Normalize backtest signals to match LiveSignal structure for helper
+                                sig["status"] = sig.get("outcome")
+                                backtest_signals.append(sig)
+        except Exception as e:
+            print(f"[*] Warning: Firestore Backtest Summary error: {e}")
 
     backtest_summary = calc_stats(backtest_signals, is_backtest=True)
 
@@ -300,21 +304,24 @@ async def get_performance_signals(
                 signals.append(data)
 
     # 2. Backtest Signals from Firestore
-    if dataset in ["ALL", "BACKTEST"]:
-        backtests = db_client.collection("backtests").stream()
-        for bt in backtests:
-            symbol_signals = db_client.collection("backtests").document(bt.id).collection("signals").stream()
-            for s in symbol_signals:
-                sig = s.to_dict()
-                sig_date_str = sig.get("date")
-                if sig_date_str:
-                    sig_dt = datetime.datetime.strptime(sig_date_str, "%Y-%m-%d")
-                    if start_dt <= sig_dt <= end_dt:
-                        if not timeframe or sig.get("timeframe", "SWING") == timeframe:
-                            sig["symbol"] = bt.id
-                            sig["dataset"] = "BACKTEST"
-                            sig["timestamp"] = sig_dt
-                            signals.append(sig)
+    if dataset in ["ALL", "BACKTEST"] and db_client is not None:
+        try:
+            backtests = db_client.collection("backtests").stream()
+            for bt in backtests:
+                symbol_signals = db_client.collection("backtests").document(bt.id).collection("signals").stream()
+                for s in symbol_signals:
+                    sig = s.to_dict()
+                    sig_date_str = sig.get("date")
+                    if sig_date_str:
+                        sig_dt = datetime.datetime.strptime(sig_date_str, "%Y-%m-%d")
+                        if start_dt <= sig_dt <= end_dt:
+                            if not timeframe or sig.get("timeframe", "SWING") == timeframe:
+                                sig["symbol"] = bt.id
+                                sig["dataset"] = "BACKTEST"
+                                sig["timestamp"] = sig_dt
+                                signals.append(sig)
+        except Exception as e:
+            print(f"[*] Warning: Could not fetch Firestore backtests: {e}")
 
     # Sort by date descending
     signals.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
