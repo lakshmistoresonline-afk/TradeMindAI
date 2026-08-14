@@ -297,14 +297,16 @@ async def get_performance_signals(
 
     signals = []
 
-    # 1. Live Signals from Postgres
+    # 1. Live Signals from Postgres (Filtered for History: Resolved Only)
     if dataset in ["ALL", "LIVE"]:
         live_list = await container.ios_repo.get_all_live_signals(start_date=start_dt, end_date=end_dt)
         for s in live_list:
-            if not timeframe or s.timeframe == timeframe:
-                data = s.model_dump()
-                data["dataset"] = "LIVE"
-                signals.append(data)
+            # Only include resolved signals in History
+            if s.status in ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED", "COMPLETED"]:
+                if not timeframe or s.timeframe == timeframe:
+                    data = s.model_dump()
+                    data["dataset"] = "LIVE"
+                    signals.append(data)
 
     # 2. Backtest Signals from Firestore
     if dataset in ["ALL", "BACKTEST"] and db_client is not None:

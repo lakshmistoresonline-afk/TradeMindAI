@@ -448,7 +448,10 @@ class HybridIOSRepository(IIOSRepository):
 
     async def get_active_live_signals(self) -> List[LiveSignal]:
         with self.session_factory() as pg:
-            res = pg.query(LiveSignalDB).filter(LiveSignalDB.status == "ACTIVE").all()
+            # Vision 2.2: Fetch all non-resolved signals for the Live Dashboard
+            res = pg.query(LiveSignalDB).filter(
+                LiveSignalDB.status.in_(["ACTIVE", "WAITING_FOR_ENTRY", "ENTRY_TRIGGERED"])
+            ).all()
             return [self._map_db_to_live_signal(r) for r in res]
 
     async def get_all_live_signals(self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None) -> List[LiveSignal]:

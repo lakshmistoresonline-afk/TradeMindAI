@@ -62,7 +62,8 @@ export default function SignalsDashboard() {
     const others = stocks.filter(s =>
         s.decision?.timeframe === currentTf &&
         !setups.find(set => set.symbol === s.symbol) &&
-        (s.decision?.rating?.includes('BUY') || s.decision?.rating?.includes('SELL'))
+        (s.decision?.rating?.includes('BUY') || s.decision?.rating?.includes('SELL')) &&
+        !['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'COMPLETED'].includes(s.decision?.status)
     );
 
     return [...setups, ...others].sort((a,b) => (b.decision?.conviction || 0) - (a.decision?.conviction || 0));
