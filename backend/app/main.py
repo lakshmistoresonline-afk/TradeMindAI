@@ -58,7 +58,12 @@ async def startup():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://com-webcraft-trademindai-c8f75.web.app",
+        "https://com-webcraft-trademindai-c8f75.firebaseapp.com",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

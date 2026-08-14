@@ -27,6 +27,9 @@ interface ApiService {
     @GET("ios/opportunities")
     suspend fun getOpportunities(): List<com.webcraft.trademindai.domain.model.MarketOpportunity>
 
+    @GET("ios/signals/live")
+    suspend fun getLiveSignals(): List<com.webcraft.trademindai.domain.model.LiveSignal>
+
     @GET("ios/twin/{symbol}")
     suspend fun getDigitalTwin(@Path("symbol") symbol: String): Map<String, Any>
 

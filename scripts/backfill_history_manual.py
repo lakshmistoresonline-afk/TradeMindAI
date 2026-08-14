@@ -54,8 +54,8 @@ async def backfill_historical_signals():
                     sig_id = f"hist_{symbol}_{bos['date'].strftime('%Y%m%d%H%M')}_{i}"
 
                     # Determine Timeframe heuristic based on BOS significance
-                    # Using a mix of INTRADAY, SHORT TERM, POSITION, LONG TERM
-                    timeframes = ["INTRADAY", "SHORT TERM", "POSITION", "LONG TERM"]
+                    # Using a mix of INTRADAY, SHORT TERM, SWING, LONG TERM
+                    timeframes = ["INTRADAY", "SHORT TERM", "SWING", "LONG TERM"]
                     tf = timeframes[i % 4]
 
                     direction = "LONG" if bos['type'] == 'BOS' else "SHORT"

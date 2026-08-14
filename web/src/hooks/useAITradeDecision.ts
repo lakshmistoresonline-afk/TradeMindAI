@@ -38,11 +38,12 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   }
 
   // 4. Normalize Timeframe
-  const rawTf = (structured.timeframe || 'SWING').toUpperCase();
+  const rawTf = (structured.timeframe || stock.timeframe || 'SWING').toUpperCase().replace('_', ' ');
   let timeframe: TimeHorizon = 'SWING';
-  if (rawTf === 'INTRADAY') timeframe = 'INTRADAY';
-  else if (rawTf === 'POSITION' || rawTf === 'MID_TERM') timeframe = 'POSITION';
-  else if (rawTf === 'LONG_TERM' || rawTf === 'LONG TERM') timeframe = 'LONG TERM';
+  if (rawTf.includes('INTRADAY')) timeframe = 'INTRADAY';
+  else if (rawTf.includes('SHORT')) timeframe = 'SHORT TERM';
+  else if (rawTf.includes('POSITION') || rawTf.includes('MID')) timeframe = 'POSITION';
+  else if (rawTf.includes('LONG')) timeframe = 'LONG TERM';
 
   // 5. Decision Status
   let status: DecisionStatus = 'ACTIVE';

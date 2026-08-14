@@ -73,4 +73,13 @@ class StockRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getLiveSignals(): Result<List<com.webcraft.trademindai.domain.model.LiveSignal>> {
+        return try {
+            val response = apiService.getLiveSignals()
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

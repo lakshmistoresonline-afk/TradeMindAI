@@ -1,6 +1,6 @@
 export type AIRating = 'STRONG BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG SELL';
 export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH';
-export type TimeHorizon = 'INTRADAY' | 'SWING' | 'POSITION' | 'LONG TERM';
+export type TimeHorizon = 'INTRADAY' | 'SWING' | 'POSITION' | 'LONG TERM' | 'SHORT TERM';
 export type DecisionStatus = 'GENERATED' | 'VALIDATED' | 'WAITING_FOR_ENTRY' | 'ENTRY_TRIGGERED' | 'ACTIVE' | 'TARGET_HIT' | 'STOP_LOSS' | 'EXPIRED' | 'CANCELLED' | 'UNAVAILABLE';
 export type DataProvenance = 'LIVE' | 'CALCULATED' | 'AI GENERATED' | 'HISTORICAL' | 'PRELIMINARY' | 'DEMO';
 

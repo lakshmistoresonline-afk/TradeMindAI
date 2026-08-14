@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.webcraft.trademindai.data.remote.MarketRegimeResponse
 import com.webcraft.trademindai.data.remote.MarketStatsResponse
+import com.webcraft.trademindai.domain.model.LiveSignal
 import com.webcraft.trademindai.domain.model.MarketOpportunity
 import com.webcraft.trademindai.domain.model.Stock
 import com.webcraft.trademindai.domain.repository.IStockRepository
@@ -21,6 +22,9 @@ class DashboardViewModel @Inject constructor(
 
     private val _stocks = MutableStateFlow<List<Stock>>(emptyList())
     val stocks: StateFlow<List<Stock>> = _stocks.asStateFlow()
+
+    private val _liveSignals = MutableStateFlow<List<LiveSignal>>(emptyList())
+    val liveSignals: StateFlow<List<LiveSignal>> = _liveSignals.asStateFlow()
 
     private val _selectedTimeframe = MutableStateFlow("ALL")
     val selectedTimeframe: StateFlow<String> = _selectedTimeframe.asStateFlow()
@@ -56,12 +60,14 @@ class DashboardViewModel @Inject constructor(
             val regimeResult = repository.getMarketRegime()
             val auditResult = repository.getPerformanceAudit()
             val opportunitiesResult = repository.getOpportunities()
+            val liveSignalsResult = repository.getLiveSignals()
             
             statsResult.onSuccess { _marketStats.value = it }
             stocksResult.onSuccess { _stocks.value = it }
             regimeResult.onSuccess { _regime.value = it }
             auditResult.onSuccess { _performanceAudit.value = it }
             opportunitiesResult.onSuccess { _opportunities.value = it }
+            liveSignalsResult.onSuccess { _liveSignals.value = it }
             
             _loading.value = false
         }

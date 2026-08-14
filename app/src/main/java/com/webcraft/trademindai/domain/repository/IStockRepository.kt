@@ -12,4 +12,5 @@ interface IStockRepository {
     suspend fun getMarketRegime(): Result<MarketRegimeResponse>
     suspend fun getPerformanceAudit(): Result<List<Map<String, Any>>>
     suspend fun getOpportunities(): Result<List<com.webcraft.trademindai.domain.model.MarketOpportunity>>
+    suspend fun getLiveSignals(): Result<List<com.webcraft.trademindai.domain.model.LiveSignal>>
 }

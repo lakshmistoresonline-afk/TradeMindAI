@@ -25,6 +25,7 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val stocks by viewModel.stocks.collectAsState()
+    val liveSignals by viewModel.liveSignals.collectAsState()
     val marketStats by viewModel.marketStats.collectAsState()
     val regime by viewModel.regime.collectAsState()
     val loading by viewModel.loading.collectAsState()
@@ -126,12 +127,21 @@ fun DashboardScreen(
                         (selectedTimeframe == "ALL" || timeframe == targetTf) && stock.analysis != null
                     }
 
-                    if (filteredStocks.isEmpty()) {
+                    val filteredLiveSignals = liveSignals.filter { signal ->
+                        val targetTf = if (selectedTimeframe == "POSITION") "MID_TERM" else selectedTimeframe
+                        (selectedTimeframe == "ALL" || signal.timeframe == targetTf || signal.timeframe == selectedTimeframe)
+                    }
+
+                    if (filteredStocks.isEmpty() && filteredLiveSignals.isEmpty()) {
                         item {
                             Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                                 Text("No $selectedTimeframe signals detected.", color = Color.Gray)
                             }
                         }
+                    }
+
+                    items(filteredLiveSignals) { signal ->
+                        LiveSignalCard(signal)
                     }
 
                     items(filteredStocks) { stock ->
@@ -209,6 +219,67 @@ fun StockSignalCard(stock: Stock) {
             val thesis = structured?.get("thesis") as? String ?: stock.analysis?.consensus ?: ""
             Text(
                 text = thesis,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun LiveSignalCard(signal: com.webcraft.trademindai.domain.model.LiveSignal) {
+    val isBuy = signal.direction == "LONG" || signal.rating.contains("BUY")
+    val color = if (isBuy) Color(0xFF10b981) else if (signal.rating.contains("SELL")) Color.Red else Color.Gray
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp, 
+            color.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(signal.symbol, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(signal.timeframe, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                }
+                
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = signal.rating,
+                        color = color,
+                        fontWeight = FontWeight.Black,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text("${signal.conviction.toInt()}% Conviction", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                PriceMetric(label = "ENTRY", value = "₹${signal.entry_price.toInt()}", color = MaterialTheme.colorScheme.onSurface)
+                PriceMetric(label = "TARGET", value = "₹${(signal.target_price ?: 0.0).toInt()}", color = Color(0xFF10b981))
+                PriceMetric(label = "STOP LOSS", value = "₹${(signal.stop_loss_price ?: 0.0).toInt()}", color = Color.Red)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Text(
+                text = "Live AI Signal - Status: ${signal.status}",
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray,
                 maxLines = 2,

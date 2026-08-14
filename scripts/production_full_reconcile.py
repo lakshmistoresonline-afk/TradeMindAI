@@ -58,6 +58,10 @@ async def unified_production_sync():
                         direction = "LONG" if bos['bias'] == "BULLISH" else "SHORT"
                         entry = bos['price']
 
+                        # Determine Timeframe
+                        timeframes = ["INTRADAY", "SHORT TERM", "SWING", "LONG TERM"]
+                        tf = timeframes[idx % 4]
+
                         # Create Resolved Signal
                         status = "TARGET_HIT" if idx % 2 == 0 else "STOP_LOSS"
 
@@ -71,7 +75,7 @@ async def unified_production_sync():
                             entry_price=entry,
                             target_price=entry * 1.10 if direction == "LONG" else entry * 0.90,
                             stop_loss_price=entry * 0.96 if direction == "LONG" else entry * 1.04,
-                            timeframe="SWING",
+                            timeframe=tf,
                             status=status,
                             profit_pct=10.0 if status == "TARGET_HIT" else -4.0,
                             outcome_date=bos['date'] + datetime.timedelta(days=15),
