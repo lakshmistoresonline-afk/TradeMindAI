@@ -366,10 +366,10 @@ async def _refresh_rankings_logic():
 
 @celery_app.task
 def analyze_nifty_100(period="1y"):
-    from scripts.audit_database import NIFTY_100
-    job = group(sync_stock_data_task.s(symbol, period=period) for symbol in NIFTY_100)
+    from scripts.audit_database import ALL_SUPPORTED
+    job = group(sync_stock_data_task.s(symbol, period=period) for symbol in ALL_SUPPORTED)
     job.apply_async()
-    return f"Triggered data sync for {len(NIFTY_100)} stocks."
+    return f"Triggered data sync for full Alpha Universe ({len(ALL_SUPPORTED)} stocks)."
 
 @celery_app.task
 def terminal_heartbeat():
