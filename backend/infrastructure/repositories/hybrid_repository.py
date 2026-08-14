@@ -488,6 +488,7 @@ class HybridIOSRepository(IIOSRepository):
                     if field == 'conviction': data[field] = 50.0
                     elif field == 'entry_price': data[field] = 0.0
                     elif field in ['mfe', 'mae']: data[field] = 0.0
+                    elif field == 'profit_pct': data[field] = 0.0
                     else: data[field] = None
 
             # 3. Ensure required string fields exist

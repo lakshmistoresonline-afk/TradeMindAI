@@ -185,23 +185,44 @@ async def add_trade_to_journal(trade_data: Dict[str, Any], current_user: dict = 
 async def get_live_signals_audit(limit: int = 100):
     """
     Vision 2.2: Live Production Signal Audit from SQL Tier.
+    Optimized for high-fidelity frontend rendering without serialization crashes.
     """
+    import math
+    from fastapi.encoders import jsonable_encoder
+
+    def sanitize_obj(obj):
+        """Recursively replaces non-JSON finite floats (NaN/Inf) with None/0.0."""
+        if isinstance(obj, dict):
+            return {k: sanitize_obj(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [sanitize_obj(i) for i in obj]
+        elif isinstance(obj, float):
+            if not math.isfinite(obj):
+                return 0.0 # Standardize on 0.0 for price/pct metrics
+        return obj
+
     try:
+        # 1. Retrieve raw domain models from repo
         signals = await container.ios_repo.get_active_live_signals()
 
-        # Manual serialization to handle any lingering Pydantic/NaN/Inf issues
+        # 2. Process and sanitize for JSON compliance
         results = []
         for s in signals:
             try:
-                results.append(s.model_dump())
-            except Exception as e:
-                print(f"Signal serialization error: {e}")
+                # Convert Pydantic to Dict and scrub non-JSON compliant floats
+                clean_data = sanitize_obj(s.model_dump())
+                results.append(clean_data)
+            except Exception as ser_err:
+                print(f"[!] Serialization error for signal {getattr(s, 'id', 'UNK')}: {ser_err}")
 
-        return results
+        # 3. Use explicit jsonable_encoder for final safety pass
+        return jsonable_encoder(results[:limit])
+
     except Exception as e:
-        print(f"Error fetching live signals: {e}")
+        print(f"[CRITICAL] Failed to fetch live signals: {e}")
         import traceback
         traceback.print_exc()
+        # Return empty list with valid status to keep UI from crashing
         return []
 
 @router.get("/deals", response_model=List[Dict[str, Any]])
