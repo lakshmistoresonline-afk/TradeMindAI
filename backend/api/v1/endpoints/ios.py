@@ -181,15 +181,27 @@ async def add_trade_to_journal(trade_data: Dict[str, Any], current_user: dict = 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/signals/live", response_model=List[LiveSignal])
+@router.get("/signals/live")
 async def get_live_signals_audit(limit: int = 100):
     """
     Vision 2.2: Live Production Signal Audit from SQL Tier.
     """
     try:
-        return await container.ios_repo.get_active_live_signals()
+        signals = await container.ios_repo.get_active_live_signals()
+
+        # Manual serialization to handle any lingering Pydantic/NaN/Inf issues
+        results = []
+        for s in signals:
+            try:
+                results.append(s.model_dump())
+            except Exception as e:
+                print(f"Signal serialization error: {e}")
+
+        return results
     except Exception as e:
         print(f"Error fetching live signals: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 @router.get("/deals", response_model=List[Dict[str, Any]])
