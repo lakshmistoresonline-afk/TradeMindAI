@@ -22,9 +22,11 @@ We have implemented a structural separation between asset classes to ensure deci
 
 ## 🛠️ Master Implementation Fixes
 
-### 1. Chronic Integrity (Section 18 & 26)
+### 2. Signal Integrity & Data Fidelity (RC-5 Update)
 - **Ordering**: `created_at DESC`. The latest signals now always appear at the top of every list across the entire application.
+- **Contract Fidelity**: Options signals now MANDATORILY include `strike`, `option_type`, and `underlying_symbol`. Any legacy signal missing this metadata is automatically purged from active learning and display nodes.
 - **Independent Prices**: Traced and verified that **Current Price** is sourced from authoritative market data nodes. For Options, **Premium P&L** is tracked independently of **Underlying Spot**.
+- **Forensic Cleanup**: Implemented an automated `00_cleanup_corrupt_data.py` script to ensure a 100% clean baseline in the Neon database.
 
 ### 2. Instrument-Aware Signal Cards
 - **Contextual Labeling**: Cards now dynamically switch labels (e.g., "ENTRY PRICE" for Equity vs "ENTRY PREMIUM" for Options).

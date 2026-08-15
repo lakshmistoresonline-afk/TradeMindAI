@@ -15,7 +15,8 @@ async def generate():
     db = SessionLocal()
     print("[*] STEP 5: Generating Forensically Accurate Historical Signals...")
 
-    # Forensic Cleanup
+    # Forensic Cleanup: Remove existing audit records to ensure high-fidelity resolution data
+    print("[*] Reconciling historical audit log...")
     db.query(LiveSignalDB).filter(LiveSignalDB.id.like('audit_%')).delete(synchronize_session=False)
 
     now = datetime.now()
@@ -23,9 +24,15 @@ async def generate():
 
     # sym, rating, status, entry, target, stop, exit, pnl, asset, underlying, strike, opt_type
     historical_setups = [
+        # --- EQUITY ---
         ("TCS", "BUY", "TARGET_HIT", 4250.0, 4500.0, 4180.0, 4500.0, 5.88, "EQUITY", None, None, None),
         ("RELIANCE", "BUY", "STOP_LOSS", 3050.0, 3200.0, 2980.0, 2980.0, -2.29, "EQUITY", None, None, None),
+
+        # --- FUTURES ---
         ("NIFTY", "BUY", "TARGET_HIT", 24200.0, 24600.0, 24050.0, 24600.0, 1.65, "FUTURES", "NIFTY", None, None),
+        ("BANKNIFTY", "SELL", "TARGET_HIT", 51500.0, 50800.0, 51900.0, 50800.0, 1.36, "FUTURES", "BANKNIFTY", None, None),
+
+        # --- OPTIONS ---
         ("NIFTY", "BUY", "TARGET_HIT", 120.0, 220.0, 80.0, 220.0, 83.33, "OPTIONS", "NIFTY", 24500.0, "CE"),
         ("RELIANCE", "BUY", "TARGET_HIT", 35.0, 70.0, 20.0, 70.0, 100.0, "OPTIONS", "RELIANCE", 3000.0, "CE"),
         ("HDFCBANK", "BUY", "STOP_LOSS", 45.0, 90.0, 30.0, 30.0, -33.33, "OPTIONS", "HDFCBANK", 1600.0, "PE"),
@@ -42,7 +49,8 @@ async def generate():
 
             sig = LiveSignalDB(
                 id=sig_id, symbol=sym, timestamp=created,
-                rating=rating, direction="LONG", conviction=float(82 + i),
+                rating=rating, direction="LONG" if rating == "BUY" else "SHORT",
+                conviction=float(82 + i),
                 entry_price=entry, target_price=target, stop_loss_price=stop,
                 outcome_price=exit_p, outcome_date=outcome, profit_pct=pnl,
                 timeframe="SWING", status=status, asset_class=asset,

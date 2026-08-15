@@ -14,8 +14,9 @@ def cleanup():
         print("[*] Starting Data Forensic Cleanup...")
 
         # 1. Purge all generated signals to ensure a 100% clean baseline
+        # This covers all prefixes used in manual population scripts.
         print("[*] Purging all manual/generated signals across segments...")
-        res = conn.execute(text("DELETE FROM live_signals WHERE id LIKE 'live_%' OR id LIKE 'master_%' OR id LIKE 'audit_%' OR id LIKE 'hist_%' OR id LIKE 'fno_%'"))
+        res = conn.execute(text("DELETE FROM live_signals WHERE id LIKE 'live_%' OR id LIKE 'master_%' OR id LIKE 'audit_%' OR id LIKE 'hist_%' OR id LIKE 'fno_%' OR id LIKE 'sig_%' OR id LIKE 'prec_%'"))
         print(f"[+] Purged {res.rowcount} generated signal records.")
 
         # 2. Fix technical master data

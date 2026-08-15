@@ -24,7 +24,10 @@ class TechnicalAnalysis:
         # Momentum Indicators
         df["RSI"] = ta.rsi(df["Close"], length=14)
 
-        # Volatility - Bollinger Bands
+        # Volatility
+        df["ATR"] = ta.atr(df["High"], df["Low"], df["Close"], length=14)
+
+        # Bollinger Bands
         try:
             bbands = ta.bbands(df["Close"])
             if bbands is not None:
