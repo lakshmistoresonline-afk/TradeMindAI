@@ -62,6 +62,9 @@ class StockDB(Base):
     delivery_rate = Column(Float, default=0.0)
     options_pcr = Column(Float, default=1.0)
     sector_alpha = Column(Float, default=0.0)
+    is_fno = Column(Boolean, default=False)
+    lot_size = Column(Integer)
+    index_weight = Column(Float)
 
 class PriceDB(Base):
     __tablename__ = "historical_prices"
@@ -181,6 +184,7 @@ class LiveSignalDB(Base):
 
     outcome_date = Column(DateTime)
     profit_pct = Column(Float)
+    outcome_price = Column(Float)
     mfe = Column(Float)
     mae = Column(Float)
     model_version = Column(String)

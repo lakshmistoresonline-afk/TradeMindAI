@@ -481,7 +481,7 @@ class HybridIOSRepository(IIOSRepository):
                 data['events'] = []
 
             # 2. Sanitize Numeric Fields (Handle NaN/Inf/None)
-            numeric_fields = ['entry_price', 'target_price', 'stop_loss_price', 'conviction', 'profit_pct', 'mfe', 'mae', 'trigger_price', 'strike']
+            numeric_fields = ['entry_price', 'target_price', 'stop_loss_price', 'conviction', 'profit_pct', 'mfe', 'mae', 'trigger_price', 'strike', 'outcome_price']
             import math
             for field in numeric_fields:
                 val = data.get(field)

@@ -80,18 +80,29 @@ export default function OptionChainTable({ symbol }: OptionChainTableProps) {
                 </TableRow>
              </TableHead>
              <TableBody>
-                {/* Simplified chain representation using actual data aggregates if available, else mock rows for UI structure */}
-                {[1,2,3,4,5].map((_, i) => (
-                   <TableRow key={i} hover>
-                      <TableCell align="right">---</TableCell>
-                      <TableCell align="right" sx={{ color: '#10b981' }}>---</TableCell>
-                      <TableCell align="right">₹---</TableCell>
-                      <TableCell align="center" sx={{ bgcolor: 'rgba(255,255,255,0.02)', fontWeight: 800 }}>{Math.round(chain.underlying_price - 100 + i*50)}</TableCell>
-                      <TableCell align="left">₹---</TableCell>
-                      <TableCell align="left" sx={{ color: '#ef4444' }}>---</TableCell>
-                      <TableCell align="left">---</TableCell>
+                {chain.strikes && chain.strikes.length > 0 ? (
+                   chain.strikes.map((s: any, i: number) => (
+                      <TableRow key={i} hover>
+                         <TableCell align="right">{s.calls?.oi?.toLocaleString() || '—'}</TableCell>
+                         <TableCell align="right" sx={{ color: (s.calls?.change || 0) >= 0 ? '#10b981' : '#ef4444' }}>
+                            {s.calls?.change ? `${s.calls.change}%` : '—'}
+                         </TableCell>
+                         <TableCell align="right">₹{s.calls?.ltp?.toLocaleString() || '—'}</TableCell>
+                         <TableCell align="center" sx={{ bgcolor: 'rgba(255,255,255,0.02)', fontWeight: 800 }}>{s.strike}</TableCell>
+                         <TableCell align="left">₹{s.puts?.ltp?.toLocaleString() || '—'}</TableCell>
+                         <TableCell align="left" sx={{ color: (s.puts?.change || 0) >= 0 ? '#10b981' : '#ef4444' }}>
+                            {s.puts?.change ? `${s.puts.change}%` : '—'}
+                         </TableCell>
+                         <TableCell align="left">{s.puts?.oi?.toLocaleString() || '—'}</TableCell>
+                      </TableRow>
+                   ))
+                ) : (
+                   <TableRow>
+                      <TableCell colSpan={7} align="center" sx={{ py: 10 }}>
+                         <Typography variant="body2" color="textSecondary">No live strike data available.</Typography>
+                      </TableCell>
                    </TableRow>
-                ))}
+                )}
              </TableBody>
           </Table>
        </TableContainer>

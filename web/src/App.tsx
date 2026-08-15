@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
 import DashboardTerminal from './pages/DashboardTerminal'
@@ -9,7 +9,9 @@ import StockIntelligence from './pages/StockIntelligence'
 import Settings from './pages/Settings'
 import Login from './pages/Login'
 import SystemControl from './pages/SystemControl'
-import SignalsDashboard from './pages/SignalsDashboard'
+import EquitySignals from './pages/EquitySignals'
+import FuturesSignals from './pages/FuturesSignals'
+import OptionsSignals from './pages/OptionsSignals'
 
 const darkTheme = createTheme({
   palette: {
@@ -21,8 +23,8 @@ const darkTheme = createTheme({
       main: '#7C3AED', // AI Violet
     },
     background: {
-      default: '#070A0F',
-      paper: '#0C1118',
+      default: '#020617',
+      paper: '#0f172a',
     },
     success: {
       main: '#10b981', // Emerald
@@ -56,7 +58,7 @@ const darkTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#070A0F',
+          backgroundColor: '#020617',
           scrollbarColor: "#111821 #070A0F",
           "&::-webkit-scrollbar, & *::-webkit-scrollbar": {
             width: 8,
@@ -83,9 +85,9 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: '#0C1118',
+          backgroundColor: '#0f172a',
           border: '1px solid rgba(255,255,255,0.05)',
-          borderRadius: 12,
+          borderRadius: 8,
         },
       },
     },
@@ -94,7 +96,7 @@ const darkTheme = createTheme({
         root: {
           textTransform: 'none',
           fontWeight: 700,
-          borderRadius: 8,
+          borderRadius: 6,
           padding: '8px 16px',
         }
       }
@@ -120,7 +122,7 @@ const darkTheme = createTheme({
           fontSize: '0.65rem',
           textTransform: 'uppercase',
           letterSpacing: '0.1em',
-          backgroundColor: '#0C1118',
+          backgroundColor: '#0f172a',
         }
       }
     }
@@ -138,7 +140,11 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<DashboardTerminal />} />
-                <Route path="/signals" element={<SignalsDashboard />} />
+                <Route path="/signals" element={<Navigate to="/signals/equity" replace />} />
+                <Route path="/signals/equity" element={<EquitySignals />} />
+                <Route path="/signals/futures" element={<FuturesSignals />} />
+                <Route path="/signals/options" element={<OptionsSignals />} />
+
                 <Route path="/market" element={<MarketDashboard />} />
                 <Route path="/portfolio" element={<PortfolioDashboard />} />
                 <Route path="/history" element={<HistoryDashboard />} />

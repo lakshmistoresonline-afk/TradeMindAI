@@ -1,14 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Paper, Tab, Tabs, Grid, Chip, CircularProgress } from '@mui/material';
-import { History, Activity, BarChart2, ShieldCheck, TrendingUp, Clock, Zap } from 'lucide-react';
-import SignalValidation from './StrategyBuilder/SignalValidation';
-import VarianceMap from '../components/Research/history/VarianceMap';
+import { Box, Typography, Paper, Tab, Tabs, Grid, Stack, IconButton, alpha, Skeleton, Divider, Button } from '@mui/material';
+import { History, Activity, BarChart2, ShieldCheck, TrendingUp, Zap, RefreshCw, FileText } from 'lucide-react';
 import { getPerformanceSummary, getPerformanceSignals } from '../api/client';
 import HistoricalSignalCard from '../components/Research/shared/HistoricalSignalCard';
 
 export default function HistoryDashboard() {
-  const [assetTab, setAssetTab] = useState(0); // 0: Equity, 1: Derivatives
-  const [activeTab, setActiveTab] = useState(0); // 0: Outcomes, 1: Audit, 2: Viz
+  const [assetTab, setAssetTab] = useState(0); // 0: Equity, 1: Futures, 2: Options
+  const [activeTab, setActiveTab] = useState(0); // 0: Archive, 1: Performance
 
   const [summary, setSummary] = useState<any>(null);
   const [signals, setSignals] = useState<any[]>([]);
@@ -23,8 +21,7 @@ export default function HistoryDashboard() {
       ]);
       setSummary(sumData);
 
-      // Sort Historical Signals: created_at DESC
-      const resolved = signalsData
+      const resolved = (signalsData || [])
         .filter((s: any) => !['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.status))
         .sort((a: any, b: any) => {
            const timeA = new Date(a.timestamp || a.date || 0).getTime();
@@ -43,109 +40,139 @@ export default function HistoryDashboard() {
     fetchData();
   }, []);
 
-  const stats = summary?.live_signals || { total: 0, resolved: 0, win_rate: 0, avg_profit: 0 };
+  const assetTypes = ['EQUITY', 'FUTURES', 'OPTIONS'];
 
   const filteredSignals = useMemo(() => {
+     const currentType = assetTypes[assetTab];
      return signals.filter(s => {
-        const isDerivative = s.asset_class === 'FUTURES' || s.asset_class === 'OPTIONS';
-        return assetTab === 0 ? !isDerivative : isDerivative;
+        const assetClass = s.asset_class || 'EQUITY';
+        return assetClass === currentType;
      });
   }, [signals, assetTab]);
 
   return (
-    <Box sx={{ pb: 10 }}>
-      {/* Header Tier */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+    <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
+      {/* 1. Archive Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 5 }}>
          <Box>
-            <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1, color: 'white' }}>
-               Performance Audit
-            </Typography>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: 1.5 }}>
-               VERIFIED INSTITUTIONAL SIGNAL RECORD
-            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>AUDIT ARCHIVE</Typography>
+            <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+               <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ShieldCheck size={14} /> FORENSIC SIGNAL LOG
+               </Typography>
+               <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
+               <Typography variant="caption" sx={{ fontWeight: 800, color: 'slategray' }}>
+                  {filteredSignals.length} RESOLVED {assetTypes[assetTab]} ENTRIES
+               </Typography>
+            </Stack>
          </Box>
-         <Chip
-           icon={<ShieldCheck size={14} />}
-           label="RECONCILIATION ACTIVE"
-           variant="outlined"
-           color="success"
-           sx={{ fontWeight: 900, height: 32 }}
-         />
+         <IconButton onClick={fetchData} sx={{ border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 1.5, bgcolor: '#0f172a' }}>
+            <RefreshCw size={20} className={loading ? 'animate-spin' : ''} color="slategray" />
+         </IconButton>
       </Box>
 
-      {/* Main Asset Class Navigation */}
-      <Box sx={{ mb: 4, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-         <Tabs
-            value={assetTab}
-            onChange={(_, v) => setAssetTab(v)}
-            sx={{ '& .MuiTab-root': { fontWeight: 900, minWidth: 200 } }}
-         >
-            <Tab label="EQUITY HISTORY" icon={<Activity size={18} />} iconPosition="start" />
-            <Tab label="DERIVATIVE HISTORY" icon={<Zap size={18} />} iconPosition="start" />
-         </Tabs>
-      </Box>
-
-      {/* Aggregate Stats Tier */}
-      <Grid container spacing={3} sx={{ mb: 5 }}>
-         <Grid item xs={12} md={3}>
-            <SummaryCard label="TOTAL RESOLVED" value={filteredSignals.length} subValue="Audited Signals" icon={<History size={20} />} color="#3b82f6" />
+      {/* 2. Control Hub */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+         <Grid item xs={12} lg={8}>
+            <Paper sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 0.5 }}>
+               <Tabs
+                  value={assetTab}
+                  onChange={(_, v) => setAssetTab(v)}
+                  sx={{
+                      px: 1,
+                      minHeight: 48,
+                      '& .MuiTabs-indicator': { height: 3, borderRadius: '3px 3px 0 0' },
+                      '& .MuiTab-root': {
+                          fontWeight: 950,
+                          fontSize: '0.8rem',
+                          minWidth: 150,
+                          color: 'slategray',
+                          textTransform: 'none',
+                          '&.Mui-selected': { color: '#fff' }
+                      }
+                  }}
+               >
+                  <Tab label="Equity History" icon={<Activity size={16} />} iconPosition="start" />
+                  <Tab label="Futures History" icon={<TrendingUp size={16} />} iconPosition="start" />
+                  <Tab label="Options History" icon={<Zap size={16} />} iconPosition="start" />
+               </Tabs>
+            </Paper>
          </Grid>
-         <Grid item xs={12} md={3}>
-            <SummaryCard label="WIN RATE" value={`${stats.win_rate}%`} subValue="System Accuracy" icon={<ShieldCheck size={20} />} color="#10b981" />
-         </Grid>
-         <Grid item xs={12} md={3}>
-            <SummaryCard label="AVG PROFIT" value={`+${stats.avg_profit}%`} subValue="Per Successful setup" icon={<TrendingUp size={20} />} color="#00D1FF" />
-         </Grid>
-         <Grid item xs={12} md={3}>
-            <SummaryCard label="AUDIT PERIOD" value="ALL" subValue={`Since ${new Date(summary?.earliest_recorded_date || '').toLocaleDateString()}`} icon={<Clock size={20} />} color="#7C3AED" />
+         <Grid item xs={12} lg={4}>
+            <Paper sx={{ bgcolor: alpha('#10b981', 0.05), border: '1px solid rgba(16,185,129,0.15)', borderRadius: 1, p: 2, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <Stack direction="row" spacing={4} alignItems="center">
+                  <Box>
+                     <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', display: 'block', mb: 0.5 }}>AVG WIN RATE</Typography>
+                     <Typography variant="h4" sx={{ fontWeight: 950, color: '#10b981', fontFamily: 'JetBrains Mono' }}>
+                        {summary?.live_signals?.win_rate || '—'}%
+                     </Typography>
+                  </Box>
+                  <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(16,185,129,0.1)' }} />
+                  <Box>
+                     <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', display: 'block', mb: 0.5 }}>AVG ALPHA</Typography>
+                     <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff', fontFamily: 'JetBrains Mono' }}>
+                        +{summary?.live_signals?.avg_profit || '—'}%
+                     </Typography>
+                  </Box>
+               </Stack>
+            </Paper>
          </Grid>
       </Grid>
 
-      <Paper sx={{ mb: 4, bgcolor: 'transparent', border: 'none' }}>
-         <Tabs
-            value={activeTab}
-            onChange={(_, v) => setActiveTab(v)}
-            sx={{
-               borderBottom: '1px solid rgba(255,255,255,0.05)',
-               '& .MuiTab-root': { minWidth: 200, fontWeight: 900, fontSize: '0.75rem' }
-            }}
-         >
-            <Tab label="OUTCOME LOG" icon={<History size={18} />} iconPosition="start" />
-            <Tab label="ACCURACY AUDIT" icon={<Activity size={18} />} iconPosition="start" />
-            <Tab label="DATA VISUALIZATION" icon={<BarChart2 size={18} />} iconPosition="start" />
-         </Tabs>
-      </Paper>
+      {/* 3. Main Content Area */}
+      <Box sx={{ mb: 4, display: 'flex', gap: 1 }}>
+         <ArchiveTabButton active={activeTab === 0} onClick={() => setActiveTab(0)} icon={<FileText size={16} />} label="Signal Audit Log" />
+         <ArchiveTabButton active={activeTab === 1} onClick={() => setActiveTab(1)} icon={<BarChart2 size={16} />} label="Performance Metrics" />
+      </Box>
 
+      {/* 4. Content Matrix */}
       {loading ? (
-         <Box sx={{ py: 10, textAlign: 'center' }}>
-            <CircularProgress size={30} sx={{ mb: 2 }} />
-            <Typography variant="caption" display="block" sx={{ fontWeight: 800 }}>RECONCILING HISTORICAL DATA...</Typography>
-         </Box>
+         <Grid container spacing={3}>
+            {[1,2,3,4,5,6].map(i => (
+               <Grid item xs={12} md={6} lg={4} key={i}>
+                  <Skeleton variant="rectangular" height={320} sx={{ borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }} />
+               </Grid>
+            ))}
+         </Grid>
       ) : (
          <Box>
             {activeTab === 0 && (
-               <Grid container spacing={2}>
+               <Grid container spacing={3}>
                   {filteredSignals.length > 0 ? filteredSignals.map((sig, idx) => (
                      <Grid item xs={12} md={6} lg={4} key={sig.id || idx}>
                         <HistoricalSignalCard signal={sig} />
                      </Grid>
                   )) : (
                      <Grid item xs={12}>
-                        <Paper sx={{ py: 10, textAlign: 'center', border: '1px dashed rgba(255,255,255,0.05)' }}>
-                            <Typography color="textSecondary" sx={{ fontWeight: 700 }}>NO RESOLVED {assetTab === 0 ? 'EQUITY' : 'DERIVATIVE'} SIGNALS</Typography>
+                        <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
+                           <History size={56} color="slategray" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
+                           <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray' }}>EMPTY AUDIT LOG</Typography>
+                           <Typography variant="body2" color="textSecondary" sx={{ mt: 1, opacity: 0.5, fontWeight: 700 }}>No resolved setups found for the selected instrument class.</Typography>
                         </Paper>
                      </Grid>
                   )}
                </Grid>
             )}
-            {activeTab === 1 && <SignalValidation isConsolidated initialTab={0} />}
-            {activeTab === 2 && (
+
+            {activeTab === 1 && (
                <Grid container spacing={3}>
                   <Grid item xs={12} lg={8}>
-                     <SignalValidation isConsolidated initialTab={0} />
+                     <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 4, letterSpacing: 1 }}>PERFORMANCE EVOLUTION</Typography>
+                        <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed rgba(255,255,255,0.03)', borderRadius: 1 }}>
+                           <Typography color="textSecondary" sx={{ fontWeight: 700, letterSpacing: 1.5, opacity: 0.5 }}>QUANT VISUALIZATION UNAVAILABLE</Typography>
+                        </Box>
+                     </Paper>
                   </Grid>
                   <Grid item xs={12} lg={4}>
-                     <VarianceMap />
+                     <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 3, letterSpacing: 1 }}>OUTCOME RATIOS</Typography>
+                        <Stack spacing={3}>
+                           <OutcomeRow label="Target Hit" count={summary?.live_signals?.outcomes?.TARGET_HIT || 0} color="#10b981" total={filteredSignals.length} />
+                           <OutcomeRow label="Stop Loss" count={summary?.live_signals?.outcomes?.STOP_LOSS || 0} color="#ef4444" total={filteredSignals.length} />
+                           <OutcomeRow label="Expired" count={summary?.live_signals?.outcomes?.EXPIRED || 0} color="slategray" total={filteredSignals.length} />
+                        </Stack>
+                     </Paper>
                   </Grid>
                </Grid>
             )}
@@ -155,15 +182,41 @@ export default function HistoryDashboard() {
   );
 }
 
-function SummaryCard({ label, value, subValue, icon, color }: any) {
+function ArchiveTabButton({ active, onClick, icon, label }: any) {
+   return (
+      <Button
+         onClick={onClick}
+         startIcon={icon}
+         sx={{
+            bgcolor: active ? alpha('#00D1FF', 0.1) : 'transparent',
+            color: active ? '#00D1FF' : 'slategray',
+            border: `1px solid ${active ? alpha('#00D1FF', 0.2) : 'rgba(255,255,255,0.05)'}`,
+            fontWeight: 950,
+            fontSize: '0.7rem',
+            px: 2,
+            py: 1,
+            borderRadius: 0.5,
+            textTransform: 'none',
+            letterSpacing: 0.5,
+            '&:hover': { bgcolor: alpha('#fff', 0.03), borderColor: 'rgba(255,255,255,0.1)' }
+         }}
+      >
+         {label.toUpperCase()}
+      </Button>
+   );
+}
+
+function OutcomeRow({ label, count, color, total }: any) {
+  const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
-    <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)', bgcolor: '#0C1118' }}>
-       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', letterSpacing: 1 }}>{label}</Typography>
-          <Box sx={{ color }}>{icon}</Box>
+    <Box>
+       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.2 }}>
+          <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 0.5 }}>{label.toUpperCase()}</Typography>
+          <Typography variant="caption" sx={{ fontWeight: 950, color: '#fff' }}>{count} <span style={{ color: 'slategray', fontWeight: 700 }}>({percentage}%)</span></Typography>
        </Box>
-       <Typography variant="h4" fontWeight={900} sx={{ mb: 0.5 }}>{value}</Typography>
-       <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700 }}>{subValue}</Typography>
-    </Paper>
+       <Box sx={{ height: 4, width: '100%', bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 4, overflow: 'hidden' }}>
+          <Box sx={{ height: '100%', width: `${percentage}%`, bgcolor: color }} />
+       </Box>
+    </Box>
   );
 }

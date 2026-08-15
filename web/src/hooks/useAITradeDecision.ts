@@ -13,7 +13,7 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   const structured = stock.structured_consensus || {};
 
   // 1. Normalize Rating
-  const rawRating = (structured.rating || analysis.consensus || 'HOLD').toUpperCase();
+  const rawRating = (structured.rating || stock.rating || analysis.consensus || 'HOLD').toUpperCase();
   let rating: AIRating = 'HOLD';
   if (rawRating.includes('STRONG BUY')) rating = 'STRONG BUY';
   else if (rawRating.includes('STRONG SELL')) rating = 'STRONG SELL';
@@ -23,7 +23,7 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   // 2. Normalize Conviction (0-100)
   const conviction = Math.round(
     (structured.conviction !== undefined && structured.conviction !== null)
-    ? structured.conviction : (stock.ai_investment_score || 0)
+    ? structured.conviction : (stock.conviction || stock.ai_investment_score || 0)
   );
 
   // 3. Normalize Risk Level
@@ -46,9 +46,9 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   else if (rawTf.includes('LONG')) timeframe = 'LONG TERM';
 
   // 5. Decision Status
-  let status: DecisionStatus = 'ACTIVE';
-  if (!stock.analysis) status = 'UNAVAILABLE';
-  else if (structured.status) status = structured.status as DecisionStatus;
+  let status: DecisionStatus = (stock.status as DecisionStatus) || 'ACTIVE';
+  if (structured.status) status = structured.status as DecisionStatus;
+  else if (!stock.analysis && !stock.status) status = 'UNAVAILABLE';
 
   // 6. Entry Logic
   const parseNum = (val: any) => {

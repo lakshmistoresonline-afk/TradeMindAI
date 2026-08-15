@@ -76,6 +76,7 @@ class LiveSignal(BaseModel):
 
     outcome_date: Optional[datetime] = None
     profit_pct: Optional[float] = None
+    outcome_price: Optional[float] = None
     mfe: float = 0.0
     mae: float = 0.0
     model_version: str = "TradeMind Core v2.2"

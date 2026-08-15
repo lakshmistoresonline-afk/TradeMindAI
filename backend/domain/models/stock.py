@@ -51,6 +51,9 @@ class Stock(BaseModel):
     ai_last_error: Optional[str] = None
     health_metrics: Optional[Dict[str, str]] = None # "Financial": "GOOD", etc.
     confidence_metrics: Optional[Dict[str, Any]] = None
+    is_fno: bool = False
+    lot_size: Optional[int] = None
+    index_weight: Optional[float] = None
     updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     def to_dict(self):
