@@ -14,6 +14,7 @@ export interface SignalEvent {
 }
 
 export interface AITradeDecision {
+  id?: string;
   rating: AIRating;
   conviction: number; // 0-100
   riskLevel: RiskLevel;

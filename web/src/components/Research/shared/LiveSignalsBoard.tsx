@@ -108,11 +108,6 @@ export default function LiveSignalsBoard({ stocks }: LiveSignalsBoardProps) {
                      </TableCell>
                      <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'primary.main' }}>
                         {s.decision.target ? `₹${Math.round(s.decision.target).toLocaleString()}` : '---'}
-                        {s.decision.targetRange && (
-                          <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', opacity: 0.7 }}>
-                             [{s.decision.targetRange[0]}-{s.decision.targetRange[1]}]
-                          </Typography>
-                        )}
                      </TableCell>
                      <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'error.main' }}>
                         {s.decision.stopLoss ? `₹${Math.round(s.decision.stopLoss).toLocaleString()}` : '---'}

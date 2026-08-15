@@ -57,34 +57,13 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
     return isNaN(num) ? undefined : num;
   };
 
-  const entry = parseNum(structured.entry) || stock.last_price || 0;
-  let target = parseNum(structured.target);
-  let stopLoss = parseNum(structured.stop_loss);
+  const entry = parseNum(structured.entry) || parseNum(stock.entry_price) || stock.last_price || 0;
+  let target = parseNum(structured.target) || parseNum(stock.target_price);
+  let stopLoss = parseNum(structured.stop_loss) || parseNum(stock.stop_loss_price);
 
-  // 6.1 Heuristic Fallback for Missing Targets/Stops (Vision 2.2 Alignment)
-  // Ensure we always have a numeric target/stop for active BUY/SELL signals
-  // Also guard against NaN specifically
-  if (rating.includes('BUY') && entry > 0) {
-    if (!target || isNaN(target)) {
-       const multiplier = rating.includes('STRONG') ? 1.15 : 1.08;
-       target = entry * multiplier;
-    }
-    if (!stopLoss || isNaN(stopLoss)) {
-       stopLoss = entry * 0.96;
-    }
-  } else if (rating.includes('SELL') && entry > 0) {
-    if (!target || isNaN(target)) {
-       const multiplier = rating.includes('STRONG') ? 0.85 : 0.92;
-       target = entry * multiplier;
-    }
-    if (!stopLoss || isNaN(stopLoss)) {
-       stopLoss = entry * 1.04;
-    }
-  }
-
-  // Ensure 0 is used instead of NaN for display if no logic could determine a price
-  target = target && !isNaN(target) ? target : (entry * 1.05);
-  stopLoss = stopLoss && !isNaN(stopLoss) ? stopLoss : (entry * 0.97);
+  // 6.1 Strict Data Adherence (Vision 2.2 Alignment)
+  // We do NOT invent targets or stop losses if they are missing from authoritative data.
+  // Use existing values or null.
 
   // 7. Drivers (Explainability)
   let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];
@@ -113,6 +92,17 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
   // Final trim to remove any remaining artifacts
   if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
 
+  // 8.1 Timestamp Normalization (UTC enforcement)
+  const ensureUTC = (ts: any) => {
+    if (!ts) return undefined;
+    if (typeof ts !== 'string') return ts;
+    // If no timezone info, append Z
+    if (!ts.includes('Z') && !ts.includes('+') && !ts.includes('-')) {
+      return `${ts}Z`;
+    }
+    return ts;
+  };
+
   return {
     rating,
     conviction,
@@ -129,19 +119,20 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
     keyRisks: structured.key_risks || (analysis.recommendations?.[0] as any)?.risks,
     thesis,
     invalidation: structured.invalidation_point,
-    generatedAt: stock.timestamp,
-    validatedAt: stock.validated_at,
-    triggeredAt: stock.triggered_at,
+    generatedAt: ensureUTC(stock.timestamp),
+    validatedAt: ensureUTC(stock.validated_at),
+    triggeredAt: ensureUTC(stock.triggered_at),
     triggerPrice: stock.trigger_price,
     triggerCondition: stock.trigger_condition,
-    outcomeDate: stock.outcome_date,
+    outcomeDate: ensureUTC(stock.outcome_date),
     profitPct: stock.profit_pct,
     mfe: stock.mfe,
     mae: stock.mae,
-    updatedAt: stock.updated_at,
+    updatedAt: ensureUTC(stock.updated_at),
+    id: stock.id,
     modelVersion: structured.modelVersion || 'TradeMind Core v2.2',
     drivers,
-    events: stock.events || []
+    events: (stock.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) }))
   };
 };
 

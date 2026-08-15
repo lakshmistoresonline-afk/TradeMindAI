@@ -359,36 +359,52 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                         <Table size="small">
                            <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
                               <TableRow>
-                                 <TableCell sx={{ pl: 3 }}>DATE</TableCell>
+                                 <TableCell sx={{ pl: 3 }}>CREATED</TableCell>
                                  <TableCell>SYMBOL</TableCell>
-                                 <TableCell>SOURCE</TableCell>
                                  <TableCell align="right">ENTRY</TableCell>
+                                 <TableCell align="right">TARGET</TableCell>
+                                 <TableCell align="right">STOP LOSS</TableCell>
                                  <TableCell align="right">OUTCOME PRICE</TableCell>
+                                 <TableCell align="right">P/L PER SHARE</TableCell>
                                  <TableCell align="right">FINAL P&L %</TableCell>
                                  <TableCell align="center">OUTCOME</TableCell>
                               </TableRow>
                            </TableHead>
                            <TableBody>
-                              {signals.filter(s => !['WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED', 'ACTIVE'].includes(s.status)).map((sig: any, idx: number) => (
-                                 <TableRow key={idx} hover sx={{ cursor: 'pointer' }}>
-                                    <TableCell sx={{ pl: 3, color: 'text.secondary', fontWeight: 600 }}>{new Date(sig.timestamp || sig.date).toLocaleDateString()}</TableCell>
-                                    <TableCell sx={{ fontWeight: 900 }}>
-                                       {sig.symbol}
-                                       <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontSize: '0.6rem' }}>{sig.timeframe}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                       <Chip label={sig.dataset} size="small" variant="outlined" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 800, opacity: 0.7 }} />
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{(sig.entry_price || sig.entry)?.toLocaleString()}</TableCell>
-                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{(sig.outcome_price || sig.target)?.toLocaleString()}</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 800, color: (sig.profit_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
-                                       {(sig.profit_pct || 0) >= 0 ? '+' : ''}{(sig.profit_pct || 0).toFixed(2)}%
-                                    </TableCell>
-                                    <TableCell align="center">
-                                       <StatusChip status={sig.status || sig.outcome} />
-                                    </TableCell>
-                                 </TableRow>
-                              ))}
+                              {signals.filter(s => !['WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED', 'ACTIVE'].includes(s.status)).map((sig: any, idx: number) => {
+                                 const entry = sig.entry_price || sig.entry || 0;
+                                 const target = sig.target_price || sig.target || 0;
+                                 const stop = sig.stop_loss_price || sig.stop_loss || 0;
+                                 const profitPct = sig.profit_pct || 0;
+                                 const profitPerShare = entry * (profitPct / 100);
+                                 const outcomePrice = sig.outcome_price || (entry * (1 + profitPct / 100));
+                                 const createdDate = sig.timestamp || sig.date;
+
+                                 return (
+                                    <TableRow key={idx} hover sx={{ cursor: 'pointer' }}>
+                                       <TableCell sx={{ pl: 3, color: 'text.secondary', fontSize: '0.7rem' }}>
+                                          {createdDate ? new Date(createdDate).toLocaleDateString() : '---'}
+                                       </TableCell>
+                                       <TableCell sx={{ fontWeight: 900 }}>
+                                          {sig.symbol}
+                                          <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontSize: '0.6rem' }}>{sig.timeframe}</Typography>
+                                       </TableCell>
+                                       <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{Math.round(entry).toLocaleString()}</TableCell>
+                                       <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', color: 'primary.main', opacity: 0.8 }}>₹{Math.round(target).toLocaleString()}</TableCell>
+                                       <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', color: 'error.main', opacity: 0.8 }}>₹{Math.round(stop).toLocaleString()}</TableCell>
+                                       <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{Math.round(outcomePrice).toLocaleString()}</TableCell>
+                                       <TableCell align="right" sx={{ fontWeight: 800, color: profitPerShare >= 0 ? 'primary.main' : 'error.main' }}>
+                                          {profitPerShare >= 0 ? '+' : '-'}₹{Math.abs(Math.round(profitPerShare)).toLocaleString()}
+                                       </TableCell>
+                                       <TableCell align="right" sx={{ fontWeight: 800, color: profitPct >= 0 ? 'primary.main' : 'error.main' }}>
+                                          {profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%
+                                       </TableCell>
+                                       <TableCell align="center">
+                                          <StatusChip status={sig.status || sig.outcome} />
+                                       </TableCell>
+                                    </TableRow>
+                                 );
+                              })}
                            </TableBody>
                         </Table>
                      </TableContainer>

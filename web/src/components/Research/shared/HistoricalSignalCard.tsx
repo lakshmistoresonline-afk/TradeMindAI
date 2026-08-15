@@ -10,13 +10,25 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
   const isStop = signal.status === 'STOP_LOSS';
   const isExpired = signal.status === 'EXPIRED';
 
-  const createdDate = signal.timestamp ? new Date(signal.timestamp) : (signal.date ? new Date(signal.date) : new Date());
-  const outcomeDate = signal.outcome_date ? new Date(signal.outcome_date) : null;
+  // Ensure UTC enforcement for naive backend strings
+  const ensureUTC = (ts: any) => {
+    if (!ts) return null;
+    if (typeof ts !== 'string') return ts;
+    if (!ts.includes('Z') && !ts.includes('+') && !ts.includes('-')) return `${ts}Z`;
+    return ts;
+  };
+
+  const createdDate = new Date(ensureUTC(signal.timestamp || signal.date) || Date.now());
+  const outcomeDate = signal.outcome_date ? new Date(ensureUTC(signal.outcome_date)!) : null;
 
   const entry = signal.entry_price || signal.entry || 0;
   const target = signal.target_price || signal.target || 0;
   const stop = signal.stop_loss_price || signal.stop_loss || 0;
   const profitPct = signal.profit_pct || 0;
+
+  // Derive P&L per share (Section 15)
+  const profitPerShare = entry * (profitPct / 100);
+  const outcomePrice = signal.outcome_price || (entry * (1 + profitPct / 100));
 
   // Holding duration calculation
   let durationStr = '---';
@@ -75,28 +87,45 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
       <Box sx={{ p: 2 }}>
          <Grid container spacing={2}>
             <Grid item xs={6}>
-               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>ENTRY</Typography>
+               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>ENTRY PRICE</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono' }}>₹{Math.round(entry).toLocaleString()}</Typography>
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'right' }}>
                <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>OUTCOME PRICE</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono' }}>₹{Math.round(signal.outcome_price || target).toLocaleString()}</Typography>
+               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono' }}>₹{Math.round(outcomePrice).toLocaleString()}</Typography>
             </Grid>
             <Grid item xs={4}>
                <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>STOP LOSS</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, color: '#ef4444', fontFamily: 'JetBrains Mono' }}>₹{Math.round(stop).toLocaleString()}</Typography>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: 'center' }}>
-               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>TARGET</Typography>
+               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>TARGET PRICE</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, color: '#10b981', fontFamily: 'JetBrains Mono' }}>₹{Math.round(target).toLocaleString()}</Typography>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: 'right' }}>
-               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>RESULT %</Typography>
+               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>PROFIT %</Typography>
                <Typography variant="body2" sx={{ fontWeight: 900, color: profitPct >= 0 ? '#10b981' : '#ef4444' }}>
                   {profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%
                </Typography>
             </Grid>
          </Grid>
+
+         <Box sx={{ mt: 2, p: 1.5, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 }}>
+            <Grid container justifyContent="space-between" alignItems="center">
+               <Box>
+                  <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.55rem', fontWeight: 800 }}>PROFIT / LOSS PER SHARE</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 900, color: profitPerShare >= 0 ? '#10b981' : '#ef4444', fontFamily: 'JetBrains Mono' }}>
+                     {profitPerShare >= 0 ? '+' : '-'}₹{Math.abs(Math.round(profitPerShare)).toLocaleString()}
+                  </Typography>
+               </Box>
+               <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.55rem', fontWeight: 800 }}>DURATION</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.primary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                     <Clock size={10} /> {durationStr}
+                  </Typography>
+               </Box>
+            </Grid>
+         </Box>
 
          <Divider sx={{ my: 1.5, opacity: 0.05 }} />
 

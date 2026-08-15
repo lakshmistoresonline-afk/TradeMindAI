@@ -34,29 +34,31 @@ export default function SignalsDashboard() {
 
       const stockMap = new Map(stocksData.map((s: any) => [s.symbol, s]));
 
+      // 1. Normalize Live Signals (can have multiple per symbol)
       const normalizedLive = liveSignalsData.map((ls: any) => {
         const stockInfo = stockMap.get(ls.symbol) || {};
         return {
           ...stockInfo,
           ...ls,
+          id: ls.id,
           decision: normalizeAITradeDecision({...stockInfo, ...ls})
         };
       });
 
-      const normalizedStocks = stocksData.map((s: any) => ({
-        ...s,
-        decision: normalizeAITradeDecision(s)
-      }));
+      // 2. Filter out symbols that already have a live signal to avoid duplicates
+      // when merging with the general stocks list (which has analysis field)
+      const liveSymbols = new Set(normalizedLive.map((s: any) => s.symbol));
 
-      const allSymbols = new Set([...normalizedLive.map((s: any) => s.symbol), ...normalizedStocks.map((s: any) => s.symbol)]);
-      const combined = Array.from(allSymbols).map(symbol => {
-          const live = normalizedLive.find((l: any) => l.symbol === symbol);
-          if (live) return live;
-          return normalizedStocks.find((s: any) => s.symbol === symbol);
-      });
+      const normalizedStocks = stocksData
+        .filter((s: any) => !liveSymbols.has(s.symbol))
+        .map((s: any) => ({
+          ...s,
+          decision: normalizeAITradeDecision(s)
+        }));
 
-      setStocks(combined);
-      console.log("Opps synced:", oppsData.length);
+      // 3. Combined list includes ALL live signals + analyzed stocks without active live signals
+      setStocks([...normalizedLive, ...normalizedStocks]);
+      console.log("Opps fetched:", oppsData.length);
     } catch (e) {
       console.error("Failed to sync signals:", e);
     } finally {
@@ -208,7 +210,7 @@ export default function SignalsDashboard() {
             {viewMode === 'grid' ? (
                <Grid container spacing={3}>
                   {filteredSignals.length > 0 ? filteredSignals.map((s) => (
-                     <Grid item xs={12} md={6} lg={4} key={s.symbol}>
+                     <Grid item xs={12} md={6} lg={4} key={s.id || s.symbol}>
                         <LiveSignalCard stock={s} decision={s.decision} />
                      </Grid>
                   )) : (

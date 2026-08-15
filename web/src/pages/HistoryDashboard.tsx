@@ -96,7 +96,7 @@ export default function HistoryDashboard() {
             {activeTab === 0 && (
                <Grid container spacing={2}>
                   {signals.map((sig, idx) => (
-                     <Grid item xs={12} md={6} lg={4} key={idx}>
+                     <Grid item xs={12} md={6} lg={4} key={sig.id || idx}>
                         <HistoricalSignalCard signal={sig} />
                      </Grid>
                   ))}

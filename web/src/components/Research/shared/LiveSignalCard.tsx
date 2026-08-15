@@ -19,22 +19,27 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
   // Derived Analytics (Section 15)
   const entry = decision.entry || 0;
   const current = stock.last_price || entry;
-  const target = decision.target || (isBuy ? entry * 1.05 : entry * 0.95);
-  const stop = decision.stopLoss || (isBuy ? entry * 0.97 : entry * 1.03);
+  const target = decision.target;
+  const stop = decision.stopLoss;
 
   // Target Progress calculation
   let progress = 0;
-  if (isBuy) {
-    progress = ((current - entry) / (target - entry)) * 100;
-  } else {
-    progress = ((entry - current) / (entry - target)) * 100;
+  if (target && target !== entry) {
+    if (isBuy) {
+      progress = ((current - entry) / (target - entry)) * 100;
+    } else {
+      progress = ((entry - current) / (entry - target)) * 100;
+    }
   }
   progress = Math.max(0, Math.min(100, progress));
 
   // Risk/Reward ratio
-  const risk = Math.abs(entry - stop);
-  const reward = Math.abs(target - entry);
-  const rrRatio = risk > 0 ? (reward / risk).toFixed(1) : '1:2.0';
+  let rrRatio = '---';
+  if (entry && target && stop) {
+    const risk = Math.abs(entry - stop);
+    const reward = Math.abs(target - entry);
+    rrRatio = risk > 0 ? `1 : ${(reward / risk).toFixed(1)}` : '---';
+  }
 
   const createdDate = decision.generatedAt ? new Date(decision.generatedAt) : new Date();
   const thesisText = decision.thesis || 'Analyzing session dynamics...';
@@ -114,10 +119,15 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
       </Box>
 
       {/* Timing Tier (Section 9) */}
-      <Box sx={{ px: 3, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-         <Clock size={12} className="text-slategray" />
-         <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>
-            CREATED: {createdDate.toLocaleDateString()} • {createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      <Box sx={{ px: 3, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+         <Stack direction="row" spacing={1} alignItems="center">
+            <Clock size={12} className="text-slategray" />
+            <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700, fontSize: '0.65rem' }}>
+               CREATED: {createdDate.toLocaleDateString()} • {createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Typography>
+         </Stack>
+         <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.55rem', opacity: 0.3, fontFamily: 'JetBrains Mono' }}>
+            ID: {decision.id || '---'}
          </Typography>
       </Box>
 
@@ -127,25 +137,25 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
           <Grid item xs={6}>
             <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem' }}>ENTRY PRICE</Typography>
             <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: 'white' }}>
-               ₹{Math.round(entry).toLocaleString()}
+               {entry ? `₹${Math.round(entry).toLocaleString()}` : '---'}
             </Typography>
           </Grid>
           <Grid item xs={6} sx={{ textAlign: 'right' }}>
             <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem' }}>CURRENT PRICE</Typography>
             <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: current >= entry ? '#10b981' : '#ef4444' }}>
-               ₹{Math.round(current).toLocaleString()}
+               {current ? `₹${Math.round(current).toLocaleString()}` : '---'}
             </Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem' }}>STOP LOSS</Typography>
             <Typography variant="body1" sx={{ fontWeight: 900, color: '#ef4444', fontFamily: 'JetBrains Mono' }}>
-               ₹{Math.round(stop).toLocaleString()}
+               {stop ? `₹${Math.round(stop).toLocaleString()}` : '---'}
             </Typography>
           </Grid>
           <Grid item xs={6} sx={{ textAlign: 'right' }}>
             <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem' }}>TARGET</Typography>
             <Typography variant="body1" sx={{ fontWeight: 900, color: '#10b981', fontFamily: 'JetBrains Mono' }}>
-               ₹{Math.round(target).toLocaleString()}
+               {target ? `₹${Math.round(target).toLocaleString()}` : '---'}
             </Typography>
           </Grid>
         </Grid>
@@ -173,7 +183,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
         <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}>
            <Box>
               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.55rem', fontWeight: 800 }}>RISK/REWARD</Typography>
-              <Typography variant="body2" sx={{ fontWeight: 900, color: '#00D1FF' }}>1 : {rrRatio}</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 900, color: '#00D1FF' }}>{rrRatio}</Typography>
            </Box>
            <Box sx={{ textAlign: 'right' }}>
               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.55rem', fontWeight: 800 }}>SIGNAL QUALITY</Typography>
