@@ -11,7 +11,8 @@ export default function DashboardTerminal() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [liveSignals, setLiveSignals] = useState<any[]>([]);
+  const [liveEquitySignals, setLiveEquitySignals] = useState<any[]>([]);
+  const [liveDerivativeSignals, setLiveDerivativeSignals] = useState<any[]>([]);
   const [performanceSummary, setPerformanceSummary] = useState<any>(null);
   const [historicalSignals, setHistoricalSignals] = useState<any[]>([]);
 
@@ -30,8 +31,8 @@ export default function DashboardTerminal() {
 
       const stockMap = new Map(stocksData.map((s: any) => [s.symbol, s]));
 
-      // 1. Authoritative Filtering & Sorting: created_at DESC (Section 18 & 26)
-      const normalizedLive = liveSignalsAuditData
+      // 1. Normalize and Group Live Signals: created_at DESC
+      const normalizedAll = liveSignalsAuditData
         .map((ls: any) => {
           const stockInfo = stockMap.get(ls.symbol) || {};
           return {
@@ -40,7 +41,6 @@ export default function DashboardTerminal() {
             decision: normalizeAITradeDecision({...stockInfo, ...ls})
           };
         })
-        // Strict Visibility Filter: Exclude HOLD, UNAVAILABLE, and 0% conviction
         .filter((s: any) =>
           s.decision.status !== 'UNAVAILABLE' &&
           s.decision.rating !== 'HOLD' &&
@@ -48,10 +48,12 @@ export default function DashboardTerminal() {
         )
         .sort((a: any, b: any) => new Date(b.timestamp || b.created_at || 0).getTime() - new Date(a.timestamp || a.created_at || 0).getTime());
 
-      setLiveSignals(normalizedLive);
+      setLiveEquitySignals(normalizedAll.filter((s: any) => s.asset_class === 'EQUITY' || !s.asset_class));
+      setLiveDerivativeSignals(normalizedAll.filter((s: any) => s.asset_class === 'FUTURES' || s.asset_class === 'OPTIONS'));
+
       setPerformanceSummary(summaryData);
 
-      // 2. Filter Resolved Signals & Sort: created_at DESC (Section 20 & 30)
+      // 2. Filter Resolved Signals & Sort: created_at DESC
       const resolved = allSignalsData
         .filter((s: any) =>
             ['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'CANCELLED', 'COMPLETED'].includes(s.status || s.outcome)
@@ -79,11 +81,9 @@ export default function DashboardTerminal() {
     return historicalSignals.filter(s => (s.status || s.outcome) === historyFilter);
   }, [historicalSignals, historyFilter]);
 
-  // Performance Trend Chart (Section 8 & 73)
   const chartOption = useMemo(() => {
     if (!historicalSignals.length) return null;
 
-    // Sort ascending for cumulative visualization
     const chartSorted = [...historicalSignals].sort((a, b) =>
        new Date(a.timestamp || a.date).getTime() - new Date(b.timestamp || b.date).getTime()
     );
@@ -156,7 +156,7 @@ export default function DashboardTerminal() {
       {/* 1. DASHBOARD HEADER */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1 }}>Signal Dashboard</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -1 }}>Signal Terminal</Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Activity size={14} /> INSTITUTIONAL MODE
@@ -172,10 +172,10 @@ export default function DashboardTerminal() {
          </IconButton>
       </Box>
 
-      {/* 2. SUMMARY STATS (Section 59) */}
+      {/* 2. SUMMARY STATS */}
       <Grid container spacing={2.5} sx={{ mb: 6 }}>
          {[
-           { label: 'ACTIVE CALLS', value: loading ? <Skeleton width={40} /> : liveSignals.length, sub: 'Monitoring entry trigger', icon: <Zap size={18} />, color: '#00D1FF' },
+           { label: 'ACTIVE CALLS', value: loading ? <Skeleton width={40} /> : liveEquitySignals.length + liveDerivativeSignals.length, sub: 'Monitoring entry trigger', icon: <Zap size={18} />, color: '#00D1FF' },
            { label: 'WIN RATE', value: loading ? <Skeleton width={60} /> : `${stats.win_rate}%`, sub: 'Resolved setups', icon: <ShieldCheck size={18} />, color: '#10b981' },
            { label: 'AVG PROFIT', value: loading ? <Skeleton width={60} /> : `${stats.avg_profit > 0 ? '+' : ''}${stats.avg_profit}%`, sub: 'Per historical signal', icon: <TrendingUp size={18} />, color: '#fbbf24' },
            { label: 'FULL HISTORY', value: loading ? <Skeleton width={40} /> : stats.total, sub: 'Audited records', icon: <History size={18} />, color: '#7C3AED' }
@@ -193,45 +193,68 @@ export default function DashboardTerminal() {
          ))}
       </Grid>
 
-      {/* 3. LIVE SIGNALS (Section 29) */}
-      <Box sx={{ mb: 8 }}>
+      {/* 3. EQUITY SIGNALS — PRIMARY SECTION */}
+      <Box sx={{ mb: 6 }}>
          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-               <Zap size={20} className="text-primary-main" /> LATEST SIGNALS
+               <Activity size={20} className="text-emerald-500" /> LATEST EQUITY SIGNALS
             </Typography>
-            <Button variant="text" size="small" endIcon={<ChevronRight size={16} />} onClick={() => navigate('/signals')} sx={{ fontWeight: 800, fontSize: '0.7rem' }}>ALL SIGNALS</Button>
+            <Button variant="text" size="small" endIcon={<ChevronRight size={16} />} onClick={() => navigate('/signals?type=EQUITY')} sx={{ fontWeight: 800, fontSize: '0.7rem' }}>ALL EQUITY</Button>
          </Box>
 
          {loading ? (
             <Grid container spacing={3}>
                {[1,2,3].map(i => (
-                  <Grid item xs={12} md={6} lg={4} key={i}>
-                     <Paper sx={{ p: 3, height: 380, border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <Skeleton variant="text" width="40%" height={32} />
-                        <Skeleton variant="rectangular" height={160} sx={{ my: 2, borderRadius: 1 }} />
-                        <Skeleton variant="text" height={24} />
-                     </Paper>
-                  </Grid>
+                  <Grid item xs={12} md={6} lg={4} key={i}><Skeleton variant="rectangular" height={380} sx={{ borderRadius: 2 }} /></Grid>
                ))}
             </Grid>
-         ) : liveSignals.length > 0 ? (
+         ) : liveEquitySignals.length > 0 ? (
             <Grid container spacing={3}>
-               {liveSignals.slice(0, 6).map((s) => (
+               {liveEquitySignals.slice(0, 3).map((s) => (
                   <Grid item xs={12} md={6} lg={4} key={s.id || s.symbol}>
                      <LiveSignalCard stock={s} decision={s.decision} />
                   </Grid>
                ))}
             </Grid>
          ) : (
-            <Paper sx={{ p: 10, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 2 }}>
-               <Typography color="textSecondary" sx={{ fontWeight: 700 }}>NO ACTIVE SIGNALS DETECTED</Typography>
-               <Typography variant="caption" color="textSecondary">Monitoring institutional order flow for high-probability setups...</Typography>
+            <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 2 }}>
+               <Typography color="textSecondary" variant="body2" sx={{ fontWeight: 700 }}>NO ACTIVE EQUITY SETUPS</Typography>
+            </Paper>
+         )}
+      </Box>
+
+      {/* 4. DERIVATIVE SIGNALS — SEPARATE SECTION */}
+      <Box sx={{ mb: 8 }}>
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+               <Zap size={20} className="text-primary-main" /> LATEST DERIVATIVE SIGNALS
+            </Typography>
+            <Button variant="text" size="small" endIcon={<ChevronRight size={16} />} onClick={() => navigate('/signals?type=DERIVATIVES')} sx={{ fontWeight: 800, fontSize: '0.7rem' }}>ALL F&O</Button>
+         </Box>
+
+         {loading ? (
+            <Grid container spacing={3}>
+               {[1,2,3].map(i => (
+                  <Grid item xs={12} md={6} lg={4} key={i}><Skeleton variant="rectangular" height={380} sx={{ borderRadius: 2 }} /></Grid>
+               ))}
+            </Grid>
+         ) : liveDerivativeSignals.length > 0 ? (
+            <Grid container spacing={3}>
+               {liveDerivativeSignals.slice(0, 3).map((s) => (
+                  <Grid item xs={12} md={6} lg={4} key={s.id || s.symbol}>
+                     <LiveSignalCard stock={s} decision={s.decision} />
+                  </Grid>
+               ))}
+            </Grid>
+         ) : (
+            <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 2 }}>
+               <Typography color="textSecondary" variant="body2" sx={{ fontWeight: 700 }}>NO ACTIVE F&O SETUPS</Typography>
             </Paper>
          )}
       </Box>
 
       <Grid container spacing={4}>
-         {/* 4. PERFORMANCE CHART (Section 8) */}
+         {/* 5. PERFORMANCE CHART */}
          <Grid item xs={12} lg={7}>
             <Box sx={{ mb: 3 }}>
                <Typography variant="h6" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -251,7 +274,7 @@ export default function DashboardTerminal() {
             </Paper>
          </Grid>
 
-         {/* 6. SIGNAL INTELLIGENCE (Section 10) */}
+         {/* 6. SIGNAL INTELLIGENCE */}
          <Grid item xs={12} lg={5}>
             <Box sx={{ mb: 3 }}>
                <Typography variant="h6" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -280,7 +303,7 @@ export default function DashboardTerminal() {
          </Grid>
       </Grid>
 
-      {/* 5. HISTORICAL AUDIT LOG (Section 30) */}
+      {/* 7. HISTORICAL AUDIT LOG */}
       <Box sx={{ mt: 8 }}>
          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 3, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 800 }}>HISTORICAL AUDIT LOG</Typography>
@@ -321,6 +344,7 @@ export default function DashboardTerminal() {
                      ) : filteredHistory.length > 0 ? (
                         filteredHistory.slice(0, 10).map((s: any, i: number) => {
                            const isHit = (s.status === 'TARGET_HIT' || s.outcome === 'TARGET_HIT');
+                           const isDerivative = s.asset_class === 'FUTURES' || s.asset_class === 'OPTIONS';
                            return (
                               <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                  <td style={tableDataStyle}>
@@ -328,7 +352,10 @@ export default function DashboardTerminal() {
                                        {new Date(s.timestamp || s.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}
                                     </Typography>
                                  </td>
-                                 <td style={{ ...tableDataStyle, fontWeight: 900 }}>{s.symbol}</td>
+                                 <td style={{ ...tableDataStyle, fontWeight: 900 }}>
+                                    {isDerivative ? (s.asset_class === 'OPTIONS' ? `${s.underlying_symbol} ${s.strike} ${s.option_type}` : `${s.underlying_symbol} FUT`) : s.symbol}
+                                    <Typography variant="caption" display="block" color="primary" sx={{ fontSize: '0.6rem', fontWeight: 900 }}>{s.asset_class || 'EQUITY'}</Typography>
+                                 </td>
                                  <td style={tableDataStyle}>
                                     <Typography variant="caption" sx={{ fontWeight: 900, color: s.direction === 'SHORT' ? 'error.main' : 'success.main' }}>
                                        {s.direction === 'SHORT' ? 'SHORT ▼' : 'LONG ▲'}
@@ -356,7 +383,7 @@ export default function DashboardTerminal() {
                         })
                      ) : (
                         <tr>
-                           <td colSpan={7} style={{ padding: '60px', textAlign: 'center' }}>
+                           <td colSpan={7} style={{ padding: '40px', textAlign: 'center' }}>
                               <Typography color="textSecondary" sx={{ fontWeight: 800, letterSpacing: 1, opacity: 0.5 }}>NO AUDIT RECORDS FOUND</Typography>
                            </td>
                         </tr>
@@ -364,7 +391,7 @@ export default function DashboardTerminal() {
                   </tbody>
                </table>
             </Box>
-            {!loading && filteredHistory.length > 10 && (
+            {!loading && historicalSignals.length > 10 && (
                <Box sx={{ p: 2.5, textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', bgcolor: 'rgba(255,255,255,0.01)' }}>
                   <Button size="small" onClick={() => navigate('/history')} sx={{ fontWeight: 800, letterSpacing: 1 }}>ACCESS FULL SIGNAL ARCHIVE</Button>
                </Box>

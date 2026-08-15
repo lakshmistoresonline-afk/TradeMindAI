@@ -1,5 +1,5 @@
-import { Box, Typography, Paper, Grid, Stack, Chip, Button, alpha, LinearProgress, Divider, IconButton, Collapse, Tooltip } from '@mui/material';
-import { Zap, ArrowRight, Star, ChevronDown, ChevronUp, Clock, Info } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Stack, Chip, Button, alpha, LinearProgress, Divider, IconButton, Collapse } from '@mui/material';
+import { Zap, ArrowRight, Star, ChevronDown, ChevronUp, Clock, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
 import { useState } from 'react';
@@ -17,8 +17,9 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
 
   const isBuy = decision.rating?.includes('BUY');
   const isHighConviction = decision.conviction > 80;
+  const isDerivative = decision.assetClass === 'FUTURES' || decision.assetClass === 'OPTIONS';
 
-  // Authoritative Trade Levels (Section 35 Audit)
+  // Authoritative Trade Levels
   const entry = decision.entry || 0;
   const current = stock.last_price || entry;
   const target = decision.target || 0;
@@ -45,7 +46,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
     rrRatio = risk > 0 ? `1 : ${(reward / risk).toFixed(2)}` : '---';
   }
 
-  // Consistent Date Formatting (Section 12 & 17)
+  // Consistent Date Formatting
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '---';
     const date = new Date(dateStr);
@@ -65,7 +66,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
         borderRadius: 2,
         overflow: 'hidden',
         bgcolor: '#0C1118',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'all 0.2s ease-in-out',
         position: 'relative',
         '&:hover': {
           borderColor: 'primary.main',
@@ -75,32 +76,26 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
         }
       }}
     >
-      {/* Header Tier (Section 49) */}
+      {/* Header Tier */}
       <Box sx={{ p: 2.5, pb: 2, display: 'grid', gridTemplateColumns: '1fr auto', gap: 2 }}>
         <Box sx={{ minWidth: 0 }}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="h5" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {stock.symbol}
+              {decision.assetClass === 'OPTIONS' ? `${decision.underlyingSymbol} ${decision.strike} ${decision.optionType}` : decision.assetClass === 'FUTURES' ? `${decision.underlyingSymbol} FUT` : stock.symbol}
             </Typography>
             {isHighConviction && <Star size={16} className="text-yellow-400" fill="currentColor" />}
           </Stack>
           <Typography
             variant="caption"
             sx={{
-                fontWeight: 700,
-                color: 'text.secondary',
-                display: 'block',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                mt: 0.5,
-                textTransform: 'uppercase'
+                fontWeight: 700, color: 'text.secondary', display: 'block',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mt: 0.5, textTransform: 'uppercase'
             }}
           >
-            {stock.name || stock.industry || 'MARKET ASSET'}
+            {stock.name || stock.industry || (isDerivative ? `${decision.underlyingSymbol} Derivative` : 'MARKET ASSET')}
           </Typography>
           <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 1, mt: 0.5, display: 'block' }}>
-            {decision.assetClass === 'OPTIONS' ? `${decision.underlyingSymbol} ${decision.strike} ${decision.optionType}` : decision.assetClass === 'FUTURES' ? `${decision.underlyingSymbol} FUT` : decision.timeframe}
+            {decision.timeframe} • {decision.assetClass || 'EQUITY'}
           </Typography>
         </Box>
 
@@ -109,10 +104,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
               label={decision.status?.replace('_', ' ')}
               size="small"
               sx={{
-                height: 20,
-                fontSize: '0.55rem',
-                fontWeight: 900,
-                mb: 1,
+                height: 20, fontSize: '0.55rem', fontWeight: 900, mb: 1,
                 bgcolor: alpha(isBuy ? '#10b981' : '#ef4444', 0.1),
                 color: isBuy ? '#10b981' : '#ef4444',
                 border: `1px solid ${alpha(isBuy ? '#10b981' : '#ef4444', 0.2)}`
@@ -129,7 +121,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
 
       <Divider sx={{ opacity: 0.05 }} />
 
-      {/* Meta Audit (Section 17) */}
+      {/* Meta Audit */}
       <Box sx={{ px: 2.5, py: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
          <Box>
             <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.55rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -143,34 +135,53 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
                 <Typography variant="caption" sx={{ fontWeight: 800, color: 'secondary.main' }}>{new Date(decision.expiry).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</Typography>
             </Box>
          )}
-         {!decision.expiry && (
-            <Tooltip title={`Internal ID Hidden • Status: ${decision.status}`}>
-                <IconButton size="small" sx={{ opacity: 0.3 }}><Info size={12} /></IconButton>
-            </Tooltip>
-         )}
       </Box>
 
-      {/* Trade Levels Grid (Section 54 & 55) */}
+      {/* Trade Levels Grid */}
       <Box sx={{ px: 2.5, py: 2, bgcolor: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
         <Grid container spacing={2}>
            <Grid item xs={6}>
-              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>ENTRY PRICE</Typography>
-              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: 'white' }}>₹{Math.round(entry).toLocaleString()}</Typography>
+              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>
+                  {decision.assetClass === 'OPTIONS' ? 'ENTRY PREMIUM' : 'ENTRY PRICE'}
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: 'white' }}>
+                  ₹{entry.toLocaleString()}
+              </Typography>
            </Grid>
            <Grid item xs={6} sx={{ textAlign: 'right' }}>
-              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>CURRENT PRICE</Typography>
-              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: current >= entry ? '#10b981' : '#ef4444' }}>₹{Math.round(current).toLocaleString()}</Typography>
+              <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>
+                  {decision.assetClass === 'OPTIONS' ? 'CURRENT PREMIUM' : 'CURRENT PRICE'}
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: current >= entry ? '#10b981' : '#ef4444' }}>
+                  ₹{current.toLocaleString()}
+              </Typography>
            </Grid>
            <Grid item xs={6}>
               <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>STOP LOSS</Typography>
-              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#ef4444' }}>₹{Math.round(stop).toLocaleString()}</Typography>
+              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#ef4444' }}>
+                  ₹{stop.toLocaleString()}
+              </Typography>
            </Grid>
            <Grid item xs={6} sx={{ textAlign: 'right' }}>
               <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>TARGET</Typography>
-              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#10b981' }}>₹{Math.round(target).toLocaleString()}</Typography>
+              <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#10b981' }}>
+                  ₹{target.toLocaleString()}
+              </Typography>
            </Grid>
         </Grid>
       </Box>
+
+      {/* Underlying Info for Derivatives */}
+      {isDerivative && stock.last_price && (
+         <Box sx={{ px: 2.5, py: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'rgba(0, 209, 255, 0.03)' }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Activity size={10} /> {decision.underlyingSymbol} SPOT
+            </Typography>
+            <Typography variant="caption" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono' }}>
+                ₹{Math.round(stock.last_price).toLocaleString()}
+            </Typography>
+         </Box>
+      )}
 
       {/* Analytics Summary */}
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
@@ -184,9 +195,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
           variant="determinate"
           value={isTradeActive ? progress : 0}
           sx={{
-            height: 6,
-            borderRadius: 3,
-            bgcolor: 'rgba(255,255,255,0.05)',
+            height: 6, borderRadius: 3, bgcolor: 'rgba(255,255,255,0.05)',
             '& .MuiLinearProgress-bar': {
               background: isTradeActive ? `linear-gradient(90deg, ${isBuy ? '#10b981' : '#ef4444'}, #00D1FF)` : 'transparent'
             }
@@ -210,7 +219,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
 
         <Divider sx={{ my: 2, opacity: 0.05 }} />
 
-        {/* Canonical Lifecycle (Section 33) */}
+        {/* Canonical Lifecycle */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" spacing={0.8}>
                 <LifecycleStep label="GEN" completed={true} />
@@ -247,14 +256,8 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
         onClick={() => navigate('/analysis', { state: { symbol: stock.symbol } })}
         endIcon={<ArrowRight size={14} />}
         sx={{
-           py: 1.5,
-           borderRadius: 0,
-           color: 'primary.main',
-           fontWeight: 800,
-           fontSize: '0.7rem',
-           letterSpacing: 1,
-           borderTop: '1px solid rgba(255,255,255,0.03)',
-           '&:hover': { bgcolor: 'rgba(0, 209, 255, 0.08)' }
+           py: 1.5, borderRadius: 0, color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', letterSpacing: 1,
+           borderTop: '1px solid rgba(255,255,255,0.03)', '&:hover': { bgcolor: 'rgba(0, 209, 255, 0.08)' }
         }}
       >
          VIEW SIGNAL DETAILS
@@ -267,13 +270,9 @@ function LifecycleStep({ label, active, completed, color = '#3b82f6' }: { label:
     return (
         <Box sx={{ textAlign: 'center' }}>
             <Box sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
+                width: 6, height: 6, borderRadius: '50%',
                 bgcolor: completed ? '#10b981' : active ? color : 'rgba(255,255,255,0.1)',
-                mx: 'auto',
-                mb: 0.5,
-                boxShadow: active ? `0 0 8px ${color}` : 'none'
+                mx: 'auto', mb: 0.5, boxShadow: active ? `0 0 8px ${color}` : 'none'
             }} />
             <Typography variant="caption" sx={{ fontSize: '0.45rem', fontWeight: 900, color: (active || completed) ? 'white' : 'text.disabled' }}>{label}</Typography>
         </Box>

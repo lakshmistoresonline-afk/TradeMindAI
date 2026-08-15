@@ -1,14 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Stack, Tab, Tabs, Button, CircularProgress, Divider, InputBase, alpha, IconButton, Tooltip } from '@mui/material';
 import { Zap, Clock, ShieldAlert, RefreshCw, Search, Activity, LayoutGrid, List } from 'lucide-react';
-import { getStocks, getOpportunities, getLiveSignalsAudit } from '../api/client';
+import { getStocks, getLiveSignalsAudit } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 import LiveSignalsBoard from '../components/Research/shared/LiveSignalsBoard';
+import { useLocation } from 'react-router-dom';
 
 export default function SignalsDashboard() {
-  const [activeTab, setActiveTab] = useState(2); // Default to SWING (index 2)
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialType = searchParams.get('type') === 'DERIVATIVES' ? 1 : 0;
+
+  const [mainTab, setMainTab] = useState(initialType); // 0: Equity, 1: Derivatives
+  const [tfTab, setTfTab] = useState(2); // Default to SWING (index 2)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [stocks, setStocks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,29 +32,25 @@ export default function SignalsDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [stocksData, oppsData, liveSignalsData] = await Promise.all([
+      const [stocksData, liveSignalsData] = await Promise.all([
         getStocks(),
-        getOpportunities(),
         getLiveSignalsAudit()
       ]);
 
       const stockMap = new Map(stocksData.map((s: any) => [s.symbol, s]));
 
-      // 1. Normalize Live Signals (can have multiple per symbol)
+      // 1. Normalize Live Signals
       const normalizedLive = liveSignalsData.map((ls: any) => {
         const stockInfo = stockMap.get(ls.symbol) || {};
         return {
           ...stockInfo,
           ...ls,
-          id: ls.id,
           decision: normalizeAITradeDecision({...stockInfo, ...ls})
         };
       });
 
-      // 2. Filter out symbols that already have a live signal to avoid duplicates
-      // when merging with the general stocks list (which has analysis field)
+      // 2. Normalize Stocks without active signals
       const liveSymbols = new Set(normalizedLive.map((s: any) => s.symbol));
-
       const normalizedStocks = stocksData
         .filter((s: any) => !liveSymbols.has(s.symbol))
         .map((s: any) => ({
@@ -56,18 +58,16 @@ export default function SignalsDashboard() {
           decision: normalizeAITradeDecision(s)
         }));
 
-      // 3. Combined list includes ALL live signals + analyzed stocks without active live signals
       const combined = [
         ...normalizedLive,
         ...normalizedStocks
       ].sort((a: any, b: any) => {
-          const timeA = new Date(a.decision?.generatedAt || a.timestamp || a.created_at || 0).getTime();
-          const timeB = new Date(b.decision?.generatedAt || b.timestamp || b.created_at || 0).getTime();
+          const timeA = new Date(a.decision?.generatedAt || a.timestamp || 0).getTime();
+          const timeB = new Date(b.decision?.generatedAt || b.timestamp || 0).getTime();
           return timeB - timeA;
       });
 
       setStocks(combined);
-      console.log("Opps fetched:", oppsData.length);
     } catch (e) {
       console.error("Failed to sync signals:", e);
     } finally {
@@ -80,24 +80,29 @@ export default function SignalsDashboard() {
   }, []);
 
   const filteredSignals = useMemo(() => {
-    const currentTf = timeframes[activeTab].value;
+    const currentTf = timeframes[tfTab].value;
+    const isDerivativeRequest = mainTab === 1;
 
     return stocks.filter(s => {
+        const assetClass = s.asset_class || 'EQUITY';
+        const matchesType = isDerivativeRequest
+            ? (assetClass === 'FUTURES' || assetClass === 'OPTIONS')
+            : (assetClass === 'EQUITY');
+
         const matchesTf = s.decision?.timeframe === currentTf;
         const isTradeable = (s.decision?.rating?.includes('BUY') || s.decision?.rating?.includes('SELL'));
-        const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                             (s.underlying_symbol?.toLowerCase().includes(searchQuery.toLowerCase()));
+
         const isNotResolved = !['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'COMPLETED'].includes(s.decision?.status);
-        return matchesTf && isTradeable && matchesSearch && isNotResolved;
-    }).sort((a, b) => {
-        const timeA = new Date(a.decision?.generatedAt || a.timestamp || 0).getTime();
-        const timeB = new Date(b.decision?.generatedAt || b.timestamp || 0).getTime();
-        return timeB - timeA;
+
+        return matchesType && matchesTf && isTradeable && matchesSearch && isNotResolved;
     });
-  }, [stocks, activeTab, searchQuery]);
+  }, [stocks, mainTab, tfTab, searchQuery]);
 
   return (
     <Box sx={{ pb: 10 }}>
-      {/* Header Tier - Modern Institutional Design */}
+      {/* Header Tier */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 5, flexWrap: 'wrap', gap: 3 }}>
          <Box>
             <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1, color: 'white' }}>
@@ -109,7 +114,7 @@ export default function SignalsDashboard() {
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: 'secondary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Activity size={14} /> {filteredSignals.length} ACTIVE OPPORTUNITIES
+                  <Activity size={14} /> {filteredSignals.length} {mainTab === 0 ? 'EQUITY' : 'F&O'} OPPORTUNITIES
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: connectionStatus === 'ONLINE' ? 'success.main' : 'error.main' }}>
@@ -119,7 +124,6 @@ export default function SignalsDashboard() {
          </Box>
 
          <Stack direction="row" spacing={2} alignItems="center">
-            {/* Search Component */}
             <Box sx={{
                display: 'flex',
                alignItems: 'center',
@@ -143,47 +147,40 @@ export default function SignalsDashboard() {
 
             <Stack direction="row" spacing={1} sx={{ bgcolor: '#0C1118', p: 0.5, borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)' }}>
                <Tooltip title="Grid View">
-                  <IconButton
-                     onClick={() => setViewMode('grid')}
-                     sx={{
-                        borderRadius: 1.5,
-                        p: 1,
-                        color: viewMode === 'grid' ? 'primary.main' : 'text.secondary',
-                        bgcolor: viewMode === 'grid' ? 'rgba(0, 209, 255, 0.1)' : 'transparent'
-                     }}
-                  >
+                  <IconButton onClick={() => setViewMode('grid')} sx={{ borderRadius: 1.5, color: viewMode === 'grid' ? 'primary.main' : 'text.secondary', bgcolor: viewMode === 'grid' ? 'rgba(0, 209, 255, 0.1)' : 'transparent' }}>
                      <LayoutGrid size={18} />
                   </IconButton>
                </Tooltip>
                <Tooltip title="List View">
-                  <IconButton
-                     onClick={() => setViewMode('list')}
-                     sx={{
-                        borderRadius: 1.5,
-                        p: 1,
-                        color: viewMode === 'list' ? 'primary.main' : 'text.secondary',
-                        bgcolor: viewMode === 'list' ? 'rgba(0, 209, 255, 0.1)' : 'transparent'
-                     }}
-                  >
+                  <IconButton onClick={() => setViewMode('list')} sx={{ borderRadius: 1.5, color: viewMode === 'list' ? 'primary.main' : 'text.secondary', bgcolor: viewMode === 'list' ? 'rgba(0, 209, 255, 0.1)' : 'transparent' }}>
                      <List size={18} />
                   </IconButton>
                </Tooltip>
             </Stack>
 
-            <IconButton
-               onClick={fetchData}
-               sx={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 2, p: 1.5, '&:hover': { bgcolor: '#111821', borderColor: 'primary.main' } }}
-            >
+            <IconButton onClick={fetchData} sx={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: 2, p: 1.5 }}>
                <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             </IconButton>
          </Stack>
       </Box>
 
-      {/* Timeframe Navigation - Institutional Tabs */}
+      {/* Main Asset Class Navigation */}
+      <Box sx={{ mb: 4, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+         <Tabs
+            value={mainTab}
+            onChange={(_, v) => setMainTab(v)}
+            sx={{ '& .MuiTab-root': { fontWeight: 900, minWidth: 200 } }}
+         >
+            <Tab label="EQUITY SIGNALS" icon={<Activity size={18} />} iconPosition="start" />
+            <Tab label="DERIVATIVE SIGNALS" icon={<Zap size={18} />} iconPosition="start" />
+         </Tabs>
+      </Box>
+
+      {/* Timeframe Navigation */}
       <Box sx={{ position: 'sticky', top: 64, zIndex: 10, bgcolor: alpha('#070A0F', 0.9), backdropFilter: 'blur(12px)', mx: -3, px: 3, mb: 4, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
          <Tabs
-            value={activeTab}
-            onChange={(_, v) => setActiveTab(v)}
+            value={tfTab}
+            onChange={(_, v) => setTfTab(v)}
             variant="scrollable"
             scrollButtons="auto"
             sx={{
@@ -230,9 +227,9 @@ export default function SignalsDashboard() {
                      <Grid item xs={12}>
                         <Box sx={{ py: 15, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.01)', border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 4 }}>
                            <ShieldAlert size={48} color="#334155" style={{ margin: '0 auto 20px' }} />
-                           <Typography variant="h6" fontWeight={800} color="textSecondary">No Validated {timeframes[activeTab].label} Setups</Typography>
-                           <Typography variant="body2" color="textSecondary" sx={{ mt: 1, opacity: 0.5 }}>The multi-agent consensus has not identified high-probability entries for this timeframe.</Typography>
-                           <Button variant="outlined" sx={{ mt: 4, borderRadius: 2 }} onClick={() => setSearchQuery('')}>RESET FILTERS</Button>
+                           <Typography variant="h6" fontWeight={800} color="textSecondary">No Validated {timeframes[tfTab].label} {mainTab === 0 ? 'Equity' : 'Derivative'} Setups</Typography>
+                           <Typography variant="body2" color="textSecondary" sx={{ mt: 1, opacity: 0.5 }}>The multi-agent consensus has not identified high-probability entries for this criteria.</Typography>
+                           <Button variant="outlined" sx={{ mt: 4, borderRadius: 2 }} onClick={() => {setSearchQuery(''); setTfTab(2);}}>RESET FILTERS</Button>
                         </Box>
                      </Grid>
                   )}

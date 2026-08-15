@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Stack, Chip, alpha, Divider, IconButton, Collapse } from '@mui/material';
-import { Clock, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, Info, Activity } from 'lucide-react';
 import { useState } from 'react';
 
 interface HistoricalSignalCardProps {
@@ -12,6 +12,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
   const isHit = signal.status === 'TARGET_HIT' || signal.outcome === 'TARGET_HIT';
   const isStop = signal.status === 'STOP_LOSS' || signal.outcome === 'STOP_LOSS';
   const isExpired = signal.status === 'EXPIRED' || signal.outcome === 'EXPIRED';
+  const isDerivative = signal.asset_class === 'FUTURES' || signal.asset_class === 'OPTIONS';
 
   // Ensure UTC enforcement for naive backend strings
   const ensureUTC = (ts: any) => {
@@ -33,7 +34,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
   const profitPerShare = entry * (profitPct / 100);
   const outcomePrice = signal.outcome_price || (entry * (1 + profitPct / 100));
 
-  // Date Formatting: 11 Aug 2026 • 10:46 AM IST
+  // Date Formatting
   const formatDate = (date: Date) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()} • ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST`;
@@ -71,7 +72,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
                 {signal.asset_class === 'OPTIONS' ? `${signal.underlying_symbol} ${signal.strike} ${signal.option_type}` : signal.asset_class === 'FUTURES' ? `${signal.underlying_symbol} FUT` : signal.symbol}
             </Typography>
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mt: 0.5 }}>
-                {signal.timeframe} • {signal.dataset || 'HISTORICAL'}
+                {signal.timeframe} • {signal.asset_class || 'EQUITY'}
             </Typography>
          </Box>
          <Box sx={{ textAlign: 'right' }}>
@@ -88,7 +89,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
 
       <Divider sx={{ opacity: 0.03 }} />
 
-      {/* Audit Meta Grid (Section 53) */}
+      {/* Audit Meta Grid */}
       <Box sx={{ px: 2, py: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, bgcolor: 'rgba(255,255,255,0.01)' }}>
          <Box>
             <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.55rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -98,7 +99,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
          </Box>
          <Box sx={{ textAlign: 'right' }}>
             <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>
-                {signal.expiry ? `EXPIRY: ${new Date(signal.expiry).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : 'RESOLUTION'}
+                {signal.expiry ? `EXPIRY: ${new Date(ensureUTC(signal.expiry)!).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : 'RESOLUTION'}
             </Typography>
             <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.65rem', color: 'text.secondary' }}>{outcomeDate ? formatDate(outcomeDate) : '---'}</Typography>
          </Box>
@@ -107,22 +108,39 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
       <Box sx={{ p: 2, flexGrow: 1 }}>
          <Grid container spacing={2}>
             <Grid item xs={6}>
-               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>ENTRY PRICE</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono' }}>₹{Math.round(entry).toLocaleString()}</Typography>
+               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>
+                   {signal.asset_class === 'OPTIONS' ? 'ENTRY PREMIUM' : 'ENTRY PRICE'}
+               </Typography>
+               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono' }}>₹{entry.toLocaleString()}</Typography>
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'right' }}>
-               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>OUTCOME PRICE</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono', color: isHit ? '#10b981' : isStop ? '#ef4444' : 'white' }}>₹{Math.round(outcomePrice).toLocaleString()}</Typography>
+               <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>
+                   {signal.asset_class === 'OPTIONS' ? 'OUTCOME PREMIUM' : 'OUTCOME PRICE'}
+               </Typography>
+               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono', color: isHit ? '#10b981' : isStop ? '#ef4444' : 'white' }}>
+                   ₹{outcomePrice.toLocaleString()}
+               </Typography>
             </Grid>
             <Grid item xs={6}>
                <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>STOP LOSS</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 700, color: '#ef4444', fontFamily: 'JetBrains Mono', opacity: 0.7 }}>₹{Math.round(stop).toLocaleString()}</Typography>
+               <Typography variant="body2" sx={{ fontWeight: 700, color: '#ef4444', fontFamily: 'JetBrains Mono', opacity: 0.7 }}>₹{stop.toLocaleString()}</Typography>
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'right' }}>
                <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.6rem', fontWeight: 800 }}>TARGET</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 700, color: '#10b981', fontFamily: 'JetBrains Mono', opacity: 0.7 }}>₹{Math.round(target).toLocaleString()}</Typography>
+               <Typography variant="body2" sx={{ fontWeight: 700, color: '#10b981', fontFamily: 'JetBrains Mono', opacity: 0.7 }}>₹{target.toLocaleString()}</Typography>
             </Grid>
          </Grid>
+
+         {isDerivative && signal.underlying_price && (
+            <Box sx={{ mt: 1.5, p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'rgba(0, 209, 255, 0.02)', borderRadius: 1 }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Activity size={10} /> {signal.underlying_symbol} SPOT AT RES
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono' }}>
+                    ₹{Math.round(signal.underlying_price).toLocaleString()}
+                </Typography>
+            </Box>
+         )}
 
          <Box sx={{ mt: 2, p: 1.5, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -133,7 +151,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
                   </Typography>
                </Box>
                <Box sx={{ textAlign: 'right' }}>
-                  <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.55rem', fontWeight: 800 }}>P/L PER SHARE</Typography>
+                  <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.55rem', fontWeight: 800 }}>P/L PER UNIT</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 900, color: profitPerShare >= 0 ? '#10b981' : '#ef4444', fontFamily: 'JetBrains Mono' }}>
                      {profitPerShare >= 0 ? '+' : '-'}₹{Math.abs(Math.round(profitPerShare)).toLocaleString()}
                   </Typography>
@@ -141,7 +159,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
             </Box>
          </Box>
 
-         {/* Audit Lifecycle (Section 31) */}
+         {/* Audit Lifecycle */}
          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" spacing={0.6}>
                 <AuditStep label="GEN" completed={true} />
@@ -159,7 +177,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
                    <Info size={10} /> SYSTEM AUDIT TRAIL
                 </Typography>
                 <Typography variant="body2" sx={{ fontSize: '0.7rem', color: 'text.secondary', mt: 0.5, lineHeight: 1.4 }}>
-                    Signal record preserved from {createdDate.toLocaleDateString()}. Resolution achieved at ₹{Math.round(outcomePrice).toLocaleString()} with verified MFE/MAE metadata.
+                    Signal record preserved from {createdDate.toLocaleDateString()}. Resolution achieved at ₹{outcomePrice.toLocaleString()} with verified metadata.
                 </Typography>
             </Box>
          </Collapse>

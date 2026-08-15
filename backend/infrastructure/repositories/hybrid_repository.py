@@ -449,9 +449,10 @@ class HybridIOSRepository(IIOSRepository):
     async def get_active_live_signals(self) -> List[LiveSignal]:
         with self.session_factory() as pg:
             # Vision 2.2: Fetch all non-resolved signals for the Live Dashboard
+            # Sort by timestamp DESC to ensure newest signals are returned first (RC-5 Alignment)
             res = pg.query(LiveSignalDB).filter(
                 LiveSignalDB.status.in_(["ACTIVE", "WAITING_FOR_ENTRY", "ENTRY_TRIGGERED"])
-            ).all()
+            ).order_by(LiveSignalDB.timestamp.desc()).all()
             return [self._map_db_to_live_signal(r) for r in res]
 
     async def get_all_live_signals(self, start_date: Optional[datetime] = None, end_date: Optional[datetime] = None) -> List[LiveSignal]:
@@ -461,6 +462,7 @@ class HybridIOSRepository(IIOSRepository):
                 query = query.filter(LiveSignalDB.timestamp >= start_date)
             if end_date:
                 query = query.filter(LiveSignalDB.timestamp <= end_date)
+            # Sort by timestamp DESC (RC-5 Alignment)
             res = query.order_by(LiveSignalDB.timestamp.desc()).all()
             return [self._map_db_to_live_signal(r) for r in res]
 
