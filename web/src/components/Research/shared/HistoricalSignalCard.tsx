@@ -68,7 +68,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
       <Box sx={{ p: 2, pb: 1.5, display: 'grid', gridTemplateColumns: '1fr auto', gap: 2 }}>
          <Box sx={{ minWidth: 0 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {signal.symbol}
+                {signal.asset_class === 'OPTIONS' ? `${signal.underlying_symbol} ${signal.strike} ${signal.option_type}` : signal.asset_class === 'FUTURES' ? `${signal.underlying_symbol} FUT` : signal.symbol}
             </Typography>
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mt: 0.5 }}>
                 {signal.timeframe} • {signal.dataset || 'HISTORICAL'}
@@ -97,7 +97,9 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'white', fontSize: '0.65rem' }}>{formatDate(createdDate)}</Typography>
          </Box>
          <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>RESOLUTION</Typography>
+            <Typography variant="caption" color="textSecondary" sx={{ fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>
+                {signal.expiry ? `EXPIRY: ${new Date(signal.expiry).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : 'RESOLUTION'}
+            </Typography>
             <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.65rem', color: 'text.secondary' }}>{outcomeDate ? formatDate(outcomeDate) : '---'}</Typography>
          </Box>
       </Box>

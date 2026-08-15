@@ -100,7 +100,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
             {stock.name || stock.industry || 'MARKET ASSET'}
           </Typography>
           <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 1, mt: 0.5, display: 'block' }}>
-            {decision.timeframe}
+            {decision.assetClass === 'OPTIONS' ? `${decision.underlyingSymbol} ${decision.strike} ${decision.optionType}` : decision.assetClass === 'FUTURES' ? `${decision.underlyingSymbol} FUT` : decision.timeframe}
           </Typography>
         </Box>
 
@@ -137,9 +137,17 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
             </Typography>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'white' }}>{formatDate(decision.generatedAt)}</Typography>
          </Box>
-         <Tooltip title={`Internal ID Hidden • Status: ${decision.status}`}>
-            <IconButton size="small" sx={{ opacity: 0.3 }}><Info size={12} /></IconButton>
-         </Tooltip>
+         {decision.expiry && (
+            <Box sx={{ textAlign: 'right' }}>
+                <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>EXPIRY</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: 'secondary.main' }}>{new Date(decision.expiry).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</Typography>
+            </Box>
+         )}
+         {!decision.expiry && (
+            <Tooltip title={`Internal ID Hidden • Status: ${decision.status}`}>
+                <IconButton size="small" sx={{ opacity: 0.3 }}><Info size={12} /></IconButton>
+            </Tooltip>
+         )}
       </Box>
 
       {/* Trade Levels Grid (Section 54 & 55) */}

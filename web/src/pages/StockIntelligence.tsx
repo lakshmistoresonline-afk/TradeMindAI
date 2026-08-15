@@ -23,6 +23,7 @@ import PeerBenchmark from '../components/Research/fundamentals/PeerBenchmark';
 
 import InstitutionalPositioning from '../components/Research/institutional/InstitutionalPositioning';
 import OptionsIntelligence from '../components/Research/options/OptionsIntelligence';
+import OptionChainTable from '../components/Research/options/OptionChainTable';
 
 import QuantAnalytics from '../components/Research/quant/QuantAnalytics';
 import StockQualityProfile from '../components/Research/fundamentals/StockQualityProfile';
@@ -161,7 +162,7 @@ export default function StockIntelligence() {
                       <Tab label="THESIS & EVIDENCE" />
                       <Tab label="TECHNICAL & QUANT" />
                       <Tab label="FUNDAMENTALS" />
-                      <Tab label="INSTITUTIONAL" />
+                      <Tab label="INSTITUTIONAL & OPTIONS" />
                       <Tab label="HISTORICAL ACCURACY" />
                    </Tabs>
                 </Box>
@@ -199,6 +200,10 @@ export default function StockIntelligence() {
                      <Box>
                         <InstitutionalPositioning stock={selectedStock} />
                         <OptionsIntelligence stock={selectedStock} />
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>LIVE OPTION CHAIN</Typography>
+                            <OptionChainTable symbol={selectedStock.symbol} />
+                        </Box>
                         <CorrelationAndHedging symbol={selectedStock.symbol} />
                      </Box>
                    )}

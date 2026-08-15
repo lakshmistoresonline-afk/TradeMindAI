@@ -132,7 +132,15 @@ export const normalizeAITradeDecision = (stock: any): AITradeDecision => {
     id: stock.id,
     modelVersion: structured.modelVersion || 'TradeMind Core v2.2',
     drivers,
-    events: (stock.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) }))
+    events: (stock.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) })),
+
+    // F&O Support (RC-5)
+    assetClass: stock.asset_class || 'EQUITY',
+    underlyingSymbol: stock.underlying_symbol,
+    strike: parseNum(stock.strike),
+    optionType: stock.option_type,
+    expiry: ensureUTC(stock.expiry),
+    lotSize: stock.lot_size
   };
 };
 

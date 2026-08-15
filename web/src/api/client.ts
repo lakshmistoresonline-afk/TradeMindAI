@@ -264,6 +264,11 @@ export const getLiveSignalsAudit = async () => {
   return response.data;
 };
 
+export const getOptionChain = async (symbol: string) => {
+  const response = await apiClient.get(`/stocks/${symbol}/option-chain`);
+  return response.data;
+};
+
 export const getPerformanceSummary = async (startDate?: string, endDate?: string, timeframe?: string) => {
   let url = '/analysis/performance/summary';
   const params = new URLSearchParams();

@@ -166,6 +166,14 @@ class LiveSignalDB(Base):
     timeframe = Column(String)
     status = Column(String)
 
+    # F&O Support (RC-5)
+    asset_class = Column(String(20), default="EQUITY")
+    underlying_symbol = Column(String(20))
+    strike = Column(Float)
+    option_type = Column(String(10))
+    expiry = Column(DateTime)
+    lot_size = Column(Integer)
+
     validated_at = Column(DateTime)
     triggered_at = Column(DateTime)
     trigger_price = Column(Float)

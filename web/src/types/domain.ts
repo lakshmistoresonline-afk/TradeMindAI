@@ -50,6 +50,14 @@ export interface AITradeDecision {
   modelVersion?: string;
   drivers?: string[];
   events?: SignalEvent[];
+
+  // F&O Support (RC-5)
+  assetClass?: 'EQUITY' | 'FUTURES' | 'OPTIONS';
+  underlyingSymbol?: string;
+  strike?: number;
+  optionType?: 'CE' | 'PE';
+  expiry?: string;
+  lotSize?: number;
 }
 
 export interface MarketSnapshot {

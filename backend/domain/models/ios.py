@@ -61,6 +61,14 @@ class LiveSignal(BaseModel):
     timeframe: str
     status: str # WAITING_FOR_ENTRY, ENTRY_TRIGGERED, ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
 
+    # F&O Support (RC-5)
+    asset_class: str = "EQUITY" # EQUITY, FUTURES, OPTIONS
+    underlying_symbol: Optional[str] = None
+    strike: Optional[float] = None
+    option_type: Optional[str] = None # CE or PE
+    expiry: Optional[datetime] = None
+    lot_size: Optional[int] = None
+
     validated_at: Optional[datetime] = None
     triggered_at: Optional[datetime] = None
     trigger_price: Optional[float] = None
