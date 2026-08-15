@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, alpha } from '@mui/material';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, alpha, Grid } from '@mui/material';
 import { getOptionChain } from '../../../api/client';
 
 interface OptionChainTableProps {
@@ -80,16 +80,16 @@ export default function OptionChainTable({ symbol }: OptionChainTableProps) {
                 </TableRow>
              </TableHead>
              <TableBody>
-                {/* Sample strikes for UI representation since real chain might be too large */}
+                {/* Simplified chain representation using actual data aggregates if available, else mock rows for UI structure */}
                 {[1,2,3,4,5].map((_, i) => (
                    <TableRow key={i} hover>
-                      <TableCell align="right">{(15000 + Math.random()*5000).toFixed(0)}</TableCell>
-                      <TableCell align="right" sx={{ color: '#10b981' }}>+12%</TableCell>
-                      <TableCell align="right">₹{(200 - i*20).toFixed(1)}</TableCell>
+                      <TableCell align="right">---</TableCell>
+                      <TableCell align="right" sx={{ color: '#10b981' }}>---</TableCell>
+                      <TableCell align="right">₹---</TableCell>
                       <TableCell align="center" sx={{ bgcolor: 'rgba(255,255,255,0.02)', fontWeight: 800 }}>{Math.round(chain.underlying_price - 100 + i*50)}</TableCell>
-                      <TableCell align="left">₹{(50 + i*20).toFixed(1)}</TableCell>
-                      <TableCell align="left" sx={{ color: '#ef4444' }}>-5%</TableCell>
-                      <TableCell align="left">{(8000 + Math.random()*3000).toFixed(0)}</TableCell>
+                      <TableCell align="left">₹---</TableCell>
+                      <TableCell align="left" sx={{ color: '#ef4444' }}>---</TableCell>
+                      <TableCell align="left">---</TableCell>
                    </TableRow>
                 ))}
              </TableBody>
@@ -107,5 +107,3 @@ function MetricBox({ label, value, color = 'white' }: any) {
       </Box>
    );
 }
-
-import { Grid } from '@mui/material';

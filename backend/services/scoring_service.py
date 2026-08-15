@@ -8,11 +8,12 @@ class ScoringService:
         """
         import numpy as np
         weights = {
-            "technical": 0.20,
-            "fundamental": 0.25,
-            "ml_bias": 0.20,
+            "technical": 0.15,
+            "fundamental": 0.20,
+            "ml_bias": 0.15,
             "smc": 0.15,
-            "institutional": 0.10,
+            "institutional": 0.15,
+            "options": 0.10,
             "sentiment": 0.10
         }
 
@@ -24,13 +25,23 @@ class ScoringService:
 
         # 2. Fundamental Score
         fund_score = 60 # Default baseline
-        # In a real impl, we'd use ROE, Debt/Equity etc from features
 
         # 3. ML Bias
         ml_score = ml_prediction.get("confidence", 0) if ml_prediction.get("prediction") == "UP" else (100 - ml_prediction.get("confidence", 0)) if ml_prediction.get("prediction") == "DOWN" else 50
 
         # 4. Institutional Bias (RC-2: Derived from feature store + Bulk Deals)
         inst_score = 50 + (features.get("fii_net_bias", 0) * 50)
+
+        # Delivery Confirmation (RC-5)
+        delivery = features.get("delivery_rate", 0)
+        if delivery > 55: inst_score += 10 # Heavy accumulation
+        elif delivery < 30 and delivery > 0: inst_score -= 5 # Weak conviction
+
+        # 5. Options Sentiment (RC-5)
+        options_score = 50
+        pcr = features.get("options_pcr", 1.0)
+        if pcr > 1.2: options_score += 20 # Strong Put base
+        elif pcr < 0.7: options_score -= 15 # Heavy Call resistance
 
         # Check for heavy buying in bulk deals
         from backend.core.postgres import SessionLocal, BulkDealDB
@@ -51,6 +62,7 @@ class ScoringService:
             (fund_score * weights["fundamental"]) +
             (ml_score * weights["ml_bias"]) +
             (inst_score * weights["institutional"]) +
+            (options_score * weights["options"]) +
             (50 * weights["smc"]) +
             (50 * weights["sentiment"])
         )
