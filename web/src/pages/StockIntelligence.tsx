@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Grid, Autocomplete, TextField, Stack, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tabs, Tab, Divider } from '@mui/material';
-import { Search, History, FileText, Database, Activity, Brain, LineChart, BarChart4, Briefcase, Book, Clock } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Autocomplete, TextField, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tabs, Tab, alpha } from '@mui/material';
+import { Search } from 'lucide-react';
 import {
-  getStocks, triggerBacktest, getBacktestResults,
+  getStocks,
   getBacktestSignals
 } from '../api/client';
 
 import ResearchHeader from '../components/Research/ResearchHeader';
-import DecisionPanel from '../components/Research/decision/DecisionPanel';
 import AIInvestmentThesis from '../components/Research/decision/AIInvestmentThesis';
 import HistoricalPatternMatch from '../components/Research/decision/HistoricalPatternMatch';
-import DecisionHistory from '../components/Research/decision/DecisionHistory';
 import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
-import ForensicPlayback from '../components/Research/history/ForensicPlayback';
-import ResearchHub from './ResearchHub';
+import ConfluenceMatrix from '../components/Research/shared/ConfluenceMatrix';
 
 import TechnicalAnalysis from '../components/Research/market/TechnicalAnalysis';
 import MarketStructure from '../components/Research/market/MarketStructure';
@@ -23,16 +20,12 @@ import CorrelationAndHedging from '../components/Research/market/CorrelationAndH
 import FundamentalAnalysis from '../components/Research/fundamentals/FundamentalAnalysis';
 import EarningsIntelligence from '../components/Research/fundamentals/EarningsIntelligence';
 import PeerBenchmark from '../components/Research/fundamentals/PeerBenchmark';
-import BusinessQualityAndMoat from '../components/Research/fundamentals/BusinessQualityAndMoat';
-import StockQualityProfile from '../components/Research/fundamentals/StockQualityProfile';
 
 import InstitutionalPositioning from '../components/Research/institutional/InstitutionalPositioning';
 import OptionsIntelligence from '../components/Research/options/OptionsIntelligence';
 
 import QuantAnalytics from '../components/Research/quant/QuantAnalytics';
-import ScenarioStressLab from '../components/Research/quant/ScenarioStressLab';
-import AIPerformance from '../components/Research/quant/AIPerformance';
-import AIResearchTimeline from '../components/Research/AIResearchTimeline';
+import StockQualityProfile from '../components/Research/fundamentals/StockQualityProfile';
 import ResearchNotebook from '../components/Research/ResearchNotebook';
 
 import { useLocation } from 'react-router-dom';
@@ -44,44 +37,10 @@ export default function StockIntelligence() {
   const { setCopilotContext } = useNotification();
   const [stocks, setStocks] = useState<any[]>([]);
   const [selectedStock, setSelectedStock] = useState<any | null>(null);
-  const [backtestReport, setBacktestReport] = useState<any | null>(null);
   const [backtestSignals, setBacktestSignals] = useState<any[]>([]);
-  const [loadingBacktest, setLoadingBacktest] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
-  const fromPortfolio = location.state?.fromPortfolio || false;
-
-  const generateReport = () => {
-    if (!selectedStock) return;
-    const decision = normalizeAITradeDecision(selectedStock);
-    const content = `
-# TRADE MIND AI: INSTITUTIONAL EQUITY RESEARCH
-## ${selectedStock.name} (${selectedStock.symbol})
-
-**Report Generated:** ${new Date().toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' })}
-**AI Conviction:** ${decision.conviction}%
-**Grade:** ${selectedStock.ai_investment_grade || 'N/A'}
-**Rating:** ${decision.rating}
-
-### EXECUTIVE SUMMARY
-${decision.thesis || 'Analysis pending for latest session dynamics.'}
-
-### AI THESIS & DRIVERS
-${decision.drivers?.map((d: any) => `- ${d}`).join('\n') || '- Technical structure alignment\n- Institutional flow bias'}
-
-### KEY CATALYST
-${decision.primaryCatalyst || 'Breakout above major structural resistance.'}
-
-### INVALIDATION
-${decision.invalidation || 'Weekly close below major support zone.'}
-`;
-    const blob = new Blob([content], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${selectedStock.symbol}_Institutional_Research.md`;
-    a.click();
-  };
+  const decision = selectedStock ? normalizeAITradeDecision(selectedStock) : null;
 
   useEffect(() => {
     const fetchStocks = async () => {
@@ -102,21 +61,11 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
   useEffect(() => {
     if (selectedStock) {
       setCopilotContext(selectedStock);
-      fetchBacktest(selectedStock.symbol);
       fetchSignals(selectedStock.symbol);
     } else {
       setCopilotContext(null);
     }
   }, [selectedStock, setCopilotContext]);
-
-  const fetchBacktest = async (symbol: string) => {
-    try {
-      const data = await getBacktestResults(symbol);
-      setBacktestReport(data && !data.error ? data : null);
-    } catch (error) {
-      console.error('Error fetching backtest:', error);
-    }
-  };
 
   const fetchSignals = async (symbol: string) => {
     try {
@@ -127,267 +76,214 @@ ${decision.invalidation || 'Weekly close below major support zone.'}
     }
   };
 
-  const handleRunBacktest = async () => {
-    if (!selectedStock) return;
-    setLoadingBacktest(true);
-    try {
-      await triggerBacktest(selectedStock.symbol);
-      alert("Backtest triggered! Please check back in a few minutes.");
-    } catch (error) {
-      console.error('Error triggering backtest:', error);
-    } finally {
-      setLoadingBacktest(false);
-    }
-  };
-
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 4, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
-        <Typography variant="h4" sx={{ fontWeight: 900 }}>Stock Intelligence</Typography>
+    <Box sx={{ pb: 10 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 5, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+        <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1 }}>Signal Laboratory</Typography>
 
         <Autocomplete
-          sx={{ width: { xs: '100%', sm: 350 } }}
+          sx={{ width: { xs: '100%', sm: 400 } }}
           options={stocks}
           getOptionLabel={(option) => `${option.symbol} - ${option.name}`}
           onChange={(_, newValue) => setSelectedStock(newValue)}
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Search NSE Ticker..."
-              size="small"
+              label="Select Instrument for Analysis..."
+              size="medium"
               placeholder="e.g. RELIANCE"
             />
           )}
         />
       </Box>
 
-      {selectedStock ? (
+      {selectedStock && decision ? (
         <Box>
           <ResearchHeader stock={selectedStock} />
 
-          {fromPortfolio && (
-            <Paper sx={{ p: 2, mb: 4, bgcolor: 'rgba(16, 185, 129, 0.05)', border: '1px solid #10b981', display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
-               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Briefcase size={20} className="text-emerald-500" />
-                  <Typography variant="subtitle2" fontWeight={800}>PORTFOLIO CONTEXT (MODEL)</Typography>
-               </Box>
-               <Divider orientation="vertical" flexItem sx={{ opacity: 0.1 }} />
-               <Box>
-                  <Typography variant="caption" color="textSecondary" display="block">WEIGHT (MODEL)</Typography>
-                  <Typography variant="body2" fontWeight={900}>4.2%</Typography>
-               </Box>
-               <Box>
-                  <Typography variant="caption" color="textSecondary" display="block">UNREALIZED P&L (MODEL)</Typography>
-                  <Typography variant="body2" fontWeight={900} color="primary">+₹24,500 (+12.4%)</Typography>
-               </Box>
-               <Box>
-                  <Typography variant="caption" color="textSecondary" display="block">RISK CONTRIBUTION (MODEL)</Typography>
-                  <Typography variant="body2" fontWeight={900} color="warning.main">MODERATE</Typography>
-               </Box>
-               <Chip label="IN HOLDINGS" size="small" color="primary" sx={{ ml: 'auto', fontWeight: 900, height: 20, fontSize: '0.6rem' }} />
-            </Paper>
-          )}
-
-          <DecisionPanel stock={selectedStock} />
-
-          <Box sx={{ mb: 4, borderBottom: '1px solid #1e293b' }}>
-             <Tabs
-               value={activeTab}
-               onChange={(_, v) => setActiveTab(v)}
-               textColor="primary"
-               indicatorColor="primary"
-               variant="scrollable"
-               scrollButtons="auto"
-             >
-                <Tab icon={<Brain size={18} />} iconPosition="start" label="DECISION" sx={{ fontWeight: 700 }} />
-                <Tab icon={<Clock size={18} />} iconPosition="start" label="LIFECYCLE" sx={{ fontWeight: 700 }} />
-                <Tab icon={<LineChart size={18} />} iconPosition="start" label="MARKET" sx={{ fontWeight: 700 }} />
-                <Tab icon={<BarChart4 size={18} />} iconPosition="start" label="FUNDAMENTALS" sx={{ fontWeight: 700 }} />
-                <Tab icon={<Activity size={18} />} iconPosition="start" label="ANALYTICS" sx={{ fontWeight: 700 }} />
-                <Tab icon={<History size={18} />} iconPosition="start" label="HISTORY" sx={{ fontWeight: 700 }} />
-                <Tab icon={<Book size={18} />} iconPosition="start" label="RESEARCH EVIDENCE" sx={{ fontWeight: 700 }} />
-             </Tabs>
-          </Box>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={9}>
-               {activeTab === 0 && (
-                 <Box>
-                    <AIInvestmentThesis stock={selectedStock} />
-                    <HistoricalPatternMatch symbol={selectedStock.symbol} />
-                 </Box>
-               )}
-
-               {activeTab === 1 && (
-                 <Box>
-                    <SignalLifecycleTimeline
-                      events={normalizeAITradeDecision(selectedStock).events || []}
-                      currentStatus={normalizeAITradeDecision(selectedStock).status}
-                    />
-                 </Box>
-               )}
-
-               {activeTab === 2 && (
-                 <Box>
-                    <TechnicalAnalysis data={selectedStock.analysis?.technical_data} />
-                    <MTFAlignmentMatrix symbol={selectedStock.symbol} />
-                    <MarketStructure smc={selectedStock.analysis?.technical_data?.smc} />
-                    <InstitutionalPositioning stock={selectedStock} />
-                    <OptionsIntelligence stock={selectedStock} />
-                    <CorrelationAndHedging symbol={selectedStock.symbol} />
-                 </Box>
-               )}
-
-               {activeTab === 3 && (
-                 <Box>
-                    <FundamentalAnalysis stock={selectedStock} />
-                    <EarningsIntelligence symbol={selectedStock.symbol} />
-                    <PeerBenchmark stock={selectedStock} />
-                    <BusinessQualityAndMoat analysis={selectedStock.analysis} />
-                 </Box>
-               )}
-
-               {activeTab === 4 && (
-                 <Box>
-                    <QuantAnalytics metrics={selectedStock.analysis?.technical_data?.quant_metrics || {}} />
-                    <ScenarioStressLab stock={selectedStock} />
-                    <AIPerformance />
-                 </Box>
-               )}
-
-               {activeTab === 5 && (
-                 <Box>
-                    <DecisionHistory history={selectedStock.analysis?.recommendation_history || []} />
-                    <Box sx={{ mt: 4 }}>
-                       <ForensicPlayback signal={selectedStock} />
-                    </Box>
-                    <AIPerformance />
-                    <AIResearchTimeline symbol={selectedStock.symbol} />
-
-                    <Paper sx={{ p: 4, mt: 4, border: '1px solid #1e293b' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                         <Box>
-                            <Typography variant="h5" fontWeight={900}>Model Validation</Typography>
-                            <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700 }}>HISTORICAL ACCURACY AUDIT</Typography>
+          <Grid container spacing={4}>
+             <Grid item xs={12} lg={8.5}>
+                <Paper sx={{ mb: 4, p: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', bgcolor: '#0C1118' }}>
+                   <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                         <Typography variant="h5" sx={{ fontWeight: 900, color: 'white' }}>{selectedStock.symbol} EXECUTION SNAPSHOT</Typography>
+                         <Chip label={decision.status} size="small" variant="outlined" color="primary" sx={{ fontWeight: 900, height: 20 }} />
+                      </Stack>
+                      <Stack direction="row" spacing={2}>
+                         <Box sx={{ textAlign: 'right' }}>
+                            <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>AI CONVICTION</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 900, color: 'secondary.main', lineHeight: 1 }}>{decision.conviction}%</Typography>
                          </Box>
-                         <Button
-                            variant="outlined"
-                            startIcon={<History size={18} />}
-                            onClick={handleRunBacktest}
-                            disabled={loadingBacktest}
-                            sx={{ fontWeight: 800 }}
-                          >
-                            {loadingBacktest ? 'Auditing...' : 'Recalculate Accuracy'}
-                          </Button>
+                      </Stack>
+                   </Box>
+
+                   <Box sx={{ p: 4 }}>
+                      <Grid container spacing={5}>
+                         <Grid item xs={6} md={3}>
+                            <LevelItem label="ENTRY ZONE" value={`₹${Math.round(decision.entry || 0).toLocaleString()}`} color="white" />
+                         </Grid>
+                         <Grid item xs={6} md={3}>
+                            <LevelItem label="STOP LOSS" value={`₹${Math.round(decision.stopLoss || 0).toLocaleString()}`} color="#ef4444" />
+                         </Grid>
+                         <Grid item xs={6} md={3}>
+                            <LevelItem label="PRIMARY TARGET" value={`₹${Math.round(decision.target || 0).toLocaleString()}`} color="#10b981" />
+                         </Grid>
+                         <Grid item xs={6} md={3}>
+                            <LevelItem label="RISK / REWARD" value={decision.riskReward} color="#00D1FF" />
+                         </Grid>
+                      </Grid>
+
+                      <Box sx={{ mt: 6 }}>
+                         <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, letterSpacing: 1 }}>SIGNAL LIFECYCLE AUDIT</Typography>
+                         <SignalLifecycleTimeline
+                            events={decision.events || []}
+                            currentStatus={decision.status}
+                         />
                       </Box>
+                   </Box>
+                </Paper>
 
-                      {backtestReport ? (
-                        <Box>
-                          <TableContainer>
-                            <Table size="small">
-                              <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
-                                <TableRow>
-                                  <TableCell sx={{ pl: 3 }}>DATE</TableCell>
-                                  <TableCell align="right">ENTRY</TableCell>
-                                  <TableCell align="right">TARGET</TableCell>
-                                  <TableCell align="right">STOP LOSS</TableCell>
-                                  <TableCell align="right">RETURN</TableCell>
-                                  <TableCell align="center">OUTCOME</TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {backtestSignals.map((sig, idx) => (
-                                  <TableRow key={idx} hover>
-                                    <TableCell sx={{ pl: 3, fontWeight: 700, color: 'text.secondary' }}>{new Date(sig.date).toLocaleDateString()}</TableCell>
-                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{sig.entry.toLocaleString()}</TableCell>
-                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'primary.main' }}>₹{sig.target?.toLocaleString() || '---'}</TableCell>
-                                    <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'error.main' }}>₹{sig.stop_loss?.toLocaleString() || '---'}</TableCell>
-                                    <TableCell align="right" sx={{ color: sig.profit_pct >= 0 ? 'primary.main' : 'error.main', fontWeight: 900 }}>
-                                      {sig.profit_pct >= 0 ? '+' : ''}{sig.profit_pct.toFixed(2)}%
-                                    </TableCell>
-                                    <TableCell align="center">
-                                      <StatusChip status={sig.outcome} />
-                                    </TableCell>
+                <Box sx={{ mb: 4, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                   <Tabs
+                     value={activeTab}
+                     onChange={(_, v) => setActiveTab(v)}
+                     textColor="primary"
+                     indicatorColor="primary"
+                     variant="scrollable"
+                     scrollButtons="auto"
+                     sx={{ '& .MuiTab-root': { fontWeight: 900, fontSize: '0.7rem' } }}
+                   >
+                      <Tab label="THESIS & EVIDENCE" />
+                      <Tab label="TECHNICAL & QUANT" />
+                      <Tab label="FUNDAMENTALS" />
+                      <Tab label="INSTITUTIONAL" />
+                      <Tab label="HISTORICAL ACCURACY" />
+                   </Tabs>
+                </Box>
+
+                <Box>
+                   {activeTab === 0 && (
+                     <Grid container spacing={3}>
+                        <Grid item xs={12} md={7}>
+                           <AIInvestmentThesis stock={selectedStock} />
+                        </Grid>
+                        <Grid item xs={12} md={5}>
+                           <ConfluenceMatrix stock={selectedStock} />
+                        </Grid>
+                     </Grid>
+                   )}
+
+                   {activeTab === 1 && (
+                     <Box>
+                        <TechnicalAnalysis data={selectedStock.analysis?.technical_data} />
+                        <MTFAlignmentMatrix symbol={selectedStock.symbol} />
+                        <MarketStructure smc={selectedStock.analysis?.technical_data?.smc} />
+                        <QuantAnalytics metrics={selectedStock.analysis?.technical_data?.quant_metrics || {}} />
+                     </Box>
+                   )}
+
+                   {activeTab === 2 && (
+                     <Box>
+                        <FundamentalAnalysis stock={selectedStock} />
+                        <EarningsIntelligence symbol={selectedStock.symbol} />
+                        <PeerBenchmark stock={selectedStock} />
+                     </Box>
+                   )}
+
+                   {activeTab === 3 && (
+                     <Box>
+                        <InstitutionalPositioning stock={selectedStock} />
+                        <OptionsIntelligence stock={selectedStock} />
+                        <CorrelationAndHedging symbol={selectedStock.symbol} />
+                     </Box>
+                   )}
+
+                   {activeTab === 4 && (
+                     <Box>
+                        <HistoricalPatternMatch symbol={selectedStock.symbol} />
+                        <Paper sx={{ p: 4, mt: 4 }}>
+                          <Typography variant="h5" fontWeight={900}>Model Validation</Typography>
+                          {backtestSignals.length > 0 ? (
+                            <TableContainer sx={{ mt: 3 }}>
+                              <Table size="small">
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>DATE</TableCell>
+                                    <TableCell align="right">ENTRY</TableCell>
+                                    <TableCell align="right">RESULT %</TableCell>
+                                    <TableCell align="center">OUTCOME</TableCell>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        </Box>
-                      ) : (
-                        <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2 }}>
-                           <Typography color="textSecondary" sx={{ fontWeight: 600 }}>No audit data available.</Typography>
-                           <Typography variant="caption" color="textSecondary">Click 'Recalculate Accuracy' to trigger a deep historical validation.</Typography>
-                        </Box>
-                      )}
-                    </Paper>
-                 </Box>
-               )}
+                                </TableHead>
+                                <TableBody>
+                                  {backtestSignals.map((sig, i) => (
+                                    <TableRow key={i} hover>
+                                      <TableCell>{new Date(sig.date).toLocaleDateString()}</TableCell>
+                                      <TableCell align="right">₹{sig.entry.toLocaleString()}</TableCell>
+                                      <TableCell align="right" sx={{ fontWeight: 900, color: sig.profit_pct >= 0 ? '#10b981' : '#ef4444' }}>
+                                        {sig.profit_pct.toFixed(2)}%
+                                      </TableCell>
+                                      <TableCell align="center">
+                                        <Chip label={sig.outcome} size="small" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }} />
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          ) : (
+                            <Box sx={{ py: 6, textAlign: 'center' }}>
+                              <Typography color="textSecondary">No historical audit data found for this symbol.</Typography>
+                            </Box>
+                          )}
+                        </Paper>
+                     </Box>
+                   )}
+                </Box>
+             </Grid>
 
-               {activeTab === 6 && (
-                 <Box>
-                    <ResearchHub isContextual symbol={selectedStock.symbol} />
-                 </Box>
-               )}
-            </Grid>
+             <Grid item xs={12} lg={3.5}>
+                <Stack spacing={3}>
+                   <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)', bgcolor: '#0C1118' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', mb: 2 }}>DATA LINEAGE</Typography>
+                      <Box sx={{ mb: 2 }}>
+                         <Typography variant="caption" color="textSecondary" display="block">SIGNAL ORIGIN</Typography>
+                         <Typography variant="body2" fontWeight={800}>TradeMind Quant V2.2</Typography>
+                      </Box>
+                      <Box sx={{ mb: 2 }}>
+                         <Typography variant="caption" color="textSecondary" display="block">LAST RECONCILIATION</Typography>
+                         <Typography variant="body2" fontWeight={800}>{selectedStock.updated_at ? new Date(selectedStock.updated_at).toLocaleString() : '---'}</Typography>
+                      </Box>
+                      <Box>
+                         <Typography variant="caption" color="textSecondary" display="block">DATA FRESHNESS</Typography>
+                         <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+                            <Chip label="PRICE: LIVE" size="small" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900, bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }} />
+                            <Chip label="SMC: 15M" size="small" sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)' }} />
+                         </Stack>
+                      </Box>
+                   </Paper>
 
-            <Grid item xs={12} lg={3}>
-              <Stack spacing={3}>
-                <StockQualityProfile metrics={selectedStock.health_metrics} />
-
-                <Paper sx={{ p: 3, border: '1px solid #1e293b' }}>
-                  <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 900 }}>
-                    <Database size={16} /> DATA LINEAGE
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary" display="block" sx={{ mb: 1, fontWeight: 700 }}>
-                    Last Sync: {selectedStock.updated_at ? new Date(selectedStock.updated_at).toLocaleString() : '---'}
-                  </Typography>
-                  <Chip label="Institutional SQL Active" size="small" color="primary" variant="outlined" sx={{ fontSize: '0.6rem', fontWeight: 900, height: 20 }} />
-                </Paper>
-
-                <Paper sx={{ p: 3, border: '1px solid #1e293b' }}>
-                   <Typography variant="subtitle2" color="textSecondary" gutterBottom sx={{ fontWeight: 900 }}>REPORTS</Typography>
-                   <Button
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      startIcon={<FileText size={18} />}
-                      onClick={generateReport}
-                      size="small"
-                      sx={{ fontWeight: 900 }}
-                    >
-                      Export Intelligence PDF
-                    </Button>
-                </Paper>
-
-                <ResearchNotebook symbol={selectedStock.symbol} />
-              </Stack>
-            </Grid>
+                   <StockQualityProfile metrics={selectedStock.health_metrics} />
+                   <ResearchNotebook symbol={selectedStock.symbol} />
+                </Stack>
+             </Grid>
           </Grid>
         </Box>
       ) : (
-        <Paper sx={{ p: 8, textAlign: 'center', bgcolor: 'rgba(15, 23, 42, 0.3)', border: '1px dashed #334155' }}>
-          <Search size={48} className="text-slategray mb-4 opacity-20" />
-          <Typography variant="h5" color="textSecondary" sx={{ mb: 1, fontWeight: 800 }}>Deep Stock Intelligence</Typography>
-          <Typography color="textSecondary" sx={{ fontWeight: 500 }}>Search for a Nifty 100 stock to begin institutional research.</Typography>
+        <Paper sx={{ p: 10, textAlign: 'center', bgcolor: alpha('#0C1118', 0.5), border: '1px dashed rgba(255,255,255,0.1)' }}>
+          <Search size={64} className="text-slategray mb-4 opacity-20" />
+          <Typography variant="h5" color="textSecondary" sx={{ mb: 1, fontWeight: 800 }}>Access Signal Laboratory</Typography>
+          <Typography color="textSecondary" sx={{ fontWeight: 500 }}>Select a verified instrument from the NSE universe to begin forensic auditing.</Typography>
         </Paper>
       )}
     </Box>
   );
 }
 
-function StatusChip({ status }: { status: string }) {
-   const isHit = status === 'TARGET_HIT';
-   const isStop = status === 'STOP_LOSS';
-   const isActive = status === 'ACTIVE';
-
-   return (
-      <Chip
-         label={status === 'TARGET_HIT' ? 'HIT' : status === 'STOP_LOSS' ? 'STOP' : status}
-         size="small"
-         variant={isActive ? "outlined" : "filled"}
-         color={isHit ? "primary" : isStop ? "error" : isActive ? "info" : "default"}
-         sx={{ fontWeight: 900, height: 18, fontSize: '0.55rem' }}
-      />
-   );
+function LevelItem({ label, value, color }: any) {
+  return (
+    <Box>
+       <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 900, letterSpacing: 1 }}>{label}</Typography>
+       <Typography variant="h5" sx={{ fontWeight: 900, color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
+    </Box>
+  );
 }

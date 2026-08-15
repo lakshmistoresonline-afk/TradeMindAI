@@ -1,52 +1,133 @@
-import { useState } from 'react';
-import { Box, Typography, Paper, Tab, Tabs, Grid } from '@mui/material';
-import { History, Activity, BarChart2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Paper, Tab, Tabs, Grid, Chip, CircularProgress } from '@mui/material';
+import { History, Activity, BarChart2, ShieldCheck, TrendingUp, Clock } from 'lucide-react';
 import SignalValidation from './StrategyBuilder/SignalValidation';
 import VarianceMap from '../components/Research/history/VarianceMap';
+import { getPerformanceSummary, getPerformanceSignals } from '../api/client';
+import HistoricalSignalCard from '../components/Research/shared/HistoricalSignalCard';
 
 export default function HistoryDashboard() {
   const [activeTab, setActiveTab] = useState(0);
+  const [summary, setSummary] = useState<any>(null);
+  const [signals, setSignals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [sumData, signalsData] = await Promise.all([
+        getPerformanceSummary(),
+        getPerformanceSignals()
+      ]);
+      setSummary(sumData);
+      setSignals(signalsData.filter((s: any) => !['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.status)));
+    } catch (error) {
+      console.error("Error fetching performance history:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const stats = summary?.live_signals || { total: 0, resolved: 0, win_rate: 0, avg_profit: 0 };
 
   return (
-    <Box>
-      <Box sx={{ mb: 4 }}>
-         <Typography variant="h4" sx={{ fontWeight: 900 }}>History & Performance</Typography>
-         <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>COMPLETE INSTITUTIONAL SIGNAL RECORD & ACCURACY AUDIT</Typography>
+    <Box sx={{ pb: 10 }}>
+      {/* Header Tier */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+         <Box>
+            <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1, color: 'white' }}>
+               Performance Audit
+            </Typography>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: 1.5 }}>
+               VERIFIED INSTITUTIONAL SIGNAL RECORD
+            </Typography>
+         </Box>
+         <Chip
+           icon={<ShieldCheck size={14} />}
+           label="REAL-TIME RECONCILIATION ACTIVE"
+           variant="outlined"
+           color="success"
+           sx={{ fontWeight: 900, height: 32 }}
+         />
       </Box>
+
+      {/* Aggregate Stats Tier (Section 22) */}
+      <Grid container spacing={3} sx={{ mb: 5 }}>
+         <Grid item xs={12} md={3}>
+            <SummaryCard label="TOTAL SIGNALS" value={stats.total} subValue="Resolved & Active" icon={<History size={20} />} color="#3b82f6" />
+         </Grid>
+         <Grid item xs={12} md={3}>
+            <SummaryCard label="WIN RATE" value={`${stats.win_rate}%`} subValue={`${stats.resolved} Audited Setups`} icon={<ShieldCheck size={20} />} color="#10b981" />
+         </Grid>
+         <Grid item xs={12} md={3}>
+            <SummaryCard label="AVG PROFIT" value={`+${stats.avg_profit}%`} subValue="Per Successful Signal" icon={<TrendingUp size={20} />} color="#00D1FF" />
+         </Grid>
+         <Grid item xs={12} md={3}>
+            <SummaryCard label="ANALYSIS PERIOD" value="90D" subValue={`Since ${new Date(summary?.earliest_recorded_date || '').toLocaleDateString()}`} icon={<Clock size={20} />} color="#7C3AED" />
+         </Grid>
+      </Grid>
 
       <Paper sx={{ mb: 4, bgcolor: 'transparent', border: 'none' }}>
          <Tabs
             value={activeTab}
             onChange={(_, v) => setActiveTab(v)}
-            indicatorColor="primary"
-            sx={{ borderBottom: '1px solid #1e293b' }}
+            sx={{
+               borderBottom: '1px solid rgba(255,255,255,0.05)',
+               '& .MuiTab-root': { minWidth: 200, fontWeight: 900, fontSize: '0.75rem' }
+            }}
          >
-            <Tab label="SIGNAL HISTORY" icon={<History size={18} />} iconPosition="start" sx={{ fontWeight: 800, minHeight: 60 }} />
-            <Tab label="OVERALL PERFORMANCE" icon={<Activity size={18} />} iconPosition="start" sx={{ fontWeight: 800, minHeight: 60 }} />
-            <Tab label="PERFORMANCE ANALYSIS" icon={<BarChart2 size={18} />} iconPosition="start" sx={{ fontWeight: 800, minHeight: 60 }} />
+            <Tab label="RECENT OUTCOMES" icon={<History size={18} />} iconPosition="start" />
+            <Tab label="ACCURACY AUDIT" icon={<Activity size={18} />} iconPosition="start" />
+            <Tab label="DATA VISUALIZATION" icon={<BarChart2 size={18} />} iconPosition="start" />
          </Tabs>
       </Paper>
 
-      <Box>
-         {activeTab === 0 && <SignalValidation isConsolidated initialTab={1} />}
-         {activeTab === 1 && (
-            <Grid container spacing={3}>
-               <Grid item xs={12} lg={8}>
-                  <SignalValidation isConsolidated initialTab={0} />
+      {loading ? (
+         <Box sx={{ py: 10, textAlign: 'center' }}>
+            <CircularProgress size={30} sx={{ mb: 2 }} />
+            <Typography variant="caption" display="block" sx={{ fontWeight: 800, letterSpacing: 1 }}>RECONCILING HISTORICAL DATA...</Typography>
+         </Box>
+      ) : (
+         <Box>
+            {activeTab === 0 && (
+               <Grid container spacing={2}>
+                  {signals.map((sig, idx) => (
+                     <Grid item xs={12} md={6} lg={4} key={idx}>
+                        <HistoricalSignalCard signal={sig} />
+                     </Grid>
+                  ))}
                </Grid>
-               <Grid item xs={12} lg={4}>
-                  <VarianceMap />
+            )}
+            {activeTab === 1 && <SignalValidation isConsolidated initialTab={0} />}
+            {activeTab === 2 && (
+               <Grid container spacing={3}>
+                  <Grid item xs={12} lg={8}>
+                     <SignalValidation isConsolidated initialTab={0} />
+                  </Grid>
+                  <Grid item xs={12} lg={4}>
+                     <VarianceMap />
+                  </Grid>
                </Grid>
-            </Grid>
-         )}
-         {activeTab === 2 && (
-            <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
-               <BarChart2 size={48} style={{ margin: '0 auto 16px' }} />
-               <Typography variant="h6">Deep Performance Analysis Engine</Typography>
-               <Typography variant="body2">Cross-referencing market regimes with signal conviction levels...</Typography>
-            </Box>
-         )}
-      </Box>
+            )}
+         </Box>
+      )}
     </Box>
+  );
+}
+
+function SummaryCard({ label, value, subValue, icon, color }: any) {
+  return (
+    <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.03)', bgcolor: '#0C1118' }}>
+       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', letterSpacing: 1 }}>{label}</Typography>
+          <Box sx={{ color }}>{icon}</Box>
+       </Box>
+       <Typography variant="h4" fontWeight={900} sx={{ mb: 0.5 }}>{value}</Typography>
+       <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 700 }}>{subValue}</Typography>
+    </Paper>
   );
 }
