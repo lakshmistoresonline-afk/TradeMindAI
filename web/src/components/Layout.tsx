@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Button } from '@mui/material';
-import { LineChart, History, Bot, Activity, Zap, X, TrendingUp, Settings } from 'lucide-react';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Button, Chip, Menu, MenuItem, Tooltip } from '@mui/material';
+import { History, Bot, Activity, Zap, X, Settings, User, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme, IconButton, BottomNavigation, BottomNavigationAction, Paper as MuiPaper, Fab } from '@mui/material';
 import { Menu as MenuIcon } from 'lucide-react';
@@ -19,8 +19,8 @@ export const NotificationContext = createContext({
 export const useNotification = () => useContext(NotificationContext);
 
 const primaryMenu = [
-  { text: 'SIGNALS', icon: <Zap size={20} />, path: '/' },
-  { text: 'MARKET', icon: <LineChart size={20} />, path: '/market' },
+  { text: 'DASHBOARD', icon: <Activity size={20} />, path: '/' },
+  { text: 'LIVE SIGNALS', icon: <Zap size={20} />, path: '/signals' },
   { text: 'HISTORY', icon: <History size={20} />, path: '/history' },
 ];
 
@@ -36,6 +36,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [marketBrief, setMarketBrief] = useState<any>(null);
 
+  // User Menu State
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const userMenuOpen = Boolean(anchorEl);
+
   useEffect(() => {
     getMarketStats().then(data => {
        const nifty = data?.['NIFTY 50'];
@@ -44,7 +48,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Vision 2.2: Real-time Forensic Signal Stream
     const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
     const socket = new WebSocket(wsUrl);
 
@@ -68,6 +71,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const handleClose = () => setNotification({ ...notification, open: false });
 
+  const handleUserMenuClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleUserMenuClose = () => setAnchorEl(null);
+
   return (
     <NotificationContext.Provider value={{ showNotification, setCopilotContext }}>
       <Box sx={{ display: 'flex' }}>
@@ -77,7 +83,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {isMobile && (
               <IconButton
                 color="inherit"
-                aria-label="open drawer"
                 edge="start"
                 onClick={() => setDrawerOpen(true)}
                 sx={{ mr: 2 }}
@@ -85,34 +90,86 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <MenuIcon />
               </IconButton>
             )}
-            <TrendingUp className="text-emerald-500 mr-2" />
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800, mr: 3, display: { xs: 'none', sm: 'block' }, letterSpacing: -0.5 }}>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 900, mr: 1, letterSpacing: -1, color: 'white' }}>
               TRADEMIND AI
             </Typography>
+            <Chip
+              label="LIVE"
+              size="small"
+              sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900, bgcolor: 'success.main', color: 'black', mr: 4 }}
+            />
 
             {!isMobile && (
-              <Stack direction="row" spacing={3} sx={{ flexGrow: 1, ml: 4 }}>
-                 <StatusIndicator label="SYSTEM" status="OPTIMAL" icon={<Activity size={14} />} color="#10b981" />
-                 <StatusIndicator label="AI QUOTA" status="STABLE" icon={<Zap size={14} />} color="#3b82f6" />
+              <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
+                {primaryMenu.map(item => (
+                  <Button
+                    key={item.text}
+                    onClick={() => navigate(item.path)}
+                    sx={{
+                      color: location.pathname === item.path ? 'white' : 'slategray',
+                      fontWeight: 800,
+                      fontSize: '0.7rem',
+                      letterSpacing: 1,
+                      '&:hover': { color: 'primary.main' }
+                    }}
+                  >
+                    {item.text}
+                  </Button>
+                ))}
               </Stack>
             )}
 
-            {!isMobile && (
-               <Stack direction="row" spacing={2} alignItems="center">
-                  <Box sx={{ bgcolor: 'rgba(255,255,255,0.03)', px: 2, py: 0.75, borderRadius: 1, border: '1px solid #1e293b' }}>
-                     <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', fontFamily: 'JetBrains Mono', letterSpacing: 1 }}>
-                        NIFTY {marketBrief ? `${marketBrief.value.toLocaleString()} (${marketBrief.change >= 0 ? '+' : ''}${marketBrief.change}%)` : '24,560.15 (+0.6%)'}
+            <Stack direction="row" spacing={2} alignItems="center">
+               {!isMobile && marketBrief && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 0.5, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
+                     <Activity size={14} className="text-emerald-500" />
+                     <Typography variant="caption" sx={{ fontWeight: 900, color: 'primary.main', fontFamily: 'JetBrains Mono' }}>
+                        NIFTY {marketBrief.value.toLocaleString()} ({marketBrief.change >= 0 ? '+' : ''}{marketBrief.change}%)
                      </Typography>
                   </Box>
-                  <Box sx={{ bgcolor: 'rgba(255,255,255,0.05)', px: 1.5, py: 0.5, borderRadius: 1, border: '1px solid #334155' }}>
-                     <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', fontFamily: 'JetBrains Mono' }}>
-                        {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }).toUpperCase()}
-                     </Typography>
+               )}
+
+               <Tooltip title="User Account">
+                  <IconButton
+                    onClick={handleUserMenuClick}
+                    sx={{ bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2, p: 1 }}
+                  >
+                    <User size={18} />
+                    <ChevronDown size={14} style={{ marginLeft: 4, opacity: 0.5 }} />
+                  </IconButton>
+               </Tooltip>
+
+               <Menu
+                 anchorEl={anchorEl}
+                 open={userMenuOpen}
+                 onClose={handleUserMenuClose}
+                 PaperProps={{
+                    sx: { width: 220, bgcolor: '#0f172a', border: '1px solid #334155', mt: 1.5, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }
+                 }}
+               >
+                  <Box sx={{ px: 2, py: 1.5 }}>
+                     <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>TradeMind User</Typography>
+                     <Typography variant="caption" color="textSecondary">Institutional Access • Verified</Typography>
                   </Box>
-               </Stack>
-            )}
+                  <Divider sx={{ opacity: 0.05 }} />
+                  <MenuItem onClick={() => { handleUserMenuClose(); navigate('/settings'); }}>
+                     <ListItemIcon><Settings size={18} /></ListItemIcon>
+                     <ListItemText primary="Settings" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleUserMenuClose(); navigate('/admin'); }}>
+                     <ListItemIcon><Activity size={18} /></ListItemIcon>
+                     <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
+                  </MenuItem>
+                  <Divider sx={{ opacity: 0.05 }} />
+                  <MenuItem onClick={handleUserMenuClose} sx={{ color: 'error.main' }}>
+                     <ListItemIcon><LogOut size={18} color="currentColor" /></ListItemIcon>
+                     <ListItemText primary="Sign Out" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
+                  </MenuItem>
+               </Menu>
+            </Stack>
           </Toolbar>
         </AppBar>
+
         <Drawer
           variant={isMobile ? "temporary" : "permanent"}
           open={isMobile ? drawerOpen : true}
@@ -124,72 +181,55 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto', mt: 4 }}>
-            <List>
-               {primaryMenu.map((item) => (
-                 <ListItem key={item.text} disablePadding>
-                    <ListItemButton
-                      onClick={() => navigate(item.path)}
-                      selected={location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path))}
-                      sx={{
-                        '&.Mui-selected': { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981' },
-                        '&.Mui-selected .MuiListItemIcon-root': { color: '#10b981' },
-                        mx: 1.5,
-                        borderRadius: 1,
-                        mb: 1.5,
-                        py: 1
-                      }}
-                    >
-                      <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={item.text}
-                        primaryTypographyProps={{
-                          variant: 'body2',
-                          fontWeight: 800,
-                          letterSpacing: 1.5,
-                          fontSize: '0.8rem'
+          <Box sx={{ height: 'calc(100% - 64px)', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ flexGrow: 1, pt: 4 }}>
+              <List>
+                 {primaryMenu.map((item) => (
+                   <ListItem key={item.text} disablePadding>
+                      <ListItemButton
+                        onClick={() => navigate(item.path)}
+                        selected={location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path))}
+                        sx={{
+                          '&.Mui-selected': { backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#10b981' },
+                          '&.Mui-selected .MuiListItemIcon-root': { color: '#10b981' },
+                          mx: 1.5,
+                          borderRadius: 1,
+                          mb: 1.5,
+                          py: 1
                         }}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-               ))}
-            </List>
+                      >
+                        <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item.text}
+                          primaryTypographyProps={{
+                            variant: 'body2',
+                            fontWeight: 800,
+                            letterSpacing: 1.5,
+                            fontSize: '0.8rem'
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                 ))}
+              </List>
+            </Box>
 
-            <Box sx={{ mt: 'auto', pb: 2 }}>
-               <Divider sx={{ mx: 2, mb: 2, opacity: 0.05 }} />
-               <List>
-                  <ListItem disablePadding>
-                     <ListItemButton onClick={() => navigate('/admin')} sx={{ mx: 1.5, borderRadius: 1 }}>
-                        <ListItemIcon sx={{ color: 'slategray', minWidth: 32 }}><Activity size={18} /></ListItemIcon>
-                        <ListItemText primary="Data Health" primaryTypographyProps={{ variant: 'caption', fontWeight: 800 }} />
-                     </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding>
-                     <ListItemButton onClick={() => navigate('/settings')} sx={{ mx: 1.5, borderRadius: 1 }}>
-                        <ListItemIcon sx={{ color: 'slategray', minWidth: 32 }}><Settings size={18} /></ListItemIcon>
-                        <ListItemText primary="Settings" primaryTypographyProps={{ variant: 'caption', fontWeight: 800 }} />
-                     </ListItemButton>
-                  </ListItem>
-               </List>
-
-               <Box sx={{ px: 2, mt: 2 }}>
-                  <Button
-                     fullWidth
-                     variant="outlined"
-                     startIcon={<Bot size={18} />}
-                     onClick={() => setCopilotOpen(true)}
-                     sx={{ borderColor: 'rgba(255,255,255,0.1)', color: 'slategray', fontWeight: 800, '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}
-                  >
-                     ASK TRADEMIND
-                  </Button>
-               </Box>
+            <Box sx={{ p: 2, borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+               <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Bot size={18} />}
+                  onClick={() => setCopilotOpen(true)}
+                  sx={{ borderColor: 'rgba(255,255,255,0.1)', color: 'slategray', fontWeight: 800, '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}
+               >
+                  ASK TRADEMIND
+               </Button>
             </Box>
           </Box>
         </Drawer>
 
-        {/* Global AI Copilot Drawer */}
         <Drawer
           anchor="right"
           open={copilotOpen}
@@ -208,7 +248,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
            </Box>
         </Drawer>
 
-        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, backgroundColor: '#020617', minHeight: '100vh', width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
+        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, pb: { xs: 15, sm: 12 }, backgroundColor: '#020617', minHeight: '100vh', width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
           <Toolbar />
           <Container maxWidth="xl" disableGutters={isMobile}>
             {children}
@@ -229,14 +269,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onChange={(_, newValue) => navigate(newValue)}
               sx={{ bgcolor: '#0f172a', borderTop: '1px solid #1e293b' }}
             >
-              <BottomNavigationAction label="Signals" value="/" icon={<Zap size={20} />} />
-              <BottomNavigationAction label="Market" value="/market" icon={<LineChart size={20} />} />
+              <BottomNavigationAction label="Terminal" value="/" icon={<Activity size={20} />} />
+              <BottomNavigationAction label="Signals" value="/signals" icon={<Zap size={20} />} />
               <BottomNavigationAction label="History" value="/history" icon={<History size={20} />} />
             </BottomNavigation>
           </MuiPaper>
         )}
 
-        {/* Global Floating Copilot Action */}
         {!isMobile && (
            <Fab
              color="primary"
@@ -249,17 +288,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </Box>
     </NotificationContext.Provider>
-  );
-}
-
-function StatusIndicator({ label, status, icon, color }: any) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 0.5, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
-       <Box sx={{ color }}>{icon}</Box>
-       <Box>
-          <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block', fontSize: '0.6rem', lineHeight: 1 }}>{label}</Typography>
-          <Typography variant="caption" sx={{ color, fontWeight: 900, fontSize: '0.65rem' }}>{status}</Typography>
-       </Box>
-    </Box>
   );
 }

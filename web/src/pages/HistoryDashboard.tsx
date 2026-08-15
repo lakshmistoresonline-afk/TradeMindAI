@@ -20,7 +20,15 @@ export default function HistoryDashboard() {
         getPerformanceSignals()
       ]);
       setSummary(sumData);
-      setSignals(signalsData.filter((s: any) => !['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.status)));
+      // Sort Historical Signals: created_at DESC (Section 18 & 20)
+      const resolved = signalsData
+        .filter((s: any) => !['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.status))
+        .sort((a: any, b: any) => {
+           const timeA = new Date(a.timestamp || a.date || 0).getTime();
+           const timeB = new Date(b.timestamp || b.date || 0).getTime();
+           return timeB - timeA;
+        });
+      setSignals(resolved);
     } catch (error) {
       console.error("Error fetching performance history:", error);
     } finally {

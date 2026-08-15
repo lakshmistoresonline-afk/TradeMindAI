@@ -59,6 +59,9 @@ class StockDB(Base):
     financial_history = Column(String)
     health_metrics = Column(String)
     confidence_metrics = Column(String)
+    delivery_rate = Column(Float, default=0.0)
+    options_pcr = Column(Float, default=1.0)
+    sector_alpha = Column(Float, default=0.0)
 
 class PriceDB(Base):
     __tablename__ = "historical_prices"

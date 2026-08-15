@@ -29,7 +29,13 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
         getCalibrationData()
       ]);
       setSummary(sumData);
-      setSignals(signalsData);
+      // Authoritative Sorting: created_at DESC (Section 18 & 26)
+      const sortedSignals = (signalsData || []).sort((a: any, b: any) => {
+          const timeA = new Date(a.timestamp || a.date || 0).getTime();
+          const timeB = new Date(b.timestamp || b.date || 0).getTime();
+          return timeB - timeA;
+      });
+      setSignals(sortedSignals);
       setCalibration(calibData);
     } catch (error) {
       console.error("Error fetching performance audit:", error);

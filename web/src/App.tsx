@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
-import SignalsDashboard from './pages/SignalsDashboard'
+import DashboardTerminal from './pages/DashboardTerminal'
 import MarketDashboard from './pages/MarketDashboard'
 import PortfolioDashboard from './pages/PortfolioDashboard'
 import HistoryDashboard from './pages/HistoryDashboard'
@@ -9,7 +9,7 @@ import StockIntelligence from './pages/StockIntelligence'
 import Settings from './pages/Settings'
 import Login from './pages/Login'
 import SystemControl from './pages/SystemControl'
-import StrategyBuilder from './pages/StrategyBuilder/StrategyBuilderPage'
+import SignalsDashboard from './pages/SignalsDashboard'
 
 const darkTheme = createTheme({
   palette: {
@@ -137,14 +137,14 @@ function App() {
           <Route path="/*" element={
             <Layout>
               <Routes>
-                <Route path="/" element={<SignalsDashboard />} />
+                <Route path="/" element={<DashboardTerminal />} />
+                <Route path="/signals" element={<SignalsDashboard />} />
                 <Route path="/market" element={<MarketDashboard />} />
                 <Route path="/portfolio" element={<PortfolioDashboard />} />
                 <Route path="/history" element={<HistoryDashboard />} />
 
                 {/* Contextual / Advanced */}
                 <Route path="/analysis" element={<StockIntelligence />} />
-                <Route path="/strategy" element={<StrategyBuilder />} />
                 <Route path="/admin" element={<SystemControl />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>

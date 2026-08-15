@@ -57,7 +57,16 @@ export default function SignalsDashboard() {
         }));
 
       // 3. Combined list includes ALL live signals + analyzed stocks without active live signals
-      setStocks([...normalizedLive, ...normalizedStocks]);
+      const combined = [
+        ...normalizedLive,
+        ...normalizedStocks
+      ].sort((a: any, b: any) => {
+          const timeA = new Date(a.decision?.generatedAt || a.timestamp || a.created_at || 0).getTime();
+          const timeB = new Date(b.decision?.generatedAt || b.timestamp || b.created_at || 0).getTime();
+          return timeB - timeA;
+      });
+
+      setStocks(combined);
       console.log("Opps fetched:", oppsData.length);
     } catch (e) {
       console.error("Failed to sync signals:", e);
@@ -79,7 +88,11 @@ export default function SignalsDashboard() {
         const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase());
         const isNotResolved = !['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'COMPLETED'].includes(s.decision?.status);
         return matchesTf && isTradeable && matchesSearch && isNotResolved;
-    }).sort((a,b) => (b.decision?.conviction || 0) - (a.decision?.conviction || 0));
+    }).sort((a, b) => {
+        const timeA = new Date(a.decision?.generatedAt || a.timestamp || 0).getTime();
+        const timeB = new Date(b.decision?.generatedAt || b.timestamp || 0).getTime();
+        return timeB - timeA;
+    });
   }, [stocks, activeTab, searchQuery]);
 
   return (
@@ -88,15 +101,15 @@ export default function SignalsDashboard() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 5, flexWrap: 'wrap', gap: 3 }}>
          <Box>
             <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1, color: 'white' }}>
-               Signal Command Center
+               Command Center
             </Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
                <Typography variant="caption" color="primary" sx={{ fontWeight: 900, letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Zap size={14} /> AI-POWERED TERMINAL
+                  <Zap size={14} /> LIVE SIGNAL STREAM
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: 'secondary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Activity size={14} /> {filteredSignals.length} LIVE OPPORTUNITIES
+                  <Activity size={14} /> {filteredSignals.length} ACTIVE OPPORTUNITIES
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: connectionStatus === 'ONLINE' ? 'success.main' : 'error.main' }}>

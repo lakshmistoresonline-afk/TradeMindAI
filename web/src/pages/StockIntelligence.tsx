@@ -78,11 +78,16 @@ export default function StockIntelligence() {
 
   return (
     <Box sx={{ pb: 10 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 5, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
-        <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1 }}>Signal Laboratory</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 5, flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
+        <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1 }}>Signal Laboratory</Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: 1.5, mt: 0.5, display: 'block' }}>
+                DEEP FORENSIC INSTRUMENT ANALYSIS
+            </Typography>
+        </Box>
 
         <Autocomplete
-          sx={{ width: { xs: '100%', sm: 400 } }}
+          sx={{ width: { xs: '100%', sm: 420 } }}
           options={stocks}
           getOptionLabel={(option) => `${option.symbol} - ${option.name}`}
           onChange={(_, newValue) => setSelectedStock(newValue)}
