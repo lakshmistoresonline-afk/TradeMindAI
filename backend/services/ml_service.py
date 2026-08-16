@@ -14,6 +14,7 @@ class MLService:
 
     async def train_and_register(self, symbol: str, features: List[FeatureVector]) -> ModelMetadata:
         """
+<<<<<<< HEAD
         Enterprise Training Pipeline with Platt Scaling Calibration:
         Trains, calibrates, evaluates, and registers a new model version.
         Uses Chronological Splitting (No random shuffle).
@@ -77,24 +78,60 @@ class MLService:
         probs_test_calibrated = calibrator.predict_proba(probs_test_raw.reshape(-1, 1))[:, 1]
 
         y_pred = (probs_test_calibrated > 0.5).astype(int)
+=======
+        Enterprise Training Pipeline:
+        Trains, evaluates, and registers a new model version.
+        """
+        import pandas as pd
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+        if len(features) < 100:
+            raise ValueError("Insufficient features for training")
+
+        df = pd.DataFrame([{"date": f.date, **f.features, "target": f.target} for f in features])
+        df.set_index('date', inplace=True)
+        df.dropna(inplace=True)
+
+        X = df.drop('target', axis=1)
+        y = df['target'].astype(int)
+
+        # Split
+        train_size = int(len(df) * 0.8)
+        X_train, X_test = X.iloc[:train_size], X.iloc[train_size:]
+        y_train, y_test = y.iloc[:train_size], y.iloc[train_size:]
+
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+
+        y_pred = model.predict(X_test)
+>>>>>>> origin/main
 
         acc = accuracy_score(y_test, y_pred)
         prec = precision_score(y_test, y_pred, zero_division=0)
         rec = recall_score(y_test, y_pred, zero_division=0)
 
+<<<<<<< HEAD
         brier_raw = brier_score_loss(y_test, probs_test_raw)
         brier_calib = brier_score_loss(y_test, probs_test_calibrated)
         logloss_calib = log_loss(y_test, probs_test_calibrated)
 
         # 6. Feature Importance
+=======
+        # Feature Importance
+>>>>>>> origin/main
         importances = dict(zip(X.columns, model.feature_importances_.astype(float)))
 
         version = datetime.utcnow().strftime("%Y%m%d%H%M")
         model_name = f"{symbol}_rf_{version}.joblib"
+<<<<<<< HEAD
         calibrator_name = f"{symbol}_platt_{version}.joblib"
 
         joblib.dump(model, os.path.join(self.model_dir, model_name))
         joblib.dump(calibrator, os.path.join(self.model_dir, calibrator_name))
+=======
+        joblib.dump(model, os.path.join(self.model_dir, model_name))
+>>>>>>> origin/main
 
         # Register metadata
         metadata = ModelMetadata(
@@ -107,6 +144,7 @@ class MLService:
             recall=float(rec),
             is_champion=False,
             last_trained=datetime.utcnow(),
+<<<<<<< HEAD
             hyperparameters={"n_estimators": 100, "feature_names": feature_names},
             feature_importances=importances,
             calibration_metadata={
@@ -125,6 +163,16 @@ class MLService:
         current_champion = await self.repository.get_champion_model(symbol)
         # Using Brier Score (Lower is better) as primary metric for probability models
         if not current_champion or brier_calib < current_champion.calibration_metadata.get("brier_score_calibrated", 1.0):
+=======
+            hyperparameters={"n_estimators": 100},
+            feature_importances=importances
+        )
+
+        # Champion Selection Logic:
+        # If this model is better than the current champion, promote it.
+        current_champion = await self.repository.get_champion_model(symbol)
+        if not current_champion or acc > current_champion.accuracy:
+>>>>>>> origin/main
             metadata.is_champion = True
             if current_champion:
                 current_champion.is_champion = False
@@ -135,11 +183,18 @@ class MLService:
 
     async def predict_with_champion(self, symbol: str, feature_vector: Dict[str, float]) -> Dict[str, Any]:
         """
+<<<<<<< HEAD
         Production Inference with Calibration:
         Uses the current champion model and its calibrator.
         """
         import pandas as pd
         import numpy as np
+=======
+        Production Inference:
+        Uses the current champion model for prediction.
+        """
+        import pandas as pd
+>>>>>>> origin/main
         champion = await self.repository.get_champion_model(symbol)
         if not champion:
             return {"prediction": "N/A", "confidence": 0, "model_version": "none"}
@@ -150,6 +205,7 @@ class MLService:
 
         model = joblib.load(model_path)
 
+<<<<<<< HEAD
         # Load Calibrator if exists
         calibrator = None
         if champion.calibration_metadata and "calibrator_file" in champion.calibration_metadata:
@@ -174,24 +230,44 @@ class MLService:
             calibrated_prob = raw_prob
 
         prediction_label = "UP" if calibrated_prob > 0.55 else "DOWN" if calibrated_prob < 0.45 else "NEUTRAL"
+=======
+        # Ensure features are in correct order (matching training)
+        # In enterprise, we'd use a FeatureStore feature-list mapper
+        X_input = pd.DataFrame([feature_vector])
+
+        # Data Drift Detection (Simplified)
+        # Compare current input to expected ranges (if defined in feature metadata)
+
+        prob = model.predict_proba(X_input)[0][1]
+        prediction_label = "UP" if prob > 0.55 else "DOWN" if prob < 0.45 else "NEUTRAL"
+>>>>>>> origin/main
 
         prediction = Prediction(
             symbol=symbol,
             date=datetime.utcnow(),
             model_version=champion.version,
             prediction=prediction_label,
+<<<<<<< HEAD
             confidence=float(calibrated_prob if calibrated_prob > 0.5 else 1-calibrated_prob),
             metadata={
                 "raw_probability_up": float(raw_prob),
                 "calibrated_probability_up": float(calibrated_prob),
                 "is_calibrated": calibrator is not None
             }
+=======
+            confidence=float(prob if prob > 0.5 else 1-prob),
+            metadata={"probability_up": float(prob)}
+>>>>>>> origin/main
         )
         await self.repository.save_prediction(prediction)
 
         return {
             "prediction": prediction_label,
             "confidence": round(prediction.confidence * 100, 2),
+<<<<<<< HEAD
             "model_version": champion.version,
             "is_calibrated": calibrator is not None
+=======
+            "model_version": champion.version
+>>>>>>> origin/main
         }

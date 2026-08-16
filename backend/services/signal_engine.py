@@ -29,11 +29,18 @@ class SignalEngine:
 
         # 3. Model Inference (Champion Model)
         ml_res = await container.ml_service.predict_with_champion(symbol, last_features)
+<<<<<<< HEAD
 
         # Calibration is now integrated into predict_with_champion (Platt Scaling)
         # We use the raw probability for metadata and the calibrated for decision logic.
         calibrated_prob = ml_res.get("metadata", {}).get("calibrated_probability_up", 0.5)
         raw_prob = ml_res.get("metadata", {}).get("raw_probability_up", 0.5)
+=======
+        raw_prob = ml_res.get("confidence", 0) / 100.0
+
+        # 4. Calibration & EV
+        calibrated_prob = CalibrationService.calibrate_probability(raw_prob, asset_class)
+>>>>>>> origin/main
 
         # 5. Risk Calculation (Master Node)
         atr = last_features.get("volatility_atr", stock.last_price * 0.02)

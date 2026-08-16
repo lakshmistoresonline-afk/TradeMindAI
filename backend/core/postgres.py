@@ -6,6 +6,7 @@ import datetime
 import os
 from .config import settings
 
+<<<<<<< HEAD
 # Hybrid Logic: Fallback to SQLite for local development if PG URL missing or empty
 DATABASE_URL = settings.POSTGRES_URL
 if not DATABASE_URL or DATABASE_URL == '""' or DATABASE_URL == "sqlite:///./local_operational.db":
@@ -14,6 +15,10 @@ if not DATABASE_URL or DATABASE_URL == '""' or DATABASE_URL == "sqlite:///./loca
     db_path = os.path.join(base_dir, "backend", "local_operational.db")
     DATABASE_URL = f"sqlite:///{db_path}"
     print(f"DEBUG: Using Canonical Local DB: {DATABASE_URL}")
+=======
+# Hybrid Logic: Fallback to SQLite for local development if PG URL missing
+DATABASE_URL = settings.POSTGRES_URL
+>>>>>>> origin/main
 
 from sqlalchemy import create_engine
 # SQLite needs special args for concurrent access in some cases
@@ -210,6 +215,7 @@ class LiveSignalDB(Base):
     model_version = Column(String)
     events = Column(String) # JSON string
 
+<<<<<<< HEAD
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"
     name = Column(String, primary_key=True)
@@ -225,6 +231,8 @@ class ModelMetadataDB(Base):
     feature_importances = Column(String) # JSON string
     calibration_metadata = Column(String) # JSON string
 
+=======
+>>>>>>> origin/main
 class WorkspaceDB(Base):
     __tablename__ = "workspaces"
     id = Column(String, primary_key=True)

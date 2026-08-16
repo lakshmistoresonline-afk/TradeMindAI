@@ -261,8 +261,12 @@ fun LiveSignalCard(signal: com.webcraft.trademindai.domain.model.LiveSignal) {
                         fontWeight = FontWeight.Black,
                         style = MaterialTheme.typography.titleMedium
                     )
+<<<<<<< HEAD
                     val convictionText = if (signal.conviction > 0) "${signal.conviction.toInt()}% Conviction" else "Probability: Not Yet Validated"
                     Text(convictionText, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+=======
+                    Text("${signal.conviction.toInt()}% Conviction", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+>>>>>>> origin/main
                 }
             }
 

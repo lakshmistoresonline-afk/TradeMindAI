@@ -29,10 +29,13 @@ async def populate():
     print(f"[*] STEP 2: Populating master table with {len(FULL_UNIVERSE)} instruments...")
 
     try:
+<<<<<<< HEAD
         # Purge existing NIFTY 200 to ensure strict 200 count
         print("[*] Purging existing NIFTY 200 records...")
         db.query(StockDB).filter(StockDB.index_membership == "NIFTY_200").delete()
 
+=======
+>>>>>>> origin/main
         count = 0
         for sym in FULL_UNIVERSE:
             stock = db.query(StockDB).filter(StockDB.symbol == sym).first()

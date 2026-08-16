@@ -209,6 +209,7 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
 
     async def save_prediction(self, prediction: Prediction) -> None:
         with self.session_factory() as pg:
+<<<<<<< HEAD
             pg.add(PredictionDB(
                 symbol=prediction.symbol,
                 date=prediction.date,
@@ -217,6 +218,9 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 confidence=prediction.confidence,
                 metadata_json=json.dumps(prediction.metadata) if prediction.metadata else None
             ))
+=======
+            pg.add(PredictionDB(symbol=prediction.symbol, date=prediction.date, model_version=prediction.model_version, prediction=prediction.prediction, confidence=prediction.confidence, metadata_json=prediction.metadata))
+>>>>>>> origin/main
             pg.commit()
 
     async def save_portfolio_health(self, health: PortfolioHealth) -> None: self.fs.collection("portfolio_health").document(health.user_id).set(health.model_dump())
@@ -288,6 +292,7 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         return VirtualPortfolio(**doc.to_dict()) if doc.exists else None
 
     async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None: self.fs.collection("virtual_portfolios").document(portfolio.user_id).set(portfolio.model_dump())
+<<<<<<< HEAD
     async def save_model_metadata(self, metadata: ModelMetadata) -> None:
         from backend.core.postgres import ModelMetadataDB
         with self.session_factory() as pg:
@@ -318,10 +323,15 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 return ModelMetadata(**data)
             return None
 
+=======
+    async def save_model_metadata(self, metadata: ModelMetadata) -> None: pass
+    async def get_champion_model(self, symbol: str) -> Optional[ModelMetadata]: return None
+>>>>>>> origin/main
     async def save_ml_dataset(self, dataset: MLDataset) -> None: pass
 
     async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
         df = self.duck.create_ml_dataset(symbol, start_date.isoformat(), end_date.isoformat())
+<<<<<<< HEAD
         results = []
         for _, row in df.iterrows():
             row_dict = row.to_dict()
@@ -335,6 +345,9 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 target=target
             ))
         return results
+=======
+        return [FeatureVector(symbol=symbol, date=row['date'], version="v1.0.0", features={k: v for k, v in row.to_dict().items() if k != 'date'}) for _, row in df.iterrows()]
+>>>>>>> origin/main
 
     async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: self.fs.collection("devices").document(device_info['device_id']).set({**device_info, "user_id": user_id})
     async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:
