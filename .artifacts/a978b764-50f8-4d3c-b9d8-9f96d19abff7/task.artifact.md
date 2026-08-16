@@ -1,0 +1,26 @@
+# Task List - TradeMind AI P0 Quant Completion
+
+- [x] **Phase 1: Audit & Environment**
+    - [x] Complete repository audit for synthetic data and hardcoded values
+    - [x] Create `scripts/windows/00_check_environment.ps1`
+    - [x] Install required local dependencies
+- [x] **Phase 2: NIFTY 200 & Data Synchronization**
+    - [x] Verify canonical NIFTY 200 list
+    - [x] Fix `scripts/universe/validate_nifty200.py`
+    - [x] Create `scripts/windows/01_sync_market.ps1`
+    - [x] Perform data forensic cleanup
+    - [x] Implement `01B_sync_historical.ps1` (Historical Sync Gate)
+- [/] **Phase 3: Quantitative Engine Development**
+    - [x] Implement `SignalEngine` (canonical representation)
+    - [x] Implement `OutcomeEngine` (real market outcomes)
+    - [x] Remove hardcoded intelligence/scores
+- [/] **Phase 4: ML, Calibration & Validation**
+    - [x] Implement Time-Safe Feature Engine
+    - [ ] Implement Probability Calibration (Platt Scaling)
+    - [x] Implement Walk-Forward Validation pipeline
+    - [x] Create local processing scripts (`02_process_intelligence.ps1`, `03_train_models.ps1`, etc.)
+- [/] **Phase 5: Infrastructure & Final Audit**
+    - [x] Disable Railway workers (Procfile, render.yaml)
+    - [ ] Verify zero-worker policy on Railway
+    - [ ] Run final NIFTY 200 audit
+    - [ ] Generate all final reports in `docs/`

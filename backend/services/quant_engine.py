@@ -1,0 +1,93 @@
+from typing import Dict, Any, List
+from backend.domain.models.data_platform import QuantMetric
+from datetime import datetime
+
+class QuantEngine:
+    @staticmethod
+    def calculate_metrics(symbol: str, df: Any, benchmark_df: Any = None) -> QuantMetric:
+        """
+        Calculates institutional risk and performance metrics.
+        """
+        if df is None or len(df) < 30: # Need at least 30 days for reasonable metrics
+            return QuantMetric(
+                symbol=symbol, date=datetime.utcnow(),
+                sharpe_ratio=0, sortino_ratio=0, max_drawdown=0,
+                beta=1.0, alpha=0, volatility=0
+            )
+
+        import pandas as pd
+        import numpy as np
+        returns = df["Close"].pct_change().dropna()
+
+        # 1. Volatility (Annualized)
+        vol = returns.std() * np.sqrt(252)
+
+        # 2. Sharpe Ratio (Risk-free rate assumed 7% for India)
+        rf = 0.07 / 252
+        excess_returns = returns - rf
+        sharpe = (excess_returns.mean() / returns.std()) * np.sqrt(252) if returns.std() != 0 else 0
+
+        # 3. Sortino Ratio (Downside deviation only)
+        downside_returns = returns[returns < 0]
+        sortino = (excess_returns.mean() / downside_returns.std()) * np.sqrt(252) if not downside_returns.empty else 0
+
+        # 4. Max Drawdown
+        cum_returns = (1 + returns).cumprod()
+        peak = cum_returns.expanding(min_periods=1).max()
+        drawdown = (cum_returns / peak) - 1
+        max_dd = drawdown.min()
+
+        # 5. Alpha/Beta (vs Benchmark)
+        alpha, beta = 0.0, 1.0
+        if benchmark_df is not None:
+            bench_returns = benchmark_df["Close"].pct_change().dropna()
+            # Align dates
+            common_idx = returns.index.intersection(bench_returns.index)
+            if len(common_idx) > 30:
+                s_ret = returns.loc[common_idx]
+                b_ret = bench_returns.loc[common_idx]
+
+                covariance = np.cov(s_ret, b_ret)[0][1]
+                variance = np.var(b_ret)
+                beta = covariance / variance if variance != 0 else 1.0
+                alpha = (s_ret.mean() - beta * b_ret.mean()) * 252
+
+        return QuantMetric(
+            symbol=symbol,
+            date=datetime.utcnow(),
+            sharpe_ratio=float(sharpe),
+            sortino_ratio=float(sortino),
+            max_drawdown=float(max_dd),
+            beta=float(beta),
+            alpha=float(alpha),
+            volatility=float(vol)
+        )
+
+    @staticmethod
+    def calculate_correlations(symbol: str, df: Any, benchmarks: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Vision 2.2: Calculates Pearson correlation coefficients against macro benchmarks.
+        """
+        if df is None or len(df) < 30: return []
+
+        import pandas as pd
+        import numpy as np
+
+        results = []
+        s_returns = df["Close"].pct_change().dropna()
+
+        for name, b_df in benchmarks.items():
+            if b_df is None or b_df.empty: continue
+
+            b_returns = b_df["Close"].pct_change().dropna()
+            # Align
+            common = s_returns.index.intersection(b_returns.index)
+            if len(common) > 20:
+                corr = np.corrcoef(s_returns.loc[common], b_returns.loc[common])[0][1]
+                results.append({
+                    "target": name,
+                    "value": float(corr),
+                    "type": "MARKET" if "Nifty" in name else "SECTOR" if "Sector" in name else "CURRENCY"
+                })
+
+        return results

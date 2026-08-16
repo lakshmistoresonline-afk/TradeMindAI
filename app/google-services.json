@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "595902577601",
+    "project_id": "com-webcraft-trademindai-c8f75",
+    "storage_bucket": "com-webcraft-trademindai-c8f75.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595902577601:android:c42cd8b544583c4b230d40",
+        "android_client_info": {
+          "package_name": "com.webcraft.trademindai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV2mVlSuVSvM-FXVZtTsn06VsSP_mTr4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

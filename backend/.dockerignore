@@ -1,0 +1,8 @@
+# Local environment and caches
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.db
+.env
+service-account.json
