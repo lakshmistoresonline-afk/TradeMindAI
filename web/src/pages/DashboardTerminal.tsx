@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Chip, IconButton, Button, Skeleton, Divider, alpha } from '@mui/material';
 import { RefreshCw, ChevronRight, Activity, TrendingUp, Bot, ArrowUpRight, ArrowDownRight, LayoutDashboard, Database, ShieldCheck, Globe, Zap } from 'lucide-react';
 import { getStocks, getLiveSignalsAudit, getPerformanceSummary, getPerformanceSignals, getMarketStats } from '../api/client';
@@ -16,7 +16,7 @@ export default function DashboardTerminal() {
   const [liveOptionsSignals, setLiveOptionsSignals] = useState<any[]>([]);
 
   const [performanceSummary, setPerformanceSummary] = useState<any>(null);
-  const [recentHistory, setRecentHistory] = useState<any[]>([]);
+  const [resolvedSignals, setResolvedSignals] = useState<any[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -60,7 +60,7 @@ export default function DashboardTerminal() {
         )
         .sort((a: any, b: any) => new Date(b.timestamp || b.date || 0).getTime() - new Date(a.timestamp || a.date || 0).getTime());
 
-      setRecentHistory(resolved.slice(0, 8));
+      setResolvedSignals(resolved);
 
     } catch (e) {
       console.error("Dashboard Sync Failed:", e);
@@ -74,6 +74,26 @@ export default function DashboardTerminal() {
   }, []);
 
   const stats = performanceSummary?.live_signals || { total: 0, resolved: 0, win_rate: 0, avg_profit: 0 };
+
+  const assetStats = useMemo(() => {
+    const calc = (type: string) => {
+        const typeSignals = resolvedSignals.filter(s => {
+            const assetClass = s.asset_class || 'EQUITY';
+            return assetClass === type;
+        });
+        const outcomes = typeSignals.filter(s => ['TARGET_HIT', 'STOP_LOSS'].includes(s.status || s.outcome));
+        if (outcomes.length === 0) return '—';
+        const wins = outcomes.filter(s => (s.status === 'TARGET_HIT' || s.outcome === 'TARGET_HIT')).length;
+        return ((wins / outcomes.length) * 100).toFixed(1);
+    };
+    return {
+        equity: stats.win_rate || '—',
+        futures: calc('FUTURES'),
+        options: calc('OPTIONS')
+    };
+  }, [resolvedSignals, stats.win_rate]);
+
+  const recentHistory = useMemo(() => resolvedSignals.slice(0, 8), [resolvedSignals]);
 
   return (
     <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
@@ -129,9 +149,9 @@ export default function DashboardTerminal() {
       {/* 3. Global Stats Triage */}
       <Grid container spacing={3} sx={{ mb: 8 }}>
          {[
-            { label: 'Equity Setup', count: liveEquitySignals.length, win: stats.win_rate, icon: <Activity size={20} />, color: '#10b981', desc: 'Cash segment opportunities' },
-            { label: 'Futures Buildup', count: liveFuturesSignals.length, win: 46.5, icon: <TrendingUp size={20} />, color: '#00D1FF', desc: 'Derivative breakout setups' },
-            { label: 'Options Premium', count: liveOptionsSignals.length, win: 51.2, icon: <Zap size={20} />, color: '#7C3AED', desc: 'High-conviction contract calls' }
+            { label: 'Equity Setup', count: liveEquitySignals.length, win: assetStats.equity, icon: <Activity size={20} />, color: '#10b981', desc: 'Cash segment opportunities' },
+            { label: 'Futures Buildup', count: liveFuturesSignals.length, win: assetStats.futures, icon: <TrendingUp size={20} />, color: '#00D1FF', desc: 'Derivative breakout setups' },
+            { label: 'Options Premium', count: liveOptionsSignals.length, win: assetStats.options, icon: <Zap size={20} />, color: '#7C3AED', desc: 'High-conviction contract calls' }
          ].map((card, i) => (
             <Grid item xs={12} md={4} key={i}>
                <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', position: 'relative' }}>
@@ -171,7 +191,7 @@ export default function DashboardTerminal() {
                      <Button size="small" onClick={() => navigate('/history')} sx={{ color: 'primary.main', fontWeight: 900, fontSize: '0.65rem' }}>FULL ARCHIVE</Button>
                   </Box>
                   <Paper sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1, overflow: 'hidden' }}>
-                     {recentHistory.map((s, i) => (
+                     {recentHistory.map((s: any, i: number) => (
                         <Box key={i} sx={{ p: 1.5, borderBottom: '1px solid rgba(255,255,255,0.03)', '&:last-child': { border: 0 } }}>
                            <Stack direction="row" justifyContent="space-between" alignItems="center">
                               <Box>

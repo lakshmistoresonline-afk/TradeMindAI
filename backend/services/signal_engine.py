@@ -34,8 +34,8 @@ class SignalEngine:
         # 4. Calibration & EV
         calibrated_prob = CalibrationService.calibrate_probability(raw_prob, asset_class)
 
-        # 5. Risk Calculation
-        atr = last_features.get("volatility_atr", stock.last_price * 0.02) # Fallback to 2%
+        # 5. Risk Calculation (Master Node)
+        atr = last_features.get("volatility_atr", stock.last_price * 0.02)
         risk_params = RiskEngine.calculate_trade_parameters(
             symbol, stock.last_price,
             "LONG" if ml_res.get("prediction") == "UP" else "SHORT",
@@ -44,31 +44,34 @@ class SignalEngine:
 
         if not risk_params: return None
 
-        ev = CalibrationService.calculate_expected_value(
+        # 6. EXPECTED VALUE (Part 17 & 18)
+        # EV = P(win) * Reward - P(loss) * Risk
+        reward_amt = risk_params["target"] - stock.last_price
+        risk_amt = stock.last_price - risk_params["stop_loss"]
+
+        expected_val = CalibrationService.calculate_expected_value(
             calibrated_prob,
-            risk_params["target"] - stock.last_price,
-            stock.last_price - risk_params["stop_loss"]
+            reward_amt,
+            risk_amt
         )
 
-        # 6. NO-TRADE ENGINE (Part 19)
-        if calibrated_prob < 0.55: return None # Low probability
-        if ev <= 0: return None               # Negative expectancy
-        if risk_params["risk_pct"] > 10: return None # Excessive risk
-
-        # 7. Regime Alignment
+        # 7. REGIME ANALYSIS
         regime_obj = await container.ios_repo.get_latest_regime()
-        regime = regime_obj.regime if regime_obj else "SIDEWAYS"
+        regime_label = regime_obj.regime if regime_obj else "SIDEWAYS"
+        regime_prob = regime_obj.sentiment_score if regime_obj else 0.5
 
-        # Reject Shorts in strong BULL, Longs in extreme BEAR
-        if regime == "BULL" and risk_params["direction"] == "SHORT": return None
+        # 8. NO-TRADE ENGINE (Part 19)
+        rejection_reason = None
+        if calibrated_prob < 0.52: rejection_reason = "WEAK_EDGE"
+        if expected_val <= 0: rejection_reason = "NEGATIVE_EXPECTANCY"
+        if risk_params["risk_pct"] > 12: rejection_reason = "EXCESSIVE_VOLATILITY"
+        if regime_label == "HIGH_VOLATILITY" and calibrated_prob < 0.65: rejection_reason = "REGIME_CONFLICT"
 
-        # 8. Construct Signal
-        if asset_class == "OPTIONS":
-            # Strict Contract Validation for Options
-            if not last_features.get("options_strike") or not last_features.get("options_type"):
-                print(f"[!] REJECT: Options setup for {symbol} missing contract metadata.")
-                return None
+        if rejection_reason:
+            print(f"   [NO_TRADE] {symbol} rejected: {rejection_reason}")
+            return None
 
+        # 9. Construct Canonical Signal
         sig_id = f"sig_{symbol}_{datetime.datetime.utcnow().strftime('%Y%m%d%H%M')}"
 
         return LiveSignal(
@@ -78,6 +81,18 @@ class SignalEngine:
             rating="BUY" if risk_params["direction"] == "LONG" else "SELL",
             direction=risk_params["direction"],
             conviction=float(calibrated_prob * 100),
+
+            # P0 Quant Fields
+            raw_probability=float(raw_prob),
+            calibrated_probability=float(calibrated_prob),
+            expected_value=float(expected_val),
+            regime=regime_label,
+            regime_probability=float(regime_prob),
+            risk_reward=float(risk_params["risk_reward"]),
+            risk_per_unit=float(abs(risk_amt)),
+            reward_per_unit=float(abs(reward_amt)),
+            data_quality_score=1.0, # TODO: Implement real data quality check
+
             entry_price=stock.last_price,
             target_price=risk_params["target"],
             stop_loss_price=risk_params["stop_loss"],
@@ -85,9 +100,11 @@ class SignalEngine:
             status="WAITING_FOR_ENTRY",
             asset_class=asset_class,
             underlying_symbol=symbol if asset_class != "EQUITY" else None,
-            strike=last_features.get("options_strike") if asset_class == "OPTIONS" else None,
-            option_type=last_features.get("options_type") if asset_class == "OPTIONS" else None,
-            expiry=datetime.datetime.utcnow() + datetime.timedelta(days=12) if asset_class != "EQUITY" else None,
             model_version=ml_res.get("model_version", "TradeMind Core v2.2"),
-            events=[SignalEvent(type="GENERATED", message="Qualified signal passed No-Trade Engine constraints.")]
+            provenance={
+                "feature_version": "v1.0.0",
+                "engine_version": "P0.QUANT.1",
+                "calibration": "Platt-Scaled"
+            },
+            events=[SignalEvent(type="GENERATED", message="Passed forensic P0 risk/edge audit.")]
         )

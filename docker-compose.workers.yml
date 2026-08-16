@@ -1,40 +1,40 @@
-version: '3.8'
+# version: '3.8'
 
-services:
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
+# services:
+#   redis:
+#     image: redis:7-alpine
+#     restart: unless-stopped
+#     ports:
+#       - "6379:6379"
 
-  worker:
-    build: 
-      context: .
-      dockerfile: backend/Dockerfile
-    restart: unless-stopped
-    environment:
-      - SERVICE_TYPE=worker
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_POOL=prefork
-      - CELERY_CONCURRENCY=2
-    env_file:
-      - backend/.env
-    volumes:
-      - ./backend/service-account.json:/app/backend/service-account.json:ro
-    depends_on:
-      - redis
+#   worker:
+#     build: 
+#       context: .
+#       dockerfile: backend/Dockerfile
+#     restart: unless-stopped
+#     environment:
+#       - SERVICE_TYPE=worker
+#       - REDIS_URL=redis://redis:6379/0
+#       - CELERY_POOL=prefork
+#       - CELERY_CONCURRENCY=2
+#     env_file:
+#       - backend/.env
+#     volumes:
+#       - ./backend/service-account.json:/app/backend/service-account.json:ro
+#     depends_on:
+#       - redis
 
-  beat:
-    build: 
-      context: .
-      dockerfile: backend/Dockerfile
-    restart: unless-stopped
-    environment:
-      - SERVICE_TYPE=beat
-      - REDIS_URL=redis://redis:6379/0
-    env_file:
-      - backend/.env
-    volumes:
-      - ./backend/service-account.json:/app/backend/service-account.json:ro
-    depends_on:
-      - redis
+#   beat:
+#     build: 
+#       context: .
+#       dockerfile: backend/Dockerfile
+#     restart: unless-stopped
+#     environment:
+#       - SERVICE_TYPE=beat
+#       - REDIS_URL=redis://redis:6379/0
+#     env_file:
+#       - backend/.env
+#     volumes:
+#       - ./backend/service-account.json:/app/backend/service-account.json:ro
+#     depends_on:
+#       - redis

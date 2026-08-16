@@ -76,16 +76,28 @@ class FeatureStoreService:
         )
         await self.repository.save_feature_vector(vector)
 
-    def extract_institutional_features(self, df_ta: Any, smc_data: Dict[str, Any], extra_context: Dict[str, Any] = None) -> Dict[str, Any]:
+    def extract_institutional_features(self, df_ta: Any, smc_data: Dict[str, Any], timestamp: Optional[datetime] = None) -> Dict[str, Any]:
         """
-        Refined Institutional Feature Engineering.
+        Canonical Time-Safe Feature Engineering.
+        If timestamp is provided, ensures no data > timestamp is used.
         """
         if df_ta is None or df_ta.empty:
             return {}
 
         import pandas as pd
         import math
+
+        # 1. TIME-SAFE SLICING
+        if timestamp:
+            # Ensure index is datetime and sorted
+            df_ta = df_ta[df_ta.index <= timestamp]
+            if df_ta.empty: return {}
+
         last_row = df_ta.iloc[-1]
+        data_ts = df_ta.index[-1]
+
+        if timestamp and data_ts > timestamp:
+            raise ValueError(f"CRITICAL: Look-ahead detected. Data timestamp {data_ts} > Target timestamp {timestamp}")
 
         # Resilient value extractor
         def get_val(key, default=0.0):

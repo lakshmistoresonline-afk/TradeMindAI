@@ -11,21 +11,24 @@ from backend.core.postgres import engine
 
 def cleanup():
     with engine.connect() as conn:
-        print("[*] Starting Data Forensic Cleanup...")
+        print("[*] Starting ABSOLUTE Data Purge...")
 
-        # 1. Purge all generated signals to ensure a 100% clean baseline
-        # This covers all prefixes used in manual population scripts.
-        print("[*] Purging all manual/generated signals across segments...")
-        res = conn.execute(text("DELETE FROM live_signals WHERE id LIKE 'live_%' OR id LIKE 'master_%' OR id LIKE 'audit_%' OR id LIKE 'hist_%' OR id LIKE 'fno_%' OR id LIKE 'sig_%' OR id LIKE 'prec_%'"))
-        print(f"[+] Purged {res.rowcount} generated signal records.")
+        # 1. Purge ALL signals to reset accuracy metrics and remove P0-incompatible nodes
+        print("[*] Purging ALL records from live_signals...")
+        res = conn.execute(text("DELETE FROM live_signals"))
+        print(f"   [+] Purged {res.rowcount} signal records.")
 
-        # 2. Fix technical master data
-        print("[*] Cleaning up orphaned stock records...")
-        res = conn.execute(text("DELETE FROM stocks WHERE name = 'Data Corrupted' OR name = 'Unknown'"))
-        print(f"[+] Deleted {res.rowcount} invalid stock master records.")
+        # 2. Purge ML Artifacts
+        print("[*] Purging predictions and opportunities...")
+        conn.execute(text("DELETE FROM predictions"))
+        conn.execute(text("DELETE FROM opportunities"))
+
+        # 3. Clean up technical master data
+        print("[*] Cleaning up stocks table...")
+        conn.execute(text("DELETE FROM stocks WHERE name = 'Data Corrupted' OR name = 'Unknown'"))
 
         conn.commit()
-        print("\n[SUCCESS] Database Cleanup Complete. System nodes are now 100% clean.")
+        print("\n[SUCCESS] Production database is now 100% clean and P0-ready.")
 
 if __name__ == "__main__":
     cleanup()

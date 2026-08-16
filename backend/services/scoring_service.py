@@ -24,7 +24,7 @@ class ScoringService:
         tech_score = (tech_score + (100 - abs(50 - rsi) * 2)) / 2
 
         # 2. Fundamental Score
-        fund_score = 60 # Default baseline
+        fund_score = features.get("fundamental_quality_score", 50) # Use actual feature or neutral 50
 
         # 3. ML Bias
         ml_score = ml_prediction.get("confidence", 0) if ml_prediction.get("prediction") == "UP" else (100 - ml_prediction.get("confidence", 0)) if ml_prediction.get("prediction") == "DOWN" else 50
@@ -38,7 +38,7 @@ class ScoringService:
         elif delivery < 30 and delivery > 0: inst_score -= 5 # Weak conviction
 
         # 5. Options Sentiment (RC-5)
-        options_score = 50
+        options_score = features.get("options_sentiment_score", 50)
         pcr = features.get("options_pcr", 1.0)
         if pcr > 1.2: options_score += 20 # Strong Put base
         elif pcr < 0.7: options_score -= 15 # Heavy Call resistance
@@ -56,6 +56,10 @@ class ScoringService:
                 inst_score += 15 # Heavy boost for verified institutional entry
                 print(f"   [Institutional Boost] Found {recent_buys} recent bulk buys for {analysis.get('symbol')}")
 
+        # 6. SMC & Sentiment (Forensic Audit: No hardcoded defaults)
+        smc_score = features.get("smc_alignment_score", 50)
+        sentiment_score = features.get("news_sentiment_score", 50)
+
         # Aggregate
         total_score = (
             (tech_score * weights["technical"]) +
@@ -63,8 +67,8 @@ class ScoringService:
             (ml_score * weights["ml_bias"]) +
             (inst_score * weights["institutional"]) +
             (options_score * weights["options"]) +
-            (50 * weights["smc"]) +
-            (50 * weights["sentiment"])
+            (smc_score * weights["smc"]) +
+            (sentiment_score * weights["sentiment"])
         )
 
         # total_score is already on 0-100 scale because component scores are 0-100
@@ -86,7 +90,7 @@ class ScoringService:
                 "Institutional": "STRONG"
             },
             "confidence": {
-                "score": 82,
-                "reasoning": "High agreement between Technical and ML models. Moderate Fundamental data completeness."
+                "score": round(total_score, 0),
+                "reasoning": f"Intelligence consolidated across {len([w for w in weights if weights[w] > 0])} validated vectors."
             }
         }

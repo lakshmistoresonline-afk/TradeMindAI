@@ -9,22 +9,13 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 load_dotenv('backend/.env')
 
 from backend.core.postgres import SessionLocal, StockDB
+from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
 
-# Nifty 200 constituents + Indices
-NIFTY_200_SYMBOLS = [
-    "NIFTY", "BANKNIFTY", "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL", "AXISBANK", "LT", "ITC",
-    "KOTAKBANK", "HINDUNILVR", "BAJFINANCE", "HCLTECH", "MARUTI", "SUNPHARMA", "TITAN", "ADANIENT", "ULTRACEMCO", "TATASTEEL",
-    "JSWSTEEL", "NTPC", "M&M", "POWERGRID", "ASIANPAINT", "LICI", "ADANIPORTS", "ADANIGREEN", "ADANIPOWER", "COALINDIA",
-    "BAJAJFINSV", "GRASIM", "HINDALCO", "NESTLEIND", "ONGC", "WIPRO", "HDFCLIFE", "SBILIFE", "DRREDDY", "ADANIENSOL",
-    "EICHERMOT", "INDUSINDBK", "BPCL", "TECHM", "DIVISLAB", "CIPLA", "TATAMOTORS", "BAJAJ-AUTO", "BRITANNIA", "APOLLOHOSP",
-    "HEROMOTOCO", "SHREECEM", "INDHOTEL", "LTIM", "TATACONSUM", "PIDILITIND", "BEL", "HAL", "CANBK", "TRENT",
-    "DLF", "PNB", "BANKBARODA", "GODREJCP", "GAIL", "CHOLAFIN", "SIEMENS", "ABB", "VBL", "UNITDSPR",
-    "TATACOMM", "AMBUJACEM", "AUROPHARMA", "BOSCHLTD", "CUMMINSIND", "ESCORTS", "GLENMARK", "HAVELLS", "IDFCFIRSTB", "IOC",
-    "IRCTC", "JINDALSTEL", "JUBLFOOD", "LICHSGFIN", "LUPIN", "M&MFIN", "MRF", "MUTHOOTFIN", "NMDC", "OBEROIRLTY",
-    "PEL", "PFC", "RECLTD", "SAIL", "SRF", "TVSMOTOR", "VOLTAS", "ZYDUSLIFE", "POLYCAB", "NYKAA",
-    "PAYTM", "ZOMATO", "MAXHEALTH", "YESBANK", "RVNL", "IRFC", "MAHABANK", "UNIONBANK", "IDBI", "UCOBANK",
-    "CENTRALBK", "IOB"
-]
+# Indices to track alongside the 200 stocks
+INDICES = ["NIFTY", "BANKNIFTY"]
+
+# Combined universe for population
+FULL_UNIVERSE = INDICES + NIFTY_200_CONSTITUENTS
 
 # Market Lot Sizes for major F&O symbols
 LOT_SIZES = {
@@ -35,21 +26,26 @@ LOT_SIZES = {
 
 async def populate():
     db = SessionLocal()
-    print(f"[*] STEP 2: Populating master table with {len(NIFTY_200_SYMBOLS)} stocks...")
+    print(f"[*] STEP 2: Populating master table with {len(FULL_UNIVERSE)} instruments...")
 
     try:
         count = 0
-        for sym in NIFTY_200_SYMBOLS:
+        for sym in FULL_UNIVERSE:
             stock = db.query(StockDB).filter(StockDB.symbol == sym).first()
 
-            is_fno = sym in LOT_SIZES or sym in ["NIFTY", "BANKNIFTY"]
+            is_fno = sym in LOT_SIZES or sym in INDICES
             lot = LOT_SIZES.get(sym, None)
+
+            # Identify if it's a constituent or index
+            index_membership = "NIFTY_200" if sym in NIFTY_200_CONSTITUENTS else "INDEX"
 
             data = {
                 "symbol": sym,
-                "name": f"{sym} Index" if sym in ["NIFTY", "BANKNIFTY"] else f"{sym} Limited",
+                "name": f"{sym} Index" if sym in INDICES else f"{sym} Limited",
                 "is_fno": is_fno,
                 "lot_size": lot,
+                "index_membership": index_membership,
+                "index_weight": 0.0, # Initial placeholder
                 "ai_status": "READY",
                 "updated_at": datetime.now()
             }
@@ -62,7 +58,7 @@ async def populate():
             count += 1
 
         db.commit()
-        print(f"[SUCCESS] Master stock population complete. Total: {count} stocks synced.")
+        print(f"[SUCCESS] Master stock population complete. Total: {count} synced.")
     except Exception as e:
         print(f"[-] Error: {e}")
         db.rollback()

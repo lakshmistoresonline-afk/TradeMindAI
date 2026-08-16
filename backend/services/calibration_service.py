@@ -5,32 +5,37 @@ class CalibrationService:
     @staticmethod
     def calibrate_probability(raw_prob: float, asset_class: str) -> float:
         """
-        Calibrates raw ML probabilities using segment-specific historical offsets.
-        Baseline: Platt-like scaling for production safety.
+        Calibrates raw ML probabilities using Platt Scaling (Sigmoid transformation).
+        Baseline: Statistical mapping to real-world win frequencies.
         """
-        # Segment-specific calibration factors (derived from forensic audit)
-        offsets = {
-            "EQUITY": 0.05,    # Overconfident in breakouts
-            "FUTURES": -0.02,   # Underconfident in trending markets
-            "OPTIONS": 0.10     # Significant decay/volatility skew
+        if raw_prob is None: return 0.5
+
+        # Segment-specific calibration parameters (A and B for Sigmoid)
+        # These would be optimized locally during Step 3 Training.
+        params = {
+            "EQUITY": {"a": -5.0, "b": 0.5},
+            "FUTURES": {"a": -4.2, "b": 0.3},
+            "OPTIONS": {"a": -6.5, "b": 1.2}
         }
 
-        factor = offsets.get(asset_class, 0.0)
+        p = params.get(asset_class, {"a": -5.0, "b": 0.5})
 
-        # Sigmoid-based squash
-        calibrated = 1 / (1 + np.exp(-(raw_prob - 0.5 - factor) * 10))
+        # Platt Scaling: P(y=1|x) = 1 / (1 + exp(A*f(x) + B))
+        # where f(x) is the raw logit or probability-like output
+        calibrated = 1 / (1 + np.exp(p["a"] * (raw_prob - 0.5) + p["b"]))
 
         return round(float(calibrated), 3)
 
     @staticmethod
-    def calculate_expected_value(prob: float, target_pct: float, stop_pct: float) -> float:
+    def calculate_expected_value(prob: float, reward_amt: float, risk_amt: float) -> float:
         """
-        EV = (P_win * Win_Amt) - (P_loss * Loss_Amt)
+        Calculates real-world Expected Value (EV) per unit.
+        EV = (P_win * Reward) - (P_loss * Risk) - Transaction Costs
         """
-        if target_pct <= 0 or stop_pct >= 0:
-            # Handle short or invalid inputs
-            target_pct = abs(target_pct)
-            stop_pct = abs(stop_pct)
+        if prob is None or prob <= 0: return -1.0
 
-        ev = (prob * target_pct) - ((1 - prob) * stop_pct)
+        # Estimate slippage + brokerage (institutional baseline: 0.1% per leg)
+        slippage = (reward_amt + risk_amt) * 0.001
+
+        ev = (prob * reward_amt) - ((1 - prob) * risk_amt) - slippage
         return round(float(ev), 2)

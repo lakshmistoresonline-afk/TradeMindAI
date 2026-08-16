@@ -65,6 +65,7 @@ class StockDB(Base):
     is_fno = Column(Boolean, default=False)
     lot_size = Column(Integer)
     index_weight = Column(Float)
+    index_membership = Column(String) # NIFTY_50, NIFTY_100, NIFTY_200, INDEX
 
 class PriceDB(Base):
     __tablename__ = "historical_prices"
@@ -177,6 +178,19 @@ class LiveSignalDB(Base):
     expiry = Column(DateTime)
     lot_size = Column(Integer)
 
+    # Quantitative Intelligence (P0 Update)
+    raw_probability = Column(Float)
+    calibrated_probability = Column(Float)
+    expected_value = Column(Float)
+    regime = Column(String)
+    regime_probability = Column(Float)
+    risk_reward = Column(Float)
+    risk_per_unit = Column(Float)
+    reward_per_unit = Column(Float)
+    data_quality_score = Column(Float)
+    feature_snapshot_id = Column(String)
+    provenance = Column(String) # JSON string
+
     validated_at = Column(DateTime)
     triggered_at = Column(DateTime)
     trigger_price = Column(Float)
@@ -248,9 +262,12 @@ class InstrumentDB(Base):
     segment = Column(String)
     instrument_type = Column(String)
     groww_symbol = Column(String, index=True)
+    underlying_symbol = Column(String)
     expiry = Column(DateTime)
     strike = Column(Float)
     option_type = Column(String)
+    lot_size = Column(Integer)
+    tick_size = Column(Float)
     source = Column(String)
     last_updated = Column(DateTime, default=datetime.datetime.utcnow)
 

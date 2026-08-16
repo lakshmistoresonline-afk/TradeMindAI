@@ -39,16 +39,20 @@ async def get_opportunities(limit: int = 20):
             active = []
 
         if not active:
-            try:
-                stocks = await container.repository.get_all_stocks(limit=100)
-                active = container.opportunity_engine.find_opportunities(stocks)
-                # Save asynchronously to avoid blocking
-                for opp in active:
-                    try: await container.ios_repo.save_opportunity(opp)
-                    except: pass
-            except Exception as engine_err:
-                print(f"Engine error generating opportunities: {engine_err}")
-                return []
+            # RAILWAY SAFETY: Do not automatically trigger heavy opportunity scanning on API request.
+            # Return empty list and indicate system node is in manual mode.
+            print("[!] Signal Node: Opportunities not found in database. Manual scan required.")
+            return []
+            # try:
+            #     stocks = await container.repository.get_all_stocks(limit=100)
+            #     active = container.opportunity_engine.find_opportunities(stocks)
+            #     # Save asynchronously to avoid blocking
+            #     for opp in active:
+            #         try: await container.ios_repo.save_opportunity(opp)
+            #         except: pass
+            # except Exception as engine_err:
+            #     print(f"Engine error generating opportunities: {engine_err}")
+            #     return []
 
         # Manual serialization for maximum robustness
         results = []

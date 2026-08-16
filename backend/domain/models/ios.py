@@ -69,6 +69,19 @@ class LiveSignal(BaseModel):
     expiry: Optional[datetime] = None
     lot_size: Optional[int] = None
 
+    # Quantitative Intelligence (P0 Update)
+    raw_probability: Optional[float] = None
+    calibrated_probability: Optional[float] = None
+    expected_value: Optional[float] = None
+    regime: Optional[str] = None
+    regime_probability: Optional[float] = None
+    risk_reward: Optional[float] = None
+    risk_per_unit: Optional[float] = None
+    reward_per_unit: Optional[float] = None
+    data_quality_score: Optional[float] = None
+    feature_snapshot_id: Optional[str] = None
+    provenance: Dict[str, Any] = Field(default_factory=dict)
+
     validated_at: Optional[datetime] = None
     triggered_at: Optional[datetime] = None
     trigger_price: Optional[float] = None

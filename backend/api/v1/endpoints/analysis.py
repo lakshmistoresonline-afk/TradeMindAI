@@ -10,15 +10,15 @@ async def trigger_analysis(
     symbol: str = None,
     period: str = "10y"
 ):
-    from backend.workers.tasks import analyze_nifty_100, analyze_stock_task
-    try:
-        if symbol:
-            task = analyze_stock_task.delay(symbol, period=period)
-            return {"message": f"Analysis triggered for {symbol}", "task_id": task.id}
-        task = analyze_nifty_100.delay(period=period)
-        return {"message": f"Batch analysis triggered for {period}", "task_id": task.id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """
+    RAILWAY SAFETY: Automatic heavy processing is disabled.
+    Please use the Local Windows Manual Workflow for bulk analysis or model training.
+    """
+    return {
+        "status": "MODEL_NOT_READY",
+        "message": "Heavy processing is disabled on Railway. Use Local Windows Workflow (scripts/windows/02_train_model.ps1)",
+        "instruction": "Run everything manually for now."
+    }
 
 @router.get("/correlation/{symbol}")
 async def get_stock_correlations(symbol: str):
