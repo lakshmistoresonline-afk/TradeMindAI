@@ -21,47 +21,5 @@ services:
       - key: POSTGRES_URL
         sync: false
 
-<<<<<<< HEAD
   # Note: Background Workers and Schedulers are DISABLED on Render/Railway.
   # ALL heavy processing (NIFTY 200, ML Training, Ingestion) must be run locally on Windows.
-=======
-  # 2. The Background Worker
-  - type: web
-    name: trademind-worker
-    env: docker
-    region: singapore
-    plan: free
-    dockerContext: .
-    dockerfilePath: backend/Dockerfile
-    envVars:
-      - key: FIREBASE_PROJECT_ID
-        value: com-webcraft-trademindai-c8f75
-      - key: SERVICE_TYPE
-        value: worker
-      - key: GROQ_API_KEY
-        sync: false
-      - key: REDIS_URL
-        sync: false
-      - key: FIREBASE_SERVICE_ACCOUNT
-        sync: false
-      - key: POSTGRES_URL
-        sync: false
-
-  # 3. The Scheduler
-  - type: web
-    name: trademind-beat
-    env: docker
-    region: singapore
-    plan: free
-    dockerContext: .
-    dockerfilePath: backend/Dockerfile
-    envVars:
-      - key: FIREBASE_PROJECT_ID
-        value: com-webcraft-trademindai-c8f75
-      - key: SERVICE_TYPE
-        value: beat
-      - key: REDIS_URL
-        sync: false
-      - key: POSTGRES_URL
-        sync: false
->>>>>>> origin/main

@@ -1,28 +1,14 @@
 import os
 import sys
 from dotenv import load_dotenv
-<<<<<<< HEAD
 from sqlalchemy import text
 from backend.core.postgres import engine
-load_dotenv('backend/.env')
-
-def validate():
-=======
-from sqlalchemy import create_engine, text
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 load_dotenv('backend/.env')
 
 def validate():
-    db_url = os.getenv('POSTGRES_URL') or os.getenv('DATABASE_URL')
-    if not db_url:
-        print("ERROR: DATABASE_URL not set.")
-        sys.exit(1)
-
-    engine = create_engine(db_url)
-
->>>>>>> origin/main
     print("============================================================")
     print(" F&O MASTER DATA VALIDATION")
     print("============================================================")

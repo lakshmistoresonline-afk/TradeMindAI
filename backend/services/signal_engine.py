@@ -29,33 +29,33 @@ class SignalEngine:
 
         # 3. Model Inference (Champion Model)
         ml_res = await container.ml_service.predict_with_champion(symbol, last_features)
-<<<<<<< HEAD
 
         # Calibration is now integrated into predict_with_champion (Platt Scaling)
         # We use the raw probability for metadata and the calibrated for decision logic.
-        calibrated_prob = ml_res.get("metadata", {}).get("calibrated_probability_up", 0.5)
-        raw_prob = ml_res.get("metadata", {}).get("raw_probability_up", 0.5)
-=======
-        raw_prob = ml_res.get("confidence", 0) / 100.0
+        prob_up = ml_res.get("metadata", {}).get("calibrated_probability_up", 0.5)
+        raw_prob_up = ml_res.get("metadata", {}).get("raw_probability_up", 0.5)
 
-        # 4. Calibration & EV
-        calibrated_prob = CalibrationService.calibrate_probability(raw_prob, asset_class)
->>>>>>> origin/main
+        # 4. Map to Direction Probability
+        direction = "LONG" if ml_res.get("prediction") == "UP" else "SHORT"
+        calibrated_prob = CalibrationService.get_direction_probability(prob_up, direction)
+        raw_prob = CalibrationService.get_direction_probability(raw_prob_up, direction)
 
         # 5. Risk Calculation (Master Node)
-        atr = last_features.get("volatility_atr", stock.last_price * 0.02)
+        price = stock.last_price or 0.0
+        atr = last_features.get("volatility_atr", price * 0.02)
         risk_params = RiskEngine.calculate_trade_parameters(
-            symbol, stock.last_price,
-            "LONG" if ml_res.get("prediction") == "UP" else "SHORT",
+            symbol, price,
+            direction,
             atr
         )
 
         if not risk_params: return None
 
-        # 6. EXPECTED VALUE (Part 17 & 18)
+        # 6. EXPECTED VALUE
         # EV = P(win) * Reward - P(loss) * Risk
-        reward_amt = risk_params["target"] - stock.last_price
-        risk_amt = stock.last_price - risk_params["stop_loss"]
+        # Ensure absolute values for direction-neutral math
+        reward_amt = abs(risk_params["target"] - price)
+        risk_amt = abs(price - risk_params["stop_loss"])
 
         expected_val = CalibrationService.calculate_expected_value(
             calibrated_prob,
@@ -68,12 +68,14 @@ class SignalEngine:
         regime_label = regime_obj.regime if regime_obj else "SIDEWAYS"
         regime_prob = regime_obj.sentiment_score if regime_obj else 0.5
 
-        # 8. NO-TRADE ENGINE (Part 19)
+        # 8. NO-TRADE ENGINE
         rejection_reason = None
-        if calibrated_prob < 0.52: rejection_reason = "WEAK_EDGE"
-        if expected_val <= 0: rejection_reason = "NEGATIVE_EXPECTANCY"
-        if risk_params["risk_pct"] > 12: rejection_reason = "EXCESSIVE_VOLATILITY"
-        if regime_label == "HIGH_VOLATILITY" and calibrated_prob < 0.65: rejection_reason = "REGIME_CONFLICT"
+        # Valid Geometry Check
+        if reward_amt <= 0 or risk_amt <= 0: rejection_reason = "INVALID_GEOMETRY"
+        elif calibrated_prob < 0.52: rejection_reason = "WEAK_EDGE"
+        elif expected_val <= 0: rejection_reason = "NEGATIVE_EXPECTANCY"
+        elif risk_params["risk_pct"] > 12: rejection_reason = "EXCESSIVE_VOLATILITY"
+        elif regime_label == "HIGH_VOLATILITY" and calibrated_prob < 0.65: rejection_reason = "REGIME_CONFLICT"
 
         if rejection_reason:
             print(f"   [NO_TRADE] {symbol} rejected: {rejection_reason}")
@@ -86,8 +88,8 @@ class SignalEngine:
             id=sig_id,
             symbol=symbol,
             timestamp=datetime.datetime.utcnow(),
-            rating="BUY" if risk_params["direction"] == "LONG" else "SELL",
-            direction=risk_params["direction"],
+            rating="BUY" if direction == "LONG" else "SELL",
+            direction=direction,
             conviction=float(calibrated_prob * 100),
 
             # P0 Quant Fields

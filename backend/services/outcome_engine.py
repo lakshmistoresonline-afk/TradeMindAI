@@ -118,7 +118,6 @@ class OutcomeEngine:
                     if target and low <= target: target_hit = True
                     if stop and high >= stop: stop_hit = True
 
-<<<<<<< HEAD
                 # SAME-CANDLE AMBIGUITY (P0 Requirement: Deterministic Conservative Policy)
                 if target_hit and stop_hit:
                     # Policy: Always assume STOP HIT first in same candle (Maximum Conservatism)
@@ -130,17 +129,6 @@ class OutcomeEngine:
                         timestamp=outcome_ts,
                         price=stop,
                         message="Target and Stop hit in same candle. Assuming Stop Hit (Conservative Policy)."
-=======
-                # SAME-CANDLE AMBIGUITY
-                if target_hit and stop_hit:
-                    current_status = "AMBIGUOUS"
-                    outcome_ts = ts.to_pydatetime()
-                    exit_price = (target + stop) / 2
-                    events.append(SignalEvent(
-                        type="AMBIGUOUS",
-                        timestamp=outcome_ts,
-                        message="Both target and stop touched in same candle. Conflict unresolved."
->>>>>>> origin/main
                     ))
                     break
 

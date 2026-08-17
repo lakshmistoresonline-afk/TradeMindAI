@@ -3,13 +3,19 @@ import sys
 import asyncio
 from sqlalchemy import text
 from dotenv import load_dotenv
+import importlib.util
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 load_dotenv('backend/.env')
 
 from backend.core.postgres import engine
-from terminal_master_scripts.02_populate_stocks_master import populate
+
+# Import the populate function dynamically
+spec = importlib.util.spec_from_file_location("populate_stocks_master", "terminal_master_scripts/02_populate_stocks_master.py")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+populate = module.populate
 
 async def test_safety():
     print("============================================================")
@@ -34,7 +40,7 @@ async def test_safety():
     except SystemExit as e:
         if e.code != 0:
             print(f"[FAIL] Sync script exited with code {e.code}")
-            return
+            sys.exit(1)
 
     # 3. Verify
     with engine.connect() as conn:

@@ -1,25 +1,25 @@
 # Quantitative Validation Report
 
-**Generated**: 2026-08-16 12:47:27.135418 UTC
+**Generated**: 2026-08-17 06:28:41.272061 UTC
 
 ## 1. Global Performance Summary
 
 | Metric | Value |
 | :--- | :--- |
-| Avg Win Rate | 68.76% |
-| Avg Expectancy (2:1 R:R) | 1.06R |
-| Calibration Improvement | 0.00% |
+| Avg Win Rate | 57.11% |
+| Avg Expectancy (2:1 R:R) | 0.71R |
+| Calibration Improvement | 100.00% |
 
 ## 2. Per-Symbol Metrics
 
 | symbol     |   n_test |   brier_raw |   brier_cal |   win_rate |   expectancy | improved   |
 |:-----------|---------:|------------:|------------:|-----------:|-------------:|:-----------|
-| RELIANCE   |      321 |        0.25 |        0.25 |   0.663551 |     0.990654 | False      |
-| TCS        |      322 |        0.25 |        0.25 |   0.701863 |     1.10559  | False      |
-| HDFCBANK   |      320 |        0.25 |        0.25 |   0.76875  |     1.30625  | False      |
-| INFY       |      320 |        0.25 |        0.25 |   0.6375   |     0.9125   | False      |
-| ICICIBANK  |      320 |        0.25 |        0.25 |   0.709375 |     1.12812  | False      |
-| SBIN       |      322 |        0.25 |        0.25 |   0.531056 |     0.593168 | False      |
-| LICI       |      204 |        0.25 |        0.25 |   0.730392 |     1.19118  | False      |
-| ITC        |      320 |        0.25 |        0.25 |   0.74375  |     1.23125  | False      |
-| HINDUNILVR |      322 |        0.25 |        0.25 |   0.701863 |     1.10559  | False      |
+| RELIANCE   |      321 |    0.269416 |    0.241933 |   0.535826 |     0.607477 | True       |
+| TCS        |      322 |    0.262294 |    0.217405 |   0.586957 |     0.76087  | True       |
+| HDFCBANK   |      320 |    0.232127 |    0.185053 |   0.625    |     0.875    | True       |
+| INFY       |      320 |    0.296617 |    0.233289 |   0.509375 |     0.528125 | True       |
+| ICICIBANK  |      320 |    0.273213 |    0.216332 |   0.5375   |     0.6125   | True       |
+| SBIN       |      322 |    0.270037 |    0.248305 |   0.546584 |     0.639752 | True       |
+| LICI       |      204 |    0.248542 |    0.201696 |   0.593137 |     0.779412 | True       |
+| ITC        |      320 |    0.270651 |    0.202328 |   0.5625   |     0.6875   | True       |
+| HINDUNILVR |      322 |    0.235762 |    0.207622 |   0.642857 |     0.928571 | True       |

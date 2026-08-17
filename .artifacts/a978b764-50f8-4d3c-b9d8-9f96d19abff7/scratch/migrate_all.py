@@ -90,6 +90,15 @@ def run_migration():
     }
     migrate_table("live_signals", sig_cols)
 
+    # 5. Market Regimes
+    regime_cols = {
+        "sentiment_score": "FLOAT",
+        "volatility_index": "FLOAT",
+        "risk_mode": "STRING",
+        "description": "STRING"
+    }
+    migrate_table("market_regimes", regime_cols)
+
     print("[SUCCESS] All migrations complete.")
 
 if __name__ == "__main__":

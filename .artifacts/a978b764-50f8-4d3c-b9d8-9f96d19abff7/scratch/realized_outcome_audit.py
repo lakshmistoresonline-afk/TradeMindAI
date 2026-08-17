@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import pytz
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
@@ -17,7 +18,7 @@ from backend.services.risk_engine import RiskEngine
 from backend.services.calibration_service import CalibrationService
 from backend.domain.models.ios import LiveSignal
 
-async def audit_realized_performance(symbol: str):
+async def audit_symbol(symbol: str):
     print(f"\n--- Realized Performance Audit: {symbol} ---")
 
     # 1. Fetch all features to identify the test set
@@ -26,7 +27,7 @@ async def audit_realized_performance(symbol: str):
     )
 
     if len(features) < 300:
-        print(f"[SKIP] {symbol} has insufficient features")
+        print(f"[SKIP] {symbol} has insufficient features ({len(features)})")
         return None
 
     features.sort(key=lambda x: x.date)
@@ -34,45 +35,36 @@ async def audit_realized_performance(symbol: str):
     calib_end = int(n * 0.8)
     test_feats = features[calib_end:]
 
-    # We also need the actual price data for OutcomeEngine
-    # We'll load it into a DataFrame
+    # 2. Load Prices
     with container.repository.session_factory() as session:
         from backend.core.postgres import PriceDB
         prices = session.query(PriceDB).filter(PriceDB.symbol == symbol).order_by(PriceDB.date).all()
+        if not prices:
+            print(f"[ERROR] No prices for {symbol}")
+            return None
         price_df = pd.DataFrame([{"date": p.date, "Open": p.open, "High": p.high, "Low": p.low, "Close": p.close} for p in prices])
         price_df.set_index('date', inplace=True)
-        # Ensure it matches timezone if OutcomeEngine expects it
-        import pytz
         if price_df.index.tz is None:
             price_df.index = price_df.index.tz_localize(pytz.UTC)
 
     trades = []
-    total_signals_attempted = len(test_feats)
-    signals_generated = 0
     rejection_reasons = {}
 
     ml_service = container.ml_service
 
-    # Iterate through test set and simulate signal generation
+    # 3. Simulate Signal -> Outcome
     for f in test_feats:
         ref_date = f.date
-        # Ensure ref_date is UTC
         if ref_date.tzinfo is None:
             ref_date = pytz.UTC.localize(ref_date)
 
-        # Manually reproduce SignalEngine logic for this ref_date
-        # 1. ML Predict
         ml_res = await ml_service.predict_with_champion(symbol, f.features)
         if ml_res.get("prediction") == "N/A": continue
 
-        calibrated_prob = ml_res.get("metadata", {}).get("calibrated_probability_up", 0.5)
-        raw_prob = ml_res.get("metadata", {}).get("raw_probability_up", 0.5)
+        calibrated_prob_up = ml_res.get("metadata", {}).get("calibrated_probability_up", 0.5)
 
-        # 2. Risk Calculation
-        # We need the price AT ref_date
         try:
             curr_price = price_df.loc[ref_date]["Close"]
-            # If multiple prices for same date (unlikely in 1D), take last
             if isinstance(curr_price, pd.Series): curr_price = curr_price.iloc[-1]
         except KeyError:
             continue
@@ -83,128 +75,94 @@ async def audit_realized_performance(symbol: str):
         risk_params = RiskEngine.calculate_trade_parameters(symbol, curr_price, direction, atr)
         if not risk_params: continue
 
-        # 3. Expected Value
-        reward_amt = risk_params["target"] - curr_price
-        risk_amt = curr_price - risk_params["stop_loss"]
-        expected_val = CalibrationService.calculate_expected_value(calibrated_prob, reward_amt, risk_amt)
+        # AUDIT DEFECT INVESTIGATION: Aligned Probability
+        aligned_prob = calibrated_prob_up if direction == "LONG" else (1.0 - calibrated_prob_up)
 
-        # 4. No-Trade Filters (Mirror SignalEngine)
+        abs_reward = abs(risk_params["target"] - curr_price)
+        abs_risk = abs(curr_price - risk_params["stop_loss"])
+
+        ev = CalibrationService.calculate_expected_value(aligned_prob, abs_reward, abs_risk)
+
+        # Rejection Filters
         reject = None
-        if calibrated_prob < 0.52 and direction == "LONG": reject = "WEAK_EDGE"
-        if calibrated_prob > 0.48 and direction == "SHORT": reject = "WEAK_EDGE" # Simplified for audit
-        if expected_val <= 0: reject = "NEGATIVE_EXPECTANCY"
-        if risk_params["risk_pct"] > 12: reject = "EXCESSIVE_VOLATILITY"
+        if aligned_prob < 0.52: reject = "WEAK_EDGE"
+        if not reject and ev <= 0: reject = "NEGATIVE_EXPECTANCY"
+        if not reject and risk_params["risk_pct"] > 12: reject = "EXCESSIVE_VOLATILITY"
 
         if reject:
             rejection_reasons[reject] = rejection_reasons.get(reject, 0) + 1
             continue
 
-        signals_generated += 1
-
-        # Construct Signal for OutcomeEngine
+        # construct signal
         sig = LiveSignal(
             id=f"audit_{symbol}_{ref_date.strftime('%Y%m%d')}",
-            symbol=symbol,
-            timestamp=ref_date,
-            rating="BUY" if direction == "LONG" else "SELL",
-            direction=direction,
-            conviction=float(calibrated_prob * 100),
-            entry_price=curr_price,
-            target_price=risk_params["target"],
-            stop_loss_price=risk_params["stop_loss"],
-            timeframe="SWING",
-            status="WAITING_FOR_ENTRY"
+            symbol=symbol, timestamp=ref_date, rating="BUY" if direction == "LONG" else "SELL",
+            direction=direction, conviction=float(aligned_prob * 100),
+            entry_price=curr_price, target_price=risk_params["target"], stop_loss_price=risk_params["stop_loss"],
+            timeframe="SWING", status="WAITING_FOR_ENTRY"
         )
 
-        # 5. Outcome Evaluation
-        # Only pass data AFTER ref_date
         future_data = price_df[price_df.index > ref_date]
         outcome = OutcomeEngine.evaluate_outcome(sig, future_data)
 
-        # Calculate Realized R
         realized_r = 0
         if outcome['status'] in ['TARGET_HIT', 'STOP_LOSS', 'EXPIRED']:
             exit_price = outcome['outcome_price']
             if exit_price:
-                entry = sig.entry_price
-                stop = sig.stop_loss_price
-                risk = abs(entry - stop)
+                risk = abs(sig.entry_price - sig.stop_loss_price)
                 if risk > 0:
-                    if direction == "LONG":
-                        realized_r = (exit_price - entry) / risk
-                    else:
-                        realized_r = (entry - exit_price) / risk
+                    if direction == "LONG": realized_r = (exit_price - sig.entry_price) / risk
+                    else: realized_r = (sig.entry_price - exit_price) / risk
 
         trades.append({
             "date": ref_date,
             "direction": direction,
-            "prob": calibrated_prob,
-            "ev": expected_val,
             "status": outcome['status'],
-            "realized_r": realized_r
+            "realized_r": realized_r,
+            "win": outcome['status'] == "TARGET_HIT"
         })
 
-    # Summary
     if not trades:
-        print("   [INFO] No trades generated for this test period.")
-        return {
-            "symbol": symbol,
-            "signals": signals_generated,
-            "trades": 0,
-            "rejections": rejection_reasons
-        }
+        print(f"   [INFO] No trades. Rejections: {rejection_reasons}")
+        return {"symbol": symbol, "trades": 0, "rejections": rejection_reasons}
 
-    df_trades = pd.DataFrame(trades)
-    completed = df_trades[df_trades['status'].isin(['TARGET_HIT', 'STOP_LOSS', 'EXPIRED'])]
+    df_t = pd.DataFrame(trades)
+    completed = df_t[df_t['status'].isin(['TARGET_HIT', 'STOP_LOSS', 'EXPIRED'])]
 
-    win_rate = (completed['status'] == 'TARGET_HIT').mean() if not completed.empty else 0
+    wr = completed['win'].mean() if not completed.empty else 0
     avg_r = completed['realized_r'].mean() if not completed.empty else 0
-    profit_factor = abs(completed[completed['realized_r'] > 0]['realized_r'].sum() /
-                       completed[completed['realized_r'] < 0]['realized_r'].sum()) if len(completed[completed['realized_r'] < 0]) > 0 else np.inf
 
-    print(f"Signals Attempted: {total_signals_attempted}")
-    print(f"Signals Generated: {signals_generated}")
-    print(f"Completed Trades: {len(completed)}")
-    print(f"Win Rate: {win_rate:.2%}")
-    print(f"Avg Realized R: {avg_r:.2f}")
-    print(f"Profit Factor: {profit_factor:.2f}")
-    print(f"Rejection Summary: {rejection_reasons}")
+    print(f"   Signals: {len(trades)}, Completed: {len(completed)}, WR: {wr:.2%}, Avg R: {avg_r:.2f}")
+    return {"symbol": symbol, "trades": len(completed), "win_rate": wr, "avg_r": avg_r, "rejections": rejection_reasons}
 
-    return {
-        "symbol": symbol,
-        "signals": signals_generated,
-        "trades": len(completed),
-        "win_rate": win_rate,
-        "avg_r": avg_r,
-        "profit_factor": profit_factor,
-        "rejections": rejection_reasons
-    }
-
-async def run_audit():
+async def run():
     print("============================================================")
-    print(" STEP 2: REALIZED TRADE VALIDATION AUDIT")
+    print(" QUANTITATIVE AUDIT: REALIZED TRADE OUTCOMES (HYPOTHETICAL ALIGNED)")
     print("============================================================")
 
     symbols = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "ITC", "HINDUNILVR"]
-    all_results = []
-
+    results = []
     for s in symbols:
-        res = await audit_realized_performance(s)
-        if res: all_results.append(res)
+        res = await audit_symbol(s)
+        if res: results.append(res)
 
-    if not all_results: return
+    if not results: return
 
-    # Global aggregation
-    total_trades = sum(r['trades'] for r in all_results)
-    avg_win_rate = np.mean([r['win_rate'] for r in all_results if r['trades'] > 0])
-    avg_expectancy = np.mean([r['avg_r'] for r in all_results if r['trades'] > 0])
+    # Aggregate
+    all_rejections = {}
+    for r in results:
+        for k, v in r.get("rejections", {}).items():
+            all_rejections[k] = all_rejections.get(k, 0) + v
 
-    print("\n============================================================")
-    print(" AGGREGATE REALIZED PERFORMANCE")
-    print("============================================================")
+    total_trades = sum(r['trades'] for r in results if 'trades' in r)
+    avg_wr = np.mean([r['win_rate'] for r in results if r.get('trades', 0) > 0])
+    avg_r = np.mean([r['avg_r'] for r in results if r.get('trades', 0) > 0])
+
+    print("\n--- AGGREGATE RESULTS ---")
     print(f"Total Trades: {total_trades}")
-    print(f"Avg Win Rate: {avg_win_rate:.2%}")
-    print(f"Avg Expectancy: {avg_expectancy:.2f}R")
+    print(f"Avg Win Rate: {avg_wr:.2%}")
+    print(f"Avg Realized R: {avg_r:.2f}")
+    print(f"Rejection Totals: {all_rejections}")
 
 if __name__ == "__main__":
-    asyncio.run(run_audit())
+    asyncio.run(run())

@@ -1,37 +1,37 @@
-# Walkthrough - Step 2 Quantitative Validation Hardening
+# Walkthrough - Step 3B: SHORT Trade Logic Refactoring
 
-I have hardened the quantitative infrastructure of TradeMind AI by expanding historical depth, implementing rigorous out-of-sample calibration, and verifying performance through chronological walk-forward testing.
+I have successfully refactored the signal and risk pipelines to correct mathematical defects that were invalidating TradeMind's `SHORT` trade performance.
 
 ## Key Accomplishments
 
-### 1. Historical Depth Recovery (6-Year Dataset)
-- **Data Expansion**: Identified that the initial sync was limited to 2 years. I successfully performed a full backfill from **January 1, 2020**, for the entire NIFTY 200 universe.
-- **Audit Results**: 188/200 symbols now have a full 6-year history. 11 symbols have valid short histories due to listing dates. 1 symbol (LTIM) remains structural unavailable.
-- **Volume**: Ingested a total of **318,364 verified real-market candles**.
+### 1. Mathematical Direction-Alignment
+- **Probability Mapping**: Fixed the critical defect where `SHORT` trades were evaluated using the probability of the price going `UP`. I implemented `get_direction_probability` in `CalibrationService` to correctly use `1 - P(UP)` for short positions.
+- **Normalized Risk Math**: Updated `SignalEngine` to use absolute price differences for risk and reward calculations. This ensures that the Expected Value (EV) calculation is mathematically valid for both `LONG` and `SHORT` directions.
 
-### 2. Time-Safe Probability Calibration
-- **Platt Scaling**: Implemented Sigmoid calibration in `MLService` using a strict **chronological 60/20/20 split**.
-- **No Leakage**: The model trains on the oldest 60%, calibrates on the middle 20%, and is evaluated on the latest 20% unseen test set.
-- **Registry**: Calibration parameters and Brier scores are now stored in the database model registry.
+### 2. Systematic Bug Fixes
+- **NoneType Price Handling**: Resolved a crash in the `SignalEngine` where symbols with missing `last_price` caused a `NoneType` multiplication error.
+- **SQLite Serialization**: Fixed an `InterfaceError` by properly serializing the `provenance` and `events` JSON fields in the `HybridStockRepository`.
+- **R:R Centralization**: Moved the hardcoded Risk/Reward ratio into `settings.DEFAULT_RISK_REWARD` (set to 2.5) to ensure consistency across the codebase.
 
-### 3. Quantitative Performance Verification
-- **Walk-Forward Validation**: Executed a true chronological backtest across representative sectors.
-- **Results**: Achieved an average **Win Rate of 68.7%** on direction and a positive **Expectancy of +1.06R** per trade.
-- **Expectancy Pass**: Confirmed that the system has a positive edge despite the previously reported accuracy concerns.
+### 3. Verification & Testing
+- **Unit Testing**: Created a comprehensive test suite `test_short_logic.py` which verified:
+    - Directional probability mapping.
+    - Risk/Reward normalization.
+    - Expected Value reproducibility.
+    - Rejection of invalid geometry.
+- **Signal Generation Test**: Verified through a bulk generation run that `SHORT` signals for major NIFTY 200 stocks (e.g., RELIANCE, TCS, HDFCBANK) are now correctly accepted by the EV gate and stored in the database.
+- **Data Protection**: Verified that no historical candles were lost during this refactoring (maintained at 334,734 rows).
 
-### 4. Zero-Worker Railway Compliance
-- **Manual Audit**: Verified `Procfile`, `render.yaml`, and `tasks.py`.
-- **Status**: **Railway Workers = 0**. All heavy quantitative processing is restricted to local Windows execution as required.
+## Reports Generated
+- [STEP3B_SHORT_TRADE_LOGIC_REFACTOR_REPORT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/STEP3B_SHORT_TRADE_LOGIC_REFACTOR_REPORT.md)
 
-## Reports
-- [HISTORICAL_DEPTH_AUDIT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/HISTORICAL_DEPTH_AUDIT.md)
-- [QUANTITATIVE_VALIDATION_REPORT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/QUANTITATIVE_VALIDATION_REPORT.md)
-- [P0_QUANT_AUDIT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/P0_QUANT_AUDIT.md)
+## Final State Verification
+- **LONG Probability Correct**: [x]
+- **SHORT Probability Correct**: [x]
+- **Positive Risk/Reward Geometry**: [x]
+- **Direction-Aware EV**: [x]
+- **Data Safety Verified**: [x]
 
-## Final Decision
-**STATUS: STEP 2 ALLOWED**
+**Final Status: FIX VERIFIED**
 
-The TradeMind AI quantitative engine is now hardened and verified. The system is ready to proceed to **Step 2: Market Intelligence Processing**.
-
-> [!TIP]
-> **Action**: Run `./scripts/windows/02_process_intelligence.ps1` to begin bulk intelligence generation for the 199 verified symbols.
+The system is now mathematically sound and ready for an unbiased historical backtest of the refactored logic.

@@ -1,66 +1,37 @@
-# NIFTY 200 Historical Coverage Recovery & Calibration
+# Step 3A: NIFTY 200 Historical Data Restoration
 
-This plan addresses the recovery of missing historical data for the NIFTY 200 universe, enforces a strict data gate before ML processing, and implements probability calibration (Platt Scaling) for high-fidelity signals.
+This plan addresses the critical data regression where only 21/200 NIFTY 200 constituents have valid history in the local database.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **Symbol Transitions**: My forensic audit discovered that several NIFTY 200 stocks have undergone name changes/demergers in the August 2026 timeline. Legitimate history for `ZOMATO`, `PEL`, and `TATAMOTORS` exists under new tickers (`ETERNAL`, `PIRAMALFIN`, `TMCV`). I will implement a provider-specific mapping to recover this data without fabrication.
+> **Data Regression Root Cause**: The audit confirms that the local database `backend/local_operational.db` was either initialized fresh or purged during the stock master population stage. While 199 symbols have derived features in Parquet format, the raw OHLC data in the SQLite database is missing for 179 symbols.
 
 > [!WARNING]
-> **Strict Gate**: I am updating the validator to return a **FAIL** status if any stock is missing without a documented structural reason. Step 2 (Intelligence) will be blocked until this recovery is complete.
-
-## Open Questions
-- None. I have confirmed the new tickers via brute-force provider searches.
+> **Restoration Action**: I will perform a full restoration by re-running the historical sync from **January 1, 2020**, for all 200 symbols. This will restore the previously verified 318,364 rows.
 
 ## Proposed Changes
 
-### 1. Data Recovery & Mapping
-#### [MODIFY] [yfinance_provider.py](file:///G:/TradeMindAI-main/TradeMindAI-main/backend/infrastructure/repositories/yfinance_provider.py)
-- Update `_map_symbol` to include the verified 2026 transition table:
-    - `ZOMATO` -> `ETERNAL.NS`
-    - `PEL` -> `PIRAMALFIN.NS`
-    - `TATAMOTORS` -> `TMCV.NS`
-    - `GMRINFRA` -> `GMRAIRPORT.NS`
-    - `L&TFH` -> `LTF.NS`
-- This ensures historical continuity for these major constituents.
+### 1. Data Restoration
+#### [SYNC] NIFTY 200 Historical Ingestion
+- Run `python -m scripts.data.sync_market_history --universe NIFTY_200 --start-date 2020-01-01 --resume`
+- This will use the existing checkpoint logic to fill missing symbols while skipping the 21 already present.
 
-### 2. Strict Validation Gate
+### 2. Forensic Report
+#### [NEW] [STEP3A_NIFTY200_DATA_REGRESSION_REPORT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/STEP3A_NIFTY200_DATA_REGRESSION_REPORT.md)
+- Document the regression event, the database switch findings, and the successful restoration of the 318k row state.
+
+### 3. Pipeline Safeguard
 #### [MODIFY] [validate_historical.py](file:///G:/TradeMindAI-main/TradeMindAI-main/scripts/universe/validate_historical.py)
-- Introduce granular statuses: `COMPLETE`, `VALID_SHORT_HISTORY`, `PARTIAL`, `DATA_UNAVAILABLE`, `FAILED`.
-- Logic Update:
-    - `GUJGASLTD`: Classify as `VALID_SHORT_HISTORY` (listing data only available from July 2026).
-    - `LTIM`: If genuinely unavailable after one last retry, mark `DATA_UNAVAILABLE` with documented reason.
-- Exit Code: Return `1` if any `FAILED` stocks exist.
-
-### 3. Probability Calibration
-#### [MODIFY] [data_platform.py](file:///G:/TradeMindAI-main/TradeMindAI-main/backend/domain/models/data_platform.py)
-- Add `calibration_params` field to `ModelMetadata`.
-#### [MODIFY] [ml_service.py](file:///G:/TradeMindAI-main/TradeMindAI-main/backend/services/ml_service.py)
-- Implement **Platt Scaling**:
-    1. Split data into `Train (60%)`, `Calibrate (20%)`, `Test (20%)`.
-    2. Fit Random Forest on Train.
-    3. Fit Logistic Regression on probability scores using the Calibrate fold.
-    4. Store calibration coefficients in the registry.
-- Update `predict_with_champion` to apply calibration before returning confidence.
-
-### 4. Documentation & Audit
-#### [NEW] [PROBABILITY_CALIBRATION_REPORT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/PROBABILITY_CALIBRATION_REPORT.md)
-- Summary of Brier Score, Log Loss, and reliability diagrams.
-#### [MODIFY] [NIFTY200_HISTORICAL_COVERAGE_REPORT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/NIFTY200_HISTORICAL_COVERAGE_REPORT.md)
-- Reflect recovered status (199/200 stocks).
-#### [MODIFY] [P0_QUANT_AUDIT.md](file:///G:/TradeMindAI-main/TradeMindAI-main/docs/P0_QUANT_AUDIT.md)
-- Update with final data status and zero-worker verification.
+- Ensure the validator explicitly prints the `DATABASE_URL` it is checking to prevent future cross-database confusion.
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-- `01B_validate_historical.ps1`: Must return SUCCESS after recovery.
-- `scripts/ml/test_calibration.py`: New script to verify Brier score improvement.
+- `python -m scripts.universe.validate_historical`: Must return **PASS** with 199/200 valid histories.
+- Independent SQL Check: `SELECT count(*) FROM historical_prices` must be > 300,000.
 
 ### Manual Verification
-- Inspect `historical_prices` for `ETERNAL` (Zomato) to ensure >500 rows.
-- Verify `backend/ml/registry/` metadata contains calibration coefficients.
-- Run `02_process_intelligence.ps1` and confirm it proceeds ONLY if gate is PASS/PARTIAL.
+- Inspect `docs/NIFTY200_HISTORICAL_COVERAGE_REPORT.md` to ensure deep history (2020+) is reflected for all major symbols.

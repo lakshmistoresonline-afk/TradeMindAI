@@ -174,6 +174,11 @@ class RealizedBacktester:
             print("[!] No trades generated.")
             return
 
+        # SAVE RAW DATA FOR AGGREGATION
+        os.makedirs("backend/data/backtest_runs", exist_ok=True)
+        batch_id = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+        pd.DataFrame(all_trades).to_parquet(f"backend/data/backtest_runs/trades_{batch_id}.parquet")
+
         self.generate_report(all_trades, all_symbol_stats)
 
     def generate_report(self, trades: List[Dict], symbol_stats: List[Dict]):
@@ -261,8 +266,22 @@ class RealizedBacktester:
         print(f"\n[SUCCESS] Baseline backtest complete. Report: {REPORT_FILE}")
 
 if __name__ == "__main__":
+    import argparse
     from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
-    # Run subset for faster audit if needed, or full for baseline.
-    # Instruction says FULL.
-    tester = RealizedBacktester(NIFTY_200_CONSTITUENTS)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--symbols", help="Comma-separated symbols")
+    parser.add_argument("--limit", type=int, help="Limit number of symbols")
+    parser.add_argument("--start", type=int, default=0, help="Start index")
+    args = parser.parse_args()
+
+    if args.symbols:
+        symbols = args.symbols.split(",")
+    else:
+        all_symbols = NIFTY_200_CONSTITUENTS
+        start = args.start
+        end = (start + args.limit) if args.limit else len(all_symbols)
+        symbols = all_symbols[start:end]
+
+    tester = RealizedBacktester(symbols)
     asyncio.run(tester.run_all())

@@ -43,24 +43,14 @@ def audit_engines():
 
     # 2. Test Time-Safety (Look-ahead)
     print("\n[*] Testing Time-Safety in OutcomeEngine...")
-    # Signal at 12:00. Data at 11:55 should be excluded.
-    future_data_leak = pd.DataFrame([
-        {"Open": 100, "High": 120, "Low": 90, "Close": 110}, # Leak (before signal)
-        {"Open": 110, "High": 112, "Low": 108, "Close": 111} # Valid (at/after signal)
-    ], index=[datetime(2026, 1, 1, 11, 55), datetime(2026, 1, 1, 12, 0)])
 
-    outcome_safe = OutcomeEngine.evaluate_outcome(signal, future_data_leak)
-    # Target is 110. High in 11:55 bar is 120. If leak, it should be TARGET_HIT.
-    if outcome_safe['status'] == "TARGET_HIT" and outcome_safe['outcome_price'] == 110:
-        # Actually in the loop it might hit target at 12:00 bar too if price is 110.
-        # Let's adjust to make it unambiguous.
-        pass
-
-    # Redo for clarity
     future_data_leak_v2 = pd.DataFrame([
-        {"Open": 100, "High": 120, "Low": 90, "Close": 100}, # Leak
-        {"Open": 100, "High": 105, "Low": 95, "Close": 102}  # No trigger
-    ], index=[datetime(2026, 1, 1, 11, 55), datetime(2026, 1, 1, 12, 0)])
+        {"Open": 100, "High": 120, "Low": 90, "Close": 100}, # Leak (before signal)
+        {"Open": 100, "High": 105, "Low": 95, "Close": 102}  # No trigger (at/after signal)
+    ], index=[datetime(2026, 1, 1, 9, 55), datetime(2026, 1, 1, 10, 0)])
+
+    # Update signal timestamp to 10:00
+    signal.timestamp = datetime(2026, 1, 1, 10, 0)
 
     outcome_leak = OutcomeEngine.evaluate_outcome(signal, future_data_leak_v2)
     if outcome_leak['status'] == "TARGET_HIT":
@@ -70,4 +60,3 @@ def audit_engines():
 
 if __name__ == "__main__":
     audit_engines()
- domestic_audit = audit_engines()

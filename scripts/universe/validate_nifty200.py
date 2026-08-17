@@ -7,23 +7,11 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
-<<<<<<< HEAD
 from backend.core.postgres import engine
+
 load_dotenv('backend/.env')
 
 def validate():
-=======
-load_dotenv('backend/.env')
-
-def validate():
-    db_url = os.getenv('POSTGRES_URL') or os.getenv('DATABASE_URL')
-    if not db_url:
-        print("ERROR: DATABASE_URL not set.")
-        sys.exit(1)
-
-    engine = create_engine(db_url)
-
->>>>>>> origin/main
     print("============================================================")
     print(" NIFTY 200 UNIVERSE VALIDATION")
     print("============================================================")

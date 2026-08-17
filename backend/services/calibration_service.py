@@ -27,12 +27,35 @@ class CalibrationService:
         return round(float(calibrated), 3)
 
     @staticmethod
+    def get_direction_probability(prob_up: float, direction: str) -> float:
+        """
+        Maps probability of 'UP' to the probability of the actual trade direction.
+        For LONG: P(UP)
+        For SHORT: 1 - P(UP)
+        """
+        if prob_up is None: return 0.5
+
+        # Clamp to [0, 1]
+        prob_up = max(0.0, min(1.0, prob_up))
+
+        if direction.upper() in ["BUY", "LONG"]:
+            return prob_up
+        elif direction.upper() in ["SELL", "SHORT"]:
+            return 1.0 - prob_up
+        return 0.5
+
+    @staticmethod
     def calculate_expected_value(prob: float, reward_amt: float, risk_amt: float) -> float:
         """
         Calculates real-world Expected Value (EV) per unit.
         EV = (P_win * Reward) - (P_loss * Risk) - Transaction Costs
+        NOTE: reward_amt and risk_amt MUST be absolute positive values.
         """
         if prob is None or prob <= 0: return -1.0
+
+        # Absolute values to ensure math works for both LONG and SHORT
+        reward_amt = abs(reward_amt)
+        risk_amt = abs(risk_amt)
 
         # Estimate slippage + brokerage (institutional baseline: 0.1% per leg)
         slippage = (reward_amt + risk_amt) * 0.001

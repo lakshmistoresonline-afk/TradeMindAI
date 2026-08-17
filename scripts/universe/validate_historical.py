@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 load_dotenv('backend/.env')
 
-from backend.core.postgres import engine
+from backend.core.postgres import engine, DATABASE_URL
 from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
 
 REPORT_FILE = "docs/NIFTY200_HISTORICAL_COVERAGE_REPORT.md"
@@ -17,6 +17,7 @@ REPORT_FILE = "docs/NIFTY200_HISTORICAL_COVERAGE_REPORT.md"
 def validate():
     print("============================================================")
     print(" NIFTY 200 HISTORICAL DATA VALIDATION")
+    print(f" TARGET DB: {DATABASE_URL}")
     print("============================================================")
 
     expected_symbols = set(NIFTY_200_CONSTITUENTS)

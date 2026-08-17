@@ -103,10 +103,7 @@ class ModelMetadata(BaseModel):
     last_trained: datetime
     hyperparameters: Dict[str, Any]
     feature_importances: Dict[str, float] = {}
-<<<<<<< HEAD
     calibration_metadata: Optional[Dict[str, Any]] = None # Platt Scaling params, Brier Score, etc.
-=======
->>>>>>> origin/main
 
 class OptionsMetric(BaseModel):
     symbol: str

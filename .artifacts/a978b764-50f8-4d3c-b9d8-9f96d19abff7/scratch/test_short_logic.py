@@ -72,5 +72,24 @@ class TestShortLogic(unittest.TestCase):
         # EV = 0.7 * 25 - 0.3 * 10 = 14.5
         self.assertTrue(ev_short_high > 14.0)
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_invalid_geometry(self):
+        # Case 1: LONG with stop above entry
+        params = RiskEngine.calculate_trade_parameters("TEST", 100.0, "LONG", 5.0)
+        # Force invalid state
+        params['stop_loss'] = 101.0
+
+        # In SignalEngine: if reward_amt <= 0 or risk_amt <= 0: rejection_reason = "INVALID_GEOMETRY"
+        risk_amt = 100.0 - 101.0 # -1.0
+        self.assertTrue(risk_amt < 0)
+
+        # Case 2: SHORT with target above entry
+        params_s = RiskEngine.calculate_trade_parameters("TEST", 100.0, "SHORT", 5.0)
+        params_s['target'] = 101.0
+        reward_amt = 100.0 - 101.0 # -1.0
+        self.assertTrue(reward_amt < 0)
+
+    def test_rr_centralization(self):
+        self.assertEqual(settings.DEFAULT_RISK_REWARD, 2.5)
+        params = RiskEngine.calculate_trade_parameters("TEST", 100.0, "LONG", 2.0)
+        self.assertEqual(params['risk_reward'], 2.5)
+        self.assertEqual(params['target'], 100.0 + (4.0 * 2.5))

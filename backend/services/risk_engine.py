@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional, Tuple
 import numpy as np
+from backend.core.config import settings
 
 class RiskEngine:
     @staticmethod
@@ -20,13 +21,14 @@ class RiskEngine:
         # 1. Stop Loss (2.0x ATR multiplier for Swing)
         stop_mult = 2.0
         risk_amt = atr * stop_mult
+        rr_ratio = settings.DEFAULT_RISK_REWARD
 
         if direction == "LONG":
             stop_loss = price - risk_amt
-            target = price + (risk_amt * 2.5) # 1:2.5 RR baseline
+            target = price + (risk_amt * rr_ratio)
         else:
             stop_loss = price + risk_amt
-            target = price - (risk_amt * 2.5)
+            target = price - (risk_amt * rr_ratio)
 
         # 2. Position Sizing (Fixed Fractional)
         # amt_to_risk = 1,000,000 * 0.02 = 20,000
@@ -46,7 +48,7 @@ class RiskEngine:
             "entry": float(price),
             "stop_loss": round(float(stop_loss), 2),
             "target": round(float(target), 2),
-            "risk_reward": 2.5,
+            "risk_reward": rr_ratio,
             "shares": final_shares,
             "notional_value": round(final_shares * price, 2),
             "risk_amount": round(final_shares * (abs(price - stop_loss)), 2),

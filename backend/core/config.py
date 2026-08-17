@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     GROWW_BASE_URL: str = "https://api.groww.in/v1"
 
     MARKET_DATA_PROVIDER: str = "yfinance" # or "groww"
+    DEFAULT_RISK_REWARD: float = 2.5
 
     SECRET_KEY: str = "SECRET"
     ALGORITHM: str = "HS256"

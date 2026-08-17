@@ -1,7 +1,6 @@
 *.iml
 .gradle
 /local.properties
-<<<<<<< HEAD
 .venv/
 node_modules/
 dist/
@@ -9,8 +8,6 @@ dist/
 /captures
 .externalNativeBuild
 .cxx
-=======
->>>>>>> origin/main
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -18,12 +15,4 @@ dist/
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-<<<<<<< HEAD
 *.log
-=======
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
->>>>>>> origin/main
