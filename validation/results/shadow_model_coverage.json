@@ -1,0 +1,13 @@
+{
+    "total_universe": 200,
+    "compatible_models": 196,
+    "missing_models": 4,
+    "failed_models": 0,
+    "successful_inference": 196,
+    "failed_inference": 0,
+    "inference_test": {
+        "status": "PASSED",
+        "prob_range": [0, 1],
+        "feature_count_verification": 11
+    }
+}

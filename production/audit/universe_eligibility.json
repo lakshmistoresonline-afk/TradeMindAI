@@ -1,0 +1,1602 @@
+[
+    {
+        "Symbol": "ABB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ACC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ADANIENSOL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ADANIENT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (2M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ADANIGREEN",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ADANIPORTS",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ADANIPOWER",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "AMBUJACEM",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "APOLLOHOSP",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "APOLLOTYRE",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ASHOKLEY",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ASIANPAINT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (1M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ASTRAL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ATGL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "AUROPHARMA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "AXISBANK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (7M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BAJAJ-AUTO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BAJAJFINSV",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BAJAJHLDNG",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BAJFINANCE",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (9M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BALKRISIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BANDHANBNK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BANKBARODA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BANKINDIA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BATAINDIA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BEL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BERGEPAINT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BHARATFORG",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BHARTIARTL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (8M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BHEL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BIOCON",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BLUEDART",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BOSCHLTD",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BPCL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "BRITANNIA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CANBK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CANFINHOME",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CGPOWER",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CHAMBLFERT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CHOLAFIN",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CIPLA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "COALINDIA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "COFORGE",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "COLPAL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CONCOR",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "COROMANDEL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CROMPTON",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "CUMMINSIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DABUR",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DALBHARAT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DEEPAKNTR",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DELHIVERY",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DIVISLAB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DIXON",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DLF",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "DRREDDY",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "EICHERMOT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ESCORTS",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "EXIDEIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "FEDERALBNK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "FORTIS",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GAIL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GLENMARK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GMRINFRA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GODREJCP",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GODREJPROP",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GRASIM",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "GUJGASLTD",
+        "Historical": "NO (20)",
+        "Fresh": "STALE",
+        "Model": "MISSING",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HAL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HAVELLS",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HCLTECH",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HDFCBANK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "YES"
+    },
+    {
+        "Symbol": "HDFCLIFE",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HEROMOTOCO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HINDALCO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HINDCOPPER",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HINDPETRO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HINDUNILVR",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HINDZINC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "HUDCO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ICICIBANK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "YES"
+    },
+    {
+        "Symbol": "ICICIGI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ICICIPRULI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "IDBI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "IDFCFIRSTB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "IGL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INDHOTEL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INDIAMART",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INDIANB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INDIGO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INDUSINDBK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INDUSTOWER",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "INFY",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "YES"
+    },
+    {
+        "Symbol": "IOC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "IRB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "IRCTC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "IRFC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ITC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "YES"
+    },
+    {
+        "Symbol": "JINDALSTEL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "JSWENERGY",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "JSWSTEEL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (1M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "JUBLFOOD",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "KALYANKJIL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "KANSAINER",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "KARURVYSYA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "KEI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "KOTAKBANK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "YES"
+    },
+    {
+        "Symbol": "KPITTECH",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "L&TFH",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "LICHSGFIN",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "LICI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "LT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (2M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "LTIM",
+        "Historical": "NO (0)",
+        "Fresh": "STALE",
+        "Model": "MISSING",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "LUPIN",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "M&M",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "M&MFIN",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MAHABANK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MANAPPURAM",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MARICO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MARUTI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MAXHEALTH",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MAZDOCK",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MFSL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MGL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MPHASIS",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MRF",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "MUTHOOTFIN",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NATIONALUM",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NAVINFLUOR",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NESTLEIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NHPC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NMDC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NTPC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "NYKAA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "OBEROIRLTY",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "OIL",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ONGC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PAGEIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PATANJALI",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PAYTM",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PEL",
+        "Historical": "NO (196)",
+        "Fresh": "YES",
+        "Model": "MISSING",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PERSISTENT",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PETRONET",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PFC",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PHOENIXLTD",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PIDILITIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PIIND",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PNB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "POLYCAB",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "POONAWALLA",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "POWERGRID",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PRESTIGE",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "PVRINOX",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "RADICO",
+        "Historical": "YES",
+        "Fresh": "YES",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "RECLTD",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "RELIANCE",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "RVNL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SAIL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SBICARD",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SBILIFE",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SBIN",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "PASS",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SHREECEM",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SHRIRAMFIN",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SIEMENS",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SJVN",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SKFINDIA",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SONACOMS",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SRF",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SUNPHARMA",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (2M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SUNTV",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SUPREMEIND",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SUZLON",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "SYNGENE",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TATACOMM",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TATACONSUM",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TATAELXSI",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TATAMOTORS",
+        "Historical": "NO (192)",
+        "Fresh": "STALE",
+        "Model": "MISSING",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TATAPOWER",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TATASTEEL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TCS",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (5M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TECHM",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TIINDIA",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TITAN",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (1M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TORNTPHARM",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TORNTPOWER",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TRENT",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "TRIDENT",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "UBL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "UCOBANK",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ULTRACEMCO",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "UNIONBANK",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "UNITDSPR",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "VBL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "VEDL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "VOLTAS",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "WHIRLPOOL",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "WIPRO",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "YESBANK",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ZOMATO",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    },
+    {
+        "Symbol": "ZYDUSLIFE",
+        "Historical": "YES",
+        "Fresh": "STALE",
+        "Model": "v2.2",
+        "Liquidity": "FAIL (0M)",
+        "Eligible": "NO"
+    }
+]

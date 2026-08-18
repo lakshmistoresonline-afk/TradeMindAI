@@ -1,0 +1,17 @@
+{
+    "timestamp": "2026-08-18T10:13:34.825240",
+    "regime": "UNKNOWN",
+    "probability": {
+        "baseline": 0.587,
+        "current": 0.6293,
+        "drift": 0.0423
+    },
+    "performance": {
+        "baseline_wr": 58.77,
+        "baseline_ev": 0.3262,
+        "current_wr": 100.0,
+        "current_ev": 2.8,
+        "trades": 1
+    },
+    "status": "INSUFFICIENT_SAMPLE_FOR_DRIFT_CONCLUSION"
+}

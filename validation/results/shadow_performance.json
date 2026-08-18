@@ -1,16 +1,25 @@
 {
-    "strategy_version": "trademind-equity-v2.2",
     "observation_start": "2026-08-18",
-    "symbols_scanned": 200,
-    "evaluations": 200,
-    "trades": 0,
-    "no_trade": 200,
+    "latest_session": "2026-08-18T10:19:46.983077",
+    "evaluation_cycles": 9,
+    "evaluation_events": 1800,
+    "eligible_evaluations": 1764,
+    "datagap_evaluations": 36,
+    "strategy_trigger_events": 9,
+    "transactional_signals": 2,
+    "active_signals": 1,
+    "completed_trades": 1,
+    "wins": 1,
+    "losses": 0,
+    "win_rate": 100.0,
+    "net_ev": 2.8,
+    "probability_mean": 0.6293,
     "rejection_reasons": {
-        "STALE_MARKET_DATA": 10,
-        "INSUFFICIENT_LIQUIDITY": 12,
-        "NO_MODEL_FOUND": 178
+        "INSUFFICIENT_LIQUIDITY": 1701,
+        "NO_MODEL_FOUND": 36,
+        "NEUTRAL_PREDICTION": 36,
+        "TREND_CONFLICT": 18
     },
-    "drift_status": "STABLE",
-    "system_health": "READY",
-    "gate_status": "LOCKED (STALE DATA)"
+    "sample_size_status": "1 / 20",
+    "readiness": "INSUFFICIENT_SAMPLE"
 }

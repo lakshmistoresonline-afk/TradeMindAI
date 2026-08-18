@@ -239,6 +239,20 @@ class ShadowSignalDB(Base):
     rejection_reason = Column(String)
     provenance_json = Column(String) # For audit trail
 
+class ShadowEventDB(Base):
+    __tablename__ = "shadow_events"
+    id = Column(Integer, primary_key=True)
+    signal_id = Column(String, index=True) # Optional link to a specific signal
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    event_type = Column(String, index=True) # EVALUATION, OUTCOME_RESOLUTION, GATE_FAILURE
+    symbol = Column(String, index=True)
+    strategy_version = Column(String)
+    model_version = Column(String)
+    decision = Column(String) # TRADE_SIGNAL, NO_TRADE, etc.
+    rejection_reason = Column(String)
+    payload_json = Column(String) # For detailed parameters (EMA, ATR, Prob, etc.)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"
     name = Column(String, primary_key=True)

@@ -4,7 +4,12 @@ class TechnicalAnalysis:
     @staticmethod
     def calculate_indicators(df: Any):
         import pandas as pd
-        import pandas_ta as ta
+        try:
+            import pandas_ta as ta
+            HAS_PANDAS_TA = True
+        except ImportError:
+            import ta
+            HAS_PANDAS_TA = False
 
         if df is None or len(df) < 2:
             return df
@@ -17,24 +22,31 @@ class TechnicalAnalysis:
             return df
 
         # Trend Indicators (Only most critical to save RAM)
-        df["EMA_20"] = ta.ema(df["Close"], length=20)
-        df["EMA_50"] = ta.ema(df["Close"], length=50)
-        df["EMA_200"] = ta.ema(df["Close"], length=200)
-
-        # Momentum Indicators
-        df["RSI"] = ta.rsi(df["Close"], length=14)
-
-        # Volatility
-        df["ATR"] = ta.atr(df["High"], df["Low"], df["Close"], length=14)
-
-        # Bollinger Bands
-        try:
-            bbands = ta.bbands(df["Close"])
-            if bbands is not None:
-                # Only keep basic bands
-                df["BBL"] = bbands.iloc[:, 0]
-                df["BBU"] = bbands.iloc[:, 2]
-        except: pass
+        if HAS_PANDAS_TA:
+            import pandas_ta as pta
+            df["EMA_20"] = pta.ema(df["Close"], length=20)
+            df["EMA_50"] = pta.ema(df["Close"], length=50)
+            df["EMA_200"] = pta.ema(df["Close"], length=200)
+            df["RSI"] = pta.rsi(df["Close"], length=14)
+            df["ATR"] = pta.atr(df["High"], df["Low"], df["Close"], length=14)
+            try:
+                bbands = pta.bbands(df["Close"])
+                if bbands is not None:
+                    df["BBL"] = bbands.iloc[:, 0]
+                    df["BBU"] = bbands.iloc[:, 2]
+            except: pass
+        else:
+            import ta as talib
+            df["EMA_20"] = talib.trend.ema_indicator(df["Close"], window=20)
+            df["EMA_50"] = talib.trend.ema_indicator(df["Close"], window=50)
+            df["EMA_200"] = talib.trend.ema_indicator(df["Close"], window=200)
+            df["RSI"] = talib.momentum.rsi(df["Close"], window=14)
+            df["ATR"] = talib.volatility.average_true_range(df["High"], df["Low"], df["Close"], window=14)
+            try:
+                bb = talib.volatility.BollingerBands(df["Close"])
+                df["BBL"] = bb.bollinger_lband()
+                df["BBU"] = bb.bollinger_hband()
+            except: pass
 
         # Support & Resistance (Classic Pivots)
         try:
