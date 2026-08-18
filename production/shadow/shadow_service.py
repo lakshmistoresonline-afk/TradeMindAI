@@ -98,6 +98,10 @@ class ShadowService:
         # 3. Resolve Outcomes
         await ShadowService.audit_open_signals()
 
+        # 4. Sync to Cloud Dashboard
+        from backend.services.shadow_sync_service import ShadowSyncService
+        await ShadowSyncService.sync_to_cloud()
+
     @staticmethod
     def _log_to_db(evaluations):
         from backend.core.postgres import ShadowEventDB

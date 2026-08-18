@@ -1,11 +1,18 @@
-# Task Checklist - Shadow Outcome Notification Automation
+# Task Checklist - Phase 5H: Hosted Shadow Monitoring Dashboard
 
-- `[/]` Implementation
-    - `[ ]` Create `production/reports/shadow_reporter.py`
-    - `[ ]` Modify `production/shadow/shadow_service.py` to automate outcome handling
-    - `[ ]` Update `production/reports/generate_shadow_report.py` for integrated progress tracking
-- `[ ]` Verification
-    - `[ ]` Verify DB persistence of terminal outcomes
-    - `[ ]` Confirm detailed outcome report generation (`SHADOW_OUTCOME_<id>.md`)
-    - `[ ]` Confirm "Latest Outcome" update (`SHADOW_LATEST_OUTCOME.md`)
-    - `[ ]` Verify completed trade count stability across restarts
+- `[/]` Backend & API Development
+    - `[ ]` Create `backend/api/v1/endpoints/shadow.py`
+    - `[ ]` Register shadow router in `backend/api/v1/api.py`
+    - `[ ]` Implement `ShadowSyncService` in `backend/services/shadow_sync_service.py`
+    - `[ ]` Integrate sync into `ShadowService.run_shadow_cycle()`
+- `[ ]` Frontend Implementation
+    - `[ ]` Create `web/src/pages/ShadowMonitor.tsx`
+    - `[ ]` Add `/shadow` route to `web/src/App.tsx`
+    - `[ ]` Implement "Shadow Monitor" Sidebar link in `web/src/components/Layout.tsx`
+- `[ ]` Security & Verification
+    - `[ ]` Verify Read-Only API constraints
+    - `[ ]` Perform forensic check for secret exposure in Firestore payload
+    - `[ ]` Test data freshness sync (30-60s)
+- `[ ]` Deployment & Reporting
+    - `[ ]` Push changes to Git
+    - `[ ]` Generate Deplayment Report `PHASE5H_WEB_MONITOR_DEPLOYMENT_REPORT.md`

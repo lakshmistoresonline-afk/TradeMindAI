@@ -12,6 +12,7 @@ import SystemControl from './pages/SystemControl'
 import EquitySignals from './pages/EquitySignals'
 import FuturesSignals from './pages/FuturesSignals'
 import OptionsSignals from './pages/OptionsSignals'
+import ShadowMonitor from './pages/ShadowMonitor'
 
 const darkTheme = createTheme({
   palette: {
@@ -151,6 +152,7 @@ function App() {
 
                 {/* Contextual / Advanced */}
                 <Route path="/analysis" element={<StockIntelligence />} />
+                <Route path="/shadow" element={<ShadowMonitor />} />
                 <Route path="/admin" element={<SystemControl />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>

@@ -35,6 +35,7 @@ export const useNotification = () => useContext(NotificationContext);
 
 const menuItems = [
   { text: 'TERMINAL', icon: <LayoutDashboard size={20} />, path: '/' },
+  { text: 'SHADOW MONITOR', icon: <Fingerprint size={20} />, path: '/shadow' },
   { text: 'EQUITY SIGNALS', icon: <Activity size={20} />, path: '/signals/equity' },
   { text: 'FUTURES SIGNALS', icon: <TrendingUp size={20} />, path: '/signals/futures' },
   { text: 'OPTIONS SIGNALS', icon: <Zap size={20} />, path: '/signals/options' },

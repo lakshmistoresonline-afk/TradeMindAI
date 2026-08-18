@@ -269,3 +269,34 @@ export const getDataHealth = async () => {
   const response = await apiClient.get('/admin/health');
   return response.data;
 };
+
+// Shadow Monitoring API (v2.2)
+export const getShadowStatus = async () => {
+  const response = await apiClient.get('/shadow/status');
+  return response.data;
+};
+
+export const getShadowSummary = async () => {
+  const response = await apiClient.get('/shadow/summary');
+  return response.data;
+};
+
+export const getShadowActiveSignals = async () => {
+  const response = await apiClient.get('/shadow/active-signals');
+  return response.data;
+};
+
+export const getShadowPerformance = async () => {
+  const response = await apiClient.get('/shadow/performance');
+  return response.data;
+};
+
+export const getShadowUniverse = async () => {
+  const response = await apiClient.get('/shadow/universe');
+  return response.data;
+};
+
+export const getShadowRejections = async () => {
+  const response = await apiClient.get('/shadow/rejections');
+  return response.data;
+};

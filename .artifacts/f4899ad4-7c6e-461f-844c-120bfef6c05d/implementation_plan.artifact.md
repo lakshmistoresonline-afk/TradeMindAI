@@ -1,43 +1,66 @@
-# Implementation Plan - Shadow Outcome Notification Automation
+# Implementation Plan - Phase 5H: Hosted Shadow Monitoring Dashboard
 
-This plan automates the persistence, verification, and reporting of terminal outcomes for Shadow signals. When a signal reaches a terminal state (WIN, LOSS, etc.), the system will automatically generate detailed markdown reports and update cumulative statistics.
+This phase implements a real-time monitoring dashboard in the hosted TradeMind AI web application. It exposes the current state of Strategy v2.2 Shadow Mode, including evaluations, signals, and performance metrics, while maintaining a strict strategy freeze.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **AUTOMATION HOOK:** The reporting logic will be integrated into the `ShadowService.audit_open_signals` loop. Every time an outcome is resolved, the database will be updated first, followed by the generation of two markdown files: `SHADOW_OUTCOME_<id>.md` and `SHADOW_LATEST_OUTCOME.md`.
+> **READ-ONLY:** The new API and dashboard are strictly read-only. No trading parameters or signal states can be modified via the web interface.
 >
-> **STRATEGY FREEZE:** This change only affects reporting and persistence infrastructure. No trading logic or Strategy v2.2 parameters will be modified.
+> **DATA SYNC:** Since the Shadow Engine runs on local infrastructure with a SQLite database, a synchronization service will push summarized metrics and active signals to **Cloud Firestore** for hosted visibility.
+>
+> **STRATEGY FREEZE:** Strategy v2.2 parameters (3% Target, 3% Stop, 10M Liquidity) remain locked and visible as "FROZEN" in the UI.
 
 ## Proposed Changes
 
-### 1. Hardened Outcome Persistence & Logging
-#### [MODIFY] [shadow_service.py](file:///G:/TradeMindAI/production/shadow/shadow_service.py)
-- Update `audit_open_signals` to:
-    - Log `OUTCOME_RESOLUTION` events to the `shadow_events` table for every resolved signal.
-    - Explicitly handle `OUTCOME_PENDING` for unreliable resolutions.
-    - Trigger `ShadowReporter.generate_outcome_reports(sig_id)` immediately after DB commit.
+### 1. Backend: Read-Only Shadow API
+#### [NEW] [shadow.py](file:///G:/TradeMindAI/backend/api/v1/endpoints/shadow.py)
+- Create FastAPI router with the following endpoints:
+    - `GET /status`: Overall system health and strategy metadata.
+    - `GET /summary`: Cumulative counts (cycles, events, signals, completed trades).
+    - `GET /active-signals`: List of currently open shadow trades.
+    - `GET /performance`: Descriptive statistics (Win Rate, Net EV) marked as `INSUFFICIENT_SAMPLE` if $< 20$.
+    - `GET /universe`: Table of all 200 symbols with their latest decision.
 
-### 2. Automated Outcome Reporting
-#### [NEW] [shadow_reporter.py](file:///G:/TradeMindAI/production/reports/shadow_reporter.py)
-- Implement `ShadowReporter` class with the following capabilities:
-    - `generate_outcome_reports(signal_id)`: Creates the detailed per-signal report.
-    - `update_latest_outcome()`: Maintains a summary of the single most recent completed trade.
-    - `calculate_completed_count()`: Derived directly from the `shadow_signals` table.
+### 2. Synchronization Service
+#### [NEW] [shadow_sync_service.py](file:///G:/TradeMindAI/backend/services/shadow_sync_service.py)
+- Implement `ShadowSyncService` to push consolidated state from SQLite to Firestore.
+- Document: `shadow_monitor/state`
+- Payload: Summary metrics, active signal snapshots, and rejection breakdowns.
+- Integration: Trigger sync at the end of every `ShadowService.run_shadow_cycle()`.
 
-### 3. Integrated Daily Reporting
-#### [MODIFY] [generate_shadow_report.py](file:///G:/TradeMindAI/production/reports/generate_shadow_report.py)
-- Ensure the `daily_shadow_report.md` automatically includes the latest completed trade status and the `COMPLETED_TRADES / 20` progress bar.
+### 3. Frontend: Shadow Monitoring Dashboard
+#### [NEW] [ShadowMonitor.tsx](file:///G:/TradeMindAI/web/src/pages/ShadowMonitor.tsx)
+- Create a high-fidelity dashboard using the existing design system (MUI Dark).
+- **Components:**
+    - **Header:** Status badges (HEALTHY, FROZEN, SAMPLE_ACCUMULATING).
+    - **Metric Grid:** 4-col layout for Cycles, Events, Signals, and Completed/20.
+    - **Active Signal View:** Card-based display for current exposure (SBIN).
+    - **NIFTY 200 Rejection Table:** Searchable list of all constituents with rejection reasons.
+    - **Health Monitor:** Status of DB, Models, and Data Freshness.
+
+#### [MODIFY] [App.tsx](file:///G:/TradeMindAI/web/src/App.tsx)
+- Register route `/shadow`.
+- Add "Shadow Monitor" to the sidebar navigation.
+
+### 4. Security & Compliance
+- **Auth:** Require valid JWT for dashboard access.
+- **Privacy:** Ensure no sensitive file paths or credentials are synchronized to the cloud.
 
 ## Verification Plan
 
-### Automated Verification
-- **Persistence Check:** After a simulated outcome resolution, the system will be "restarted" to verify the signal remains in its terminal state and the completed trade count is stable.
-- **Integrity Check:** `integrity_scan.py` will verify that no fabricated outcomes were created.
+### Automated Tests
+- `pytest backend/tests/api/test_shadow_api.py`: Verify read-only constraints.
+- `ShadowSyncService` unit test: Verify Firestore payload integrity.
 
 ### Manual Verification
-- **Report Audit:** Inspect `production/reports/SHADOW_OUTCOME_<signal_id>.md` for data accuracy (MFE, MAE, Net Return, etc.).
-- **Consistency Check:** Verify that the "Latest Outcome" in the daily report matches the database record.
+- Deploy to Firebase Hosting and verify the dashboard appears at `/shadow`.
+- Confirm `SBIN` active signal and `1 / 20` progress are correctly displayed.
+- Verify 10M Liquidity rejections are visible in the symbol table.
 
-## Lifecycle Transition
-- `ACTIVE` → `TARGET_HIT` (WIN) | `STOP_LOSS` (LOSS) | `EXPIRED` (TIMEOUT) | `OUTCOME_PENDING`
+## Final Status Matrix
+| Condition | Decision |
+| :--- | :--- |
+| End-to-end data flow verified | `WEB_MONITOR_DEPLOYED` |
+| Sync failure or auth issue | `WEB_MONITOR_ISSUES_FOUND` |
+| Infrastructure blocked | `WEB_MONITOR_BLOCKED` |
