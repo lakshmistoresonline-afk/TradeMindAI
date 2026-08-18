@@ -1,22 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box, Typography, Grid, Paper, Stack, Chip, Divider,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  CircularProgress, alpha, LinearProgress, Button, Tooltip
+  CircularProgress, alpha, LinearProgress
 } from '@mui/material';
 import {
-  ShieldCheck,
   Activity,
-  BarChart3,
-  Database,
   Clock,
-  Trophy,
-  AlertTriangle,
-  ExternalLink,
   RefreshCcw,
-  Fingerprint,
-  Zap
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
 import { getShadowStatus, getShadowSummary, getShadowActiveSignals, getShadowUniverse, getShadowPerformance } from '../api/client';
 

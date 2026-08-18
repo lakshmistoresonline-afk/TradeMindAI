@@ -15,7 +15,8 @@ import {
   TrendingUp,
   LineChart,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Fingerprint
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme, Fab } from '@mui/material';

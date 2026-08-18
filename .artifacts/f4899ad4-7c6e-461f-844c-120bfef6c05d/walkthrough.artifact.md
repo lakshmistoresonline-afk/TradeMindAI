@@ -1,37 +1,32 @@
-# Walkthrough - Shadow Outcome Notification Automation
+# Walkthrough - Phase 5H: Hosted Shadow Monitoring Dashboard
 
-I have successfully automated the outcome persistence and reporting lifecycle for the Shadow Trading system.
+I have successfully prepared the TradeMind AI web application for hosting the new Shadow Monitoring Dashboard.
 
-## Key Changes
+## Key Accomplishments
 
-### 1. Automated Outcome Resolution & Persistence
-- **Service Integration:** Modified `ShadowService.audit_open_signals` to automatically trigger outcome resolution events.
-- **Authoritative Logging:** Every resolved trade now generates an immutable `OUTCOME_RESOLUTION` event in the `shadow_events` table and updates the signal's terminal state in `shadow_signals`.
-- **Durable Lifecycle:** Confirmed that terminal outcomes (WIN, LOSS, etc.) are persisted and survive service restarts.
+### 1. Build & Integrity Fixes
+- **TypeScript Reconciliation:** Fixed several build errors in [Layout.tsx](file:///G:/TradeMindAI/web/src/components/Layout.tsx) and [ShadowMonitor.tsx](file:///G:/TradeMindAI/web/src/pages/ShadowMonitor.tsx) regarding missing icon imports (`Fingerprint`, `Zap`) and unused variables.
+- **Production Build:** Successfully generated the optimized production bundle using `npm run build`. The artifacts are ready in [web/dist/](file:///G:/TradeMindAI/web/dist/).
 
-### 2. Standardized Outcome Reporting
-- **Dedicated Reporter:** Created [shadow_reporter.py](file:///G:/TradeMindAI/production/reports/shadow_reporter.py) to handle the generation of detailed markdown reports.
-- **Signal Reports:** Each completed trade now produces a unique report (e.g., [SHADOW_OUTCOME_sig_SBIN_202608180715.md](file:///G:/TradeMindAI/production/reports/SHADOW_OUTCOME_sig_SBIN_202608180715.md)).
-- **Latest Outcome Summary:** The file [SHADOW_LATEST_OUTCOME.md](file:///G:/TradeMindAI/production/reports/SHADOW_LATEST_OUTCOME.md) is automatically updated to reflect the most recently resolved trade.
+### 2. Deployment Readiness
+- **Artifact Sync:** Copied the build artifacts from the web sub-directory to the root [dist/](file:///G:/TradeMindAI/dist/) folder to align with the primary `firebase.json` configuration.
+- **API Hardening:** Verified that the new Shadow API endpoints are strictly read-only and correctly bridge the local database to the hosted interface via Firestore.
 
-### 3. Integrated Milestone Tracking
-- **Progress Metric:** Updated [generate_shadow_report.py](file:///G:/TradeMindAI/production/reports/generate_shadow_report.py) to derive the `COMPLETED_TRADES / 20` progress from the database.
-- **Sample Status:** Reports now explicitly show whether the current sample is `STATISTICALLY_INSUFFICIENT` or `SAMPLE_COMPLETE`.
+### 3. Dashboard Features
+- **Real-time Monitoring:** The dashboard is configured to auto-refresh every 30 seconds.
+- **Milestone Tracking:** The `COMPLETED_TRADES / 20` progress bar is visible and derives from the authoritative database.
+- **Audit Table:** A searchable NIFTY 200 table is included, providing granular rejection reasons (e.g., `INSUFFICIENT_LIQUIDITY`).
 
-## Results Summary (Test Outcome: SBIN)
+## Deployment Instructions
 
-| Field | Value |
-| :--- | :--- |
-| **Signal ID** | `sig_SBIN_202608180715` |
-| **Outcome** | **WIN (TARGET_HIT)** |
-| **Net Return** | 2.80% |
-| **Completed Trades** | 1 / 20 |
-| **Status** | `SHADOW_HEALTHY_INSUFFICIENT_SAMPLE` |
+> [!CAUTION]
+> **AUTHENTICATION REQUIRED:** The automated deployment to Firebase project `com-webcraft-trademindai-c8f75` was blocked due to missing credentials in the current environment.
+>
+> Please run the following command from the project root to complete the hosting:
+> ```powershell
+> firebase deploy --only hosting
+> ```
 
-## Verification
-- **Persistence:** Signals remain terminal in DB after resolution.
-- **Idempotency:** No duplicate signals or reports are created upon service restart.
-- **Accuracy:** MFE (3.50%) and MAE (-0.50%) are correctly captured in the audit trail.
-
-> [!TIP]
-> The system is now fully autonomous in collecting and reporting "Ground Truth" evidence for Strategy v2.2.
+## Final Status
+`WEB_MONITOR_READY_FOR_HOSTING`
+The code is committed, pushed, and the build is verified. The system is one deployment away from public visibility.

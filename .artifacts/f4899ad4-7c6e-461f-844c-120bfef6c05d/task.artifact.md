@@ -1,18 +1,21 @@
 # Task Checklist - Phase 5H: Hosted Shadow Monitoring Dashboard
 
-- `[/]` Backend & API Development
-    - `[ ]` Create `backend/api/v1/endpoints/shadow.py`
-    - `[ ]` Register shadow router in `backend/api/v1/api.py`
-    - `[ ]` Implement `ShadowSyncService` in `backend/services/shadow_sync_service.py`
-    - `[ ]` Integrate sync into `ShadowService.run_shadow_cycle()`
-- `[ ]` Frontend Implementation
-    - `[ ]` Create `web/src/pages/ShadowMonitor.tsx`
-    - `[ ]` Add `/shadow` route to `web/src/App.tsx`
-    - `[ ]` Implement "Shadow Monitor" Sidebar link in `web/src/components/Layout.tsx`
-- `[ ]` Security & Verification
-    - `[ ]` Verify Read-Only API constraints
-    - `[ ]` Perform forensic check for secret exposure in Firestore payload
-    - `[ ]` Test data freshness sync (30-60s)
-- `[ ]` Deployment & Reporting
-    - `[ ]` Push changes to Git
-    - `[ ]` Generate Deplayment Report `PHASE5H_WEB_MONITOR_DEPLOYMENT_REPORT.md`
+- `[x]` Backend & API Development
+    - `[x]` Create `backend/api/v1/endpoints/shadow.py`
+    - `[x]` Register shadow router in `backend/api/v1/api.py`
+    - `[x]` Implement `ShadowSyncService` in `backend/services/shadow_sync_service.py`
+    - `[x]` Integrate sync into `ShadowService.run_shadow_cycle()`
+- `[x]` Frontend Implementation
+    - `[x]` Create `web/src/pages/ShadowMonitor.tsx`
+    - `[x]` Add `/shadow` route to `web/src/App.tsx`
+    - `[x]` Implement "Shadow Monitor" Sidebar link in `web/src/components/Layout.tsx`
+- `[x]` Security & Verification
+    - `[x]` Verify Read-Only API constraints
+    - `[x]` Perform forensic check for secret exposure in Firestore payload
+    - `[x]` Test data freshness sync (30-60s)
+- `[/]` Deployment & Reporting
+    - `[x]` Fix TypeScript build errors (unused imports, missing icons)
+    - `[x]` Build the web project (`npm run build`)
+    - `[x]` Prepare root `dist/` directory with build artifacts
+    - `[/]` Deploy to Firebase Hosting (Auth Blocked)
+    - `[ ]` Generate Deployment Report `PHASE5H_WEB_MONITOR_DEPLOYMENT_REPORT.md`
