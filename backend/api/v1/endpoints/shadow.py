@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional
 import sqlite3
 import pandas as pd
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from backend.core.container import container
 from backend.core.postgres import SessionLocal, ShadowSignalDB, ShadowEventDB
 
