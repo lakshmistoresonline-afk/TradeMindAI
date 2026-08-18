@@ -1,21 +1,16 @@
-# Task Checklist - Phase 6: Railway 24/7 Shadow Engine Migration
+# Task Checklist - Phase 6.3: Shadow Monitor Reporting Correction
 
-- `[/]` Infrastructure & Environment
-    - `[ ]` Update `backend/core/config.py` with `ENVIRONMENT` setting
-    - `[ ]` Update `backend/start.sh` with shadow service types
-    - `[ ]` Update `docs/RAILWAY_RESOURCE_POLICY.md` to permit shadow monitoring
-- `[ ]` Database Migration
-    - `[ ]` Create `scripts/maintenance/migrate_shadow_to_pg.py`
-    - `[ ]` Migrate SBIN WIN signal to PostgreSQL
-    - `[ ]` Verify 1/20 completed trades in PG
-- `[ ]` Celery Orchestration
-    - `[ ]` Add `run_shadow_cycle_task` to `backend/workers/tasks.py`
-    - `[ ]` Configure 30-minute NSE-hour schedule
-    - `[ ]` Implement Distributed Lock in `ShadowService`
-- `[ ]` Monitoring & Heartbeats
-    - `[ ]` Create `production/shadow/shadow_heartbeat.py`
-    - `[ ]` Update `backend/api/v1/endpoints/shadow.py` with heartbeat endpoints
-- `[ ]` Deployment & Acceptance
-    - `[ ]` Deploy Shadow API, Worker, and Beat to Railway
-    - `[ ]` Run PC Shutdown Acceptance Test
-    - `[ ]` Generate `PHASE6_RAILWAY_SHADOW_DEPLOYMENT_REPORT.md`
+- `[/]` Backend Correction
+    - `[ ]` Fix `strategy_trigger_events` query in `shadow.py`
+    - `[ ]` Implement DB-based probability mean in `shadow.py`
+    - `[ ]` Verify Phase 5G baseline scoping
+- `[ ]` Frontend Update
+    - `[ ]` Rename labels in `ShadowMonitor.tsx`
+    - `[ ]` Add "ACTIVE SIGNAL DETAILS" section to daily report markdown
+- `[ ]` Reporting Alignment
+    - `[ ]` Synchronize `generate_shadow_report.py` logic with API
+    - `[ ]` Verify terminal outcome whitelist enforcement
+- `[ ]` Validation & Deployment
+    - `[ ]` Run end-to-end regression test for SBIN signal
+    - `[ ]` Commit and push to Railway
+    - `[ ]` Create `PHASE6_SHADOW_REPORTING_FIX_REPORT.md`

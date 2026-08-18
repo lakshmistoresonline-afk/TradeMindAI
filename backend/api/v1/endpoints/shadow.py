@@ -29,23 +29,40 @@ async def get_shadow_status():
 @router.get("/summary")
 async def get_shadow_summary():
     with SessionLocal() as session:
-        # Cumulative Counts from DB
-        eval_events = session.query(ShadowEventDB).filter(ShadowEventDB.event_type == 'EVALUATION').count()
-        # Cycles are unique timestamps
-        eval_cycles = session.query(ShadowEventDB.timestamp).filter(ShadowEventDB.event_type == 'EVALUATION').distinct().count()
+        BASELINE_START = "2026-08-18"
+        # Cumulative Counts from DB (Scoped to Baseline)
+        base_query = session.query(ShadowEventDB).filter(
+            ShadowEventDB.event_type == 'EVALUATION',
+            ShadowEventDB.timestamp >= BASELINE_START
+        )
+        eval_events = base_query.count()
+        eval_cycles = base_query.with_entities(ShadowEventDB.timestamp).distinct().count()
 
-        transactional_signals = session.query(ShadowSignalDB).count()
-        active_signals = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'ACTIVE').count()
+        # Strategy Trigger Events (actual triggers)
+        trigger_events = base_query.filter(ShadowEventDB.decision == 'TRADE_SIGNAL').count()
+
+        # Transactional Signals (Scoped to Baseline)
+        transactional_signals = session.query(ShadowSignalDB).filter(
+            ShadowSignalDB.timestamp >= BASELINE_START
+        ).count()
+
+        active_signals = session.query(ShadowSignalDB).filter(
+            ShadowSignalDB.status == 'ACTIVE',
+            ShadowSignalDB.timestamp >= BASELINE_START
+        ).count()
 
         TERMINAL_STATES = ['TARGET_HIT', 'STOP_LOSS', 'TIMEOUT', 'AMBIGUOUS', 'INVALID']
-        completed_trades = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES)).count()
+        completed_trades = session.query(ShadowSignalDB).filter(
+            ShadowSignalDB.status.in_(TERMINAL_STATES),
+            ShadowSignalDB.timestamp >= BASELINE_START
+        ).count()
 
         return {
             "evaluation_cycles": eval_cycles,
             "evaluation_events": eval_events,
             "eligible_evaluations": eval_cycles * 196,
             "data_gap_evaluations": eval_cycles * 4,
-            "strategy_trigger_events": eval_events, # Simplification: every trigger in events is counted
+            "strategy_trigger_events": trigger_events,
             "transactional_signals": transactional_signals,
             "active_signals": active_signals,
             "completed_trades": completed_trades
@@ -74,8 +91,12 @@ async def get_active_signals():
 @router.get("/performance")
 async def get_shadow_performance():
     with SessionLocal() as session:
+        BASELINE_START = "2026-08-18"
         TERMINAL_STATES = ['TARGET_HIT', 'STOP_LOSS', 'TIMEOUT', 'AMBIGUOUS', 'INVALID']
-        terminal = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES)).all()
+        terminal = session.query(ShadowSignalDB).filter(
+            ShadowSignalDB.status.in_(TERMINAL_STATES),
+            ShadowSignalDB.timestamp >= BASELINE_START
+        ).all()
 
         completed = len(terminal)
         wins = len([t for t in terminal if t.status == 'TARGET_HIT'])
@@ -84,10 +105,29 @@ async def get_shadow_performance():
         returns = [t.net_return for t in terminal if t.net_return is not None]
         net_ev = sum(returns) / len(returns) if returns else 0.0
 
+        # Calculate Probability Mean from shadow_events (authoritative)
+        events = session.query(ShadowEventDB.payload_json).filter(
+            ShadowEventDB.event_type == 'EVALUATION',
+            ShadowEventDB.timestamp >= BASELINE_START
+        ).all()
+
+        prob_values = []
+        for e in events:
+            if e[0]: # payload_json
+                try:
+                    payload = json.loads(e[0])
+                    if payload.get("prob") is not None:
+                        prob_values.append(payload["prob"])
+                except:
+                    continue
+
+        prob_mean = sum(prob_values) / len(prob_values) if prob_values else 0.0
+
         return {
             "completed_trades": completed,
             "win_rate": round(win_rate, 2),
             "net_ev": round(net_ev, 4),
+            "probability_mean": round(prob_mean, 4),
             "sample_status": "INSUFFICIENT_SAMPLE" if completed < 20 else "ADEQUATE",
             "wins": wins,
             "losses": completed - wins

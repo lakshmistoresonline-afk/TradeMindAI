@@ -85,10 +85,10 @@ export default function ShadowMonitor() {
           <MetricCard title="EVALUATION CYCLES" value={summary?.evaluation_cycles || 0} icon={<RefreshCcw size={20} color="#00D1FF" />} />
         </Grid>
         <Grid item xs={12} md={3}>
-          <MetricCard title="TOTAL EVENTS" value={summary?.evaluation_events || 0} icon={<Activity size={20} color="#7C3AED" />} />
+          <MetricCard title="EVALUATION EVENTS" value={summary?.evaluation_events || 0} icon={<Activity size={20} color="#7C3AED" />} />
         </Grid>
         <Grid item xs={12} md={3}>
-          <MetricCard title="TRIGGER EVENTS" value={summary?.strategy_trigger_events || 0} icon={<Zap size={20} color="#f59e0b" />} />
+          <MetricCard title="STRATEGY TRIGGER EVENTS" value={summary?.strategy_trigger_events || 0} icon={<Zap size={20} color="#f59e0b" />} />
         </Grid>
         <Grid item xs={12} md={3}>
           <ProgressCard title="COMPLETED TRADES" current={perf?.completed_trades || 0} target={20} />
