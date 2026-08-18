@@ -1,21 +1,21 @@
-# Task Checklist - Phase 5H: Hosted Shadow Monitoring Dashboard
+# Task Checklist - Phase 6: Railway 24/7 Shadow Engine Migration
 
-- `[x]` Backend & API Development
-    - `[x]` Create `backend/api/v1/endpoints/shadow.py`
-    - `[x]` Register shadow router in `backend/api/v1/api.py`
-    - `[x]` Implement `ShadowSyncService` in `backend/services/shadow_sync_service.py`
-    - `[x]` Integrate sync into `ShadowService.run_shadow_cycle()`
-- `[x]` Frontend Implementation
-    - `[x]` Create `web/src/pages/ShadowMonitor.tsx`
-    - `[x]` Add `/shadow` route to `web/src/App.tsx`
-    - `[x]` Implement "Shadow Monitor" Sidebar link in `web/src/components/Layout.tsx`
-- `[x]` Security & Verification
-    - `[x]` Verify Read-Only API constraints
-    - `[x]` Perform forensic check for secret exposure in Firestore payload
-    - `[x]` Test data freshness sync (30-60s)
-- `[/]` Deployment & Reporting
-    - `[x]` Fix TypeScript build errors (unused imports, missing icons)
-    - `[x]` Build the web project (`npm run build`)
-    - `[x]` Prepare root `dist/` directory with build artifacts
-    - `[/]` Deploy to Firebase Hosting (Auth Blocked)
-    - `[ ]` Generate Deployment Report `PHASE5H_WEB_MONITOR_DEPLOYMENT_REPORT.md`
+- `[/]` Infrastructure & Environment
+    - `[ ]` Update `backend/core/config.py` with `ENVIRONMENT` setting
+    - `[ ]` Update `backend/start.sh` with shadow service types
+    - `[ ]` Update `docs/RAILWAY_RESOURCE_POLICY.md` to permit shadow monitoring
+- `[ ]` Database Migration
+    - `[ ]` Create `scripts/maintenance/migrate_shadow_to_pg.py`
+    - `[ ]` Migrate SBIN WIN signal to PostgreSQL
+    - `[ ]` Verify 1/20 completed trades in PG
+- `[ ]` Celery Orchestration
+    - `[ ]` Add `run_shadow_cycle_task` to `backend/workers/tasks.py`
+    - `[ ]` Configure 30-minute NSE-hour schedule
+    - `[ ]` Implement Distributed Lock in `ShadowService`
+- `[ ]` Monitoring & Heartbeats
+    - `[ ]` Create `production/shadow/shadow_heartbeat.py`
+    - `[ ]` Update `backend/api/v1/endpoints/shadow.py` with heartbeat endpoints
+- `[ ]` Deployment & Acceptance
+    - `[ ]` Deploy Shadow API, Worker, and Beat to Railway
+    - `[ ]` Run PC Shutdown Acceptance Test
+    - `[ ]` Generate `PHASE6_RAILWAY_SHADOW_DEPLOYMENT_REPORT.md`

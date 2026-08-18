@@ -27,80 +27,113 @@ class ShadowService:
     async def run_shadow_cycle():
         """
         Executes a full shadow trading cycle:
-        1. Check current drawdown.
-        2. Scan universe for signals.
-        3. Persist and Log results.
-        4. Audit existing signals for outcomes.
+        1. Check production safety (SQLite forbidden).
+        2. Acquire Distributed Lock (Redis).
+        3. Check current drawdown.
+        4. Scan universe for signals.
+        5. Persist and Log results.
+        6. Audit existing signals for outcomes.
         """
-        run_ts = datetime.utcnow()
-        print(f"[*] Starting Shadow Cycle [{run_ts}]")
-
-        # 1. Check Drawdown
-        current_dd = ShadowService.calculate_current_drawdown()
-        if current_dd > ShadowService.DRAWDOWN_LIMIT:
-            print(f"[!] CRITICAL: Drawdown limit exceeded ({current_dd:.2f}%). Shadow trading halted.")
+        # 1. Production Safety Check
+        from backend.core.config import settings
+        from backend.core.postgres import DATABASE_URL
+        if settings.ENVIRONMENT == "production" and "sqlite" in DATABASE_URL.lower():
+            print("[!] CRITICAL: PRODUCTION_SHADOW_SQLITE_FORBIDDEN. Halted.")
             return
 
-        # 2. Scan Universe & Log Evaluations
-        evaluations = []
-        for symbol in NIFTY_200_CONSTITUENTS:
-            eval_data = ShadowService._init_eval_data(symbol, run_ts)
-            try:
-                # Get eligibility data
-                stock = await container.repository.get_stock_by_symbol(symbol)
-                champion = await container.data_platform_repo.get_champion_model(symbol)
+        # 2. Acquire Distributed Lock (Redis)
+        from redis import asyncio as aioredis
+        redis = aioredis.from_url(settings.REDIS_URL)
+        lock_key = "lock:shadow_engine_cycle"
 
-                if not champion:
-                    eval_data.update({"decision": "NO_TRADE_MODEL_ERROR", "rejection_reason": "NO_MODEL_FOUND"})
-                else:
-                    eval_data["model_version"] = champion.version
-                    features_list = await container.data_platform_repo.get_features_by_range(symbol, run_ts - timedelta(days=7), run_ts)
+        # Try to acquire lock for 45 minutes (to cover long scans)
+        is_locked = await redis.set(lock_key, "LOCKED", ex=2700, nx=True)
+        if not is_locked:
+            print("[INFO] Shadow cycle already in progress (Locked). Skipping.")
+            return
 
-                    if not features_list:
-                        eval_data.update({"decision": "DATA_UNAVAILABLE", "rejection_reason": "NO_FEATURES_FOUND"})
+        try:
+            run_ts = datetime.utcnow()
+            print(f"[*] Starting Shadow Cycle [{run_ts}]")
+
+            # Record Heartbeat
+            from production.shadow.shadow_heartbeat import ShadowHeartbeat
+            ShadowHeartbeat.record_heartbeat("ENGINE_RUNNING")
+
+            # 3. Check Drawdown
+            current_dd = ShadowService.calculate_current_drawdown()
+            if current_dd > ShadowService.DRAWDOWN_LIMIT:
+                print(f"[!] CRITICAL: Drawdown limit exceeded ({current_dd:.2f}%). Shadow trading halted.")
+                return
+
+            # 4. Scan Universe & Log Evaluations
+            evaluations = []
+            for symbol in NIFTY_200_CONSTITUENTS:
+                eval_data = ShadowService._init_eval_data(symbol, run_ts)
+                try:
+                    # Get eligibility data
+                    stock = await container.repository.get_stock_by_symbol(symbol)
+                    champion = await container.data_platform_repo.get_champion_model(symbol)
+
+                    if not champion:
+                        eval_data.update({"decision": "NO_TRADE_MODEL_ERROR", "rejection_reason": "NO_MODEL_FOUND"})
                     else:
-                        last_f = features_list[-1]
-                        eval_data.update({
-                            "price": stock.last_price if stock else None,
-                            "EMA_200": last_f.features.get("ema_200"),
-                            "ATR": last_f.features.get("ATR"),
-                            "liquidity": stock.avg_volume if stock else 0.0
-                        })
+                        eval_data["model_version"] = champion.version
+                        features_list = await container.data_platform_repo.get_features_by_range(symbol, run_ts - timedelta(days=7), run_ts)
 
-                        # Execute Strategy
-                        signal = await container.signal_engine.generate_signal(symbol, "EQUITY", "SWING")
-
-                        if signal:
-                            eval_data.update({
-                                "decision": "TRADE_SIGNAL",
-                                "calibrated_probability": signal.calibrated_probability,
-                                "EV": signal.expected_value,
-                                "direction": signal.direction,
-                                "target": signal.target_price,
-                                "stop": signal.stop_loss_price,
-                                "data_quality_score": signal.data_quality_score
-                            })
-                            ShadowService.persist_shadow_signal(signal)
+                        if not features_list:
+                            eval_data.update({"decision": "DATA_UNAVAILABLE", "rejection_reason": "NO_FEATURES_FOUND"})
                         else:
-                            # Rejection reason tracking
-                            reason = await ShadowService._audit_rejection(symbol, stock, last_f.features)
-                            eval_data.update({"decision": "NO_TRADE", "rejection_reason": reason})
+                            last_f = features_list[-1]
+                            eval_data.update({
+                                "price": stock.last_price if stock else None,
+                                "EMA_200": last_f.features.get("ema_200"),
+                                "ATR": last_f.features.get("ATR"),
+                                "liquidity": stock.avg_volume if stock else 0.0
+                            })
 
-            except Exception as e:
-                eval_data.update({"decision": "NO_TRADE_DATA_ERROR", "rejection_reason": f"EXCEPTION: {str(e)}"})
+                            # Execute Strategy
+                            signal = await container.signal_engine.generate_signal(symbol, "EQUITY", "SWING")
 
-            evaluations.append(eval_data)
+                            if signal:
+                                eval_data.update({
+                                    "decision": "TRADE_SIGNAL",
+                                    "calibrated_probability": signal.calibrated_probability,
+                                    "EV": signal.expected_value,
+                                    "direction": signal.direction,
+                                    "target": signal.target_price,
+                                    "stop": signal.stop_loss_price,
+                                    "data_quality_score": signal.data_quality_score
+                                })
+                                ShadowService.persist_shadow_signal(signal)
+                            else:
+                                # Rejection reason tracking
+                                reason = await ShadowService._audit_rejection(symbol, stock, last_f.features)
+                                eval_data.update({"decision": "NO_TRADE", "rejection_reason": reason})
 
-        # Log Evaluations
-        ShadowService._log_to_csv(evaluations)
-        ShadowService._log_to_db(evaluations)
+                except Exception as e:
+                    eval_data.update({"decision": "NO_TRADE_DATA_ERROR", "rejection_reason": f"EXCEPTION: {str(e)}"})
 
-        # 3. Resolve Outcomes
-        await ShadowService.audit_open_signals()
+                evaluations.append(eval_data)
 
-        # 4. Sync to Cloud Dashboard
-        from backend.services.shadow_sync_service import ShadowSyncService
-        await ShadowSyncService.sync_to_cloud()
+            # 5. Log Evaluations
+            ShadowService._log_to_csv(evaluations)
+            ShadowService._log_to_db(evaluations)
+
+            # 6. Resolve Outcomes
+            await ShadowService.audit_open_signals()
+
+            # 7. Sync to Cloud Dashboard
+            from backend.services.shadow_sync_service import ShadowSyncService
+            await ShadowSyncService.sync_to_cloud()
+
+            print(f"[*] Shadow Cycle Complete [{datetime.utcnow()}]")
+            ShadowHeartbeat.record_heartbeat("ENGINE_IDLE")
+
+        finally:
+            # Release Lock
+            await redis.delete(lock_key)
+            await redis.close()
 
     @staticmethod
     def _log_to_db(evaluations):

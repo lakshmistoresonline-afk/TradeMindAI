@@ -16,12 +16,13 @@ To maintain 100% operational uptime while minimizing credit consumption on Railw
 | **Signal Audit** | **HEAVY** | **LOCAL** | **DISABLED** | `./scripts/windows/02_process_intelligence.ps1` |
 | **ML Training** | **HEAVY** | **LOCAL** | **DISABLED** | `./scripts/windows/03_train_models.ps1` |
 | **Backtesting** | **HEAVY** | **LOCAL** | **DISABLED** | `./scripts/windows/04_run_validation.ps1` |
+| **Shadow Monitoring**| Lightweight| Railway | **ENABLED** | `production/shadow/shadow_service.py` |
 | **Signal Generation** | **HEAVY** | **LOCAL** | **DISABLED** | `./scripts/windows/05_generate_signals.ps1` |
 
 ## 3. Mandatory Rules
-1. **ZERO WORKER POLICY**: Celery workers, Celery Beat, and scheduled jobs (Cron) are strictly prohibited on Railway.
+1. **ZERO WORKER POLICY (EXCEPT SHADOW)**: Celery workers/Beat are permitted ONLY for certified Shadow Monitoring (Strategy v2.2).
 2. **NO API SIDE-EFFECTS**: API endpoints that initiate heavy tasks are disabled.
-3. **MANUAL FIRST**: All database updates, model retraining, and signal generation MUST be initiated manually from a local machine using provided scripts.
+3. **MANUAL FIRST**: All database updates, model retraining, and non-shadow signal generation MUST be initiated manually from a local machine using provided scripts.
 4. **CREDIT PROTECTION**: Bulk synchronization of NIFTY 200 or F&O data on Railway is strictly prohibited.
 
 ## 4. Local Windows Workflow
@@ -38,6 +39,12 @@ Execute these scripts from the project root using `powershell.exe`.
 | `05_generate_signals.ps1` | Bulk Production Signals |
 
 ---
+
+## 5. Shadow Engine on Railway
+The certified Strategy v2.2 Shadow Engine is permitted to run on Railway under the following constraints:
+- **Interval**: Maximum once every 30 minutes.
+- **Queue**: Strictly routed to the `shadow` queue.
+- **Concurrency**: `concurrency=1` to minimize CPU burst.
 
 ## 5. Failure Protocol
 If a required model or dataset is missing on Railway, the API will return:

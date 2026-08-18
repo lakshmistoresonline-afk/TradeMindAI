@@ -16,35 +16,28 @@ print(f"DEBUG: tasks.py v2.2.2 loaded from {os.path.abspath(__file__)}")
 
 celery_app = Celery("tasks", broker=settings.REDIS_URL)
 
-# Automated Schedule (DISABLED for Railway Safety - Manual Local Execution Required)
-celery_app.conf.beat_schedule = {}
-# celery_app.conf.beat_schedule = {
-#     "analyze-nifty-100-morning": {
-#         "task": "backend.workers.tasks.analyze_nifty_100",
-#         "schedule": crontab(hour=9, minute=30, day_of_week="mon-fri"),
-#     },
-#     "analyze-nifty-100-evening": {
-#         "task": "backend.workers.tasks.analyze_nifty_100",
-#         "schedule": crontab(hour=16, minute=15, day_of_week="mon-fri"),
-#     },
-#     "market-intel-periodic": {
-#         "task": "backend.workers.tasks.process_market_intelligence",
-#         "schedule": crontab(minute="*/15"), # Every 15 minutes for real-time feel
-#     },
-#     "refresh-rankings-periodic": {
-#         "task": "backend.workers.tasks.refresh_ai_rankings",
-#         "schedule": crontab(minute="*/30"),
-#     },
-#     "audit-active-signals": {
-#         "task": "backend.workers.tasks.audit_signals_task",
-#         "schedule": crontab(minute="*/30"),
-#     },
-#     "terminal-heartbeat": {
-#         "task": "backend.workers.tasks.terminal_heartbeat",
-#         "schedule": 60.0, # Every minute
-#     },
-# }
+# Automated Schedule (ENABLED for Railway Shadow Monitoring v2.2)
+celery_app.conf.beat_schedule = {
+    "run-shadow-monitoring-cycle": {
+        "task": "backend.workers.tasks.run_shadow_cycle_task",
+        "schedule": crontab(minute="*/30", hour="9-16", day_of_week="mon-fri"), # Every 30 mins during market hours
+    },
+    "shadow-worker-heartbeat": {
+        "task": "backend.workers.tasks.terminal_heartbeat", # Reuse existing for basic health
+        "schedule": 60.0,
+    }
+}
 celery_app.conf.timezone = 'Asia/Kolkata'
+
+@celery_app.task(queue="shadow")
+def run_shadow_cycle_task():
+    from production.shadow.shadow_service import ShadowService
+    from production.shadow.shadow_heartbeat import ShadowHeartbeat
+
+    ShadowHeartbeat.record_heartbeat("SCHEDULER_TRIGGER")
+
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(ShadowService.run_shadow_cycle())
 
 @celery_app.task
 def sync_stock_data_task(symbol: str, period="1y"):

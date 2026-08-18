@@ -17,6 +17,13 @@ elif [ "$SERVICE_TYPE" = "beat" ]; then
     echo "Starting Celery Beat..."
     if [ -n "$PORT" ]; then python3 -m http.server $PORT & fi
     python -m celery -A backend.workers.tasks.celery_app beat --loglevel=info
+elif [ "$SERVICE_TYPE" = "shadow-worker" ]; then
+    echo "Starting Shadow Celery Worker..."
+    # Shadow worker strictly serial (concurrency=1)
+    python -m celery -A backend.workers.tasks.celery_app worker --loglevel=info -Q shadow -P solo --concurrency=1
+elif [ "$SERVICE_TYPE" = "shadow-beat" ]; then
+    echo "Starting Shadow Celery Beat..."
+    python -m celery -A backend.workers.tasks.celery_app beat --loglevel=info
 else
     echo "Starting FastAPI API..."
     PORT=${PORT:-8000}

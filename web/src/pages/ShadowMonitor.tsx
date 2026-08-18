@@ -73,7 +73,7 @@ export default function ShadowMonitor() {
           </Typography>
         </Box>
         <Stack direction="row" spacing={2}>
-           <StatusBadge label="ENGINE" status="HEALTHY" color="#10b981" />
+           <StatusBadge label="ENGINE" status={perf?.health?.shadow_worker || "HEALTHY"} color={perf?.health?.shadow_worker === 'ONLINE' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="STRATEGY" status="FROZEN" color="#00D1FF" />
            <StatusBadge label="SAMPLE" status={perf?.sample_status || "INSUFFICIENT"} color="#f59e0b" />
         </Stack>

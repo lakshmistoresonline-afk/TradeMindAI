@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "com-webcraft-trademindai-c8f75"
-  }
+    "default": "com-webcraft-trademindai-c8f75",
+    "staging": "com-webcraft-trademindai-c8f75"
+  },
+  "targets": {},
+  "etags": {}
 }

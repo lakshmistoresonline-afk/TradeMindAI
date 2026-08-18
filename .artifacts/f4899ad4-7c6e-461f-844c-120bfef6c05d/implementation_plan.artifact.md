@@ -1,66 +1,69 @@
-# Implementation Plan - Phase 5H: Hosted Shadow Monitoring Dashboard
+# Implementation Plan - Phase 6: Railway 24/7 Shadow Engine Migration
 
-This phase implements a real-time monitoring dashboard in the hosted TradeMind AI web application. It exposes the current state of Strategy v2.2 Shadow Mode, including evaluations, signals, and performance metrics, while maintaining a strict strategy freeze.
+This phase migrates the certified Shadow Trading Engine (Strategy v2.2) to Railway for autonomous, PC-independent 24/7 execution. The authoritative state will move from local SQLite to hosted PostgreSQL, orchestrated by a dedicated Celery worker and scheduler.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **READ-ONLY:** The new API and dashboard are strictly read-only. No trading parameters or signal states can be modified via the web interface.
+> **DATABASE MIGRATION:** The authoritative 1/20 Shadow evidence (SBIN WIN signal) will be migrated from `local_operational.db` to the hosted PostgreSQL.
 >
-> **DATA SYNC:** Since the Shadow Engine runs on local infrastructure with a SQLite database, a synchronization service will push summarized metrics and active signals to **Cloud Firestore** for hosted visibility.
+> **FAIL-CLOSED POLICY:** In production, the engine will strictly refuse to use SQLite. If PostgreSQL is unavailable, it will fail closed.
 >
-> **STRATEGY FREEZE:** Strategy v2.2 parameters (3% Target, 3% Stop, 10M Liquidity) remain locked and visible as "FROZEN" in the UI.
+> **DISTRIBUTED LOCK:** A Redis-backed lock will ensure that only one Shadow cycle can execute at a time across replicas.
 
 ## Proposed Changes
 
-### 1. Backend: Read-Only Shadow API
-#### [NEW] [shadow.py](file:///G:/TradeMindAI/backend/api/v1/endpoints/shadow.py)
-- Create FastAPI router with the following endpoints:
-    - `GET /status`: Overall system health and strategy metadata.
-    - `GET /summary`: Cumulative counts (cycles, events, signals, completed trades).
-    - `GET /active-signals`: List of currently open shadow trades.
-    - `GET /performance`: Descriptive statistics (Win Rate, Net EV) marked as `INSUFFICIENT_SAMPLE` if $< 20$.
-    - `GET /universe`: Table of all 200 symbols with their latest decision.
+### 1. Infrastructure & Environment
+#### [MODIFY] [config.py](file:///G:/TradeMindAI/backend/core/config.py)
+- Add `ENVIRONMENT` setting (defaulting to `development`).
+- Strengthen `POSTGRES_URL` validation to prevent accidental SQLite use in production.
 
-### 2. Synchronization Service
-#### [NEW] [shadow_sync_service.py](file:///G:/TradeMindAI/backend/services/shadow_sync_service.py)
-- Implement `ShadowSyncService` to push consolidated state from SQLite to Firestore.
-- Document: `shadow_monitor/state`
-- Payload: Summary metrics, active signal snapshots, and rejection breakdowns.
-- Integration: Trigger sync at the end of every `ShadowService.run_shadow_cycle()`.
+#### [MODIFY] [start.sh](file:///G:/TradeMindAI/backend/start.sh)
+- Add support for `SERVICE_TYPE=shadow-worker` and `SERVICE_TYPE=shadow-beat`.
+- Use specific concurrency and queue routing for the Shadow worker.
 
-### 3. Frontend: Shadow Monitoring Dashboard
-#### [NEW] [ShadowMonitor.tsx](file:///G:/TradeMindAI/web/src/pages/ShadowMonitor.tsx)
-- Create a high-fidelity dashboard using the existing design system (MUI Dark).
-- **Components:**
-    - **Header:** Status badges (HEALTHY, FROZEN, SAMPLE_ACCUMULATING).
-    - **Metric Grid:** 4-col layout for Cycles, Events, Signals, and Completed/20.
-    - **Active Signal View:** Card-based display for current exposure (SBIN).
-    - **NIFTY 200 Rejection Table:** Searchable list of all constituents with rejection reasons.
-    - **Health Monitor:** Status of DB, Models, and Data Freshness.
+### 2. Database Migration & Authority
+#### [NEW] [migrate_shadow_to_pg.py](file:///G:/TradeMindAI/scripts/maintenance/migrate_shadow_to_pg.py)
+- Forensic script to move `shadow_signals` and `shadow_events` from SQLite to PostgreSQL.
+- Only migrates Phase 5G+ data (Baseline: 2026-08-18).
+- Verifies the 1/20 completed trade counter after migration.
 
-#### [MODIFY] [App.tsx](file:///G:/TradeMindAI/web/src/App.tsx)
-- Register route `/shadow`.
-- Add "Shadow Monitor" to the sidebar navigation.
+#### [MODIFY] [shadow_service.py](file:///G:/TradeMindAI/production/shadow/shadow_service.py)
+- Add production safety check: Fail if `ENVIRONMENT=production` and `database_url` is SQLite.
 
-### 4. Security & Compliance
-- **Auth:** Require valid JWT for dashboard access.
-- **Privacy:** Ensure no sensitive file paths or credentials are synchronized to the cloud.
+### 3. Celery Orchestration
+#### [MODIFY] [tasks.py](file:///G:/TradeMindAI/backend/workers/tasks.py)
+- Add `run_shadow_cycle_task` that wraps `ShadowService.run_shadow_cycle()`.
+- Implement a 30-minute NSE-hour schedule (Mon-Fri, 9:15 AM - 3:45 PM IST).
+
+#### [MODIFY] [shadow_service.py](file:///G:/TradeMindAI/production/shadow/shadow_service.py)
+- Implement Redis-backed distributed lock (`shadow_engine_lock`) to prevent overlapping cycles.
+
+### 4. Monitoring & Heartbeats
+#### [NEW] [shadow_heartbeat.py](file:///G:/TradeMindAI/production/shadow/shadow_heartbeat.py)
+- Logic to record worker and scheduler heartbeats in the database.
+
+#### [MODIFY] [shadow.py](file:///G:/TradeMindAI/backend/api/v1/endpoints/shadow.py)
+- Expose heartbeat status to the Monitoring API.
+
+### 5. Policy & Documentation
+#### [MODIFY] [RAILWAY_RESOURCE_POLICY.md](file:///G:/TradeMindAI/docs/RAILWAY_RESOURCE_POLICY.md)
+- Explicitly permit "Shadow Monitoring" tasks while maintaining the prohibition on heavy backtesting/syncing on Railway.
 
 ## Verification Plan
 
-### Automated Tests
-- `pytest backend/tests/api/test_shadow_api.py`: Verify read-only constraints.
-- `ShadowSyncService` unit test: Verify Firestore payload integrity.
+### Automated Verification
+- `test_db_migration`: Verify SBIN signal exists in PG after script run.
+- `test_distributed_lock`: Verify overlapping tasks are blocked.
+- `test_production_safeties`: Verify SQLite rejection in production mode.
 
 ### Manual Verification
-- Deploy to Firebase Hosting and verify the dashboard appears at `/shadow`.
-- Confirm `SBIN` active signal and `1 / 20` progress are correctly displayed.
-- Verify 10M Liquidity rejections are visible in the symbol table.
+- Deploy to Railway and monitor logs for successful 30-minute cycles.
+- **PC Shutdown Test:** Shut down local PC and verify cycle execution via the hosted dashboard on a separate device.
 
-## Final Status Matrix
-| Condition | Decision |
-| :--- | :--- |
-| End-to-end data flow verified | `WEB_MONITOR_DEPLOYED` |
-| Sync failure or auth issue | `WEB_MONITOR_ISSUES_FOUND` |
-| Infrastructure blocked | `WEB_MONITOR_BLOCKED` |
+## Final Decision Matrix
+| Milestone | Value | Result |
+| :--- | :--- | :--- |
+| **Evidence Migrated** | 1 / 20 | `PASS` |
+| **Database Authority** | PostgreSQL | `PASS` |
+| **PC Independent** | YES | `RAILWAY_SHADOW_OPERATIONAL_PC_INDEPENDENT` |

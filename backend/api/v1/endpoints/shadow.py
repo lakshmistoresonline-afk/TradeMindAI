@@ -133,13 +133,26 @@ async def get_shadow_rejections():
 
 @router.get("/health")
 async def get_shadow_health():
-    return {
-        "database": "PASS",
-        "model_runtime": "PASS",
-        "data_freshness": "PASS",
-        "persistence": "PASS",
-        "shadow_engine": "PASS",
-        "api": "PASS",
-        "sync": "PASS",
-        "strategy_freeze": "PASS"
-    }
+    with SessionLocal() as session:
+        # Check Worker Heartbeat (within last 5 mins)
+        cutoff = datetime.utcnow() - timedelta(minutes=5)
+        worker_event = session.query(ShadowEventDB).filter(
+            ShadowEventDB.event_type == 'HEARTBEAT',
+            ShadowEventDB.timestamp >= cutoff
+        ).order_by(ShadowEventDB.timestamp.desc()).first()
+
+        # Check last cycle
+        last_cycle = session.query(ShadowEventDB).filter(
+            ShadowEventDB.event_type == 'EVALUATION'
+        ).order_by(ShadowEventDB.timestamp.desc()).first()
+
+        return {
+            "database": "PASS",
+            "model_runtime": "PASS",
+            "data_freshness": "PASS",
+            "persistence": "PASS",
+            "shadow_worker": "ONLINE" if worker_event else "OFFLINE",
+            "last_worker_heartbeat": worker_event.timestamp.isoformat() if worker_event else None,
+            "last_shadow_cycle": last_cycle.timestamp.isoformat() if last_cycle else None,
+            "strategy_freeze": "PASS"
+        }
