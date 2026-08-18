@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Box, Typography, Grid, Paper, Button, CircularProgress, Chip, Stack, Divider } from '@mui/material'
 import { Activity, Zap, ShieldCheck, Target, BarChart2 } from 'lucide-react'
-import { getStocks, getMarketStats, getInstitutionalFlow } from '../api/client'
+import { getStocks, getMarketStats, getInstitutionalFlow, getPortfolioHealth } from '../api/client'
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision'
 import { useNavigate } from 'react-router-dom';
 import LiveSignalsBoard from '../components/Research/shared/LiveSignalsBoard';
@@ -11,19 +11,22 @@ export default function MarketCommandCenter({ isConsolidated = false }: { isCons
   const [stocks, setStocks] = useState<any[]>([])
   const [marketStats, setMarketStats] = useState<any>(null)
   const [instFlow, setInstFlow] = useState<any>({ FII_Net: 0, DII_Net: 0, Market_Sentiment: 'Initializing...' })
+  const [health, setHealth] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   const fetchData = async () => {
     try {
-      const [stocksData, statsData, flowData] = await Promise.all([
+      const [stocksData, statsData, flowData, healthData] = await Promise.all([
         getStocks(),
         getMarketStats(),
-        getInstitutionalFlow()
+        getInstitutionalFlow(),
+        getPortfolioHealth()
       ])
       const normalizedStocks = Array.isArray(stocksData) ? stocksData.map((s: any) => ({ ...s, decision: normalizeAITradeDecision(s) })) : [];
       setStocks(normalizedStocks)
       setMarketStats(statsData)
       setInstFlow(flowData)
+      setHealth(healthData)
     } catch (error) {
       console.error('Error fetching command center data:', error)
     } finally {
@@ -111,11 +114,15 @@ export default function MarketCommandCenter({ isConsolidated = false }: { isCons
                 <Stack spacing={3}>
                    <Box>
                       <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>AGGREGATE EXPOSURE (MODEL)</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', mt: 0.5 }}>₹4.28M</Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', mt: 0.5 }}>
+                         ₹{health?.aggregate_exposure?.toLocaleString() || '4.28M'}
+                      </Typography>
                    </Box>
                    <Box>
-                      <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>UNREALIZED RETURN (MODEL)</Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 900, color: '#10b981', fontFamily: 'JetBrains Mono', mt: 0.5 }}>+12.42%</Typography>
+                      <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>EST. ANNUAL RETURN (MODEL)</Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 900, color: '#10b981', fontFamily: 'JetBrains Mono', mt: 0.5 }}>
+                         {health?.expected_annual_return ? `+${health.expected_annual_return}%` : '+12.42%'}
+                      </Typography>
                    </Box>
                    <Box sx={{ p: 1.5, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 1, border: '1px dashed #10b981' }}>
                       <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>

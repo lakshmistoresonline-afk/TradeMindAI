@@ -67,10 +67,10 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
 
   // Calibration Data (Conviction vs Outcome)
   const calibrationOption = {
-    xAxis: { type: 'category', data: calibration?.labels || ['50-60', '60-70', '70-80', '80-90', '90-100'], name: 'Conviction', axisLabel: { fontSize: 10 } },
+    xAxis: { type: 'category', data: (calibration?.labels && calibration.labels.length > 0) ? calibration.labels : ['50', '60', '70', '80', '90'], name: 'Conviction', axisLabel: { fontSize: 10 } },
     yAxis: { type: 'value', name: 'Win Rate %', axisLabel: { fontSize: 10 } },
     series: [{
-      data: calibration?.win_rates || [45, 52, 68, 75, 84],
+      data: (calibration?.win_rates && calibration.win_rates.length > 0) ? calibration.win_rates : [0, 0, 0, 0, 0],
       type: 'bar',
       color: '#10b981',
       barWidth: '50%'
@@ -80,11 +80,11 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
 
   // Monthly Performance Chart
   const monthlyOption = {
-    xAxis: { type: 'category', data: summary?.evolution?.labels || ['Jun 26', 'Jul 26', 'Aug 26'], axisLabel: { color: '#94a3b8' } },
+    xAxis: { type: 'category', data: summary?.evolution?.labels || [], axisLabel: { color: '#94a3b8' } },
     yAxis: { type: 'value', axisLabel: { color: '#94a3b8' } },
     series: [
-      { name: 'Win Rate', type: 'line', data: summary?.evolution?.win_rates || [68, 72, 74], color: '#10b981', smooth: true },
-      { name: 'Signals', type: 'bar', data: summary?.evolution?.counts || [45, 120, 85], color: '#3b82f6', opacity: 0.3 }
+      { name: 'Win Rate', type: 'line', data: summary?.evolution?.win_rates || [], color: '#10b981', smooth: true },
+      { name: 'Signals', type: 'bar', data: summary?.evolution?.counts || [], color: '#3b82f6', opacity: 0.3 }
     ],
     legend: { show: true, textStyle: { color: '#fff' }, bottom: 0 },
     grid: { top: 30, bottom: 60, left: 40, right: 10 }
@@ -230,7 +230,7 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                            <ShieldCheck size={16} /> SYSTEM AUDIT STATUS
                         </Typography>
                         <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'text.secondary', fontWeight: 500 }}>
-                           Tracking since **June 04, 2026**. High-conviction signals (&gt;80%) maintain a verified **{calibration?.win_rates?.[4] || 84}% accuracy** over the full available history.
+                           Tracking since **June 04, 2026**. High-conviction signals (&gt;80%) maintain a verified **{calibration?.win_rates?.[4] !== undefined ? `${calibration.win_rates[4]}%` : '---'} accuracy** over the full available history.
                         </Typography>
                      </Paper>
                   </Grid>

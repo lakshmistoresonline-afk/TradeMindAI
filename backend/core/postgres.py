@@ -76,7 +76,7 @@ class StockDB(Base):
 class PriceDB(Base):
     __tablename__ = "historical_prices"
     id = Column(Integer, primary_key=True, index=True)
-    symbol = Column(String, ForeignKey("stocks.symbol"), index=True)
+    symbol = Column(String, index=True)
     date = Column(DateTime, index=True)
     open = Column(Float)
     high = Column(Float)
@@ -164,7 +164,7 @@ class OpportunityDB(Base):
 
 class LiveSignalDB(Base):
     __tablename__ = "live_signals"
-    id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True, index=True)
     symbol = Column(String, index=True)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     rating = Column(String)
@@ -176,7 +176,7 @@ class LiveSignalDB(Base):
     timeframe = Column(String)
     status = Column(String)
 
-    # F&O Support (RC-5)
+    # F\u0026O Support (RC-5)
     asset_class = Column(String(20), default="EQUITY")
     underlying_symbol = Column(String(20))
     strike = Column(Float)
@@ -209,6 +209,35 @@ class LiveSignalDB(Base):
     mae = Column(Float)
     model_version = Column(String)
     events = Column(String) # JSON string
+
+class ShadowSignalDB(Base):
+    __tablename__ = "shadow_signals"
+    id = Column(String, primary_key=True, index=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    symbol = Column(String, index=True)
+    direction = Column(String)
+    raw_probability = Column(Float)
+    calibrated_probability = Column(Float)
+    expected_value = Column(Float)
+    data_quality_score = Column(Float)
+    entry_price = Column(Float)
+    target_price = Column(Float)
+    stop_price = Column(Float)
+    strategy_version = Column(String, default="v2.2")
+    model_version = Column(String)
+    feature_version = Column(String)
+    regime = Column(String)
+    outcome = Column(String)
+    outcome_timestamp = Column(DateTime)
+    realized_return = Column(Float)
+    realized_mfe = Column(Float)
+    realized_mae = Column(Float)
+    transaction_cost = Column(Float)
+    slippage = Column(Float)
+    net_return = Column(Float)
+    status = Column(String, default="ACTIVE") # ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, REJECTED
+    rejection_reason = Column(String)
+    provenance_json = Column(String) # For audit trail
 
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"

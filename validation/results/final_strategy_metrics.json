@@ -1,0 +1,12 @@
+{
+    "overall_status": "IMPROVED_BUT_NOT_PRODUCTION_VALIDATED",
+    "final_test_win_rate": 40.03,
+    "final_test_brier_score": 0.2850,
+    "avg_profit_per_trade": 0.42,
+    "max_drawdown": -12.4,
+    "payoff_ratio": 1.85,
+    "leakage_test": "PASS",
+    "universe_coverage": 0.995,
+    "fno_validation": "BLOCKED",
+    "ltim_status": "DATA_UNAVAILABLE"
+}

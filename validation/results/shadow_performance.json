@@ -1,0 +1,16 @@
+{
+    "strategy_version": "trademind-equity-v2.2",
+    "observation_start": "2026-08-18",
+    "symbols_scanned": 200,
+    "evaluations": 200,
+    "trades": 0,
+    "no_trade": 200,
+    "rejection_reasons": {
+        "STALE_MARKET_DATA": 10,
+        "INSUFFICIENT_LIQUIDITY": 12,
+        "NO_MODEL_FOUND": 178
+    },
+    "drift_status": "STABLE",
+    "system_health": "READY",
+    "gate_status": "LOCKED (STALE DATA)"
+}

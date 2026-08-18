@@ -88,16 +88,20 @@ async def get_conviction_calibration():
                             brackets[bracket]["wins"] += 1
 
         # 2. Format for chart
+        if sum([v["total"] for v in brackets.values()]) == 0:
+             return {"labels": [], "win_rates": [], "status": "INSUFFICIENT_DATA"}
+
         return {
             "labels": list(brackets.keys()),
             "win_rates": [
                 round((v["wins"] / v["total"] * 100), 1) if v["total"] > 0 else 0
                 for v in brackets.values()
-            ]
+            ],
+            "status": "VALIDATED"
         }
     except Exception as e:
         print(f"Calibration Error: {e}")
-        return {"labels": ["50-60", "60-70", "70-80", "80-90", "90-100"], "win_rates": [45, 52, 68, 75, 84]}
+        return {"labels": [], "win_rates": [], "status": "ERROR"}
 
 @router.get("/performance/summary")
 async def get_performance_summary(
@@ -383,11 +387,7 @@ async def get_performance_audit():
                 all_signals.append(sig)
 
         if not all_signals:
-            # Seed with bootstrap sample if entirely empty to prevent UI crash
-            return [
-                {"symbol": "RELIANCE", "date": datetime.datetime.utcnow(), "entry": 2450, "target": 2600, "outcome": "ACTIVE", "profit_pct": 0, "mfe": 1.2, "mae": -0.5},
-                {"symbol": "TCS", "date": datetime.datetime.utcnow(), "entry": 3800, "target": 4100, "outcome": "TARGET_HIT", "profit_pct": 7.8, "mfe": 8.1, "mae": -1.2}
-            ]
+            return []
 
         # Sort by date descending
         all_signals.sort(key=lambda x: x.get("date", datetime.datetime.min), reverse=True)

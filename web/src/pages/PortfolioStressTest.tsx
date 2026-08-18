@@ -9,8 +9,8 @@ export default function PortfolioStressTest() {
 
   useEffect(() => {
     getStocks().then(data => {
-       const mockHoldings = data.filter((s:any) => ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK'].includes(s.symbol));
-       setHoldings(mockHoldings);
+       const realHoldings = data.filter((s:any) => s.ai_investment_score > 0).slice(0, 6);
+       setHoldings(realHoldings);
     });
   }, []);
 
@@ -20,7 +20,7 @@ export default function PortfolioStressTest() {
     { name: 'Policy Volatility', impact: marketDrop * 0.4, color: 'info' }
   ];
 
-  const totalValue = 1000000;
+  const totalValue = holdings.reduce((acc, h) => acc + (h.market_cap / 1e8), 0) || 1000000; // Simulated value if real positions missing
   const avgBeta = holdings.length > 0 ? holdings.reduce((acc, h) => acc + (h.beta || 1.0), 0) / holdings.length : 1.15;
   const highBetaPositions = holdings.filter(h => (h.beta || 1.0) > 1.2);
 

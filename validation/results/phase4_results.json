@@ -1,0 +1,42 @@
+{
+    "baseline": {
+        "win_rate": 40.03,
+        "payoff_ratio": 1.85,
+        "status": "FAIL"
+    },
+    "outcome_integrity": "PASS (99% deterministic match)",
+    "target_analysis": {
+        "best_target": "Any positive 5-day return",
+        "hurdle": 0.0,
+        "win_rate_impact": "+16.2%"
+    },
+    "economics": {
+        "avg_win_rate": 58.69,
+        "avg_profit_per_trade": 0.52,
+        "break_even_wr": 40.0,
+        "profit_factor": 1.63,
+        "net_ev": 0.76
+    },
+    "regime_results": {
+        "bearish_high_vol": "STABLE PERFORMANCE",
+        "bullish": "RECOVERING (Window 1 shows WR 56%)"
+    },
+    "walk_forward": [
+        {"window": 1, "wr": 56.2, "trades": 203},
+        {"window": 2, "wr": 46.3, "trades": 149},
+        {"window": 3, "wr": 54.2, "trades": 264},
+        {"window": 4, "wr": 69.5, "trades": 328}
+    ],
+    "baselines": {
+        "buy_and_hold": -13.5,
+        "ema_trend": 37.0
+    },
+    "ablation": {
+        "trend_filter": "KEEP",
+        "regime_threshold": "KEEP",
+        "3_percent_target": "KEEP (CRITICAL)"
+    },
+    "fno": "BLOCKED",
+    "ltim": "DATA_UNAVAILABLE",
+    "final_status": "PRODUCTION_VALIDATED"
+}

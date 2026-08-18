@@ -1,0 +1,10 @@
+{
+    "timestamp": "2026-08-18T01:00:00Z",
+    "win_rate_weighted": 58.69,
+    "avg_profit_net": 0.52,
+    "target_pct": 3.0,
+    "stop_pct": 3.0,
+    "filters": ["EMA_200", "Breakout_0.5_ATR", "Prob_0.52", "EV_0.0"],
+    "model": "RandomForest_Depth5",
+    "status": "PRODUCTION_VALIDATED"
+}

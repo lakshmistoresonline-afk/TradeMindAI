@@ -9,8 +9,10 @@ export default function RiskGuard({ isConsolidated = false }: { isConsolidated?:
 
   useEffect(() => {
     getStocks().then(data => {
-       const mockHoldings = data.filter((s:any) => ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK'].includes(s.symbol));
-       setHoldings(mockHoldings);
+       // Filter for stocks with non-zero investment score or recent signals to simulate holdings
+       // In a real production app, this would be an /ios/portfolio/positions endpoint
+       const realHoldings = data.filter((s:any) => s.ai_investment_score > 0).slice(0, 6);
+       setHoldings(realHoldings);
     });
     getPortfolioHealth().then(setHealth);
   }, []);
@@ -77,10 +79,17 @@ export default function RiskGuard({ isConsolidated = false }: { isConsolidated?:
                                  </Box>
                                  <LinearProgress variant="determinate" value={(h.beta / (health?.avg_beta || 1) * 10)} color="warning" sx={{ height: 4, borderRadius: 2 }} />
                               </Box>
-                              <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontWeight: 600 }}>VaR (95%): ₹{Math.round(health?.var_95 / 5).toLocaleString()}</Typography>
+                              <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontWeight: 600 }}>VaR (95%): ₹{health?.var_95 ? Math.round(health.var_95).toLocaleString() : '---'}</Typography>
                            </Box>
                         </Grid>
                      ))}
+                     {holdings.length === 0 && (
+                        <Grid item xs={12}>
+                           <Box sx={{ py: 4, textAlign: 'center' }}>
+                              <Typography variant="caption" color="textSecondary">No active risk exposure detected in current portfolio.</Typography>
+                           </Box>
+                        </Grid>
+                     )}
                   </Grid>
                </Box>
             </Paper>
@@ -94,18 +103,11 @@ export default function RiskGuard({ isConsolidated = false }: { isConsolidated?:
                   <Typography variant="h6" fontWeight={900}>AI Intelligence Alerts</Typography>
                </Stack>
                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <RiskAlert
-                    title="High Sector Correlation Detected"
-                    desc="Your holdings in TCS and INFY show a 0.88 correlation over the last 30 days. Recommend trimming one position to reduce sector-specific risk."
-                  />
-                  <RiskAlert
-                    title="Gamma Exposure Warning"
-                    desc="Near-term options expiry in HDFCBANK suggests heightened volatility. Ensure stop-loss levels are adjusted for wider ATR."
-                  />
-                  <RiskAlert
-                    title="Institutional Distribution Pattern"
-                    desc="Large block selling detected in RELIANCE at 2550 resistance. Institutional flow is turning negative for the weekly timeframe."
-                  />
+                  {health?.alerts && health.alerts.length > 0 ? health.alerts.map((a: any, i: number) => (
+                    <RiskAlert key={i} title={a.title} desc={a.description} />
+                  )) : (
+                    <Typography variant="caption" color="textSecondary">No critical risk alerts identified by multi-agent audit.</Typography>
+                  )}
                </Box>
             </Paper>
          </Grid>
@@ -116,12 +118,12 @@ export default function RiskGuard({ isConsolidated = false }: { isConsolidated?:
                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 3, fontWeight: 900 }}>CONCENTRATION MATRIX</Typography>
                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <Box>
-                     <Typography variant="caption" color="textSecondary" fontWeight={800} display="block" sx={{ mb: 1 }}>TOP 3 ASSETS EXPOSURE</Typography>
+                     <Typography variant="caption" color="textSecondary" fontWeight={800} display="block" sx={{ mb: 1 }}>TOP ASSETS EXPOSURE</Typography>
                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="h5" fontWeight={900}>58.2%</Typography>
-                        <Chip label="HIGH" size="small" color="error" sx={{ fontWeight: 900, height: 18, fontSize: '0.6rem' }} />
+                        <Typography variant="h5" fontWeight={900}>{health?.concentration_pct ? `${health.concentration_pct}%` : '---'}</Typography>
+                        <Chip label={health?.concentration_pct > 50 ? "HIGH" : "NORMAL"} size="small" color={health?.concentration_pct > 50 ? "error" : "primary"} sx={{ fontWeight: 900, height: 18, fontSize: '0.6rem' }} />
                      </Box>
-                     <LinearProgress variant="determinate" value={58} color="error" sx={{ height: 6, borderRadius: 3 }} />
+                     <LinearProgress variant="determinate" value={health?.concentration_pct || 0} color={health?.concentration_pct > 50 ? "error" : "primary"} sx={{ height: 6, borderRadius: 3 }} />
                   </Box>
                   <Divider sx={{ opacity: 0.05 }} />
                   <Box>

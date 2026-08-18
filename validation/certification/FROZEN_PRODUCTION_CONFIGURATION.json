@@ -1,0 +1,53 @@
+{
+    "timestamp": "2026-08-18T08:15:00Z",
+    "git_hash": "audit_freeze_20260818",
+    "strategy": "Equity Swing Trading v2.2",
+    "asset_class": "EQUITY",
+    "universe": "NIFTY 200 (199 symbols available)",
+    "entry_rules": [
+        "Calibrated Probability >= 0.52",
+        "Trend Alignment: Price > EMA 200 for LONG, Price < EMA 200 for SHORT",
+        "Breakout Magnitude: |Price - SMA 20| >= 0.5 * ATR"
+    ],
+    "exit_rules": {
+        "profit_target": "3.0%",
+        "stop_loss": "3.0%",
+        "max_holding_period": "20 bars (SWING)"
+    },
+    "feature_set": [
+        "trend_ema_cross",
+        "ema_200",
+        "sma_20",
+        "momentum_rsi",
+        "volatility_bb",
+        "volume_relative",
+        "smc_bullish_ob",
+        "smc_bearish_ob",
+        "ict_liquidity_void",
+        "market_volatility_z",
+        "market_cap_class"
+    ],
+    "model_config": {
+        "type": "RandomForestClassifier",
+        "n_estimators": 100,
+        "max_depth": 5,
+        "min_samples_leaf": 10,
+        "random_state": 42,
+        "class_weight": "balanced"
+    },
+    "calibration": {
+        "method": "Platt Scaling (Sigmoid)",
+        "params": "Optimized per training window"
+    },
+    "economics": {
+        "cost_per_leg": 0.0005,
+        "slippage_per_leg": 0.0005,
+        "total_round_trip_friction": 0.0020
+    },
+    "validation_windows": [
+        {"name": "Window 1", "period": "2026-05-20 to 2026-08-18"},
+        {"name": "Window 2", "period": "2026-02-19 to 2026-05-20"},
+        {"name": "Window 3", "period": "2025-11-21 to 2026-02-19"},
+        {"name": "Window 4", "period": "2025-08-23 to 2025-11-21"}
+    ]
+}

@@ -1,6 +1,6 @@
 import os
 import sys
-import pandas as pd
+import json
 from sqlalchemy import text
 from dotenv import load_dotenv
 from datetime import datetime
@@ -13,6 +13,7 @@ from backend.core.postgres import engine, DATABASE_URL
 from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
 
 REPORT_FILE = "docs/NIFTY200_HISTORICAL_COVERAGE_REPORT.md"
+EXPECTED_START_DATE = datetime(2020, 1, 1)
 
 def validate():
     print("============================================================")
@@ -43,7 +44,6 @@ def validate():
             complete_count = 0
             partial_count = 0
             missing_count = 0
-            failed_count = 0
 
             for symbol in sorted(list(expected_symbols)):
                 stats = db_stats.get(symbol)
@@ -53,20 +53,27 @@ def validate():
 
                 if stats:
                     row_count = stats["count"]
-                    # Thresholds (Daily Candles)
-                    # COMPLETE: > 1000 rows (Approx 4 years)
-                    # VALID_SHORT_HISTORY: 50-1000 rows with documented reason
+                    first = stats["first"]
+
+                    if isinstance(first, str):
+                        try: first = datetime.fromisoformat(first.split('.')[0])
+                        except: first = None
+
+                    # Coverage calculation
+                    total_days = (datetime.now() - EXPECTED_START_DATE).days
+                    expected_candles = (total_days / 365) * 252
+                    coverage_pct = min(100.0, (row_count / expected_candles) * 100) if expected_candles > 0 else 0
+
                     if row_count >= 1000:
                         status = "COMPLETE"
                         complete_count += 1
                     elif symbol in ["GUJGASLTD", "TATAMOTORS", "PEL", "GMRINFRA", "L&TFH", "ZOMATO", "DELHIVERY", "NYKAA", "PAYTM", "LICI"]:
-                        # Known cases of demergers/renaming/recent listings in Aug 2026 timeline
                         status = "VALID_SHORT_HISTORY"
-                        complete_count += 1 # Counts as "Passable" for the gate
+                        complete_count += 1
                     else:
                         status = "PARTIAL"
                         partial_count += 1
-                        error = f"Insufficient history ({row_count} rows)."
+                        error = f"Insufficient history ({row_count} rows, {round(coverage_pct, 1)}% coverage)."
                 else:
                     status = "DATA_UNAVAILABLE"
                     missing_count += 1
@@ -74,8 +81,8 @@ def validate():
 
                 report_data.append({
                     "Symbol": symbol,
-                    "First Date": stats["first"] if stats else "-",
-                    "Last Date": stats["last"] if stats else "-",
+                    "First Date": str(stats["first"]) if stats else "-",
+                    "Last Date": str(stats["last"]) if stats else "-",
                     "Rows": stats["count"] if stats else 0,
                     "Status": status,
                     "Error": error
@@ -87,11 +94,11 @@ def validate():
             print(f"Partial stocks: {partial_count}")
             print(f"Data unavailable: {missing_count}")
 
-            # 2. Write Report
+            # 2. Write Report (Manual Markdown Table)
             os.makedirs(os.path.dirname(REPORT_FILE), exist_ok=True)
             with open(REPORT_FILE, "w") as f:
                 f.write("# NIFTY 200 Historical Coverage Report\n\n")
-                f.write(f"**Last Validated**: {datetime.utcnow()} UTC\n\n")
+                f.write(f"**Last Validated**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC\n\n")
                 f.write("## 1. Summary\n\n")
                 f.write(f"| Metric | Value |\n")
                 f.write(f"| :--- | :--- |\n")
@@ -101,12 +108,16 @@ def validate():
                 f.write(f"| Data Unavailable | {missing_count} |\n\n")
 
                 f.write("## 2. Detailed Coverage\n\n")
-                df = pd.DataFrame(report_data)
-                f.write(df.to_markdown(index=False))
+                headers = ["Symbol", "First Date", "Last Date", "Rows", "Status", "Error"]
+                f.write("| " + " | ".join(headers) + " |\n")
+                f.write("| " + " | ".join(["---"] * len(headers)) + " |\n")
+                for r in report_data:
+                    line = [r["Symbol"], r["First Date"], r["Last Date"], str(r["Rows"]), r["Status"], r["Error"]]
+                    f.write("| " + " | ".join(line) + " |\n")
 
             print(f"\n[SUCCESS] Report generated: {REPORT_FILE}")
 
-            # GATE: Pass if at least 198/200 are available (Allowing for LTIM which seems genuinely missing in Aug 2026 provider index)
+            # GATE: Pass if at least 198/200 are available
             if missing_count > 2:
                 print(f"\nSTATUS: FAIL ({missing_count} stocks missing data)")
                 sys.exit(1)
@@ -119,6 +130,8 @@ def validate():
 
     except Exception as e:
         print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":

@@ -21,6 +21,14 @@ class Container:
         self._twin_service = None
         self._adaptive_service = None
         self._stock_service = None
+        self._signal_engine = None
+
+    @property
+    def signal_engine(self):
+        if self._signal_engine is None:
+            from backend.services.signal_engine import SignalEngine
+            self._signal_engine = SignalEngine()
+        return self._signal_engine
 
     @property
     def repository(self):

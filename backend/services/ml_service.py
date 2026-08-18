@@ -55,8 +55,14 @@ class MLService:
         X_calib, y_calib = X.iloc[train_end:calib_end], y.iloc[train_end:calib_end]
         X_test, y_test = X.iloc[calib_end:], y.iloc[calib_end:]
 
-        # 3. Fit Random Forest (Oldest 60%)
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        # 3. Fit Random Forest with Regularization to prevent overfitting
+        model = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=5,
+            min_samples_leaf=10,
+            random_state=42,
+            class_weight='balanced'
+        )
         model.fit(X_train, y_train)
 
         # 4. Fit Platt Scaling (Middle 20%)

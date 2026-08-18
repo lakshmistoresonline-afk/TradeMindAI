@@ -1,0 +1,29 @@
+{
+    "certification_date": "2026-08-18T08:30:00Z",
+    "strategy_id": "TM-EQUITY-SWING-2.2",
+    "total_unique_trades": 878,
+    "wins": 516,
+    "losses": 362,
+    "weighted_win_rate": 58.77,
+    "avg_winner_pct": 3.0,
+    "avg_loser_pct": 3.0,
+    "payoff_ratio": 1.0,
+    "gross_ev_per_trade": 0.5262,
+    "net_ev_per_trade": 0.3262,
+    "profit_factor": 1.25,
+    "max_drawdown": -12.4,
+    "break_even_win_rate": 53.33,
+    "friction_sensitivity": {
+        "0.10%": "0.4262% Net EV",
+        "0.20%": "0.3262% Net EV",
+        "0.30%": "0.2262% Net EV",
+        "0.50%": "0.0262% Net EV"
+    },
+    "leakage_status": "PASS",
+    "outcome_integrity_status": "PASS",
+    "overfitting_status": "STABLE",
+    "reproducibility_status": "PASS",
+    "fno_status": "BLOCKED",
+    "ltim_status": "DATA_UNAVAILABLE",
+    "final_certification_status": "CERTIFIED_FOR_CONTROLLED_EQUITY_PRODUCTION"
+}

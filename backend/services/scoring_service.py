@@ -107,9 +107,9 @@ class ScoringService:
             "grade": grade,
             "health": {
                 "Technical": "EXCELLENT" if (tech_score or 0) > 75 else "GOOD" if (tech_score or 0) > 50 else "WEAK",
-                "Financial": "STABLE",
-                "Growth": "HIGH",
-                "Institutional": "STRONG"
+                "Financial": "STABLE" if (fund_score or 0) > 50 else "VOLATILE" if fund_score is not None else "UNKNOWN",
+                "Growth": "HIGH" if (fund_score or 0) > 70 else "MODERATE" if fund_score is not None else "UNKNOWN",
+                "Institutional": "STRONG" if (inst_score or 50) > 65 else "ACCUMULATING" if (inst_score or 50) > 50 else "DISTRIBUTION" if inst_score is not None else "NEUTRAL"
             },
             "confidence": {
                 "score": round(total_score, 0),

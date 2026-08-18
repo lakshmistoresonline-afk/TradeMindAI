@@ -1,0 +1,10 @@
+{
+    "overall_status": "FAIL",
+    "sample_size": 126,
+    "symbols_validated": 7,
+    "win_rate": 38.38,
+    "avg_profit": 0.07,
+    "brier_score": 0.3397,
+    "leakage_test": "PASS",
+    "calibration": "WEAK"
+}

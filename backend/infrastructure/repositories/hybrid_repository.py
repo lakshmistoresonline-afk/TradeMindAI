@@ -486,8 +486,9 @@ class HybridIOSRepository(IIOSRepository):
 
             # Deep serialize JSON fields
             for col in ['events', 'provenance']:
-                if data.get(col):
-                    data[col] = json.dumps(json_serializable(data[col]))
+                val = data.get(col)
+                if val is not None:
+                    data[col] = json.dumps(json_serializable(val))
 
             if db_sig:
                 for k, v in data.items(): setattr(db_sig, k, v)
@@ -519,15 +520,18 @@ class HybridIOSRepository(IIOSRepository):
         try:
             data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
 
-            # 1. Robust Event Parsing
-            if data.get('events') and isinstance(data['events'], str):
-                try:
-                    data['events'] = json.loads(data['events'])
-                except:
-                    data['events'] = []
+            # 1. Robust JSON Parsing
+            for col in ['events', 'provenance']:
+                if data.get(col) and isinstance(data[col], str):
+                    try:
+                        data[col] = json.loads(data[col])
+                    except:
+                        data[col] = [] if col == 'events' else {}
 
             if not isinstance(data.get('events'), list):
                 data['events'] = []
+            if not isinstance(data.get('provenance'), dict):
+                data['provenance'] = {}
 
             # 2. Sanitize Numeric Fields (Handle NaN/Inf/None)
             numeric_fields = ['entry_price', 'target_price', 'stop_loss_price', 'conviction', 'profit_pct', 'mfe', 'mae', 'trigger_price', 'strike', 'outcome_price']

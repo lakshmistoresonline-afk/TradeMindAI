@@ -1,0 +1,12 @@
+{
+    "timestamp": "2026-08-17T23:18:00Z",
+    "win_rate": 38.38,
+    "avg_profit_pct": 0.07,
+    "brier_score": 0.3397,
+    "sample_size": 126,
+    "symbols_validated": 7,
+    "symbols": ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "SBIN", "ITC"],
+    "oos_period": "Last 6 months (Simulated resolution)",
+    "overall_status": "FAIL",
+    "leakage_test": "PASS"
+}
