@@ -14,7 +14,7 @@ import uuid
 
 print(f"DEBUG: tasks.py v2.2.2 loaded from {os.path.abspath(__file__)}")
 
-celery_app = Celery("tasks", broker=settings.REDIS_URL)
+celery_app = Celery("backend.workers.tasks", broker=settings.REDIS_URL)
 
 # Automated Schedule (ENABLED for Railway Shadow Monitoring v2.2)
 celery_app.conf.beat_schedule = {
@@ -365,7 +365,7 @@ def analyze_nifty_100(period="1y"):
     job.apply_async()
     return f"Triggered data sync for full Alpha Universe ({len(ALL_SUPPORTED)} stocks)."
 
-@celery_app.task
+@celery_app.task(queue="shadow")
 def terminal_heartbeat():
     """
     Vision 2.2: Ultra-Resilient Live Terminal Heartbeat.
@@ -373,6 +373,11 @@ def terminal_heartbeat():
     """
     import yfinance as yf
     from backend.core.container import container
+    from production.shadow.shadow_heartbeat import ShadowHeartbeat
+
+    # Record worker presence in DB for dashboard
+    ShadowHeartbeat.record_heartbeat("WORKER_PRESENCE")
+
     try:
         nifty = 0.0
         try:

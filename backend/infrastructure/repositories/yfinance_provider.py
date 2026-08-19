@@ -33,7 +33,9 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             "L&TFH": "LTF",
             "TATAMOTORS": "TMCV",
             "ZOMATO": "ETERNAL",
-            "PEL": "PIRAMALFIN"
+            "PEL": "PIRAMALFIN",
+            # NSE NIFTY 50 Aug 2026 Resiliency
+            "^NSEI": "NIFTY_50.NS"
         }
         mapped = mapping.get(symbol.upper(), symbol)
         return f"{mapped}.NS" if not mapped.startswith("^") else mapped
