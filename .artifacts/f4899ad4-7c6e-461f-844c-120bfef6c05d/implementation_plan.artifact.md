@@ -1,48 +1,53 @@
-# Implementation Plan - Phase 6.4: Celery Routing & Data Provider Remediation
+# Implementation Plan - Phase 7: Autonomous Shadow Accumulation & Continuous Validation
 
-This phase resolves the infrastructure defects identified in the Phase 6.4 forensic audit, enabling autonomous PC-independent Shadow execution on Railway.
+This phase establishes the continuous monitoring and validation framework for the now PC-independent Shadow Engine (Strategy v2.2) on Railway. The primary goal is the natural accumulation of 20 genuine completed trades while maintaining 100% operational integrity and strategy freeze.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **TASK NAMESPACE ALIGNMENT:** We are standardizing the Celery task namespace to `backend.workers.tasks` to ensure the Beat scheduler and Worker remain synchronized.
+> **NO MANUAL INTERVENTION:** The system is now fully autonomous. We will not manually trigger cycles or resolve outcomes unless a systemic failure is detected.
 >
-> **QUEUE ROUTING:** Every production Shadow task (including heartbeats) will be explicitly routed to the `shadow` queue to prevent delivery to generic workers.
+> **20-TRADE MILESTONE:** This is the hard project gate. Paper Trading certification will only be initiated after the 20th genuine terminal outcome is audited and reported.
 >
-> **DATA PROVIDER FIX:** We will update the NIFTY symbol mapping to resolve the 404/Delisted errors seen in the logs.
+> **STRATEGY FREEZE:** Strategy v2.2 parameters (3% Target/Stop, 0.52 Prob, 10M Liquidity) are non-negotiable and strictly enforced by the cloud worker.
 
 ## Proposed Changes
 
-### 1. Celery Routing Hardening
-#### [MODIFY] [tasks.py](file:///G:/TradeMindAI/backend/workers/tasks.py)
-- Change `celery_app = Celery("tasks", ...)` to `celery_app = Celery("backend.workers.tasks", ...)`.
-- Add `queue="shadow"` to the `@celery_app.task` decorator for `terminal_heartbeat`.
-- Ensure all automated tasks in `beat_schedule` use the consistent namespace.
+### 1. Continuous Reporting & Progress Tracking
+#### [MODIFY] [generate_shadow_report.py](file:///G:/TradeMindAI/production/reports/generate_shadow_report.py)
+- Refine to support "Phase 7" context.
+- Ensure all metrics are derived from Neon PostgreSQL.
+- Add "PC Independence" health check to the markdown report.
 
-### 2. Market Data Resiliency
-#### [MODIFY] [yfinance_provider.py](file:///G:/TradeMindAI/backend/infrastructure/repositories/yfinance_provider.py)
-- Update `_map_symbol` for NIFTY to use the currently active 2026 Yahoo Finance ticker.
-- Implement more robust error handling for heartbeat price discovery.
+### 2. Autonomous Monitoring Report
+#### [NEW] [PHASE7_AUTONOMOUS_SHADOW_MONITORING_REPORT.md](file:///G:/TradeMindAI/production/reports/PHASE7_AUTONOMOUS_SHADOW_MONITORING_REPORT.md)
+- Template for continuous tracking of Phase 7 progress.
+- Includes cycle logs, signal audits, and drift metrics.
 
-### 3. Monitoring API Alignment
-#### [MODIFY] [shadow.py](file:///G:/TradeMindAI/backend/api/v1/endpoints/shadow.py)
-- Update heartbeat lookup query to use the new standardized task namespace.
+### 3. Integrity & Heartbeat Automation
+#### [RUN] Cloud-Side Monitoring
+- The existing `shadow-worker` and `shadow-beat` on Railway already record heartbeats and evaluation events.
+- Verification will be done periodically by querying the Cloud API.
+
+### 4. Outcome Resolution Automation
+- **Status:** Already implemented in `ShadowService`. Resolves ACTIVE signals naturally against subsequent market candles.
 
 ## Verification Plan
 
-### Automated Verification
-- **Task Registration Test:** Run `celery -A backend.workers.tasks.celery_app inspect registered` locally and verify tasks appear as `backend.workers.tasks.*`.
-- **Routing Verification:** Verify via Redis (if possible) that heartbeat tasks are arriving in the `shadow` queue.
+### Automated Monitoring (Cloud)
+- **Cycle Count Monitoring:** Verify `evaluation_cycles` increment every 30 minutes (NSE Hours).
+- **Heartbeat Audit:** Verify `shadow_worker` and `shadow_beat` show `ONLINE` status in the web dashboard.
+- **Drift Audit:** Verify Probability Mean remains within ±0.05 of the 0.587 baseline.
 
 ### Manual Acceptance Test
-1. **Redeploy to Railway:** Apply changes and monitor logs.
-2. **Delivery Audit:** Confirm "Received task: backend.workers.tasks.run_shadow_cycle_task" appears in the Shadow Worker logs.
-3. **Dashboard Update:** Confirm **Evaluation Cycles** increment autonomously without local intervention.
+- **Dashboard Review:** Periodic inspection of [https://com-webcraft-trademindai-c8f75.web.app/shadow](https://com-webcraft-trademindai-c8f75.web.app/shadow).
+- **Milestone Verification:** Generate a milestone report (`SHADOW_MILESTONE_05`, etc.) as soon as the completed trade count advances.
 
-## Final Status Matrix
-| Milestone | Expected | Status |
+## Milestone Horizon
+| Milestone | Completed Trades | Expectation |
 | :--- | :--- | :--- |
-| Task Name Match | Synchronized | `PENDING` |
-| Queue Delivery | Target: `shadow` | `PENDING` |
-| NIFTY LTP | Valid Number | `PENDING` |
-| **PC Independent**| YES | `PENDING` |
+| **Current** | 1 / 20 | Baseline established (SBIN WIN). |
+| **M1** | 5 / 20 | First statistical confidence check. |
+| **M2** | 10 / 20 | Mid-horizon audit. |
+| **M3** | 15 / 20 | Final pre-gate audit. |
+| **M4** | 20 / 20 | **PHASE 7 COMPLETE - SHADOW-TO-PAPER GATE**. |
