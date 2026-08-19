@@ -26,7 +26,7 @@ celery_app.conf.task_routes = {
 celery_app.conf.beat_schedule = {
     "run-shadow-monitoring-cycle": {
         "task": "backend.workers.tasks.run_shadow_cycle_task",
-        "schedule": crontab(minute="*/30", hour="9-16", day_of_week="mon-fri"), # Every 30 mins during market hours
+        "schedule": crontab(minute="*/30", hour="9-18", day_of_week="mon-fri"), # 9 AM to 6 PM IST
         "options": {"queue": "shadow"}
     },
     "shadow-worker-heartbeat": {
