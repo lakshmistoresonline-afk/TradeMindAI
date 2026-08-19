@@ -24,42 +24,42 @@ def generate():
     TERMINAL_OUTCOMES = ['TARGET_HIT', 'STOP_LOSS', 'TIMEOUT', 'AMBIGUOUS', 'INVALID']
 
     # 1. Database - AUTHORITATIVE SOURCE
-    conn = sqlite3.connect(db_path)
+    from backend.core.postgres import engine
+    from sqlalchemy import text
 
-    # Terminal Signals (Terminal Outcomes) from Phase 5G baseline
-    query_terminal = f"SELECT * FROM shadow_signals WHERE status IN {tuple(TERMINAL_OUTCOMES)} AND timestamp >= '{BASELINE_START}'"
-    terminal_df = pd.read_sql_query(query_terminal, conn)
+    with engine.connect() as conn:
+        # Terminal Signals (Terminal Outcomes) from Phase 5G baseline
+        query_terminal = f"SELECT * FROM shadow_signals WHERE status IN {tuple(TERMINAL_OUTCOMES)} AND timestamp >= '{BASELINE_START}'"
+        terminal_df = pd.read_sql_query(query_terminal, conn)
 
-    # Active Signals
-    query_active = "SELECT * FROM shadow_signals WHERE status = 'ACTIVE'"
-    active_df = pd.read_sql_query(query_active, conn)
-    active_signals_count = len(active_df)
+        # Active Signals
+        query_active = "SELECT * FROM shadow_signals WHERE status = 'ACTIVE'"
+        active_df = pd.read_sql_query(query_active, conn)
+        active_signals_count = len(active_df)
 
-    # Evaluation Events
-    try:
-        query_events = "SELECT * FROM shadow_events WHERE event_type = 'EVALUATION'"
-        events_df = pd.read_sql_query(query_events, conn)
-    except:
-        events_df = pd.DataFrame()
+        # Evaluation Events
+        try:
+            query_events = "SELECT * FROM shadow_events WHERE event_type = 'EVALUATION'"
+            events_df = pd.read_sql_query(query_events, conn)
+        except:
+            events_df = pd.DataFrame()
 
-    # Transactional Signals from Phase 5G baseline
-    query_txn = f"SELECT count(*) FROM shadow_signals WHERE timestamp >= '{BASELINE_START}'"
-    transactional_signals = conn.execute(query_txn).fetchone()[0]
+        # Transactional Signals from Phase 5G baseline
+        query_txn = text(f"SELECT count(*) FROM shadow_signals WHERE timestamp >= '{BASELINE_START}'")
+        transactional_signals = conn.execute(query_txn).scalar()
 
-    # Prob stats (eligible only) from Database
-    prob_values = []
-    if not events_df.empty:
-        for payload in events_df['payload_json'].dropna():
-            try:
-                p_data = json.loads(payload)
-                if p_data.get('prob') is not None:
-                    prob_values.append(p_data['prob'])
-            except:
-                pass
+        # Prob stats (eligible only) from Database
+        prob_values = []
+        if not events_df.empty:
+            for payload in events_df['payload_json'].dropna():
+                try:
+                    p_data = json.loads(payload)
+                    if p_data.get('prob') is not None:
+                        prob_values.append(p_data['prob'])
+                except:
+                    pass
 
-    prob_mean = sum(prob_values) / len(prob_values) if prob_values else 0.0
-
-    conn.close()
+        prob_mean = sum(prob_values) / len(prob_values) if prob_values else 0.0
 
     if events_df.empty:
         print("No evaluation events in DB.")

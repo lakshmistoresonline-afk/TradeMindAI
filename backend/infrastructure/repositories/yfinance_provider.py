@@ -24,7 +24,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
 
     def _map_symbol(self, symbol: str) -> str:
         mapping = {
-            "NIFTY": "^NSEI",
+            "NIFTY": "NIFTY_50",
             "BANKNIFTY": "^NSEBANK",
             "FINNIFTY": "^CNXFIN",
             "INDIAVIX": "^INDIAVIX",
@@ -33,12 +33,13 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             "L&TFH": "LTF",
             "TATAMOTORS": "TMCV",
             "ZOMATO": "ETERNAL",
-            "PEL": "PIRAMALFIN",
-            # NSE NIFTY 50 Aug 2026 Resiliency
-            "NIFTY": "^NSEI",
-            "^NSEI": "NIFTY_50.NS"
+            "PEL": "PIRAMALFIN"
         }
         mapped = mapping.get(symbol.upper(), symbol)
+
+        # Resiliency for direct index ticker lookups
+        if mapped == "^NSEI": mapped = "NIFTY_50"
+
         return f"{mapped}.NS" if not mapped.startswith("^") else mapped
 
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
