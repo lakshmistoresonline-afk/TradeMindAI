@@ -3,6 +3,8 @@
 # Ensure the app can find the backend package
 export PYTHONPATH=$PYTHONPATH:/app
 
+echo "[*] BOOTSTRAP: Detected SERVICE_TYPE='$SERVICE_TYPE'"
+
 # --- PRODUCTION CONFIGURATION VALIDATION (Phase 7.3) ---
 if [ "$ENVIRONMENT" = "production" ]; then
     echo "--- PRODUCTION CONFIGURATION VALIDATION ---"

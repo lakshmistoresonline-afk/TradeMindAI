@@ -37,6 +37,10 @@ celery_app.conf.beat_schedule = {
 }
 celery_app.conf.timezone = 'Asia/Kolkata'
 
+print(f"[*] SCHEDULER: Active schedules detected: {len(celery_app.conf.beat_schedule)}")
+for name, spec in celery_app.conf.beat_schedule.items():
+    print(f"    - {name}: {spec.get('task')}")
+
 @celery_app.task(queue="shadow")
 def run_shadow_cycle_task():
     from production.shadow.shadow_service import ShadowService
