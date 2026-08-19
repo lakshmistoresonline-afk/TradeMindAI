@@ -35,6 +35,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             "ZOMATO": "ETERNAL",
             "PEL": "PIRAMALFIN",
             # NSE NIFTY 50 Aug 2026 Resiliency
+            "NIFTY": "^NSEI",
             "^NSEI": "NIFTY_50.NS"
         }
         mapped = mapping.get(symbol.upper(), symbol)

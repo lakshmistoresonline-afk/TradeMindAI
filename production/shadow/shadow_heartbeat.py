@@ -19,6 +19,14 @@ class ShadowHeartbeat:
         Records a heartbeat for a specific shadow component (worker or scheduler).
         """
         try:
+            from backend.core.config import settings
+            from backend.core.postgres import DATABASE_URL
+
+            # Fail-Closed Production Guard
+            if settings.ENVIRONMENT == "production" and "sqlite" in DATABASE_URL.lower():
+                print(f"[!] Heartbeat Blocked: SQLite detected in production for {component}.")
+                return
+
             with SessionLocal() as session:
                 # We'll use a simple KV pattern or shadow_events for now,
                 # but let's assume a dedicated system table or ShadowEventDB for health.

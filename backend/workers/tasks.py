@@ -21,10 +21,12 @@ celery_app.conf.beat_schedule = {
     "run-shadow-monitoring-cycle": {
         "task": "backend.workers.tasks.run_shadow_cycle_task",
         "schedule": crontab(minute="*/30", hour="9-16", day_of_week="mon-fri"), # Every 30 mins during market hours
+        "options": {"queue": "shadow"}
     },
     "shadow-worker-heartbeat": {
         "task": "backend.workers.tasks.terminal_heartbeat", # Reuse existing for basic health
         "schedule": 60.0,
+        "options": {"queue": "shadow"}
     }
 }
 celery_app.conf.timezone = 'Asia/Kolkata'

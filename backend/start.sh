@@ -3,6 +3,23 @@
 # Ensure the app can find the backend package
 export PYTHONPATH=$PYTHONPATH:/app
 
+# --- PRODUCTION CONFIGURATION VALIDATION (Phase 7.3) ---
+if [ "$ENVIRONMENT" = "production" ]; then
+    echo "--- PRODUCTION CONFIGURATION VALIDATION ---"
+    if [ -z "$POSTGRES_URL" ]; then
+        echo "[!] CRITICAL ERROR: POSTGRES_URL is missing in production environment."
+        exit 1
+    fi
+    if [ -z "$REDIS_URL" ]; then
+        echo "[!] CRITICAL ERROR: REDIS_URL is missing in production environment."
+        exit 1
+    fi
+    echo "ENVIRONMENT: production"
+    echo "DATABASE: PostgreSQL (Authoritative)"
+    echo "SERVICE_TYPE: $SERVICE_TYPE"
+    echo "[+] Configuration Validated. Starting Service..."
+fi
+
 if [ "$SERVICE_TYPE" = "worker" ]; then
     echo "Starting Celery Worker..."
     # Render fallback: Start dummy server if PORT is provided

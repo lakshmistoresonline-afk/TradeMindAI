@@ -8,7 +8,13 @@ from .config import settings
 
 # Hybrid Logic: Fallback to SQLite for local development if PG URL missing or empty
 DATABASE_URL = settings.POSTGRES_URL
-if not DATABASE_URL or DATABASE_URL == '""' or DATABASE_URL == "sqlite:///./local_operational.db":
+
+# PRODUCTION FAIL-CLOSED GUARD (Phase 7.3)
+if settings.ENVIRONMENT == "production":
+    if not DATABASE_URL or "sqlite" in DATABASE_URL.lower():
+        print("[!] CRITICAL: PRODUCTION_SHADOW_SQLITE_FORBIDDEN. PostgeSQL URL missing or invalid.")
+        raise RuntimeError("PRODUCTION_SHADOW_SQLITE_FORBIDDEN")
+elif not DATABASE_URL or DATABASE_URL == '""' or DATABASE_URL == "sqlite:///./local_operational.db":
     # Use absolute path for local operational database to avoid relative path issues
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     db_path = os.path.join(base_dir, "backend", "local_operational.db")
