@@ -300,3 +300,8 @@ export const getShadowRejections = async () => {
   const response = await apiClient.get('/shadow/rejections');
   return response.data;
 };
+
+export const getShadowHealth = async () => {
+  const response = await apiClient.get('/shadow/health');
+  return response.data;
+};

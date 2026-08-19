@@ -12,7 +12,7 @@ import {
   Zap,
   AlertTriangle
 } from 'lucide-react';
-import { getShadowStatus, getShadowSummary, getShadowActiveSignals, getShadowUniverse, getShadowPerformance } from '../api/client';
+import { getShadowStatus, getShadowSummary, getShadowActiveSignals, getShadowUniverse, getShadowPerformance, getShadowHealth } from '../api/client';
 
 export default function ShadowMonitor() {
   const [status, setStatus] = useState<any>(null);
@@ -20,23 +20,26 @@ export default function ShadowMonitor() {
   const [activeSignals, setActiveSignals] = useState<any[]>([]);
   const [universe, setUniverse] = useState<any[]>([]);
   const [perf, setPerf] = useState<any>(null);
+  const [health, setHealth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
   const fetchData = async () => {
     try {
-      const [sStatus, sSum, sActive, sUni, sPerf] = await Promise.all([
+      const [sStatus, sSum, sActive, sUni, sPerf, sHealth] = await Promise.all([
         getShadowStatus(),
         getShadowSummary(),
         getShadowActiveSignals(),
         getShadowUniverse(),
-        getShadowPerformance()
+        getShadowPerformance(),
+        getShadowHealth()
       ]);
       setStatus(sStatus);
       setSummary(sSum);
       setActiveSignals(sActive);
       setUniverse(sUni);
       setPerf(sPerf);
+      setHealth(sHealth);
       setLastRefreshed(new Date());
     } catch (err) {
       console.error("Failed to fetch shadow data:", err);
@@ -71,9 +74,12 @@ export default function ShadowMonitor() {
             <Clock size={14} style={{ verticalAlign: 'middle', marginRight: 8 }} />
             BASELINE START: {status?.baseline_start} | LAST REFRESHED: {lastRefreshed.toLocaleTimeString()}
           </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mt: 0.5 }}>
+            LAST CLOUD CYCLE: {health?.last_shadow_cycle || 'N/A'} | WORKER HB: {health?.last_worker_heartbeat || 'N/A'}
+          </Typography>
         </Box>
         <Stack direction="row" spacing={2}>
-           <StatusBadge label="ENGINE" status={perf?.health?.shadow_worker || "HEALTHY"} color={perf?.health?.shadow_worker === 'ONLINE' ? "#10b981" : "#f59e0b"} />
+           <StatusBadge label="ENGINE" status={health?.shadow_worker || "HEALTHY"} color={health?.shadow_worker === 'ONLINE' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="STRATEGY" status="FROZEN" color="#00D1FF" />
            <StatusBadge label="SAMPLE" status={perf?.sample_status || "INSUFFICIENT"} color="#f59e0b" />
         </Stack>
