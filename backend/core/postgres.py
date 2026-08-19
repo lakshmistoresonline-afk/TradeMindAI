@@ -23,7 +23,19 @@ elif not DATABASE_URL or DATABASE_URL == '""' or DATABASE_URL == "sqlite:///./lo
 
 from sqlalchemy import create_engine
 # SQLite needs special args for concurrent access in some cases
-engine_args = {"connect_args": {"check_same_thread": False}} if "sqlite" in DATABASE_URL else {}
+engine_args = {}
+if "sqlite" in DATABASE_URL:
+    engine_args = {"connect_args": {"check_same_thread": False}}
+else:
+    # Neon PostgreSQL Hardening (Phase 7.5)
+    engine_args = {
+        "pool_pre_ping": True,
+        "pool_recycle": 3600,
+        "pool_size": 10,
+        "max_overflow": 20,
+        "connect_args": {"connect_timeout": 10}
+    }
+
 engine = create_engine(DATABASE_URL, **engine_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

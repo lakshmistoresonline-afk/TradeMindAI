@@ -16,6 +16,12 @@ print(f"DEBUG: tasks.py v2.2.2 loaded from {os.path.abspath(__file__)}")
 
 celery_app = Celery("backend.workers.tasks", broker=settings.REDIS_URL)
 
+# Vision 2.2: Hardened Routing
+celery_app.conf.task_default_queue = "shadow"
+celery_app.conf.task_routes = {
+    "backend.workers.tasks.*": {"queue": "shadow"}
+}
+
 # Automated Schedule (ENABLED for Railway Shadow Monitoring v2.2)
 celery_app.conf.beat_schedule = {
     "run-shadow-monitoring-cycle": {

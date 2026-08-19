@@ -1,53 +1,56 @@
-# Implementation Plan - Phase 7: Autonomous Shadow Accumulation & Continuous Validation
+# Implementation Plan - Phase 7.5: Celery Routing & Production Reliability Fix
 
-This phase establishes the continuous monitoring and validation framework for the now PC-independent Shadow Engine (Strategy v2.2) on Railway. The primary goal is the natural accumulation of 20 genuine completed trades while maintaining 100% operational integrity and strategy freeze.
+This phase resolves the remaining infrastructure defects identified in the Railway production logs: incorrect Celery queue routing, a missing Beat schedule for the Shadow cycle, and unstable database connection pooling.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> **NO MANUAL INTERVENTION:** The system is now fully autonomous. We will not manually trigger cycles or resolve outcomes unless a systemic failure is detected.
+> **QUEUE CONSOLIDATION:** All production Shadow tasks and heartbeats will be strictly routed to the `shadow` queue. The Shadow Worker will be configured to ONLY listen to this queue, preventing it from wasting resources on generic tasks.
 >
-> **20-TRADE MILESTONE:** This is the hard project gate. Paper Trading certification will only be initiated after the 20th genuine terminal outcome is audited and reported.
+> **CONNECTION RESILIENCE:** We are enabling `pool_pre_ping=True` and `pool_recycle=3600` for the Neon PostgreSQL engine. This automatically detects and recovers "stale" SSL connections that previously caused 500 errors.
 >
-> **STRATEGY FREEZE:** Strategy v2.2 parameters (3% Target/Stop, 0.52 Prob, 10M Liquidity) are non-negotiable and strictly enforced by the cloud worker.
+> **SECURITY HARDENING:** All diagnostic logging of Firebase credential lengths and metadata will be removed to prevent information leakage in production logs.
 
 ## Proposed Changes
 
-### 1. Continuous Reporting & Progress Tracking
-#### [MODIFY] [generate_shadow_report.py](file:///G:/TradeMindAI/production/reports/generate_shadow_report.py)
-- Refine to support "Phase 7" context.
-- Ensure all metrics are derived from Neon PostgreSQL.
-- Add "PC Independence" health check to the markdown report.
+### 1. Celery Routing & Schedule Repair
+#### [MODIFY] [tasks.py](file:///G:/TradeMindAI/backend/workers/tasks.py)
+- Refine `celery_app.conf.beat_schedule`:
+    - Ensure `run-shadow-monitoring-cycle` correctly points to `backend.workers.tasks.run_shadow_cycle_task`.
+    - Explicitly set `options={"queue": "shadow"}` for all scheduled tasks.
+- Refine task decorators:
+    - Ensure `terminal_heartbeat` is explicitly routed to `queue="shadow"`.
 
-### 2. Autonomous Monitoring Report
-#### [NEW] [PHASE7_AUTONOMOUS_SHADOW_MONITORING_REPORT.md](file:///G:/TradeMindAI/production/reports/PHASE7_AUTONOMOUS_SHADOW_MONITORING_REPORT.md)
-- Template for continuous tracking of Phase 7 progress.
-- Includes cycle logs, signal audits, and drift metrics.
+### 2. Database Connection Hardening
+#### [MODIFY] [postgres.py](file:///G:/TradeMindAI/backend/core/postgres.py)
+- Update `create_engine` for PostgreSQL to include:
+    - `pool_pre_ping=True`: Verifies connection health before use.
+    - `pool_recycle=3600`: Rotates connections every hour to prevent stale SSL timeouts.
+    - `pool_size=10` and `max_overflow=20`: Optimized for Railway replica concurrency.
 
-### 3. Integrity & Heartbeat Automation
-#### [RUN] Cloud-Side Monitoring
-- The existing `shadow-worker` and `shadow-beat` on Railway already record heartbeats and evaluation events.
-- Verification will be done periodically by querying the Cloud API.
+### 3. Railway Startup Refinement
+#### [MODIFY] [start.sh](file:///G:/TradeMindAI/backend/start.sh)
+- Ensure the `shadow-worker` service explicitly starts with `-Q shadow` to match the routing configuration.
 
-### 4. Outcome Resolution Automation
-- **Status:** Already implemented in `ShadowService`. Resolves ACTIVE signals naturally against subsequent market candles.
+### 4. Security & Firebase Isolation
+#### [MODIFY] [database.py](file:///G:/TradeMindAI/backend/core/database.py)
+- Remove `Raw Credential Length` print statements.
+- Wrap Firebase initialization in a clean try/except that logs only high-level status (SUCCESS/FAIL) without metadata.
 
 ## Verification Plan
 
-### Automated Monitoring (Cloud)
-- **Cycle Count Monitoring:** Verify `evaluation_cycles` increment every 30 minutes (NSE Hours).
-- **Heartbeat Audit:** Verify `shadow_worker` and `shadow_beat` show `ONLINE` status in the web dashboard.
-- **Drift Audit:** Verify Probability Mean remains within ±0.05 of the 0.587 baseline.
+### Automated Verification
+- **Local Namespace Check:** `celery -A backend.workers.tasks.celery_app inspect registered` should show `backend.workers.tasks.run_shadow_cycle_task`.
+- **Local Routing Check:** Verify `celery_app.conf.task_routes` (if added) or decorator-level routing.
 
-### Manual Acceptance Test
-- **Dashboard Review:** Periodic inspection of [https://com-webcraft-trademindai-c8f75.web.app/shadow](https://com-webcraft-trademindai-c8f75.web.app/shadow).
-- **Milestone Verification:** Generate a milestone report (`SHADOW_MILESTONE_05`, etc.) as soon as the completed trade count advances.
+### Manual Verification (Cloud Logs)
+1.  **Deployment:** Push to Railway and wait for service restarts.
+2.  **Worker Log Audit:** Confirm `[queues] .> shadow` appears during startup.
+3.  **Beat Log Audit:** Confirm `Scheduler: Sending due task backend.workers.tasks.run_shadow_cycle_task` appears every 30 mins (during IST market hours).
+4.  **API Audit:** Verify `/api/v1/shadow/performance` no longer returns 500 errors after idle periods.
 
-## Milestone Horizon
-| Milestone | Completed Trades | Expectation |
-| :--- | :--- | :--- |
-| **Current** | 1 / 20 | Baseline established (SBIN WIN). |
-| **M1** | 5 / 20 | First statistical confidence check. |
-| **M2** | 10 / 20 | Mid-horizon audit. |
-| **M3** | 15 / 20 | Final pre-gate audit. |
-| **M4** | 20 / 20 | **PHASE 7 COMPLETE - SHADOW-TO-PAPER GATE**. |
+## Success Criteria
+- [ ] Worker consumes `shadow` queue.
+- [ ] Beat dispatches Shadow cycle.
+- [ ] Neon connection remains stable (No "SSL closed unexpectedly").
+- [ ] **Evaluation Cycles** increments to 11+ in the cloud.

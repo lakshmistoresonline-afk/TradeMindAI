@@ -11,7 +11,6 @@ db_client = None
 firebase_creds_json = os.getenv("FIREBASE_SERVICE_ACCOUNT")
 
 if firebase_creds_json:
-    print(f"[*] Raw Credential Length: {len(firebase_creds_json)}")
     try:
         import base64
         import re
@@ -22,9 +21,8 @@ if firebase_creds_json:
         cred = credentials.Certificate(creds_dict)
         app = firebase_admin.initialize_app(cred)
         db_client = firestore.client()
-        print("[+] Firebase initialized from Base64")
+        print("[+] Firebase initialized successfully.")
     except Exception as b64_err:
-        print(f"[*] Base64 init failed ({b64_err}), trying Raw JSON...")
         try:
             # Try raw JSON with repair
             clean_json = firebase_creds_json.strip().strip("'").strip('"').replace("\\n", "\n")
@@ -32,16 +30,15 @@ if firebase_creds_json:
             cred = credentials.Certificate(creds_dict)
             app = firebase_admin.initialize_app(cred)
             db_client = firestore.client()
-            print("[+] Firebase initialized from Raw JSON")
+            print("[+] Firebase initialized from raw JSON.")
         except Exception as json_err:
-            print(f"[!] Firebase Init Failed completely: {json_err}")
             # Final fallback: initialize with just project ID
             try:
                 app = firebase_admin.initialize_app(options={'projectId': settings.FIREBASE_PROJECT_ID})
                 db_client = firestore.client()
-                print("[+] Firebase Fallback initialized (Read-Only/Limited)")
+                print("[+] Firebase initialized in limited mode.")
             except Exception as final_err:
-                print(f"[!!] Total Firebase Failure: {final_err}")
+                print(f"[!!] Firebase initialization failed.")
 
 # Local file fallbacks if no environment variable or if it failed
 if db_client is None:
