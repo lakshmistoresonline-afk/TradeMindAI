@@ -22,13 +22,19 @@ if [ "$ENVIRONMENT" = "production" ]; then
     echo "[+] Configuration Validated."
 fi
 
-# --- EMERGENCY WORKER ELIMINATION (Phase 7.9) ---
-if [ "$SERVICE_TYPE" != "api" ] && [ -n "$SERVICE_TYPE" ]; then
-    echo "[!] CRITICAL ERROR: BACKGROUND WORKERS ARE DISABLED ON RAILWAY."
-    echo "    Role '$SERVICE_TYPE' is not permitted in cloud environment."
-    echo "    All background tasks must be executed manually from the local machine."
-    exit 1
+# --- ZERO RAILWAY WORKER ENFORCEMENT (Phase 7.8 Correction) ---
+if [ "$ENVIRONMENT" = "production" ]; then
+    if [ "$SERVICE_TYPE" != "api" ]; then
+        echo "[!] CRITICAL ERROR: RAILWAY_BACKGROUND_EXECUTION_DISABLED"
+        echo "    Role '$SERVICE_TYPE' is forbidden in the cloud environment."
+        echo "    Railway is reserved ONLY for API/Web serving."
+        echo "    All heavy processing must run manually on local Windows infrastructure."
+        exit 1
+    fi
 fi
+
+# Note: Celery worker/beat branches removed to prevent accidental cloud execution.
+# Background tasks are preserved in the codebase for local manual execution only.
 
 echo "Starting FastAPI API..."
 PORT=${PORT:-8000}

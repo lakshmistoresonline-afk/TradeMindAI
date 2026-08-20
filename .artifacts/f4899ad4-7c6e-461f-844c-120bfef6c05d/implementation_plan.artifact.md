@@ -1,46 +1,46 @@
-# Implementation Plan - Emergency Railway/Celery Worker Elimination
+# Implementation Plan - Phase 7.8 Correction: Enforce Zero Railway Workers
 
-This plan implements a strict "Zero-Worker" policy on Railway to resolve production errors and move all background processing to local manual execution.
+This plan corrects the Phase 7.8 implementation by strictly enforcing the "Zero-Worker" policy on Railway. It removes all background execution paths from the cloud infrastructure and consolidates all heavy processing to local manual execution.
 
 ## User Review Required
 
 > [!CRITICAL]
-> **RAILWAY WORKER DEACTIVATION:** This change will disable all Celery Workers and Beat schedulers on Railway. Background tasks like market sync, ML training, and Shadow monitoring will no longer run automatically in the cloud.
+> **ARCHITECTURE RESET:** We are reverting the attempts to make Celery Beat/Worker functional on Railway. The cloud environment will now be strictly limited to the API/Web role.
 >
-> **LOCAL MANUAL EXECUTION:** All background processing must now be initiated manually from the local Windows PC using the provided scripts.
+> **FAIL-CLOSED ENFORCEMENT:** Any service attempt on Railway to start a role other than `api` will result in an immediate `RuntimeError` and exit.
 
 ## Proposed Changes
 
 ### 1. Hardening Railway Startup Script
 #### [MODIFY] [start.sh](file:///G:/TradeMindAI/backend/start.sh)
-- Remove all logic for `worker`, `beat`, `shadow-worker`, and `shadow-beat`.
-- Implement a strict check: If `SERVICE_TYPE` is not `api`, the script will log an error and exit immediately.
-- This prevents Railway from starting any background execution roles even if configured.
+- Revert the Phase 7.8 changes (dummy HTTP server, worker/beat branches).
+- Implement a strict, streamlined check:
+    - If `ENVIRONMENT == "production"` and `SERVICE_TYPE != "api"`, log `RAILWAY_BACKGROUND_EXECUTION_DISABLED` and exit 1.
+- Remove all `celery worker` and `celery beat` command branches.
 
-### 2. Disabling Automated Schedule
+### 2. Schedule Protection
 #### [MODIFY] [tasks.py](file:///G:/TradeMindAI/backend/workers/tasks.py)
-- Disable the `celery_app.conf.beat_schedule` entirely in production.
-- Add a safety check in `celery_app` initialization to prevent it from starting as a worker/beat on Railway.
+- Ensure `beat_schedule` remains empty in production.
+- Revert the schedule extension (9-18) for the production check if it was added.
 
-### 3. Documentation & Audit
-#### [NEW] [RAILWAY_ZERO_WORKER_AUDIT.md](file:///G:/TradeMindAI/docs/RAILWAY_ZERO_WORKER_AUDIT.md)
-- Document the removal of Railway workers and schedulers.
-- List the local replacements for each previously automated task.
+### 3. Documentation Update
+#### [MODIFY] [RAILWAY_ZERO_WORKER_AUDIT.md](file:///G:/TradeMindAI/docs/RAILWAY_ZERO_WORKER_AUDIT.md)
+- Update to reflect the finalized Zero-Worker status.
+- Document that the container termination for forbidden services is the intended security behavior.
 
 ## Verification Plan
 
 ### Automated Verification
-- **Local Test:** Verify that `SERVICE_TYPE=api` still starts the FastAPI server correctly.
-- **Fail-Closed Test:** Set `SERVICE_TYPE=worker` locally and verify the script exits with an error.
+- **Startup Refusal Test:** Set `SERVICE_TYPE=shadow-worker` locally with `ENVIRONMENT=production` and verify it logs `RAILWAY_BACKGROUND_EXECUTION_DISABLED` and exits.
+- **API Liveness Test:** Set `SERVICE_TYPE=api` and verify the FastAPI server starts normally.
 
-### Manual Verification (Railway)
-1. **Redeploy to Railway:** Apply the changes.
-2. **Log Audit:** Confirm that any service other than the API shows "ERROR: Background workers are disabled on Railway."
-3. **Task Audit:** Confirm that no new evaluation events or signals are created autonomously in Neon PostgreSQL.
+### Manual Verification
+1. **Redeploy to Railway:** Apply the hardened `start.sh`.
+2. **Log Audit:** Confirm `trademind-worker` and `trademind-beat` services show the critical error and exit.
+3. **Cloud Status:** Verify the [Shadow Monitor Dashboard](https://com-webcraft-trademindai-c8f75.web.app/shadow) shows **Evaluation Cycles** remain at 10 (proving no cloud execution).
 
 ## Success Criteria
 - Railway Workers = 0
 - Railway Schedulers = 0
-- Railway Background Tasks = 0
-- No `ModuleNotFoundError: No module named 'production'` on Railway.
-- Local manual execution remains fully functional.
+- Railway heavy processing = 0
+- Local manual workflows remain the single source of database updates.

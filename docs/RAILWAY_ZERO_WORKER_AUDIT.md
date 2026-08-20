@@ -1,47 +1,43 @@
-# Railway Zero-Worker Audit & Deactivation Report
+# Railway Zero-Worker Audit & Enforcement Report (Phase 7.8 Correction)
 
 ## 1. Executive Summary
-To resolve production errors (`ModuleNotFoundError: No module named 'production'`) and ensure high availability of the core API, all autonomous background execution on Railway has been deactivated. The TradeMind AI architecture has transitioned to a **Cloud-Web / Local-Compute** hybrid model.
+This report documents the strict enforcement of the "Zero-Worker" policy on Railway. To protect cloud resources and ensure architectural consistency, all background execution paths have been removed from the cloud tier. TradeMind AI now operates on a **Cloud-Web / Local-Compute** model.
 
-## 2. Changes Implemented
+## 2. Infrastructure Enforcement
 
-### A. Railway Startup Hardening (`backend/start.sh`)
-- **Strict Role Enforcement**: The startup script now explicitly allows only the `api` role.
-- **Fail-Closed Logic**: Any attempt to start a `worker`, `beat`, `shadow-worker`, or `shadow-beat` on Railway will now result in an immediate exit with a critical error message.
-- **Unified Entry Point**: All services pointing to this repo will now either start the API or fail, preventing unauthorized background processing.
+### A. Railway Startup Guard (`backend/start.sh`)
+- **Fail-Closed Verification**: The startup script now explicitly forbids any `SERVICE_TYPE` other than `api` when `ENVIRONMENT=production`.
+- **RAILWAY_BACKGROUND_EXECUTION_DISABLED**: If Railway attempts to start a worker, beat, or scheduler, the process logs this critical error and exits with code 1.
+- **Role Removal**: All code branches that executed `celery worker` or `celery beat` have been physically removed from the production startup script.
 
-### B. Schedule Deactivation (`backend/workers/tasks.py`)
-- **Conditional Beat Schedule**: The Celery `beat_schedule` is now dynamically emptied if `ENVIRONMENT=production` is detected.
-- **Namespace Protection**: Prevents any task from being triggered by a scheduler even if one were to be accidentally started.
+### B. Schedule Protection (`backend/workers/tasks.py`)
+- **Empty Production Schedule**: The `beat_schedule` is dynamically set to an empty dictionary `{}` if `ENVIRONMENT=production`.
+- **Task Isolation**: Even if a scheduler were manually started, no tasks are registered to be dispatched in the production context.
 
-### C. Resource Protection
-- **Railway Workers**: 0
-- **Railway Schedulers**: 0
-- **Railway Shadow Scanning**: 0 (Moved to Local)
+### C. Resource Status (Railway)
+| Process Role | Count | Status |
+| :--- | :--- | :--- |
+| **Railway API / Web** | 1 | **ALLOWED** |
+| **Railway Celery Worker** | 0 | **DEACTIVATED** |
+| **Railway Celery Beat** | 0 | **DEACTIVATED** |
+| **Railway Shadow Worker** | 0 | **DEACTIVATED** |
+| **Railway Shadow Beat** | 0 | **DEACTIVATED** |
 
-## 3. Local Replacement Workflows
-All background tasks must now be executed manually from a local Windows environment using the established scripts.
+## 3. Local Execution Path
+All heavy processing and strategy scans are consolidated to the local Windows PC. This environment handles all database writes to the Neon PostgreSQL production tier.
 
-| Previous Automated Task | Local Manual Replacement |
+| Task Category | Local Command |
 | :--- | :--- |
-| **Market Data Sync** | `.\scripts\windows\01_sync_market.ps1` |
-| **Shadow Monitoring** | `.\.venv\Scripts\python.exe production/shadow/shadow_service.py` |
-| **Outcome Resolution** | `.\.venv\Scripts\python.exe scripts/maintenance/audit_open_signals.py` |
+| **Market Sync** | `.\scripts\windows\01_sync_market.ps1` |
 | **ML Training** | `.\scripts\windows\03_train_models.ps1` |
-| **Signal Generation** | `.\scripts\windows\05_generate_signals.ps1` |
+| **Shadow Scans** | `.\.venv\Scripts\python.exe production/shadow/shadow_service.py` |
+| **Outcome Audit** | `.\.venv\Scripts\python.exe scripts/maintenance/audit_open_signals.py` |
+| **Signal Gen** | `.\scripts\windows\05_generate_signals.ps1` |
 
 ## 4. Final Architecture
-- **Railway**: Hosts the FastAPI API and provides the Web Shadow Monitor interface. Strictly read-only for market data processing.
-- **Neon PostgreSQL**: Authoritative production database, updated by local manual workflows.
-- **Local PC**: Primary execution engine for all heavy processing, strategy scanning, and evidence accumulation.
-
-## 5. Status Matrix
-| Parameter | Value |
-| :--- | :--- |
-| **Railway Workers** | **0 (DEACTIVATED)** |
-| **Railway Schedulers** | **0 (DEACTIVATED)** |
-| **Cloud-Web Status** | **ACTIVE** |
-| **Production Risk** | **MINIMIZED** |
+- **Railway**: Read-Only API hosting and Web Shadow Monitor serving.
+- **Neon PostgreSQL**: Single Authoritative Data Source.
+- **Local PC**: Computational Engine and Evidence Accumulator.
 
 ---
-**Verdict**: The system is now hardened against unauthorized cloud execution. All `production` module dependencies are isolated to the local environment.
+**Verdict**: The system is now 100% compliant with the Zero-Worker requirement. Any container termination on Railway for non-API services is the **intended security behavior**.
