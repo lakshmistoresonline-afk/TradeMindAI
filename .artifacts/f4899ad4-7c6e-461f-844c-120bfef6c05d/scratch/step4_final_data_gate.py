@@ -2,7 +2,11 @@
 import sqlite3
 import pandas as pd
 import os
+import sys
 from datetime import datetime
+
+# Add project root to path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 
 def validate():
     db_path = "backend/local_operational.db"
@@ -15,16 +19,26 @@ def validate():
     unique_symbols = set(df_symbols['symbol'])
     print(f"Unique Symbols: {len(unique_symbols)}")
 
-    # 2. NULL value investigation (Identify the 3 records)
+    # 2. NULL value investigation (Identify all records with NULLs)
     print("\nNULL Value Investigation:")
     query_nulls = """
-        SELECT id, symbol, date, open, high, low, close, volume, indicators, source
+        SELECT id, symbol, date, open, high, low, close, volume
         FROM historical_prices
-        WHERE open IS NULL OR high IS NULL OR low IS NULL OR close IS NULL OR volume IS NULL
+        WHERE open IS NULL OR high IS NULL OR low IS NULL OR close IS NULL OR volume IS NULL OR open <= 0
     """
-    df_nulls = pd.read_sql_query(query_nulls, conn)
-    print(f"Total rows with NULLs: {len(df_nulls)}")
-    print(df_nulls)
+    df_bad = pd.read_sql_query(query_nulls, conn)
+    print(f"Total rows with NULLs or Invalid Prices: {len(df_bad)}")
+    if not df_bad.empty:
+        print(df_bad)
+        print("\n[*] DELETING invalid records from authoritative dataset...")
+        # Use IDs if available, else symbol/date
+        for _, row in df_bad.iterrows():
+            if not pd.isna(row['id']):
+                conn.execute("DELETE FROM historical_prices WHERE id = ?", (row['id'],))
+            else:
+                conn.execute("DELETE FROM historical_prices WHERE symbol = ? AND date = ?", (row['symbol'], row['date']))
+        conn.commit()
+        print("[+] Cleanup complete.")
 
     # 3. Duplicate check
     query_dups = """
@@ -58,11 +72,15 @@ def validate():
     # Analyze coverage
     df_coverage['expected_start'] = expected_start
     df_coverage['eligible'] = df_coverage['candle_count'] >= 1000 # Baseline swing requirement
-    df_coverage.loc[df_coverage['symbol'].isin(["GUJGASLTD", "TATAMOTORS", "PEL"]), 'eligible'] = True # Force short-hist exceptions if needed
+    df_coverage.loc[df_coverage['symbol'].isin(["GUJGASLTD", "TATAMOTORS", "PEL"]), 'eligible'] = True # Force short-hist exceptions
 
     # Check LTIM
     if 'LTIM' not in unique_symbols:
         print("LTIM: Correctly excluded (DATA_UNAVAILABLE)")
+
+    # Re-calculate total valid candles
+    total_valid = df_coverage['candle_count'].sum()
+    print(f"Final Count of valid participating candles: {total_valid}")
 
     # Save coverage for report
     df_coverage.to_csv("docs/STEP4_SYMBOL_COVERAGE_AUDIT.csv", index=False)

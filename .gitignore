@@ -1,18 +1,262 @@
-*.iml
-.gradle
-/local.properties
-.venv/
+# GLOBAL GITIGNORE
+# Ignore runtime-generated, build, cache, dependency and OS artifacts.
+# Keep source code, configuration, data, JSON/YAML/XML, lock files and keys.
+
+# Node.js / JavaScript
 node_modules/
+**/node_modules/
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.heapsnapshot
+
+# JS framework/build/cache
+.next/cache/
+.nuxt/cache/
+.svelte-kit/cache/
+.angular/cache/
+.vite/
+.parcel-cache/
+.webpack-cache/
+.rollup.cache/
+.cache/
+**/.cache/
 dist/
-/build
-/captures
-.externalNativeBuild
-.cxx
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+**/dist/
+out/
+**/out/
+build/
+**/build/
+storybook-static/
+.astro/
+
+# React Native / Expo / Metro
+.expo/
+.expo-shared/
+.metro/
+.metro-cache/
+**/.gradle/
+**/.cxx/
+*.apk
+*.aab
+
+# Android / Gradle
+.gradle/
+**/captures/
+*.hprof
+
+# iOS / Xcode
+DerivedData/
+**/DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcarchive
+.build/
+**/.build/
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.pytype/
+.tox/
+.nox/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+ENV/
+**/.venv/
+**/venv/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+wheels/
+
+# Test / coverage output
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+**/coverage/
+.nyc_output/
+test-results/
+**/test-results/
+playwright-report/
+allure-results/
+allure-report/
+
+# Java / JVM / Kotlin
+*.class
+hs_err_pid*.log
+replay_pid*.log
+.kotlin/
+**/.kotlin/
+
+# C / C++ / native build output
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+*.d
+*.gcda
+*.gcno
+*.gcov
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Rust
+target/
+**/target/
+
+# Ruby / PHP
+.bundle/
+vendor/bundle/
+vendor/
+composer.phar
+
+# .NET / Visual Studio
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs and runtime state
 *.log
+*.log.*
+logs/
+log/
+**/logs/
+**/log/
+runtime/
+**/runtime/
+run/
+**/run/
+tmp/
+**/tmp/
+temp/
+**/temp/
+*.pid
+*.pid.lock
+*.pidfile
+*.sock
+
+# Generic caches
+*.cache
+.eslintcache
+.stylelintcache
+.tscache
+.sass-cache/
+.babel-cache/
+.swc/
+.turbo/
+.nx/cache/
+.nx/workspace-data/
+
+# Database runtime journals (database files themselves remain trackable)
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Temporary/editor files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.swn
+*~
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.patch.tmp
+
+# OS generated files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.directory
+.Trash-*/
+
+# Partial/download files
+*.part
+*.crdownload
+*.download
+*.partial
+*.filepart
+
+# Office temporary files
+~$*.doc
+~$*.docx
+~$*.xls
+~$*.xlsx
+~$*.ppt
+~$*.pptx
+
+# IDE local/runtime state
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries/
+.idea/**/shelf/
+.idea/**/httpRequests/
+.vscode/*.log
+.metadata/
+.project.bak
+.settings/*.tmp
+
+# Local development / emulator state
+.serverless/
+.aws-sam/
+.cdk.out/
+terraform.tfstate
+terraform.tfstate.*
+.terraform/
+**/.terraform/
+.firebase/
+firebase-debug.log
+ui-debug.log
+
+# Generated thumbnails / previews
+.thumbnails/
+**/.thumbnails/
+previews/
+**/previews/
+
+# IMPORTANT: NOT IGNORED
+# .env and .env.*
+# *.json, *.yaml, *.yml, *.xml, *.toml, *.ini, *.conf, *.config
+# *.properties, *.key, *.pem, *.crt, *.cer
+# firebase.json, .firebaserc, google-services.json
+# package.json, package-lock.json, yarn.lock, pnpm-lock.yaml
+# Gradle configuration, source code, SQL/data files and maintained files

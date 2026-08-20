@@ -28,6 +28,7 @@ def deduplicate():
         return
 
     # Create temporary table to store one of each
+    cursor.execute("DROP TABLE IF EXISTS historical_prices_temp")
     cursor.execute("CREATE TABLE historical_prices_temp AS SELECT * FROM historical_prices WHERE 1=0")
 
     # Insert unique rows into temp
@@ -37,8 +38,8 @@ def deduplicate():
         GROUP BY symbol, date
     """)
 
-    unique_count = cursor.execute("SELECT count(*) FROM historical_prices_temp").scalar()
-    old_count = cursor.execute("SELECT count(*) FROM historical_prices").scalar()
+    unique_count = cursor.execute("SELECT count(*) FROM historical_prices_temp").fetchone()[0]
+    old_count = cursor.execute("SELECT count(*) FROM historical_prices").fetchone()[0]
 
     print(f"Old count: {old_count}")
     print(f"New count: {unique_count}")

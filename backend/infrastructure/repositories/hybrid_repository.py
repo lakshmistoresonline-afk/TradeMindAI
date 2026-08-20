@@ -124,7 +124,16 @@ class HybridStockRepository(IStockRepository):
 
             results = []
             for p in prices:
-                p_data = {c.name: getattr(p, c.name) for c in p.__table__.columns}
+                if p is None: continue
+                # Handle both SQLAlchemy objects and Row objects
+                if hasattr(p, '__table__'):
+                    p_data = {c.name: getattr(p, c.name) for c in p.__table__.columns}
+                elif hasattr(p, '_asdict'):
+                    p_data = p._asdict()
+                else:
+                    # Fallback for other potential types
+                    p_data = {col: getattr(p, col) for col in p.__dict__ if not col.startswith('_')}
+
                 if p_data.get('indicators') and isinstance(p_data['indicators'], str):
                     try: p_data['indicators'] = json.loads(p_data['indicators'])
                     except: pass

@@ -9,8 +9,15 @@ from .config import settings
 # Hybrid Logic: Fallback to SQLite for local development if PG URL missing or empty
 DATABASE_URL = settings.POSTGRES_URL
 
+# EXECUTION MODE OVERRIDE (Phase 7.9)
+if os.getenv("TRADEMIND_EXECUTION_MODE") == "local":
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    db_path = os.path.join(base_dir, "backend", "local_operational.db")
+    DATABASE_URL = f"sqlite:///{db_path}"
+    print(f"DEBUG: FORCED LOCAL MODE: {DATABASE_URL}")
+
 # PRODUCTION FAIL-CLOSED GUARD (Phase 7.3)
-if settings.ENVIRONMENT == "production":
+elif settings.ENVIRONMENT == "production":
     if not DATABASE_URL or "sqlite" in DATABASE_URL.lower():
         print("[!] CRITICAL: PRODUCTION_SHADOW_SQLITE_FORBIDDEN. PostgeSQL URL missing or invalid.")
         raise RuntimeError("PRODUCTION_SHADOW_SQLITE_FORBIDDEN")

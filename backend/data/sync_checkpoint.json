@@ -1,1200 +1,162 @@
 {
     "ABB": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:10:41.946106"
-    },
-    "ACC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:10:46.438667"
-    },
-    "ADANIENSOL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:10:49.271993"
-    },
-    "ADANIENT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:10:52.261311"
-    },
-    "ADANIGREEN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:10:56.219584"
-    },
-    "ADANIPORTS": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:00.319864"
-    },
-    "ADANIPOWER": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:04.421102"
-    },
-    "AMBUJACEM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:08.344519"
-    },
-    "APOLLOHOSP": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:12.229259"
-    },
-    "APOLLOTYRE": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:16.320001"
-    },
-    "ASHOKLEY": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:20.324263"
-    },
-    "ASIANPAINT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:24.217642"
-    },
-    "ASTRAL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:28.144680"
-    },
-    "ATGL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:32.163244"
-    },
-    "AUROPHARMA": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:36.521442"
-    },
-    "AXISBANK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:41.053247"
-    },
-    "BAJAJ-AUTO": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:43.537857"
-    },
-    "BAJAJFINSV": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:46.224818"
-    },
-    "BAJAJHLDNG": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:49.070246"
-    },
-    "BAJFINANCE": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:52.036441"
-    },
-    "BALKRISIND": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:56.344750"
-    },
-    "BANDHANBNK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:11:59.402012"
-    },
-    "BANKBARODA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:03.362163"
-    },
-    "BANKINDIA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:07.393398"
-    },
-    "BATAINDIA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:11.252587"
-    },
-    "BEL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:15.411839"
-    },
-    "BERGEPAINT": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:19.457805"
-    },
-    "BHARATFORG": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:23.286549"
-    },
-    "BHARTIARTL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:27.109445"
-    },
-    "BHEL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:30.046719"
-    },
-    "BIOCON": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:32.988679"
-    },
-    "BLUEDART": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:37.152754"
-    },
-    "BOSCHLTD": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:41.044307"
-    },
-    "BPCL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:45.234265"
-    },
-    "BRITANNIA": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:48.395191"
-    },
-    "CANBK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:52.342860"
-    },
-    "CANFINHOME": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:12:56.284406"
-    },
-    "CGPOWER": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:00.909176"
-    },
-    "CHAMBLFERT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:04.856992"
-    },
-    "CHOLAFIN": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:08.934015"
-    },
-    "CIPLA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:12.867124"
-    },
-    "COALINDIA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:15.808735"
-    },
-    "COFORGE": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:19.761121"
-    },
-    "COLPAL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:23.647551"
-    },
-    "CONCOR": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:28.138684"
-    },
-    "COROMANDEL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:32.024464"
-    },
-    "CROMPTON": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:35.939855"
-    },
-    "CUMMINSIND": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:39.937212"
-    },
-    "DABUR": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:44.016558"
-    },
-    "DALBHARAT": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:47.924427"
-    },
-    "DEEPAKNTR": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:50.801203"
-    },
-    "DELHIVERY": {
-        "status": "SUCCESS",
-        "count": 1050,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:54.579846"
-    },
-    "DIVISLAB": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:13:58.514775"
-    },
-    "DIXON": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:02.349620"
-    },
-    "DLF": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:06.298803"
-    },
-    "DRREDDY": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:10.361675"
-    },
-    "EICHERMOT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:14.290189"
-    },
-    "ESCORTS": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:18.390137"
-    },
-    "EXIDEIND": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:22.562094"
-    },
-    "FEDERALBNK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:26.689671"
-    },
-    "FORTIS": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:29.599142"
-    },
-    "GAIL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:33.772853"
-    },
-    "GLENMARK": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:37.686849"
-    },
-    "GMRINFRA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:41.712353"
-    },
-    "GODREJCP": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:46.288518"
-    },
-    "GODREJPROP": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:49.172450"
-    },
-    "GRASIM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:50.863776"
-    },
-    "GUJGASLTD": {
-        "status": "ERROR",
-        "error": "can't compare offset-naive and offset-aware datetimes",
-        "updated_at": "2026-08-18 06:43:07.268489"
-    },
-    "HAL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:14:57.203956"
-    },
-    "HAVELLS": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:01.654288"
-    },
-    "HCLTECH": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:05.628447"
-    },
-    "HDFCBANK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:09.542745"
-    },
-    "HDFCLIFE": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:13.528051"
-    },
-    "HEROMOTOCO": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:17.436104"
-    },
-    "HINDALCO": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:21.388069"
-    },
-    "HINDCOPPER": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:24.588642"
-    },
-    "HINDPETRO": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:28.604555"
-    },
-    "HINDUNILVR": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:32.751441"
-    },
-    "HINDZINC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:35.639229"
-    },
-    "HUDCO": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:39.604190"
-    },
-    "ICICIBANK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:43.496773"
-    },
-    "ICICIGI": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:47.389424"
-    },
-    "ICICIPRULI": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:51.426140"
-    },
-    "IDBI": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:54.271008"
-    },
-    "IDFCFIRSTB": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:15:57.986953"
-    },
-    "IGL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:01.925392"
-    },
-    "INDHOTEL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:05.845083"
-    },
-    "INDIAMART": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:10.102272"
-    },
-    "INDIANB": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:13.203187"
-    },
-    "INDIGO": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:17.145860"
-    },
-    "INDUSINDBK": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:21.233757"
-    },
-    "INDUSTOWER": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:25.550109"
-    },
-    "INFY": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:29.794429"
-    },
-    "IOC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:31.943487"
-    },
-    "IRB": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:35.091534"
-    },
-    "IRCTC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:39.167461"
-    },
-    "IRFC": {
-        "status": "SUCCESS",
-        "count": 1374,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:43.114125"
-    },
-    "ITC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:47.587034"
-    },
-    "JINDALSTEL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:51.623974"
-    },
-    "JSWENERGY": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:53.783170"
-    },
-    "JSWSTEEL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:16:57.684894"
-    },
-    "JUBLFOOD": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:01.606761"
-    },
-    "KALYANKJIL": {
-        "status": "SUCCESS",
-        "count": 1335,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:04.443338"
-    },
-    "KANSAINER": {
-        "status": "SUCCESS",
-        "count": 1641,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:08.396031"
-    },
-    "KARURVYSYA": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:12.499754"
-    },
-    "KEI": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:16.621445"
-    },
-    "KOTAKBANK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:20.689879"
-    },
-    "KPITTECH": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:23.617433"
-    },
-    "L&TFH": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:27.506567"
-    },
-    "LICHSGFIN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:31.700488"
-    },
-    "LICI": {
-        "status": "SUCCESS",
-        "count": 1055,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:35.463597"
-    },
-    "LT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:17:39.495070"
-    },
-    "LTIM": {
         "status": "FAILED",
         "error": "No EQUITY data received from provider after retries",
-        "updated_at": "2026-08-18 06:43:30.779260"
-    },
-    "LUPIN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:04.631038"
-    },
-    "M&M": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:08.731336"
-    },
-    "M&MFIN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:12.929576"
-    },
-    "MAHABANK": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:16.038429"
-    },
-    "MANAPPURAM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:20.015937"
-    },
-    "MARICO": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:23.904275"
-    },
-    "MARUTI": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:27.763425"
-    },
-    "MAXHEALTH": {
-        "status": "SUCCESS",
-        "count": 1485,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:31.879113"
-    },
-    "MAZDOCK": {
-        "status": "SUCCESS",
-        "count": 1449,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:36.650551"
-    },
-    "MFSL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:39.404350"
-    },
-    "MGL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:43.413933"
-    },
-    "MPHASIS": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:47.648463"
-    },
-    "MRF": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:50.550033"
-    },
-    "MUTHOOTFIN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:54.964539"
-    },
-    "NATIONALUM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:18:57.878788"
-    },
-    "NAVINFLUOR": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:02.073969"
-    },
-    "NESTLEIND": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:05.265516"
-    },
-    "NHPC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:09.644483"
-    },
-    "NMDC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:12.715267"
-    },
-    "NTPC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:16.830142"
-    },
-    "NYKAA": {
-        "status": "SUCCESS",
-        "count": 1182,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:20.693303"
-    },
-    "OBEROIRLTY": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:23.658052"
-    },
-    "OIL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:27.538826"
-    },
-    "ONGC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:30.498065"
-    },
-    "PAGEIND": {
-        "status": "SUCCESS",
-        "count": 1641,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:34.452390"
-    },
-    "PATANJALI": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:38.402296"
-    },
-    "PAYTM": {
-        "status": "SUCCESS",
-        "count": 1176,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:42.287018"
-    },
-    "PEL": {
-        "status": "SUCCESS",
-        "count": 195,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:45.591826"
-    },
-    "PERSISTENT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:49.482273"
-    },
-    "PETRONET": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:52.522319"
-    },
-    "PFC": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:56.466830"
-    },
-    "PHOENIXLTD": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:19:59.394254"
-    },
-    "PIDILITIND": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:03.407845"
-    },
-    "PIIND": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:06.300529"
-    },
-    "PNB": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:10.470848"
-    },
-    "POLYCAB": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:14.335285"
-    },
-    "POONAWALLA": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:18.244100"
-    },
-    "POWERGRID": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:22.323236"
-    },
-    "PRESTIGE": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:25.774104"
-    },
-    "PVRINOX": {
-        "status": "SUCCESS",
-        "count": 1642,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:28.711080"
-    },
-    "RADICO": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:20:32.586800"
-    },
-    "RECLTD": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:33.728438"
-    },
-    "RELIANCE": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:37.627653"
-    },
-    "RVNL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:41.772455"
-    },
-    "SAIL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:45.993872"
-    },
-    "SBICARD": {
-        "status": "SUCCESS",
-        "count": 1592,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:49.924184"
-    },
-    "SBILIFE": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:53.892850"
-    },
-    "SBIN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:43:56.839211"
-    },
-    "SHREECEM": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:00.855117"
-    },
-    "SHRIRAMFIN": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:04.727980"
-    },
-    "SIEMENS": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:08.884681"
-    },
-    "SJVN": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:11.788717"
-    },
-    "SKFINDIA": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:15.667824"
-    },
-    "SONACOMS": {
-        "status": "SUCCESS",
-        "count": 1276,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:18.848038"
-    },
-    "SRF": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:21.805018"
-    },
-    "SUNPHARMA": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:25.741480"
-    },
-    "SUNTV": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:28.616370"
-    },
-    "SUPREMEIND": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:31.519181"
-    },
-    "SUZLON": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:35.304994"
-    },
-    "SYNGENE": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:39.632654"
-    },
-    "TATACOMM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:43.628499"
-    },
-    "TATACONSUM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:47.694853"
-    },
-    "TATAELXSI": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:50.480081"
-    },
-    "TATAMOTORS": {
-        "status": "SUCCESS",
-        "count": 193,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:53.864606"
-    },
-    "TATAPOWER": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:44:57.937764"
-    },
-    "TATASTEEL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:02.354450"
-    },
-    "TCS": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:06.532878"
-    },
-    "TECHM": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:09.457799"
-    },
-    "TIINDIA": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:12.265999"
-    },
-    "TITAN": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:15.132610"
-    },
-    "TORNTPHARM": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:17.889717"
-    },
-    "TORNTPOWER": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:20.648937"
-    },
-    "TRENT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:23.397227"
-    },
-    "TRIDENT": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:26.428487"
-    },
-    "UBL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:29.507265"
-    },
-    "UCOBANK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:32.318089"
-    },
-    "ULTRACEMCO": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:35.307666"
-    },
-    "UNIONBANK": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:39.847704"
-    },
-    "UNITDSPR": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:43.735773"
-    },
-    "VBL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:48.079220"
-    },
-    "VEDL": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:50.999676"
-    },
-    "VOLTAS": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:54.935389"
-    },
-    "WHIRLPOOL": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:45:58.923651"
-    },
-    "WIPRO": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:46:02.856053"
-    },
-    "YESBANK": {
-        "status": "SUCCESS",
-        "count": 1644,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:46:06.649715"
-    },
-    "ZOMATO": {
-        "status": "SUCCESS",
-        "count": 1256,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:46:10.342972"
-    },
-    "ZYDUSLIFE": {
-        "status": "SUCCESS",
-        "count": 1643,
-        "last_date": "2026-08-18 00:00:00",
-        "updated_at": "2026-08-18 06:46:14.394404"
+        "updated_at": "2026-08-20 06:02:06.734968"
+    },
+    "ACC": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:02:24.861451"
+    },
+    "ADANIENSOL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:02:42.964314"
+    },
+    "ADANIENT": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:01.931815"
+    },
+    "ADANIGREEN": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:19.900484"
+    },
+    "ADANIPORTS": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:38.539883"
+    },
+    "ADANIPOWER": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:57.494026"
+    },
+    "AMBUJACEM": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:04:16.604875"
+    },
+    "APOLLOHOSP": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:04:34.400563"
+    },
+    "APOLLOTYRE": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:04:51.904611"
+    },
+    "ASHOKLEY": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:05:10.564171"
+    },
+    "ASIANPAINT": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:05:29.251041"
+    },
+    "ASTRAL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:05:47.078730"
+    },
+    "ATGL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:06:06.207170"
+    },
+    "AUROPHARMA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:06:25.383329"
+    },
+    "AXISBANK": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:06:44.338838"
+    },
+    "BAJAJ-AUTO": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:02.126359"
+    },
+    "BAJAJFINSV": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:20.234271"
+    },
+    "BAJAJHLDNG": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:38.952150"
+    },
+    "BAJFINANCE": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:57.088549"
+    },
+    "BALKRISIND": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:08:16.147334"
+    },
+    "BANDHANBNK": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:08:33.198730"
+    },
+    "BANKBARODA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:08:50.848020"
+    },
+    "BANKINDIA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:09:09.778205"
+    },
+    "BATAINDIA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:09:28.589452"
+    },
+    "BEL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:09:47.175152"
+    },
+    "BERGEPAINT": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:10:06.721547"
+    },
+    "BHARATFORG": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:10:24.733336"
+    },
+    "BHARTIARTL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:10:42.029748"
+    },
+    "BHEL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:11:00.163799"
+    },
+    "BIOCON": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:11:18.001701"
+    },
+    "BLUEDART": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:11:36.285630"
     }
 }
