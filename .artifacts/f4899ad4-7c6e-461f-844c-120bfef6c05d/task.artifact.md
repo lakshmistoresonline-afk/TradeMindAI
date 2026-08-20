@@ -1,12 +1,12 @@
-# Task Checklist - Phase 7.7: Fix Railway Beat Service Role
+# Task Checklist - Emergency Railway/Celery Worker Elimination
 
-- `[/]` Infrastructure Hardening
-    - `[ ]` Enhance `backend/start.sh` with explicit role logging
-    - `[ ]` Add schedule count logging to `backend/workers/tasks.py`
-- `[ ]` Configuration Correction (Railway)
-    - `[ ]` Update `trademind-beat` SERVICE_TYPE to `shadow-beat`
+- `[/]` Implementation
+    - `[ ]` Deactivate background roles in `backend/start.sh`
+    - `[ ]` Disable automated schedule in `backend/workers/tasks.py`
+    - `[ ]` Implement fail-closed startup validation
+- `[ ]` Documentation
+    - `[ ]` Create `docs/RAILWAY_ZERO_WORKER_AUDIT.md`
 - `[ ]` Verification
-    - `[ ]` Confirm "Shadow Celery Beat" starting message in logs
-    - `[ ]` Verify task dispatch in Beat logs
-    - `[ ]` Verify task receipt in Worker logs
-    - `[ ]` Update `daily_shadow_report.md` with cloud-cycle success
+    - `[ ]` Verify API still starts correctly
+    - `[ ]` Verify worker refusal locally
+    - `[ ]` Final Git push

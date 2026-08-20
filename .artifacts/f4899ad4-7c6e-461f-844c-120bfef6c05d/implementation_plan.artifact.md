@@ -1,39 +1,46 @@
-# Implementation Plan - Phase 7.7: Fix Railway Beat Service Role
+# Implementation Plan - Emergency Railway/Celery Worker Elimination
 
-This phase resolves the role confusion in the Railway `trademind-beat` service. Forensic evidence shows that this service is currently starting a Celery Worker instead of the intended Celery Beat scheduler, resulting in zero autonomous shadow cycles.
+This plan implements a strict "Zero-Worker" policy on Railway to resolve production errors and move all background processing to local manual execution.
 
 ## User Review Required
 
-> [!IMPORTANT]
-> **ROLE CORRECTION:** The `trademind-beat` service on Railway must have its `SERVICE_TYPE` environment variable corrected to `shadow-beat`.
+> [!CRITICAL]
+> **RAILWAY WORKER DEACTIVATION:** This change will disable all Celery Workers and Beat schedulers on Railway. Background tasks like market sync, ML training, and Shadow monitoring will no longer run automatically in the cloud.
 >
-> **ZERO-DUPLICATION:** This will stop the duplicate worker running on the beat service and activate the actual scheduler required for 24/7 monitoring.
->
-> **STRATEGY FREEZE:** No trading logic or Strategy v2.2 parameters will be modified.
+> **LOCAL MANUAL EXECUTION:** All background processing must now be initiated manually from the local Windows PC using the provided scripts.
 
 ## Proposed Changes
 
 ### 1. Hardening Railway Startup Script
 #### [MODIFY] [start.sh](file:///G:/TradeMindAI/backend/start.sh)
-- Add explicit logging of the detected `SERVICE_TYPE` at the very beginning of the script to make future role confusion immediately visible in logs.
-- Ensure `shadow-beat` does not attempt to use `concurrency` or `queue` flags which are worker-specific.
+- Remove all logic for `worker`, `beat`, `shadow-worker`, and `shadow-beat`.
+- Implement a strict check: If `SERVICE_TYPE` is not `api`, the script will log an error and exit immediately.
+- This prevents Railway from starting any background execution roles even if configured.
 
-### 2. Schedule Validation
+### 2. Disabling Automated Schedule
 #### [MODIFY] [tasks.py](file:///G:/TradeMindAI/backend/workers/tasks.py)
-- Add a startup log entry that prints the count of active schedules in `beat_schedule`. This helps verify the scheduler "sees" the Shadow cycle task upon boot.
+- Disable the `celery_app.conf.beat_schedule` entirely in production.
+- Add a safety check in `celery_app` initialization to prevent it from starting as a worker/beat on Railway.
 
-### 3. Monitoring API Resilience
-- No changes required. The API is already reading from Neon PG.
+### 3. Documentation & Audit
+#### [NEW] [RAILWAY_ZERO_WORKER_AUDIT.md](file:///G:/TradeMindAI/docs/RAILWAY_ZERO_WORKER_AUDIT.md)
+- Document the removal of Railway workers and schedulers.
+- List the local replacements for each previously automated task.
 
 ## Verification Plan
 
-### Manual Verification (Cloud Logs)
-1. **Apply Configuration:** Change `SERVICE_TYPE` to `shadow-beat` in the Railway dashboard for the `trademind-beat` service.
-2. **Startup Audit:** Confirm logs show "Starting Shadow Celery Beat..." and **NOT** "mingle: searching for neighbors".
-3. **Dispatch Audit:** Wait for the next 30-minute interval and confirm "Sending due task backend.workers.tasks.run_shadow_cycle_task" appears in the beat logs.
-4. **Execution Audit:** Confirm the `trademind-worker` (the actual worker) logs "Task received: ...run_shadow_cycle_task".
+### Automated Verification
+- **Local Test:** Verify that `SERVICE_TYPE=api` still starts the FastAPI server correctly.
+- **Fail-Closed Test:** Set `SERVICE_TYPE=worker` locally and verify the script exits with an error.
+
+### Manual Verification (Railway)
+1. **Redeploy to Railway:** Apply the changes.
+2. **Log Audit:** Confirm that any service other than the API shows "ERROR: Background workers are disabled on Railway."
+3. **Task Audit:** Confirm that no new evaluation events or signals are created autonomously in Neon PostgreSQL.
 
 ## Success Criteria
-- [ ] `trademind-beat` service runs as `celery beat`.
-- [ ] No worker "mingle" messages appear in the beat service logs.
-- [ ] **Evaluation Cycles** increments autonomously on the web dashboard.
+- Railway Workers = 0
+- Railway Schedulers = 0
+- Railway Background Tasks = 0
+- No `ModuleNotFoundError: No module named 'production'` on Railway.
+- Local manual execution remains fully functional.

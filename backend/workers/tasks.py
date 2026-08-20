@@ -22,24 +22,30 @@ celery_app.conf.task_routes = {
     "backend.workers.tasks.*": {"queue": "shadow"}
 }
 
-# Automated Schedule (ENABLED for Railway Shadow Monitoring v2.2)
-celery_app.conf.beat_schedule = {
-    "run-shadow-monitoring-cycle": {
-        "task": "backend.workers.tasks.run_shadow_cycle_task",
-        "schedule": crontab(minute="*/30", hour="9-18", day_of_week="mon-fri"), # 9 AM to 6 PM IST
-        "options": {"queue": "shadow"}
-    },
-    "shadow-worker-heartbeat": {
-        "task": "backend.workers.tasks.terminal_heartbeat", # Reuse existing for basic health
-        "schedule": 60.0,
-        "options": {"queue": "shadow"}
+# Automated Schedule (DISABLED ON RAILWAY - LOCAL ONLY)
+if settings.ENVIRONMENT == "production":
+    celery_app.conf.beat_schedule = {}
+    print("[!] SCHEDULER: Automated schedules are DISABLED in production environment.")
+else:
+    celery_app.conf.beat_schedule = {
+        "run-shadow-monitoring-cycle": {
+            "task": "backend.workers.tasks.run_shadow_cycle_task",
+            "schedule": crontab(minute="*/30", hour="9-18", day_of_week="mon-fri"), # 9 AM to 6 PM IST
+            "options": {"queue": "shadow"}
+        },
+        "shadow-worker-heartbeat": {
+            "task": "backend.workers.tasks.terminal_heartbeat", # Reuse existing for basic health
+            "schedule": 60.0,
+            "options": {"queue": "shadow"}
+        }
     }
-}
+
 celery_app.conf.timezone = 'Asia/Kolkata'
 
-print(f"[*] SCHEDULER: Active schedules detected: {len(celery_app.conf.beat_schedule)}")
-for name, spec in celery_app.conf.beat_schedule.items():
-    print(f"    - {name}: {spec.get('task')}")
+if settings.ENVIRONMENT != "production":
+    print(f"[*] SCHEDULER: Active schedules detected: {len(celery_app.conf.beat_schedule)}")
+    for name, spec in celery_app.conf.beat_schedule.items():
+        print(f"    - {name}: {spec.get('task')}")
 
 @celery_app.task(queue="shadow")
 def run_shadow_cycle_task():
