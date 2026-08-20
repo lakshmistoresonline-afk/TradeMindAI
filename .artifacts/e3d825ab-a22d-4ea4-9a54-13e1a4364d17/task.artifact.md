@@ -1,0 +1,31 @@
+# Step 4.3 Robustness Validation Tasks
+
+- `[x]` Phase 1: Audit & Manifest
+    - `[x]` Verify Step 4.2 Checksum
+    - `[x]` Create `docs/step4_3/REPOSITORY_AUDIT.md`
+    - `[x]` Create `docs/step4_3/BASELINE_MANIFEST.json`
+- `[x]` Phase 2: Integrity & Bias Audits
+    - `[x]` Timeline Audit
+    - `[x]` Look-Ahead Audit
+    - `[x]` Survivorship Audit
+- `[x]` Phase 3: Out-of-Sample (OOS) Validation
+    - `[x]` Determine IS/VAL/OOS boundaries
+    - `[x]` Run OOS Portfolio Backtest
+    - `[x]` Generate OOS Comparison Report
+- `[/]` Phase 4: Robustness Experiments
+    - `[x]` Threshold Robustness (0.52 - 0.70)
+    - `[ ]` Target/Stop Robustness Sensitivity
+    - `[ ]` Slippage & Transaction Cost Robustness
+    - `[x]` Long vs Short Breakdown
+    - `[x]` Gap Execution Analysis
+    - `[x]` Symbol & Sector Robustness
+- `[/]` Phase 5: Statistical Validation
+    - `[x]` Monte Carlo Trade-Order Test (10,000 runs)
+    - `[x]` Bootstrap Confidence Intervals
+    - `[ ]` MAE/MFE Analysis
+    - `[ ]` Liquidity & Capacity Analysis
+- `[ ]` Phase 6: Final Reporting
+    - `[ ]` Data Quality & Model Drift Audit
+    - `[ ]` Generate Robustness Scorecard
+    - `[ ]` Create `FINAL_VERDICT.md`
+    - `[ ]` Orchestrate via `STEP4_3_RUN_ROBUSTNESS.ps1`

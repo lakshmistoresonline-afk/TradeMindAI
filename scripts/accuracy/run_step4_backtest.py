@@ -76,13 +76,18 @@ class BacktestOrchestrator:
                                 "signal_date": df.index[i].isoformat(),
                                 "direction": signal.direction,
                                 "probability": signal.calibrated_probability,
-                                "entry": signal.entry_price,
+                                "intended_entry": signal.entry_price,
+                                "actual_entry": outcome.get("actual_entry_price"),
+                                "entry_execution_type": outcome.get("entry_execution_type"),
                                 "target": signal.target_price,
                                 "stop": signal.stop_loss_price,
                                 "exit": outcome.get("outcome_price"),
                                 "outcome": status,
                                 "profit_pct": outcome.get("profit_pct", 0.0),
-                                "holding_period": len(outcome.get("events", []))
+                                "bars_to_entry": outcome.get("bars_to_entry", 0),
+                                "bars_in_position": outcome.get("bars_in_position", 0),
+                                "bars_to_expiry": outcome.get("bars_to_expiry", 0),
+                                "holding_period": outcome.get("bars_in_position", 0) # Maintain compatibility
                             }
                             self.results.append(trade_result)
                             symbol_trades += 1
@@ -147,15 +152,25 @@ class BacktestOrchestrator:
         df_res = pd.DataFrame(self.results)
         if df_res.empty: return
 
+        wins = int(len(df_res[df_res['outcome'] == 'TARGET_HIT']))
+        losses = int(len(df_res[df_res['outcome'] == 'STOP_LOSS']))
+        expired = int(len(df_res[df_res['outcome'] == 'EXPIRED']))
+        total = len(df_res)
+
+        # Statistics Integrity Assertions (Step 4.1.1)
+        assert total == wins + losses + expired, f"Stats mismatch: {total} != {wins} + {losses} + {expired}"
+
         self.stats = {
-            "total_trades": len(df_res),
-            "wins": int(len(df_res[df_res['outcome'] == 'TARGET_HIT'])),
-            "losses": int(len(df_res[df_res['outcome'] == 'STOP_LOSS'])),
-            "unresolved": int(len(df_res[df_res['outcome'].isin(['ACTIVE', 'EXPIRED', 'WAITING_FOR_ENTRY', 'DATA_UNAVAILABLE'])])),
-            "win_rate": float((len(df_res[df_res['outcome'] == 'TARGET_HIT']) / len(df_res)) * 100),
+            "total_trades": total,
+            "wins": wins,
+            "losses": losses,
+            "expired": expired,
+            "unresolved": 0,
+            "win_rate": float((wins / (wins + losses)) * 100) if (wins + losses) > 0 else 0.0,
             "avg_return": float(df_res['profit_pct'].mean()),
             "total_return": float(df_res['profit_pct'].sum()),
-            "max_drawdown": self._calculate_drawdown(df_res['profit_pct'])
+            "max_drawdown": self._calculate_drawdown(df_res['profit_pct']),
+            "win_rate_basis": "wins / (wins + losses)"
         }
 
     def _calculate_drawdown(self, returns):

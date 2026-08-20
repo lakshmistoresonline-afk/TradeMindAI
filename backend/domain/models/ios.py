@@ -90,6 +90,14 @@ class LiveSignal(BaseModel):
     outcome_date: Optional[datetime] = None
     profit_pct: Optional[float] = None
     outcome_price: Optional[float] = None
+
+    # Forensic Execution Fields (Step 4 Corrective)
+    actual_entry_price: Optional[float] = None
+    entry_execution_type: Optional[str] = None # NORMAL, FAVORABLE_GAP, INTRABAR
+    bars_to_entry: int = 0
+    bars_in_position: int = 0
+    bars_to_expiry: int = 0
+
     mfe: float = 0.0
     mae: float = 0.0
     model_version: str = "TradeMind Core v2.2"

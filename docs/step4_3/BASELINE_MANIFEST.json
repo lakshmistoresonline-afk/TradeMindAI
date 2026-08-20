@@ -1,0 +1,19 @@
+{
+    "input_file": "docs/STEP4_FULL_REALIZED_BACKTEST_RESULTS.json",
+    "input_sha256": "8B2517115EE44892398FFC4D71000BCD1055BF66996D5D4CFE68EFFF262CEF4C",
+    "trade_count": 37876,
+    "starting_capital": 1000000,
+    "strategy_version": "v2.2",
+    "parameters": {
+        "target_pct": 3.0,
+        "stop_pct": 3.0,
+        "prob_threshold": 0.52
+    },
+    "portfolio_config": {
+        "risk_per_trade": 0.01,
+        "max_concurrent_positions": 10,
+        "max_position_allocation": 0.10,
+        "max_total_exposure": 1.0,
+        "allow_same_symbol": false
+    }
+}

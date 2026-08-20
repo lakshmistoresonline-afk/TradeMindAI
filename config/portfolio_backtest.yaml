@@ -1,0 +1,32 @@
+# Portfolio Backtest Configuration
+starting_capital: 1000000  # ₹1,000,000 default for better resolution
+
+position_sizing:
+  mode: FIXED_FRACTIONAL
+  risk_per_trade: 0.01  # 1% risk
+  max_position_allocation: 0.10  # 10% max allocation
+  max_total_exposure: 1.0  # 100% max exposure
+
+limits:
+  max_concurrent_positions: 10
+  allow_long: true
+  allow_short: true
+  allow_same_symbol_multiple_positions: false
+  allow_opposite_symbol_positions: false
+
+costs:
+  # Base Slippage Scenarios handled in sensitivity analysis
+  default_slippage: 0.0010  # 0.10% per leg
+  
+  # Standard Indian Brokerage/Taxes (Approximate)
+  brokerage_per_leg: 0.0005  # 0.05% or ₹20 (using % for simplicity)
+  stt_delivery_buy: 0.001    # 0.1%
+  stt_delivery_sell: 0.001   # 0.1%
+  exchange_charges: 0.000035 # 0.00345%
+  gst_on_brokerage_plus_exchange: 0.18
+  stamp_duty: 0.00015        # 0.015% (Buy only for delivery)
+  sebi_charges: 0.000001     # ₹10 per crore
+
+accounting:
+  mark_to_market: true
+  use_actual_entry: true
