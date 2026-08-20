@@ -1,16 +1,13 @@
-# Task Checklist - Fix Historical Data Pipeline
+# Task Checklist - STEP 4: Full Realized Backtest
 
-- `[x]` Database Routing & Backup
-    - `[x]` Backup `backend/local_operational.db`
-    - `[x]` Modify `backend/core/postgres.py` for `TRADEMIND_EXECUTION_MODE=local`
-- `[x]` Neon Schema Repair
-    - `[x]` Implement `repair_neon_historical_schema.py`
-    - `[x]` Execute repair on Neon
-- `[x]` Pipeline Recovery (SQLite)
-    - `[x]` Sync GUJGASLTD (Local Mode)
-    - `[x]` Sync TATAMOTORS (Local Mode)
-    - `[x]` Sync PEL (Local Mode)
-- `[x]` Final Audit & Reconciliation
-    - `[x]` Generate `docs/DATA_PIPELINE_PRE_STEP4_AUDIT.md`
-    - `[x]` Reconcile symbol/candle counts
-    - `[x]` Set `STEP4_READY` verdict
+- `[x]` Data Integrity Restoration
+    - `[x]` Deduplicate local SQLite `historical_prices` table
+    - `[x]` Verify 199 eligible symbols
+- `[x]` Backtest Execution
+    - `[x]` Implement `run_step4_backtest.py`
+    - `[x]` Execute backtest against 199 symbols (38,636 trades)
+    - `[x]` Aggregate metrics (Win Rate, Expectancy, R:R)
+- `[x]` Reporting & Final Audit
+    - `[x]` Generate `docs/STEP4_FULL_REALIZED_BACKTEST_REPORT.md`
+    - `[x]` Perform regression check against known trades (SBIN)
+    - `[x]` Reconcile candle counts between Neon and SQLite

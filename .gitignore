@@ -253,6 +253,39 @@ ui-debug.log
 previews/
 **/previews/
 
+# Runtime / generated files
+*.hprof
+*.heapdump
+*.log
+*.tmp
+*.temp
+
+# Gradle caches
+.gradle/
+.gradle_home/
+
+# Build output
+build/
+*/build/
+out/
+*/out/
+
+# Android generated files
+.externalNativeBuild/
+.cxx/
+captures/
+
+# Node dependencies
+node_modules/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
 # IMPORTANT: NOT IGNORED
 # .env and .env.*
 # *.json, *.yaml, *.yml, *.xml, *.toml, *.ini, *.conf, *.config
