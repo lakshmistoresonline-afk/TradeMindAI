@@ -1,54 +1,53 @@
-# Implementation Plan - Step 4.3 Robustness + OOS + Walk-Forward Validation
+# Implementation Plan - STEP 4.5.2 MARKET-CALENDAR-AWARE SHADOW EXECUTION
 
-This plan implements a comprehensive robustness validation suite for Strategy v2.2, covering data integrity, out-of-sample performance, parameter sensitivity, and statistical significance.
+This plan implements an intelligent market-aware workflow for shadow trading, distinguishing between different market sessions and handling EOD reconciliation.
 
-## User Review Required
+## 1. Objectives
+- **Market Awareness**: Implement precise tracking of Indian market sessions (Open, Closed, Pre/Post, Holiday, Weekend).
+- **Session-Specific Workflows**: Create separate scripts for Intraday (Signal Generation) and EOD (Reconciliation/Equity updates).
+- **Data Integrity**: Audit and document invalid symbols in the NIFTY 200 universe.
+- **Enhanced Visibility**: Prominently display market status and diagnostic scores on the dashboard.
 
-> [!IMPORTANT]
-> **Baseline Freeze**: Step 4.1 and 4.2 results are treated as read-only. No logic changes to signal generation, outcome evaluation, or portfolio accounting will be made during this phase.
->
-> **Execution Environment**: All validations will run locally on Windows using Python and PowerShell. No Railway cloud resources will be used.
->
-> **Walk-Forward Validation**: If the current architecture does not support automated retraining within a loop, this sub-phase will be marked as `PENDING` with a technical gap analysis.
+## 2. Proposed Changes
 
-## Proposed Changes
+### [MODIFY] [backend/services/market_calendar.py](file:///G:/TradeMindAI/backend/services/market_calendar.py)
+- Refactor `IndianMarketCalendar` to include:
+    - List of observed 2026 NSE holidays.
+    - `get_current_session()` method returning `OPEN`, `CLOSED`, `PRE_MARKET`, `POST_MARKET`, `HOLIDAY`, `WEEKEND`.
+    - Improved `get_data_freshness_status` logic.
 
-### Phase 1: Audit & Manifest
-- **Checksum Verification**: Confirm SHA-256 of `docs/STEP4_FULL_REALIZED_BACKTEST_RESULTS.json`.
-- **Baseline Manifest**: Create `docs/step4_3/BASELINE_MANIFEST.json`.
-- **Repository Audit**: Document the purpose and safety status of relevant project files in `docs/step4_3/REPOSITORY_AUDIT.md`.
+### [NEW] [docs/step4_5/INVALID_SYMBOL_AUDIT.md](file:///G:/TradeMindAI/docs/step4_5/INVALID_SYMBOL_AUDIT.md)
+- Audit of the 4 invalid symbols (`GUJGASLTD`, `LTIM`, `PEL`, `TATAMOTORS`).
+- Detail missing fields, date ranges, and reasons for failure.
 
-### Phase 2: Data Integrity & Bias Audits
-- **Timeline Audit**: Verify chronological consistency (Feature -> Signal -> Entry -> Exit).
-- **Look-Ahead Audit**: Check if any features use future data.
-- **Survivorship Audit**: Determine if the backtest is biased toward currently surviving NIFTY 200 stocks.
+### [MODIFY] [scripts/accuracy/step4_5_shadow_engine.py](file:///G:/TradeMindAI/scripts/accuracy/step4_5_shadow_engine.py)
+- Update `run_cycle()` to accept a `mode` parameter (`intraday` or `eod`).
+- In `intraday` mode: Generate signals only if `OPEN`.
+- In `eod` mode: Perform full position reconciliation using latest prices and update daily equity.
+- Log session type and market status in diagnostics.
 
-### Phase 3: Out-of-Sample (OOS) Validation
-- **Period Splitting**: Divide data into 60% In-Sample, 20% Validation, 20% Out-of-Sample.
-- **OOS Backtest**: Run the portfolio simulator on the OOS portion without changing parameters.
-- **Comparison**: Generate `docs/step4_3/OOS_REPORT.md` comparing IS and OOS performance.
+### [MODIFY] [scripts/accuracy/step4_5_firebase_sync.py](file:///G:/TradeMindAI/scripts/accuracy/step4_5_firebase_sync.py)
+- Include `market_status` and `session_type` in the `shadow_summary/latest` document.
+- Sync detailed diagnostics including session context.
 
-### Phase 4: Robustness & Sensitivity Analysis
-- **Parameter Sensitivity**: Evaluate performance across different probability thresholds (0.52 to 0.70) and Target/Stop combinations (2% to 5%).
-- **Execution Robustness**: Analyze impact of slippage (0% to 0.5%) and transaction costs.
-- **Structural Analysis**: Compare Long vs. Short, Normal vs. Favorable Gap, and Sector-level performance.
-- **Symbol Robustness**: Identify top/bottom 20 contributors and test strategy without top symbols.
+### [NEW] [scripts/windows/STEP4_5_SHADOW_INTRADAY.ps1](file:///G:/TradeMindAI/scripts/windows/STEP4_5_SHADOW_INTRADAY.ps1)
+- Master runner for active market hours.
+- Exits with `MARKET_CLOSED` if not in an `OPEN` session.
 
-### Phase 5: Statistical Validation
-- **Monte Carlo**: Randomly reshuffle trade order (10,000 simulations) to determine drawdown and return distributions.
-- **Bootstrap**: Resample trade results to calculate 95% confidence intervals for win rate and expectancy.
-- **MAE/MFE**: Analyze adverse and favorable excursions for all trades.
+### [NEW] [scripts/windows/STEP4_5_SHADOW_EOD.ps1](file:///G:/TradeMindAI/scripts/windows/STEP4_5_SHADOW_EOD.ps1)
+- Master runner for post-market reconciliation.
+- Forces equity update and generates the daily summary report.
 
-### Phase 6: Final Reporting
-- **Robustness Scorecard**: A high-level dashboard of PASS/FAIL/WARNING for all validation dimensions.
-- **Final Verdict**: Classification of the strategy (e.g., ROBUST, FRAGILE, etc.) based on quantified evidence.
-
-## Verification Plan
+## 3. Verification Plan
 
 ### Automated Tests
-- `scripts/windows/STEP4_3_RUN_ROBUSTNESS.ps1`: Orchestrates all audits and simulations.
-- Assertions to fail if checksums change or if data leakage is detected.
+- Run `verify_firebase_shadow.py` to confirm `market_status` field exists in Firestore.
+- Assert `ShadowScanDiagnosticDB` records the correct `rejection_reason` for a closed market.
 
 ### Manual Verification
-- Reviewing `docs/step4_3/FINAL_VERDICT.md` for a comprehensive investment perspective.
-- Verifying all CSV outputs in `data/results/step4_3/` for data completeness.
+- Execute `STEP4_5_SHADOW_EOD.ps1` and verify the `shadow_equity` history update.
+- Check the Dashboard (if connected) for the new Market Status badge.
+
+## 4. Hard Constraints
+- **FROZEN Strategy**: No changes to v2.2 logic (Target, Stop, Threshold, Model).
+- **Local Only**: 100% Windows execution.

@@ -1,17 +1,14 @@
-# TradeMind AI - Step 4.3 Survivorship Audit
+# Step 4.3 Survivorship Bias Audit
 
 ## Universe Definition
-- **Source**: NIFTY 200 Canonical List (2026-08-16)
-- **Methodology**: The current backtest uses the *current* constituents of the NIFTY 200 for all historical periods.
-
-## Risk Assessment
-> [!WARNING]
-> **SURVIVORSHIP_BIAS_RISK**: The strategy is tested only on stocks that have survived and remained in the NIFTY 200 until August 2026. Stocks that were in the NIFTY 200 in 2017 but were later delisted or moved to lower indices are NOT included in the results.
-
-## Quantitative Findings
 - **Current Constituents**: 200
-- **Historical Constituents (Delisted)**: 0 (Missing from dataset)
-- **Coverage**: 100% of current members, 0% of historical non-survivors.
+- **Historical Traded Symbols in DB**: 199
+- **Symbols not in current NIFTY 200**: 0
 
-## Conclusion
-The backtest results likely overestimate performance due to the exclusion of historical failures. This risk is common in early-stage validation and should be mitigated in later phases by using point-in-time universe data.
+## Findings
+> [!WARNING]
+> **SURVIVORSHIP_BIAS_RISK**: The backtest uses current NIFTY 200 constituents applied historically.
+Stocks that were delisted, merged, or moved out of the NIFTY 200 before Aug 2026 are likely missing from the dataset.
+
+## Potential Impact
+The results may overstate performance by excluding companies that failed or underperformed to the point of being removed from the index.

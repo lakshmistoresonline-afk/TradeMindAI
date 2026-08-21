@@ -278,6 +278,22 @@ class ShadowEventDB(Base):
     payload_json = Column(String) # For detailed parameters (EMA, ATR, Prob, etc.)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
+class ShadowScanDiagnosticDB(Base):
+    __tablename__ = "shadow_scan_diagnostics"
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String, index=True)
+    scan_timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    market_data_timestamp = Column(DateTime)
+    data_age_hours = Column(Float)
+    signal_score = Column(Float)
+    threshold = Column(Float, default=0.52)
+    liquidity_status = Column(String) # PASS, FAIL
+    stale_data_status = Column(String) # FRESH, STALE, MARKET_CLOSED
+    signal_decision = Column(String) # SIGNAL_GENERATED, REJECTED
+    rejection_reason = Column(String)
+    model_version = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"
     name = Column(String, primary_key=True)

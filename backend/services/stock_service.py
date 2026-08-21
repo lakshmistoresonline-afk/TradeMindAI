@@ -5,6 +5,7 @@ from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow
 from datetime import datetime
 import gc
+import pandas as pd
 
 class StockService:
     def __init__(self, repository: IStockRepository, provider: IMarketDataProvider, news_provider: INewsProvider, inst_provider: IInstitutionalDataProvider):
@@ -125,14 +126,22 @@ class StockService:
 
     async def sync_incremental_prices(self, symbol: str, new_history_df: Any):
         for index, row in new_history_df.iterrows():
+            # Robust datetime conversion
+            if hasattr(index, 'to_pydatetime'):
+                dt = index.to_pydatetime()
+            elif isinstance(index, (datetime, pd.Timestamp)):
+                dt = index
+            else:
+                dt = pd.to_datetime(index).to_pydatetime()
+
             price = StockPrice(
                 symbol=symbol,
-                date=index.to_pydatetime(),
+                date=dt,
                 open=row["Open"],
                 high=row["High"],
                 low=row["Low"],
                 close=row["Close"],
-                volume=int(row["Volume"])
+                volume=int(row["Volume"]) if "Volume" in row else 0
             )
             await self.repository.save_historical_prices(symbol, [price])
 

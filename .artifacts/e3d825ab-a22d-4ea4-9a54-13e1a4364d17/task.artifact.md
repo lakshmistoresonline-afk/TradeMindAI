@@ -1,31 +1,16 @@
-# Step 4.3 Robustness Validation Tasks
+# Step 4.5.3 NIFTY 200 Data + Feature Pipeline Remediation Tasks
 
-- `[x]` Phase 1: Audit & Manifest
-    - `[x]` Verify Step 4.2 Checksum
-    - `[x]` Create `docs/step4_3/REPOSITORY_AUDIT.md`
-    - `[x]` Create `docs/step4_3/BASELINE_MANIFEST.json`
-- `[x]` Phase 2: Integrity & Bias Audits
-    - `[x]` Timeline Audit
-    - `[x]` Look-Ahead Audit
-    - `[x]` Survivorship Audit
-- `[x]` Phase 3: Out-of-Sample (OOS) Validation
-    - `[x]` Determine IS/VAL/OOS boundaries
-    - `[x]` Run OOS Portfolio Backtest
-    - `[x]` Generate OOS Comparison Report
-- `[/]` Phase 4: Robustness Experiments
-    - `[x]` Threshold Robustness (0.52 - 0.70)
-    - `[ ]` Target/Stop Robustness Sensitivity
-    - `[ ]` Slippage & Transaction Cost Robustness
-    - `[x]` Long vs Short Breakdown
-    - `[x]` Gap Execution Analysis
-    - `[x]` Symbol & Sector Robustness
-- `[/]` Phase 5: Statistical Validation
-    - `[x]` Monte Carlo Trade-Order Test (10,000 runs)
-    - `[x]` Bootstrap Confidence Intervals
-    - `[ ]` MAE/MFE Analysis
-    - `[ ]` Liquidity & Capacity Analysis
-- `[ ]` Phase 6: Final Reporting
-    - `[ ]` Data Quality & Model Drift Audit
-    - `[ ]` Generate Robustness Scorecard
-    - `[ ]` Create `FINAL_VERDICT.md`
-    - `[ ]` Orchestrate via `STEP4_3_RUN_ROBUSTNESS.ps1`
+- `[x]` Phase 1: Market Calendar & Data Audit
+    - `[x]` Refactor `IndianMarketCalendar` in `backend/services/market_calendar.py`
+    - `[x]` Create `INVALID_SYMBOL_AUDIT.md` in `docs/step4_5/`
+- `[x]` Phase 2: Data Remediation & Backfill
+    - `[x]` Correct ticker mappings in `YFinanceProvider` (TMCV, PIRAMALFIN, ETERNAL)
+    - `[x]` Develop `remediate_data.py` with robust backfill and target labeling
+    - `[x]` Regenerate features for all 200 symbols (198 SUCCESS)
+- `[x]` Phase 3: Model Training & Diagnostics
+    - `[x]` Train champion models for `PEL`, `TATAMOTORS`, etc.
+    - `[x]` Capture top diagnostic signal scores (PEL: 0.96)
+- `[x]` Phase 4: Automation & Testing
+    - `[x]` Create `STEP4_5_3_REMEDIATE_DATA.ps1`
+    - `[x]` Implement regression tests in `tests/`
+    - `[x]` Synchronize remediated status to Firebase

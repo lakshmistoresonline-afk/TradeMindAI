@@ -33,7 +33,9 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             "L&TFH": "LTF",
             "TATAMOTORS": "TMCV",
             "ZOMATO": "ETERNAL",
-            "PEL": "PIRAMALFIN"
+            "PEL": "PIRAMALFIN",
+            "GUJGASLTD": "GUJGASLTD",
+            "LTIM": "LTIM"
         }
         mapped = mapping.get(symbol.upper(), symbol)
 
@@ -44,8 +46,23 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
 
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         try:
-            ticker = yf.Ticker(self._map_symbol(symbol))
-            info = ticker.info
+            mapped_sym = self._map_symbol(symbol)
+            ticker = yf.Ticker(mapped_sym)
+            info = {}
+            try:
+                info = ticker.info
+            except Exception as yf_err:
+                print(f"   [!] yfinance info 429/Error for {symbol}, trying yahooquery...")
+                yq = YQTicker(mapped_sym)
+                yq_info = yq.price.get(mapped_sym, {})
+                if isinstance(yq_info, dict):
+                    info = {
+                        "longName": yq_info.get("longName") or yq_info.get("shortName"),
+                        "regularMarketPrice": yq_info.get("regularMarketPrice"),
+                        "marketCap": yq_info.get("marketCap"),
+                        "regularMarketPreviousClose": yq_info.get("regularMarketPreviousClose"),
+                        "volume": yq_info.get("regularMarketVolume")
+                    }
 
             if not info or info.get("regularMarketPrice") is None:
                 hist = await self.fetch_history(symbol, period="1d")
