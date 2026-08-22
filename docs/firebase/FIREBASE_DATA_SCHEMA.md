@@ -1,10 +1,9 @@
-# Firebase Firestore Data Schema
-
-This document outlines the schema used for the TradeMind AI application layer in Firestore.
+# Firebase Firestore Data Schema v2.0
 
 ## Collections
 
-### 1. `stocks` (Stock Master)
+### 1. `stocks`
+- **Purpose**: NIFTY 200 symbol master and metadata.
 - **Document ID**: `symbol` (e.g., `RELIANCE`)
 - **Fields**:
     - `name`: string
@@ -13,56 +12,53 @@ This document outlines the schema used for the TradeMind AI application layer in
     - `last_price`: number
     - `market_cap`: number
     - `is_fno`: boolean
-    - `index_membership`: string (e.g., `NIFTY_200`)
+    - `index_membership`: string
+    - `status`: string (`OPERATIONAL`, `DATA_UNAVAILABLE`)
     - `updated_at`: timestamp
 
-### 2. `live_signals` (Active & Historical Signals)
-- **Document ID**: `bt_{symbol}_{YYYYMMDD}` or UUID
-- **Fields**:
-    - `symbol`: string
-    - `timestamp`: timestamp
-    - `direction`: string (`LONG`, `SHORT`)
-    - `conviction`: number (0-100)
-    - `entry_price`: number
-    - `target_price`: number
-    - `stop_loss_price`: number
-    - `status`: string (`ACTIVE`, `TARGET_HIT`, `STOP_LOSS`, `EXPIRED`)
-    - `profit_pct`: number
-    - `model_version`: string
+#### Sub-collection: `prices`
+- **Document ID**: `YYYY-MM-DD`
+- **Fields**: `open`, `high`, `low`, `close`, `volume`, `timestamp`
 
-### 3. `portfolio_trades` (Realized Executions)
-- **Document ID**: `trade_{id}`
+### 2. `live_signals`
+- **Purpose**: Historical validation and backtest signals.
+- **Document ID**: `val_{symbol}_{timestamp}`
 - **Fields**:
-    - `trade_id`: string
     - `symbol`: string
     - `direction`: string
-    - `entry_date`: timestamp
-    - `exit_date`: timestamp
-    - `entry_price`: number
-    - `exit_price`: number
-    - `quantity`: number
-    - `net_pnl`: number
-    - `transaction_costs`: number
-    - `slippage`: number
-    - `status`: string
+    - `score`: number
+    - `entry`: number
+    - `target`: number
+    - `stop`: number
+    - `status`: string (`TARGET_HIT`, `STOP_LOSS`, `EXPIRED`)
+    - `timestamp`: timestamp
 
-### 4. `portfolio_equity` (Historical Performance)
+### 3. `shadow_signals`
+- **Purpose**: Real-time unseen market observation signals.
+- **Document ID**: `sig_{symbol}_{timestamp}`
+- **Fields**: same as `live_signals` + `shadow_only: true`.
+
+### 4. `portfolio_equity`
+- **Purpose**: Equity curve for historical and shadow accounts.
+- **Document ID**: `type_{YYYY-MM-DD}` (e.g., `backtest_2026-08-21`)
+- **Fields**: `date`, `equity`, `cash`, `realized_pnl`, `open_positions`
+
+### 5. `performance_summary`
+- **Purpose**: High-level KPI for each validation phase.
+- **Document ID**: `backtest`, `walk_forward`, `shadow`
+- **Fields**: `total_return`, `win_rate`, `profit_factor`, `max_drawdown`, `expectancy`
+
+### 6. `market_regimes`
+- **Purpose**: Economic environment tracking.
 - **Document ID**: `YYYY-MM-DD`
-- **Fields**:
-    - `date`: timestamp
-    - `equity`: number
-    - `cash`: number
-    - `realized_pnl`: number
-    - `unrealized_pnl`: number
-    - `open_positions`: number
+- **Fields**: `regime` (BULL/BEAR), `vix`, `sentiment`, `description`
 
-### 5. `performance_summary` (Aggregated Metrics)
+### 7. `shadow_scan_diagnostics`
+- **Purpose**: Per-symbol gate audit for shadow trading.
+- **Document ID**: `diag_{symbol}_{timestamp}`
+- **Fields**: `symbol`, `score`, `decision`, `reason`, `age_hours`, `timestamp`
+
+### 8. `system_status`
+- **Purpose**: Infrastructure health and last sync metadata.
 - **Document ID**: `latest`
-- **Fields**:
-    - `total_net_pnl`: number
-    - `total_return_pct`: number
-    - `win_rate`: number
-    - `profit_factor`: number
-    - `max_drawdown`: number
-    - `sharpe_ratio`: number
-    - `last_updated`: timestamp
+- **Fields**: `market_status`, `last_data_update`, `last_shadow_run`, `operational_count`

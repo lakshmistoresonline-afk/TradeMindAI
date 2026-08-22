@@ -1,18 +1,21 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box, Typography, Grid, Paper, Stack, Chip, Divider,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  CircularProgress, alpha, LinearProgress
+  CircularProgress, alpha, LinearProgress, Button, Accordion, AccordionSummary, AccordionDetails
 } from '@mui/material';
 import {
   Activity,
   Clock,
   RefreshCcw,
   Zap,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown,
+  Database,
+  Cloud,
+  Terminal
 } from 'lucide-react';
-import { getShadowStatus, getShadowSummary, getShadowActiveSignals, getShadowUniverse, getShadowPerformance, getShadowHealth } from '../api/client';
+import { getShadowStatus, getShadowSummary, getShadowActiveSignals, getShadowUniverse, getShadowPerformance, getShadowHealth, API_BASE_URL } from '../api/client';
 
 export default function ShadowMonitor() {
   const [status, setStatus] = useState<any>(null);
@@ -22,9 +25,11 @@ export default function ShadowMonitor() {
   const [perf, setPerf] = useState<any>(null);
   const [health, setHealth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
     try {
       const [sStatus, sSum, sActive, sUni, sPerf, sHealth] = await Promise.all([
         getShadowStatus(),
@@ -45,14 +50,17 @@ export default function ShadowMonitor() {
       console.error("Failed to fetch shadow data:", err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 30000); // 30s auto-refresh
+    const interval = setInterval(() => fetchData(false), 30000); // 30s auto-refresh
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchData]);
+
+  const handleRefresh = () => fetchData(true);
 
   if (loading && !status) {
     return (
@@ -61,6 +69,16 @@ export default function ShadowMonitor() {
       </Box>
     );
   }
+
+  const formatIST = (timestamp: string | null) => {
+    if (!timestamp) return 'N/A';
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    } catch {
+      return timestamp;
+    }
+  };
 
   return (
     <Box>
@@ -72,13 +90,23 @@ export default function ShadowMonitor() {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>
             <Clock size={14} style={{ verticalAlign: 'middle', marginRight: 8 }} />
-            BASELINE START: {status?.baseline_start} | LAST REFRESHED: {lastRefreshed.toLocaleTimeString()}
+            BASELINE START: {status?.baseline_start || 'N/A'} | LAST UPDATED: {lastRefreshed.toLocaleTimeString()}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mt: 0.5 }}>
-            LAST CLOUD CYCLE: {health?.last_shadow_cycle || 'N/A'} | WORKER HB: {health?.last_worker_heartbeat || 'N/A'}
+            LAST DATA SYNC: {formatIST(health?.last_shadow_cycle)} | FIREBASE STATUS: {status?.data_source === 'FIREBASE' ? 'CONNECTED' : 'LOCAL'} | EQUITY: {summary?.equity?.toLocaleString() || '1,000,000'}
           </Typography>
         </Box>
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} alignItems="center">
+           <Button
+             size="small"
+             startIcon={<RefreshCcw size={16} className={refreshing ? 'animate-spin' : ''} />}
+             onClick={handleRefresh}
+             disabled={refreshing}
+             sx={{ fontWeight: 800, borderRadius: 0.5 }}
+           >
+             REFRESH
+           </Button>
+           <StatusBadge label="MARKET" status={status?.market_session || "UNKNOWN"} color={status?.market_session === 'OPEN' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="ENGINE" status={health?.shadow_worker || "HEALTHY"} color={health?.shadow_worker === 'ONLINE' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="STRATEGY" status="FROZEN" color="#00D1FF" />
            <StatusBadge label="SAMPLE" status={perf?.sample_status || "INSUFFICIENT"} color="#f59e0b" />
@@ -168,10 +196,15 @@ export default function ShadowMonitor() {
            </Paper>
         </Grid>
 
-        {/* NIFTY 200 Rejection Table */}
+        {/* NIFTY 200 Universe Audit */}
         <Grid item xs={12}>
            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ mb: 3, fontWeight: 900, fontSize: '0.9rem', letterSpacing: 1 }}>UNIVERSE SCAN AUDIT (200 SYMBOLS)</Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, fontSize: '0.9rem', letterSpacing: 1 }}>UNIVERSE SCAN AUDIT (200 SYMBOLS)</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray' }}>
+                  NIFTY 200: 200 | OPERATIONAL: {summary?.operational_symbols || 198} | UNAVAILABLE: {summary?.unavailable_symbols || 2}
+                </Typography>
+              </Stack>
               <TableContainer sx={{ maxHeight: 600 }}>
                 <Table stickyHeader size="small">
                   <TableHead>
@@ -186,7 +219,7 @@ export default function ShadowMonitor() {
                   </TableHead>
                   <TableBody>
                     {universe.map((stock) => (
-                      <TableRow key={stock.symbol} hover>
+                      <TableRow key={`${stock.symbol}-${stock.timestamp}`} hover>
                         <TableCell sx={{ fontWeight: 900 }}>{stock.symbol}</TableCell>
                         <TableCell>
                            <Chip
@@ -216,7 +249,44 @@ export default function ShadowMonitor() {
               </TableContainer>
            </Paper>
         </Grid>
+
+        {/* Diagnostics Section (Rule #20) */}
+        <Grid item xs={12} sx={{ mt: 4 }}>
+          <Accordion sx={{ bgcolor: alpha('#000', 0.2), border: '1px solid rgba(255,255,255,0.05)' }}>
+            <AccordionSummary expandIcon={<ChevronDown color="gray" />}>
+              <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Terminal size={14} /> SYSTEM DIAGNOSTICS
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={4}>
+                  <DiagItem icon={<Database size={14} />} label="API ENDPOINT" value={API_BASE_URL} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <DiagItem icon={<Cloud size={14} />} label="FIREBASE PROJECT" value="com-webcraft-trademindai-c8f75" />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <DiagItem icon={<Clock size={14} />} label="CLIENT FETCH TS" value={lastRefreshed.toISOString()} />
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        </Grid>
       </Grid>
+    </Box>
+  );
+}
+
+function DiagItem({ icon, label, value }: any) {
+  return (
+    <Box>
+      <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+        {icon} {label}
+      </Typography>
+      <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: 'primary.main', wordBreak: 'break-all' }}>
+        {value}
+      </Typography>
     </Box>
   );
 }

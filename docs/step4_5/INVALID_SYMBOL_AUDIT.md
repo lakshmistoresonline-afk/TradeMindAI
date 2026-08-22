@@ -1,18 +1,18 @@
-# Invalid Symbol Audit - Step 4.5.2
+# Invalid Symbol Audit - Step 4.5.4
 
-The following symbols in the NIFTY 200 universe failed to produce valid diagnostics or features during the Step 4.5.1 Shadow Run.
+The following symbols in the NIFTY 200 universe are currently unavailable for signal generation.
 
-| Symbol | Failure Reason | Local Price Count | Note |
-| :--- | :--- | :--- | :--- |
-| **GUJGASLTD** | `INSUFFICIENT_DATA` | 23 bars | Symbol recently added to DB; requires 100+ bars for feature stores. |
-| **LTIM** | `DATA_UNAVAILABLE` | 0 bars | Missing historical price data in `historical_prices` table. |
-| **PEL** | `FEATURE_GEN_ERROR` | 197 bars | Data exists but `get_features_by_range` returned empty (possible range mismatch). |
-| **TATAMOTORS** | `FEATURE_GEN_ERROR` | 193 bars | Data exists but failed gate in diagnostic orchestrator. |
+| Symbol | Status | Failure Reason | Local Price Count | Note |
+| :--- | :--- | :--- | :--- | :--- |
+| **GUJGASLTD** | `DATA_UNAVAILABLE` | `INSUFFICIENT_DATA` | 26 bars | Requires 100+ bars for stable indicator calculation. |
+| **LTIM** | `DATA_UNAVAILABLE` | `NOT_FOUND_ON_YAHOO` | 0 bars | Ticker mapping verified as LTIM.NS but Yahoo Finance returns no history for current period. |
 
-## Remediation Strategy
-- **LTIM**: Manual data backfill required using `yfinance`.
-- **GUJGASLTD**: Automatic accumulation will resolve this over time.
-- **PEL / TATAMOTORS**: Investigate `backend/services/feature_store.py` for potential date-alignment edge cases.
+## Forensic Analysis
+- **GUJGASLTD**: Standard Yahoo API returns very limited depth for this specific symbol (post-2026/07). Data accumulation is pending.
+- **LTIM**: LTIMindtree (merged) data depth issues on Yahoo Finance.
 
-**STATUS**: `WARNING`
-196/200 symbols are fully operational.
+## Safety Guard
+These symbols are automatically rejected by the `SignalEngine` and `ShadowEngine` with the reason `INVALID_DATA`.
+
+**STATUS**: `MONITORING_DATA_ACCUMULATION`
+198/200 symbols are fully operational.

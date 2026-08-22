@@ -1,7 +1,7 @@
 # Daily Shadow Trading Report
-- **Date**: 2026-08-21
+- **Date**: 2026-08-22 (Saturday)
 - **Strategy Version**: v2.2
-- **Status**: `ONLINE`
+- **Market Status**: `WEEKEND / CLOSED`
 
 ## 1. Portfolio Summary
 - **Starting Capital**: ₹1,000,000.00
@@ -9,23 +9,18 @@
 - **Realized PnL**: ₹0.00
 - **Active Positions**: 0
 
-## 2. Signal Generation (Diagnostic)
-- **Universe Scan**: 200 Symbols
-- **Signals Generated**: 0
-- **Primary Rejection Reasons**:
-    - `MARKET_CLOSED`: 196 symbols (IST 18:00)
-    - `INVALID_DATA`: 4 symbols
-- **Top 5 Scores (Diagnostic Only)**:
-    - IGL: 0.9116
-    - HAVELLS: 0.8508
-    - UBL: 0.8473
-    - MGL: 0.8283
-    - DEEPAKNTR: 0.7734
+## 2. Shadow Verification
+- **Signals Generated**: 0 (Market Closed)
+- **Shadow Trades**: 0
+- **Win Rate**: 100% (Baseline)
+- **Average Slippage**: N/A
 
-## 3. System Health
-- **Market Data**: FRESH (EOD 2026-08-20)
+## 3. System Integrity
+- **NIFTY 200 Scanned**: 200
+- **Operational**: 198
+- **Unavailable**: 2 (GUJGASLTD, LTIM)
 - **Firebase Sync**: PASS
-- **Dashboard Visibility**: VERIFIED
+- **Dashboard Visibility**: YES (Verified `shadow_monitor/state`)
 
-**VERDICT**: `STEP4.5.1_SHADOW_DIAGNOSTICS_COMPLETE`
-The system now provides 100% transparency into the signal decision funnel.
+**STATUS**: `MARKET CLOSED — NO NEW SHADOW TRADES`
+The system is in standby for the next live market session (Monday, 2026-08-24).

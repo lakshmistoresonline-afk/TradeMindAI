@@ -1,52 +1,51 @@
-# Implementation Plan - STEP 4: Critical Forensic Revalidation
+# Shadow Dashboard Forensic Fix Implementation Plan
 
-This plan addresses the massive anomalies identified in the Step 4 backtest results, specifically the impossible losses (up to -245%) in `EXPIRED` trades. We will audit the `OutcomeEngine` logic, verify data continuity for extreme cases, and produce a corrected baseline for Strategy v2.2.
+The Shadow Dashboard at `/shadow` is currently showing stale, mock, or cached data from 2026-08-18. This is because the backend API reads from a local/stale SQL database instead of the authoritative Firebase/Firestore source. This plan refactors the backend to use Firestore and updates the UI to reflect real-time application state.
 
 ## User Review Required
 
-> [!CRITICAL]
-> **PHANTOM LOSSES:** The forensic audit has confirmed that 320 out of 322 `EXPIRED` trades never triggered an entry (`WAITING_FOR_ENTRY`). The system incorrectly assigned them a "realized" loss based on the price 200 bars later, despite no capital ever being committed.
->
-> **SLIPPAGE AUDIT:** The previous claim of "High-fidelity slippage" has been found to be **FALSE**. The backtest orchestrator used raw `OutcomeEngine` results which exclude the 0.20% institutional friction model.
->
-> **DRAWDOWN ACCOUNTING:** The -102.6% drawdown is a result of a compounding error where single-trade returns exceeded -100% (specifically in failed Short signals that never triggered).
+> [!IMPORTANT]
+> The backend will be switched to read exclusively from Firestore for Shadow Monitor endpoints. Ensure that the `FIREBASE_SERVICE_ACCOUNT` environment variable or `service-account.json` is correctly configured in the production (Railway) environment.
 
-## Proposed Forensic Changes
+> [!WARNING]
+> The "SBIN" record currently appearing as `ACTIVE` will be investigated in Firestore. If it is found to be stale (already resolved in local engine), it will be corrected in Firebase to ensure the dashboard remains accurate.
 
-### 1. Algorithmic Correction
-#### [MODIFY] [OutcomeEngine.py](file:///G:/TradeMindAI/backend/services/outcome_engine.py)
-- Ensure that if a trade expires while still in `WAITING_FOR_ENTRY`, its `profit_pct` is strictly **0.0**.
-- A trade only incurs profit/loss if it transitions to `ACTIVE`.
+## Proposed Changes
 
-### 2. Corporate Action Verification
-- Audit symbols like `ADANIPOWER` and `ADANIENT` for the period 2021-2023.
-- Verify if the extreme moves (15 -> 53) were genuine market action or unadjusted data gaps.
-- Ensure the backtest uses the most accurate adjusted pricing available in the SQLite dataset.
+### Backend API Refactor
 
-### 3. Reporting & Performance Recalculation
-#### [NEW] [docs/STEP4_EXPIRED_FORENSIC_REPORT.md](file:///G:/TradeMindAI/docs/STEP4_EXPIRED_FORENSIC_REPORT.md)
-- Detail the root cause of the "Phantom Losses."
-- Provide the "Triggered-Only" win rate and expectancy.
-#### [NEW] [docs/STEP4_CORRECTED_BASELINE_REPORT.md](file:///G:/TradeMindAI/docs/STEP4_CORRECTED_BASELINE_REPORT.md)
-- The new authoritative baseline for Strategy v2.2.
+Modify `backend/api/v1/endpoints/shadow.py` to fetch data from Firestore.
+
+#### [MODIFY] [shadow.py](file:///G:/TradeMindAI/backend/api/v1/endpoints/shadow.py)
+- Import `db_client` from `backend.core.database`.
+- Refactor `/status`, `/summary`, `/active-signals`, `/performance`, `/universe`, and `/health` to query Firestore collections:
+    - `shadow_summary/latest`
+    - `shadow_signals`
+    - `shadow_scan_diagnostics`
+
+### Frontend UI Enhancements
+
+Update `web/src/pages/ShadowMonitor.tsx` to improve transparency and data freshness.
+
+#### [MODIFY] [ShadowMonitor.tsx](file:///G:/TradeMindAI/web/src/pages/ShadowMonitor.tsx)
+- Replace "WORKER HB" with "LAST FIREBASE SYNC".
+- Add a "REFRESH" button and "LAST UPDATED" timestamp.
+- Add a "DIAGNOSTICS" section (collapsible/dev-only) showing the active API endpoint and Firebase project ID (Rule #20).
+
+### Documentation & Audits
+
+#### [NEW] [DASHBOARD_DATA_SOURCE_AUDIT.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_DATA_SOURCE_AUDIT.md)
+#### [NEW] [DASHBOARD_FIREBASE_MAPPING.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_FIREBASE_MAPPING.md)
+#### [NEW] [DASHBOARD_STALENESS_AUDIT.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_STALENESS_AUDIT.md)
+#### [NEW] [DASHBOARD_VERIFICATION_REPORT.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_VERIFICATION_REPORT.md)
 
 ## Verification Plan
 
 ### Automated Verification
-- **Scenario B Calculation:** Run a script to filter the existing `results.json` and calculate stats excluding non-triggered trades.
-- **Stop Enforcement Test:** Verify that `EXPIRED` trades did not cross the 3% stop loss while in `ACTIVE` state.
+- Run `scripts/accuracy/verify_firebase_shadow.py` to ensure Firebase connectivity.
+- Create a test script to compare backend API responses with direct Firestore queries.
 
 ### Manual Verification
-- **Equity Curve Audit:** Re-plot the equity curve using the corrected triggered-only sequence.
-- **Slippage Enforcement:** Manually apply the 0.20% friction to a subset of trades to verify the impact on expectancy.
-
-## Milestone Status
-| Milestone | Status |
-| :--- | :--- |
-| **Phantom Loss Identified** | **CONFIRMED** |
-| **Short Formula Verified** | **CONFIRMED** |
-| **Logic Correction** | `PENDING_APPROVAL` |
-| **Baseline Re-Verification** | `BLOCKED` |
-
----
-**Verdict:** The baseline remains **UNVERIFIED**. I am proceeding with the logic correction upon your approval.
+- Deploy changes to the local environment and verify the `/shadow` dashboard against the Firestore console.
+- Check "SBIN" status in the UI vs. Firebase.
+- Verify that "Incognito" mode shows the same data as a normal session (cache check).

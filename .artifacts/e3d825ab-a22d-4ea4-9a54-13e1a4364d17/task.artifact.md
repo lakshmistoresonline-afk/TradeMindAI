@@ -1,16 +1,21 @@
-# Step 4.5.3 NIFTY 200 Data + Feature Pipeline Remediation Tasks
+# Firebase Quota-Safe Synchronization Tasks
 
-- `[x]` Phase 1: Market Calendar & Data Audit
-    - `[x]` Refactor `IndianMarketCalendar` in `backend/services/market_calendar.py`
-    - `[x]` Create `INVALID_SYMBOL_AUDIT.md` in `docs/step4_5/`
-- `[x]` Phase 2: Data Remediation & Backfill
-    - `[x]` Correct ticker mappings in `YFinanceProvider` (TMCV, PIRAMALFIN, ETERNAL)
-    - `[x]` Develop `remediate_data.py` with robust backfill and target labeling
-    - `[x]` Regenerate features for all 200 symbols (198 SUCCESS)
-- `[x]` Phase 3: Model Training & Diagnostics
-    - `[x]` Train champion models for `PEL`, `TATAMOTORS`, etc.
-    - `[x]` Capture top diagnostic signal scores (PEL: 0.96)
-- `[x]` Phase 4: Automation & Testing
-    - `[x]` Create `STEP4_5_3_REMEDIATE_DATA.ps1`
-    - `[x]` Implement regression tests in `tests/`
-    - `[x]` Synchronize remediated status to Firebase
+- `[/]` Phase 1: Infrastructure & Queue
+    - `[ ]` Create `data/firebase/firebase_sync_queue.json`
+    - `[ ]` Implement queue management logic (Add/Pop/Update)
+- `[ ]` Phase 2: Quota-Safe Engine
+    - `[ ]` Create `scripts/accuracy/sync_quota_safe.py`
+    - `[ ]` Implement "Check-Before-Write" optimization
+    - `[ ]` Implement 429 error handling and early exit
+- `[ ]` Phase 3: Data Tiering Implementation
+    - `[ ]` Tier 1 Sync: System Status, Summaries, Stocks Master
+    - `[ ]` Tier 2 Sync (Controlled): Equity History, Recent Regimes
+    - `[ ]` Tier 3 Filter: Exclude full history and research signals
+- `[ ]` Phase 4: Automation & Verification
+    - `[ ]` Create `FIREBASE_QUOTA_SAFE_SYNC.ps1`
+    - `[ ]` Verify queue resumption from a stopped state
+    - `[ ]` Regenerate `FIREBASE_COMPLETE_DATA_INVENTORY.md`
+- `[ ]` Phase 5: Final Forensic Reports
+    - `[ ]` Create `FIREBASE_SYNC_QUEUE_STATUS.md`
+    - `[ ]` Create `FIREBASE_FINAL_DATA_STATUS.md`
+    - `[ ]` Create `FIREBASE_QUOTA_SAFE_SYNC_PLAN.md`

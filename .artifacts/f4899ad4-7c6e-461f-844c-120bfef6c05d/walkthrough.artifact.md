@@ -1,32 +1,34 @@
-# Walkthrough - Phase 7: Autonomous Shadow Accumulation
+# Walkthrough - Shadow Dashboard Forensic Fix
 
-I have established the continuous monitoring and validation framework for the autonomous cloud-based Shadow Engine.
+The Shadow Dashboard has been refactored to use Firebase as the authoritative data source, resolving the issue where stale data from 2026-08-18 was being displayed.
 
-## Key Accomplishments
+## Key Changes
 
-### 1. Phase 7 Infrastructure
-- **Autonomous Horizon:** Transitioned the system into a sustained observation period where the Railway Shadow Worker and Beat Scheduler handle all 30-minute evaluations independently.
-- **Continuous Reporting:** Updated the reporting engine in [generate_shadow_report.py](file:///G:/TradeMindAI/production/reports/generate_shadow_report.py) to explicitly reflect the Phase 7 context and PC-independent status.
-- **Monitoring Portal:** Created the [PHASE7_AUTONOMOUS_SHADOW_MONITORING_REPORT.md](file:///G:/TradeMindAI/production/reports/PHASE7_AUTONOMOUS_SHADOW_MONITORING_REPORT.md) as a living document to track progress toward the 20-trade milestone.
+### 1. Backend API Firestore Integration
+The shadow monitoring endpoints in `backend/api/v1/endpoints/shadow.py` have been refactored to read directly from Firestore collections (`shadow_summary`, `shadow_signals`, `shadow_scan_diagnostics`) instead of the local SQL database. This ensures that the dashboard reflects the reconciled cloud state.
 
-### 2. Operational Invariants
-- **Strategy Freeze:** Verified that Strategy v2.2 parameters (3% Target/Stop, 0.52 Prob, 10M Liquidity) are strictly locked in the cloud tier.
-- **Model Success:** Confirmed that the cloud worker has full access to the 196 certified champion models for deterministic inference.
-- **Data Integrity:** Ensured that all metrics derive exclusively from the authoritative Neon PostgreSQL database.
+### 2. SBIN Record Reconciliation
+The "SBIN" signal (`sig_SBIN_202608180715`), which was incorrectly showing as `ACTIVE`, was verified in Firestore. It is already marked as `TARGET_HIT` in the cloud. The API refactor correctly filters this signal out of the "ACTIVE" view, aligning the UI with the actual outcome.
 
-## Current Milestone Status
+### 3. UI Transparency & Freshness
+The `ShadowMonitor.tsx` component was updated with:
+- **Last Data Sync:** Replaces the worker heartbeat with a timestamp from the latest cloud synchronization.
+- **Refresh Button:** Allows manual fetching to bypass any client-side staleness.
+- **System Diagnostics:** A new section showing the active API endpoint and Firebase project ID for immediate forensic verification.
 
-| Metric | Value | Status |
-| :--- | :--- | :--- |
-| **Completed Trades** | 1 / 20 | **INSUFFICIENT_SAMPLE** |
-| **Active Signals** | 1 | sig_SBIN_202608181011 |
-| **PC Independence** | **PASS** | Cloud-Autonomous |
-| **System Status** | **HEALTHY** | No manual intervention |
+## Verification Results
 
-## Next Steps
-The system will now naturally accumulate terminal outcomes. No further manual triggers are required.
-- **Milestone 1:** Generate `SHADOW_MILESTONE_05.md` once the 5th trade resolves.
-- **Final Gate:** Progression to Paper Trading remains blocked until the 20th genuine trade is completed and audited.
+### Automated Tests
+- Verified Firestore connectivity and SBIN signal status via custom diagnostic scripts.
+- Confirmed API logic correctly filters non-active signals.
 
-> [!TIP]
-> You can monitor real-time progress via the hosted dashboard: [https://com-webcraft-trademindai-c8f75.web.app/shadow](https://com-webcraft-trademindai-c8f75.web.app/shadow).
+### Manual Verification
+- The dashboard now displays `ACTIVE SIGNAL = NONE` (Correct as per current shadow state).
+- "COMPLETED TRADES" correctly reflects the resolved SBIN trade.
+- "LAST DATA SYNC" reflects the actual engine execution time.
+
+## Artifacts Created
+- [DASHBOARD_DATA_SOURCE_AUDIT.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_DATA_SOURCE_AUDIT.md)
+- [DASHBOARD_FIREBASE_MAPPING.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_FIREBASE_MAPPING.md)
+- [DASHBOARD_STALENESS_AUDIT.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_STALENESS_AUDIT.md)
+- [DASHBOARD_VERIFICATION_REPORT.md](file:///G:/TradeMindAI/docs/firebase/DASHBOARD_VERIFICATION_REPORT.md)

@@ -1,53 +1,58 @@
-# Implementation Plan - STEP 4.5.2 MARKET-CALENDAR-AWARE SHADOW EXECUTION
+# Implementation Plan - FIREBASE QUOTA-SAFE FINAL DATA SYNCHRONIZATION
 
-This plan implements an intelligent market-aware workflow for shadow trading, distinguishing between different market sessions and handling EOD reconciliation.
+This plan implements a robust, quota-aware synchronization engine for TradeMind AI to handle Firestore free-tier limits while ensuring the dashboard remains fully operational.
 
 ## 1. Objectives
-- **Market Awareness**: Implement precise tracking of Indian market sessions (Open, Closed, Pre/Post, Holiday, Weekend).
-- **Session-Specific Workflows**: Create separate scripts for Intraday (Signal Generation) and EOD (Reconciliation/Equity updates).
-- **Data Integrity**: Audit and document invalid symbols in the NIFTY 200 universe.
-- **Enhanced Visibility**: Prominently display market status and diagnostic scores on the dashboard.
+- **Quota Safety**: Implement `QUOTA_SAFE_MODE` with a daily write ceiling and automatic 429 error detection.
+- **Incremental Sync**: Use a persistent JSON queue (`data/firebase/firebase_sync_queue.json`) to track pending writes.
+- **Upsert Optimization**: Implement a "Check-Before-Write" strategy to skip redundant updates, saving critical quota.
+- **Data Tiering**: Categorize data into Tier 1 (Vital), Tier 2 (Historical), and Tier 3 (Local Archive).
 
-## 2. Proposed Changes
+## 2. Data Tiering Strategy
 
-### [MODIFY] [backend/services/market_calendar.py](file:///G:/TradeMindAI/backend/services/market_calendar.py)
-- Refactor `IndianMarketCalendar` to include:
-    - List of observed 2026 NSE holidays.
-    - `get_current_session()` method returning `OPEN`, `CLOSED`, `PRE_MARKET`, `POST_MARKET`, `HOLIDAY`, `WEEKEND`.
-    - Improved `get_data_freshness_status` logic.
+### Tier 1 — VITAL (Always Priority)
+- `system_status/latest`: Current market and sync status.
+- `performance_summary/*`: KPIs for all validation phases.
+- `stocks/*`: Symbol master (excluding full price history).
+- `market_regimes`: Latest record.
+- `shadow_signals` & `shadow_summary`: Active monitoring data.
 
-### [NEW] [docs/step4_5/INVALID_SYMBOL_AUDIT.md](file:///G:/TradeMindAI/docs/step4_5/INVALID_SYMBOL_AUDIT.md)
-- Audit of the 4 invalid symbols (`GUJGASLTD`, `LTIM`, `PEL`, `TATAMOTORS`).
-- Detail missing fields, date ranges, and reasons for failure.
+### Tier 2 — HISTORICAL (Sync as Quota Allows)
+- `portfolio_equity`: Backtest and shadow equity curves.
+- `market_regimes`: Historical classification history.
+- `stocks/{symbol}/prices`: Latest 30-100 bars for dashboard charts.
 
-### [MODIFY] [scripts/accuracy/step4_5_shadow_engine.py](file:///G:/TradeMindAI/scripts/accuracy/step4_5_shadow_engine.py)
-- Update `run_cycle()` to accept a `mode` parameter (`intraday` or `eod`).
-- In `intraday` mode: Generate signals only if `OPEN`.
-- In `eod` mode: Perform full position reconciliation using latest prices and update daily equity.
-- Log session type and market status in diagnostics.
+### Tier 3 — LOCAL ARCHIVE (Do Not Sync)
+- Full 1M+ `historical_prices` (Dashboard uses EOD/Recent only).
+- Raw 37,876 Step 4.2 backtest signals (Archived for research).
 
-### [MODIFY] [scripts/accuracy/step4_5_firebase_sync.py](file:///G:/TradeMindAI/scripts/accuracy/step4_5_firebase_sync.py)
-- Include `market_status` and `session_type` in the `shadow_summary/latest` document.
-- Sync detailed diagnostics including session context.
+## 3. Proposed Changes
 
-### [NEW] [scripts/windows/STEP4_5_SHADOW_INTRADAY.ps1](file:///G:/TradeMindAI/scripts/windows/STEP4_5_SHADOW_INTRADAY.ps1)
-- Master runner for active market hours.
-- Exits with `MARKET_CLOSED` if not in an `OPEN` session.
+### [NEW] [data/firebase/firebase_sync_queue.json](file:///G:/TradeMindAI/data/firebase/firebase_sync_queue.json)
+- Persistent store for pending sync operations.
+- Tracks symbol, date, collection, document ID, and status.
 
-### [NEW] [scripts/windows/STEP4_5_SHADOW_EOD.ps1](file:///G:/TradeMindAI/scripts/windows/STEP4_5_SHADOW_EOD.ps1)
-- Master runner for post-market reconciliation.
-- Forces equity update and generates the daily summary report.
+### [NEW] [scripts/accuracy/sync_quota_safe.py](file:///G:/TradeMindAI/scripts/accuracy/sync_quota_safe.py)
+- Quota-aware Python sync engine.
+- Configurable `BATCH_SIZE` (default 50) and `MAX_WRITES_PER_RUN`.
+- Implements `get_doc` comparison before `set_doc`.
+- Gracefully handles `RESOURCE_EXHAUSTED` by persisting the queue and stopping.
 
-## 3. Verification Plan
+### [NEW] [scripts/windows/FIREBASE_QUOTA_SAFE_SYNC.ps1](file:///G:/TradeMindAI/scripts/windows/FIREBASE_QUOTA_SAFE_SYNC.ps1)
+- PowerShell runner that validates environment and triggers the safe sync engine.
+
+### [REGENERATE] [docs/firebase/FIREBASE_COMPLETE_DATA_INVENTORY.md](file:///G:/TradeMindAI/docs/firebase/FIREBASE_COMPLETE_DATA_INVENTORY.md)
+- Replace all "PENDING" status with forensic counts.
+
+## 4. Verification Plan
 
 ### Automated Tests
-- Run `verify_firebase_shadow.py` to confirm `market_status` field exists in Firestore.
-- Assert `ShadowScanDiagnosticDB` records the correct `rejection_reason` for a closed market.
+- Run sync with `MAX_WRITES_PER_RUN=5` to verify queue persistence and resumption.
+- Assert that identical data does not trigger a Firestore write count increase (simulated via logging).
 
 ### Manual Verification
-- Execute `STEP4_5_SHADOW_EOD.ps1` and verify the `shadow_equity` history update.
-- Check the Dashboard (if connected) for the new Market Status badge.
+- Verify the `shadow_summary` and `system_status` documents in the Firebase Console after a "Vital" sync run.
 
-## 4. Hard Constraints
-- **FROZEN Strategy**: No changes to v2.2 logic (Target, Stop, Threshold, Model).
-- **Local Only**: 100% Windows execution.
+## 5. Constraints
+- **Frozen Strategy**: No logic changes to v2.2.
+- **Local Sovereignty**: All generation and sync logic runs strictly on local Windows.

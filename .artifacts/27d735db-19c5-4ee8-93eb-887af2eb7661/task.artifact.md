@@ -1,0 +1,5 @@
+- [x] Remediate Firestore data (Summary + Signals)
+- [x] Enhance Backend Shadow API (market_session + universe stats)
+- [x] Update Frontend ShadowMonitor UI (Badges + Universe breakdown)
+- [x] Verify IST Market Calendar logic
+- [x] Final Verification & Documentation
