@@ -9,6 +9,10 @@ from google.cloud import firestore
 
 router = APIRouter()
 
+# --- Frozen Strategy v2.2 Constants ---
+BASELINE_START = "2026-08-18"
+TERMINAL_STATES = ['TARGET_HIT', 'STOP_LOSS', 'TIMEOUT', 'AMBIGUOUS', 'INVALID']
+
 def get_firestore_summary():
     if not db_client:
         return None
