@@ -1,0 +1,53 @@
+{
+    "windows": [
+        {
+            "window": 1,
+            "trades": 181,
+            "wins": 104,
+            "losses": 77,
+            "win_rate": 57.46,
+            "avg_win": 3.0,
+            "avg_loss": 3.0,
+            "avg_profit_net": 0.2475,
+            "net_ev_calc": 0.2475
+        },
+        {
+            "window": 2,
+            "trades": 146,
+            "wins": 68,
+            "losses": 78,
+            "win_rate": 46.58,
+            "avg_win": 3.0,
+            "avg_loss": 3.0,
+            "avg_profit_net": -0.4055,
+            "net_ev_calc": -0.4055
+        },
+        {
+            "window": 3,
+            "trades": 251,
+            "wins": 138,
+            "losses": 113,
+            "win_rate": 54.98,
+            "avg_win": 3.0,
+            "avg_loss": 3.0,
+            "avg_profit_net": 0.0988,
+            "net_ev_calc": 0.0988
+        },
+        {
+            "window": 4,
+            "trades": 300,
+            "wins": 206,
+            "losses": 94,
+            "win_rate": 68.67,
+            "avg_win": 3.0,
+            "avg_loss": 3.0,
+            "avg_profit_net": 0.92,
+            "net_ev_calc": 0.92
+        }
+    ],
+    "weighted_metrics": {
+        "total_trades": 878,
+        "win_rate": 58.77,
+        "avg_profit_net": 0.3262
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "timestamp": "2026-08-18T00:30:00Z",
+    "win_rate": 40.03,
+    "brier_score": 0.285,
+    "avg_profit_pct": 0.42,
+    "payoff_ratio": 1.85,
+    "max_drawdown": -12.4,
+    "trade_count": 255,
+    "feature_set": [
+        "trend_ema_cross", "ema_200", "momentum_rsi", "volatility_bb",
+        "volume_relative", "smc_bullish_ob", "smc_bearish_ob",
+        "ict_liquidity_void", "market_volatility_z", "market_cap_class"
+    ],
+    "model_config": {
+        "type": "RandomForest",
+        "max_depth": 5,
+        "min_samples_leaf": 10,
+        "n_estimators": 100
+    },
+    "thresholds": {
+        "prob": 0.52,
+        "ev": 0.0,
+        "data_quality": 0.6
+    },
+    "friction": {
+        "cost_per_leg": 0.0005,
+        "slippage_per_leg": 0.0005
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "experiments": [
+        {
+            "name": "Initial Baseline",
+            "win_rate": 38.38,
+            "brier_score": 0.3397,
+            "status": "FAIL",
+            "details": "Simulated resolution of proof signals."
+        },
+        {
+            "name": "Walk-Forward (Aggressive Label)",
+            "win_rate": 28.17,
+            "brier_score": 0.4102,
+            "status": "FAIL",
+            "details": "Target = 1% move. Heavy DOWN bias."
+        },
+        {
+            "name": "Walk-Forward (Balanced Label + Trend Filter)",
+            "win_rate": 40.03,
+            "brier_score": 0.2850,
+            "status": "IMPROVED",
+            "details": "Target = any positive return. Trend filter active."
+        }
+    ],
+    "final_decision": "IMPROVED_BUT_NOT_PRODUCTION_VALIDATED"
+}

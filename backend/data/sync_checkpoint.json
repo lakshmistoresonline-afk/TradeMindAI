@@ -1,0 +1,162 @@
+{
+    "ABB": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:02:06.734968"
+    },
+    "ACC": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:02:24.861451"
+    },
+    "ADANIENSOL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:02:42.964314"
+    },
+    "ADANIENT": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:01.931815"
+    },
+    "ADANIGREEN": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:19.900484"
+    },
+    "ADANIPORTS": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:38.539883"
+    },
+    "ADANIPOWER": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:03:57.494026"
+    },
+    "AMBUJACEM": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:04:16.604875"
+    },
+    "APOLLOHOSP": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:04:34.400563"
+    },
+    "APOLLOTYRE": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:04:51.904611"
+    },
+    "ASHOKLEY": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:05:10.564171"
+    },
+    "ASIANPAINT": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:05:29.251041"
+    },
+    "ASTRAL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:05:47.078730"
+    },
+    "ATGL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:06:06.207170"
+    },
+    "AUROPHARMA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:06:25.383329"
+    },
+    "AXISBANK": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:06:44.338838"
+    },
+    "BAJAJ-AUTO": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:02.126359"
+    },
+    "BAJAJFINSV": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:20.234271"
+    },
+    "BAJAJHLDNG": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:38.952150"
+    },
+    "BAJFINANCE": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:07:57.088549"
+    },
+    "BALKRISIND": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:08:16.147334"
+    },
+    "BANDHANBNK": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:08:33.198730"
+    },
+    "BANKBARODA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:08:50.848020"
+    },
+    "BANKINDIA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:09:09.778205"
+    },
+    "BATAINDIA": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:09:28.589452"
+    },
+    "BEL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:09:47.175152"
+    },
+    "BERGEPAINT": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:10:06.721547"
+    },
+    "BHARATFORG": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:10:24.733336"
+    },
+    "BHARTIARTL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:10:42.029748"
+    },
+    "BHEL": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:11:00.163799"
+    },
+    "BIOCON": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:11:18.001701"
+    },
+    "BLUEDART": {
+        "status": "FAILED",
+        "error": "No EQUITY data received from provider after retries",
+        "updated_at": "2026-08-20 06:11:36.285630"
+    }
+}

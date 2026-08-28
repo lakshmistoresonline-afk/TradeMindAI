@@ -1,0 +1,19 @@
+{
+    "path": "docs/STEP4_FULL_REALIZED_BACKTEST_RESULTS.json",
+    "filename": "STEP4_FULL_REALIZED_BACKTEST_RESULTS.json",
+    "SHA256": "8B2517115EE44892398FFC4D71000BCD1055BF66996D5D4CFE68EFFF262CEF4C",
+    "strategy_version": "v2.2",
+    "starting_capital": 1000000,
+    "final_equity": 18471648.51,
+    "trade_count": 37876,
+    "win_rate": 49.21,
+    "drawdown": -13.08,
+    "target": "3%",
+    "stop": "3%",
+    "threshold": 0.52,
+    "portfolio_limits": {
+        "max_positions": 10,
+        "max_allocation": "10%"
+    },
+    "timestamp": "2026-08-21T14:16:32"
+}

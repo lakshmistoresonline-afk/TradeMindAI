@@ -1,0 +1,20 @@
+{
+    "manifest_version": "v2.2.0",
+    "last_updated": "2026-08-18T11:20:00Z",
+    "strategy_version": "v2.2",
+    "total_models": 196,
+    "compatible_symbols": 196,
+    "missing_symbols": 4,
+    "missing_reasons": {
+        "GUJGASLTD": "DATA_UNAVAILABLE",
+        "LTIM": "PROVIDER_MAPPING_ERROR",
+        "PEL": "DATA_UNAVAILABLE",
+        "TATAMOTORS": "DATA_UNAVAILABLE"
+    },
+    "model_config": {
+        "engine": "RandomForestClassifier",
+        "features": 11,
+        "max_depth": 5,
+        "min_samples_leaf": 10
+    }
+}

@@ -1,0 +1,25 @@
+services:
+  # 1. The API Server
+  - type: web
+    name: trademind-api
+    env: docker
+    region: singapore
+    plan: free
+    dockerContext: .
+    dockerfilePath: backend/Dockerfile
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: com-webcraft-trademindai-c8f75
+      - key: SERVICE_TYPE
+        value: api
+      - key: GROQ_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      - key: POSTGRES_URL
+        sync: false
+
+  # Note: Background Workers and Schedulers are DISABLED on Render/Railway.
+  # ALL heavy processing (NIFTY 200, ML Training, Ingestion) must be run locally on Windows.

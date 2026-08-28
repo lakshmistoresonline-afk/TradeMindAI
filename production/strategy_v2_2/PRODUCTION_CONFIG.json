@@ -1,0 +1,33 @@
+{
+    "strategy_version": "v2.2",
+    "release_date": "2026-08-18",
+    "release_tag": "trademind-equity-v2.2",
+    "status": "SHADOW_READY",
+    "parameters": {
+        "profit_target_pct": 3.0,
+        "stop_loss_pct": 3.0,
+        "prob_threshold": 0.52,
+        "ev_threshold": 0.0,
+        "ema_200_filter": true,
+        "magnitude_filter_atr": 0.5,
+        "liquidity_gate_volume": 10000000.0,
+        "data_staleness_gate_hours": 24.0,
+        "drawdown_gate_limit_pct": 15.0
+    },
+    "economics": {
+        "brokerage_per_leg": 0.0005,
+        "slippage_per_leg": 0.0005,
+        "total_friction_round_trip": 0.0020
+    },
+    "model_metadata": {
+        "engine": "RandomForest",
+        "max_depth": 5,
+        "min_samples_leaf": 10,
+        "feature_count": 11
+    },
+    "certification_reference": {
+        "win_rate_weighted": 58.77,
+        "net_ev": 0.3262,
+        "trades_audited": 878
+    }
+}

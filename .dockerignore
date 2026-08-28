@@ -1,0 +1,21 @@
+# Exclude Frontend from Backend Build
+web/
+dist/
+node_modules/
+
+# Exclude Local Python Env
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Exclude Git and IDE files
+.git/
+.idea/
+.vscode/
+
+# Exclude local database and env
+*.db
+local_operational.db
+.env
+service-account.json

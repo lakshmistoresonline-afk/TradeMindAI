@@ -1,0 +1,285 @@
+{
+    "pending": [],
+    "completed": [
+        {
+            "id": "performance_summary/backtest",
+            "collection_path": "performance_summary",
+            "doc_id": "backtest",
+            "data": {
+                "total_return": 1747.16,
+                "win_rate": 49.77,
+                "trades": 6882,
+                "status": "VERIFIED"
+            },
+            "priority": 2,
+            "added_at": "2026-08-22T06:44:04.966460"
+        },
+        {
+            "id": "performance_summary/walk_forward",
+            "collection_path": "performance_summary",
+            "doc_id": "walk_forward",
+            "data": {
+                "total_return": 2757.34,
+                "win_rate": 52.57,
+                "trades": 4489,
+                "status": "VALIDATED"
+            },
+            "priority": 2,
+            "added_at": "2026-08-22T06:44:04.966460"
+        },
+        {
+            "id": "stocks/RELIANCE",
+            "collection_path": "stocks",
+            "doc_id": "RELIANCE",
+            "data": {
+                "name": "RELIANCE Limited",
+                "sector": "Energy",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/TCS",
+            "collection_path": "stocks",
+            "doc_id": "TCS",
+            "data": {
+                "name": "TCS Limited",
+                "sector": "Technology",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/INFY",
+            "collection_path": "stocks",
+            "doc_id": "INFY",
+            "data": {
+                "name": "INFY Limited",
+                "sector": "Technology",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/HDFCBANK",
+            "collection_path": "stocks",
+            "doc_id": "HDFCBANK",
+            "data": {
+                "name": "HDFCBANK Limited",
+                "sector": "Financial Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/ICICIBANK",
+            "collection_path": "stocks",
+            "doc_id": "ICICIBANK",
+            "data": {
+                "name": "ICICIBANK Limited",
+                "sector": "Financial Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/SBIN",
+            "collection_path": "stocks",
+            "doc_id": "SBIN",
+            "data": {
+                "name": "SBIN Limited",
+                "sector": "Financial Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/BHARTIARTL",
+            "collection_path": "stocks",
+            "doc_id": "BHARTIARTL",
+            "data": {
+                "name": "BHARTIARTL Limited",
+                "sector": "Communication Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/ITC",
+            "collection_path": "stocks",
+            "doc_id": "ITC",
+            "data": {
+                "name": "ITC Limited",
+                "sector": "Consumer Defensive",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/LT",
+            "collection_path": "stocks",
+            "doc_id": "LT",
+            "data": {
+                "name": "LT Limited",
+                "sector": "Industrials",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/KOTAKBANK",
+            "collection_path": "stocks",
+            "doc_id": "KOTAKBANK",
+            "data": {
+                "name": "KOTAKBANK Limited",
+                "sector": "Financial Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/AXISBANK",
+            "collection_path": "stocks",
+            "doc_id": "AXISBANK",
+            "data": {
+                "name": "AXISBANK Limited",
+                "sector": "Financial Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/ASIANPAINT",
+            "collection_path": "stocks",
+            "doc_id": "ASIANPAINT",
+            "data": {
+                "name": "ASIANPAINT Limited",
+                "sector": "Basic Materials",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/MARUTI",
+            "collection_path": "stocks",
+            "doc_id": "MARUTI",
+            "data": {
+                "name": "MARUTI Limited",
+                "sector": "Consumer Cyclical",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.996521"
+        },
+        {
+            "id": "stocks/TITAN",
+            "collection_path": "stocks",
+            "doc_id": "TITAN",
+            "data": {
+                "name": "TITAN Limited",
+                "sector": "Consumer Cyclical",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        },
+        {
+            "id": "stocks/BAJFINANCE",
+            "collection_path": "stocks",
+            "doc_id": "BAJFINANCE",
+            "data": {
+                "name": "BAJFINANCE Limited",
+                "sector": "Financial Services",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        },
+        {
+            "id": "stocks/ADANIENT",
+            "collection_path": "stocks",
+            "doc_id": "ADANIENT",
+            "data": {
+                "name": "ADANIENT Limited",
+                "sector": "Energy",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        },
+        {
+            "id": "stocks/SUNPHARMA",
+            "collection_path": "stocks",
+            "doc_id": "SUNPHARMA",
+            "data": {
+                "name": "SUNPHARMA Limited",
+                "sector": "Healthcare",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        },
+        {
+            "id": "stocks/ULTRACEMCO",
+            "collection_path": "stocks",
+            "doc_id": "ULTRACEMCO",
+            "data": {
+                "name": "ULTRACEMCO Limited",
+                "sector": "Basic Materials",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        },
+        {
+            "id": "stocks/JSWSTEEL",
+            "collection_path": "stocks",
+            "doc_id": "JSWSTEEL",
+            "data": {
+                "name": "JSWSTEEL Limited",
+                "sector": "Basic Materials",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        },
+        {
+            "id": "stocks/NIFTY",
+            "collection_path": "stocks",
+            "doc_id": "NIFTY",
+            "data": {
+                "name": "NIFTY Index",
+                "sector": "None",
+                "status": "OPERATIONAL"
+            },
+            "priority": 3,
+            "added_at": "2026-08-22T06:44:04.997520"
+        }
+    ],
+    "failed": [
+        {
+            "id": "system_status/latest",
+            "collection_path": "system_status",
+            "doc_id": "latest",
+            "data": {
+                "status": "OPERATIONAL_SAFE",
+                "version": "v2.2"
+            },
+            "priority": 1,
+            "added_at": "2026-08-22T06:44:04.966460",
+            "error": "Timeout of 60.0s exceeded, last exception: 429 Quota exceeded."
+        }
+    ]
+}

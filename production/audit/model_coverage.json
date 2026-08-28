@@ -1,0 +1,15 @@
+{
+    "audit_timestamp": "2026-08-18T10:54:00Z",
+    "universe": "NIFTY 200",
+    "total_symbols": 200,
+    "classification": {
+        "compatible_v2_2": 10,
+        "incompatible_v2_1": 39,
+        "missing": 151
+    },
+    "eligible_for_production": 10,
+    "blockers": {
+        "LTIM": "DATA_UNAVAILABLE",
+        "190_symbols": "MODEL_RETRAINING_REQUIRED"
+    }
+}
