@@ -1,0 +1,87 @@
+{
+    "timestamp": "2026-08-28T17:08:21.454239",
+    "sample_size": 20,
+    "outcomes": {
+        "TARGET_HIT": 10,
+        "STOP_LOSS": 9,
+        "TIMEOUT": 1
+    },
+    "win_rate": {
+        "directional": 50.0,
+        "excl_timeout": 52.63
+    },
+    "pnl": {
+        "total_net": 28.2,
+        "avg_trade": 2.01,
+        "avg_win": 5.13,
+        "avg_loss": -3.6,
+        "largest_win": 9.8,
+        "largest_loss": -4.2,
+        "profit_factor": 2.57
+    },
+    "risk": {
+        "max_drawdown": -6.3,
+        "expectancy": 0.77
+    },
+    "segmentation": {
+        "long": {
+            "count": 15,
+            "wins": 9,
+            "losses": 5,
+            "timeouts": 1,
+            "win_rate": 60.0,
+            "net_pnl": 29.0
+        },
+        "short": {
+            "count": 5,
+            "wins": 1,
+            "losses": 4,
+            "timeouts": 0,
+            "win_rate": 20.0,
+            "net_pnl": -0.8
+        }
+    },
+    "sector_analysis": {
+        "Consumer Electronics": {
+            "count": 1.0,
+            "wins": 0.0,
+            "net_pnl": 0.0
+        },
+        "Consumer Goods": {
+            "count": 4.0,
+            "wins": 2.0,
+            "net_pnl": 12.2
+        },
+        "Energy": {
+            "count": 2.0,
+            "wins": 1.0,
+            "net_pnl": -0.4
+        },
+        "Financial Services": {
+            "count": 6.0,
+            "wins": 3.0,
+            "net_pnl": 2.4
+        },
+        "Healthcare": {
+            "count": 1.0,
+            "wins": 1.0,
+            "net_pnl": 2.8
+        },
+        "Industrials": {
+            "count": 2.0,
+            "wins": 1.0,
+            "net_pnl": 5.6
+        },
+        "Materials": {
+            "count": 1.0,
+            "wins": 1.0,
+            "net_pnl": 2.8
+        },
+        "Technology": {
+            "count": 3.0,
+            "wins": 1.0,
+            "net_pnl": 2.8
+        }
+    },
+    "strategy_classification": "V2.2_PROMISING_BUT_LIMITED_SAMPLE"
+}

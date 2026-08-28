@@ -1,86 +1,137 @@
 import datetime
 import pandas as pd
-import yfinance as yf
 from typing import Dict, Any, Optional
 from backend.core.container import container
 from backend.domain.models.ios import LiveSignal
+
+class ProviderCapabilityRegistry:
+    @staticmethod
+    def get_capabilities(provider_name: str) -> Dict[str, Any]:
+        """
+        Part 6: Provider Capability Registry.
+        Defines what each provider can safely support.
+        """
+        registry = {
+            "GrowwProvider": {
+                "equity_support": True,
+                "index_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE", "BSE"]
+            },
+            "YFinanceProvider": {
+                "equity_support": True,
+                "index_support": True,
+                "future_support": False, # Yahoo NSE futures are unreliable
+                "option_support": False, # Options coverage is poor
+                "exchanges": ["NSE", "BSE"]
+            }
+        }
+        return registry.get(provider_name, {
+            "equity_support": True,
+            "index_support": True,
+            "future_support": False,
+            "option_support": False,
+            "exchanges": ["NSE"]
+        })
 
 class PriceResolver:
     @staticmethod
     async def resolve_current_price(signal: LiveSignal) -> Dict[str, Any]:
         """
-        Canonical Price Resolver (Step 2D).
-        Resolves current_price, underlying_price, and applies normalization.
+        Step 2E Canonical Price Resolver.
+        Implements:
+        - Instrument eligibility
+        - Provider capability check
+        - Expiry validation
+        - Zero-fabrication defense
+        - Separate underlying/instrument price
         """
         provider = container.provider
+        provider_name = provider.__class__.__name__
+        caps = ProviderCapabilityRegistry.get_capabilities(provider_name)
+
         asset_class = signal.asset_class
         symbol = signal.symbol
         instr_id = signal.instrument_id or symbol
 
-        # P0 Rule: Initialize with NULLs, not 0.0 (Part 8/26)
+        now = datetime.datetime.now()
+
+        # P0 Rule: Initialize with NULLs (Part 5)
         result = {
             "current_price": None,
             "underlying_price": None,
             "normalized_current_price": None,
-            "timestamp": datetime.datetime.now(),
-            "source": provider.__class__.__name__,
-            "status": "DATA_UNAVAILABLE"
+            "timestamp": now,
+            "source": provider_name,
+            "status": "DATA_UNAVAILABLE",
+            "eligibility": "ELIGIBLE"
         }
 
+        # 1. Expiry Validation (Part 9)
+        if signal.expiry:
+            expiry_dt = signal.expiry
+            if isinstance(expiry_dt, str):
+                try:
+                    expiry_dt = datetime.datetime.fromisoformat(expiry_dt)
+                except:
+                    expiry_dt = None
+
+            # Use UTC comparison if expiry is UTC, otherwise local
+            if expiry_dt and expiry_dt.replace(tzinfo=None) < now.replace(tzinfo=None):
+                result["status"] = "EXPIRED"
+                result["eligibility"] = "EXPIRED_INSTRUMENT"
+                return result
+
         try:
-            # 1. Fetch Underlying Price (Spot/Index)
+            # 2. Provider Support Check (Part 6)
+            supported = True
+            if asset_class == "FUTURES" and not caps.get("future_support"): supported = False
+            if asset_class == "OPTIONS" and not caps.get("option_support"): supported = False
+
+            if not supported:
+                result["status"] = "PROVIDER_UNSUPPORTED"
+                result["eligibility"] = "INSTRUMENT_BLOCKED"
+                return result
+
+            # 3. Fetch Underlying Price (Spot/Index)
             u_sym = signal.underlying_symbol or symbol
             u_price = await provider.get_ltp(u_sym)
 
-            # Part 7: Zero Price Rule
-            if u_price > 0:
+            # Part 4 & 7: Zero Price Defense
+            if u_price and u_price > 0:
                 result["underlying_price"] = u_price
             else:
                 result["underlying_price"] = None
 
-            # 2. Fetch Instrument Price
+            # 4. Fetch Instrument Price
             if asset_class == "EQUITY" or asset_class == "INDEX":
                 result["current_price"] = result["underlying_price"]
                 result["status"] = "FRESH" if result["current_price"] else "DATA_UNAVAILABLE"
+                if not result["current_price"]:
+                    result["eligibility"] = "DATA_BLOCKED"
 
-            elif asset_class == "FUTURES":
-                # For Futures, use instr_id (e.g. RELIANCE26AUGFUT.NS)
-                f_price = await provider.get_ltp(instr_id)
+            elif asset_class in ["FUTURES", "OPTIONS"]:
+                # Part 10 & 11: Absolute separation
+                d_price = await provider.get_ltp(instr_id)
 
-                # Part 7 & 10: Ensure futures price is valid and separate from spot
-                if f_price > 0:
-                    # Basic mapping defense: spot usually != future (Part 10)
-                    if result["underlying_price"] and abs(f_price - result["underlying_price"]) < 0.01:
-                         # Highly unlikely for NSE futures to be EXACTLY spot unless mapping failed
-                         # but for Nifty it might be very close. We tag it.
-                         result["current_price"] = f_price
-                         result["status"] = "FRESH_SPOT_ALIGNED"
-                    else:
-                         result["current_price"] = f_price
-                         result["status"] = "FRESH"
-                else:
-                    result["current_price"] = None
-                    result["status"] = "INSTRUMENT_NOT_FOUND"
-
-            elif asset_class == "OPTIONS":
-                # Defect 1 Fix: Fetch actual premium from specific ticker
-                # Part 8: Never fallback to underlying
-                o_price = await provider.get_ltp(instr_id)
-
-                if o_price > 0:
-                    if result["underlying_price"] and o_price == result["underlying_price"]:
-                        # Hard Contamination Check (Defect 1)
+                if d_price and d_price > 0:
+                    # Part 4: Underlying Contamination Check
+                    if result["underlying_price"] and abs(d_price - result["underlying_price"]) < 0.0001:
+                        # Hard Contamination Check
                         result["current_price"] = None
-                        result["status"] = "DERIVATIVE_MAPPING_FAILURE"
+                        result["status"] = "INVALID"
+                        result["eligibility"] = "INVALID_DATA"
                     else:
-                        result["current_price"] = o_price
+                        result["current_price"] = d_price
                         result["status"] = "FRESH"
                 else:
                     result["current_price"] = None
-                    result["status"] = "DERIVATIVE_DATA_UNAVAILABLE"
+                    result["status"] = "INSTRUMENT_NOT_FOUND"
+                    result["eligibility"] = "DATA_BLOCKED"
 
-            # 3. Apply Normalization Factor (Step 2D - Part 19)
-            factor = getattr(signal, "price_adjustment_factor", 1.0)
+            # 5. Apply Normalization (Part 17)
+            factor = signal.price_adjustment_factor
             if result["current_price"]:
                 result["normalized_current_price"] = result["current_price"] * factor
             else:
@@ -89,5 +140,6 @@ class PriceResolver:
         except Exception as e:
             print(f"[PriceResolver] Error resolving {symbol}: {e}")
             result["status"] = "ERROR"
+            result["eligibility"] = "DATA_BLOCKED"
 
         return result

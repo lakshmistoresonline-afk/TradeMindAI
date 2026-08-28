@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     DEFAULT_RISK_REWARD: float = 2.5
 
     SECRET_KEY: str = "SECRET"
+
+    @validator("SECRET_KEY")
+    def validate_secret_key(cls, v: str, values: dict) -> str:
+        if values.get("ENVIRONMENT") == "production" and v == "SECRET":
+            raise ValueError("SECRET_KEY must be set in production environment")
+        return v
+
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 

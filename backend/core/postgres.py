@@ -167,6 +167,31 @@ class EarningsDB(Base):
     revenue_estimate = Column(Float)
     surprise_pct = Column(Float)
 
+class OptionsChainDB(Base):
+    __tablename__ = "options_chains"
+    id = Column(String, primary_key=True)
+    symbol = Column(String, index=True)
+    expiry = Column(DateTime, index=True)
+    underlying_price = Column(Float)
+    pcr = Column(Float)
+    max_pain = Column(Float)
+    total_oi = Column(BigInteger)
+    iv_atm = Column(Float)
+    greeks_aggregate = Column(String) # JSON string
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+
+class MLDatasetDB(Base):
+    __tablename__ = "ml_datasets"
+    id = Column(String, primary_key=True)
+    symbol = Column(String, index=True)
+    version = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    start_date = Column(DateTime)
+    end_date = Column(DateTime)
+    split_ratio = Column(Float)
+    features_included = Column(String) # JSON string
+    storage_path = Column(String)
+
 class OpportunityDB(Base):
     __tablename__ = "opportunities"
     id = Column(String, primary_key=True)
@@ -239,12 +264,33 @@ class LiveSignalDB(Base):
     model_version = Column(String)
     events = Column(String) # JSON string
 
+    # Step 3 Separation
+    evaluation_mode = Column(String, default="LIVE_SHADOW")
+    universe_version = Column(String, default="NIFTY_200_AUG2026")
+    strategy_version = Column(String, default="v2.2")
+    data_timestamp = Column(DateTime)
+    market_timestamp = Column(DateTime)
+    exit_reason = Column(String)
+    fees = Column(Float)
+    slippage = Column(Float)
+    net_pnl = Column(Float)
+    signal_eligibility = Column(String)
+    outcome_verified = Column(Boolean, default=False)
+    quantity = Column(Integer)
+    capital_allocation = Column(Float)
+    risk_amount = Column(Float)
+    gross_pnl = Column(Float)
+    pnl_percentage = Column(Float)
+
 class ShadowSignalDB(Base):
     __tablename__ = "shadow_signals"
     id = Column(String, primary_key=True, index=True)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     symbol = Column(String, index=True)
     direction = Column(String)
+    asset_class = Column(String(20), default="EQUITY")
+    instrument_id = Column(String)
+    instrument_type = Column(String)
     raw_probability = Column(Float)
     calibrated_probability = Column(Float)
     expected_value = Column(Float)
@@ -253,23 +299,35 @@ class ShadowSignalDB(Base):
     target_price = Column(Float)
     stop_price = Column(Float)
     strategy_version = Column(String, default="v2.2")
+    universe_version = Column(String, default="NIFTY_200_AUG2026")
     model_version = Column(String)
     feature_version = Column(String)
     regime = Column(String)
-    outcome = Column(String)
+    outcome = Column(String) # For legacy compatibility, redundant with status
     outcome_timestamp = Column(DateTime)
     exit_price = Column(Float)
     realized_return = Column(Float)
     realized_mfe = Column(Float)
     realized_mae = Column(Float)
-    transaction_cost = Column(Float)
+    transaction_cost = Column(Float) # Fees
     slippage = Column(Float)
     net_return = Column(Float)
-    status = Column(String, default="ACTIVE") # ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, REJECTED
-    rejection_reason = Column(String)
+    exit_reason = Column(String)
+    data_timestamp = Column(DateTime)
+    market_timestamp = Column(DateTime)
+    evaluation_mode = Column(String, default="LIVE_SHADOW", index=True)
+    status = Column(String, default="ACTIVE", index=True)
+    signal_eligibility = Column(String)
+    outcome_verified = Column(Boolean, default=False)
+    quantity = Column(Integer)
+    capital_allocation = Column(Float)
+    risk_amount = Column(Float)
+    gross_pnl = Column(Float)
+    pnl_percentage = Column(Float)
+    fees = Column(Float)
+    net_pnl = Column(Float)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    provenance_json = Column(String) # For audit trail
 
 class ShadowEventDB(Base):
     __tablename__ = "shadow_events"
@@ -284,6 +342,7 @@ class ShadowEventDB(Base):
     rejection_reason = Column(String)
     payload_json = Column(String) # For detailed parameters (EMA, ATR, Prob, etc.)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    evaluation_mode = Column(String, default="LIVE_SHADOW", index=True)
 
 class ShadowScanDiagnosticDB(Base):
     __tablename__ = "shadow_scan_diagnostics"
@@ -299,7 +358,32 @@ class ShadowScanDiagnosticDB(Base):
     signal_decision = Column(String) # SIGNAL_GENERATED, REJECTED
     rejection_reason = Column(String)
     model_version = Column(String)
+    provider_name = Column(String)
+    provider_latency_ms = Column(Integer)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class DailyMetricDB(Base):
+    __tablename__ = "daily_metrics"
+    date = Column(Date, primary_key=True)
+    universe_version = Column(String)
+    signals_generated = Column(Integer)
+    signals_active = Column(Integer)
+    target_hits = Column(Integer)
+    stop_losses = Column(Integer)
+    timeouts = Column(Integer)
+    expired = Column(Integer)
+    cancelled = Column(Integer)
+    invalid_outcomes = Column(Integer)
+    gross_pnl = Column(Float)
+    fees = Column(Float)
+    slippage = Column(Float)
+    net_pnl = Column(Float)
+    virtual_equity = Column(Float)
+    drawdown = Column(Float)
+    exposure = Column(Float)
+    provider_reliability_pct = Column(Float)
+    avg_latency_ms = Column(Integer)
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
 
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"
@@ -382,6 +466,20 @@ class InstrumentDB(Base):
     tick_size = Column(Float)
     source = Column(String)
     last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+
+from sqlalchemy import event
+from .config import settings
+
+@event.listens_for(LiveSignalDB, 'before_insert')
+def guard_live_signal(mapper, connection, target):
+    # Part 4/34: Environment Guard
+    if settings.ENVIRONMENT in ["production", "shadow"] and target.evaluation_mode == "TEST":
+        raise ValueError(f"CRITICAL: Rejected TEST signal insertion into {settings.ENVIRONMENT} database.")
+
+@event.listens_for(ShadowSignalDB, 'before_insert')
+def guard_shadow_signal(mapper, connection, target):
+    if settings.ENVIRONMENT in ["production", "shadow"] and target.evaluation_mode == "TEST":
+        raise ValueError(f"CRITICAL: Rejected TEST signal insertion into {settings.ENVIRONMENT} database.")
 
 def init_db():
     Base.metadata.create_all(bind=engine)

@@ -37,6 +37,68 @@ def get_shadow_status():
         "environment": settings.ENVIRONMENT
     }
 
+@router.get("/coverage")
+def get_shadow_coverage():
+    """
+    Step 4: Universe Coverage Metrics.
+    Authoritative from SQL Tier.
+    """
+    from backend.core.postgres import StockDB
+    try:
+        with SessionLocal() as session:
+            total = session.query(StockDB).count()
+            fo_eligible = session.query(StockDB).filter(StockDB.is_fno == True).count()
+            data_available = session.query(StockDB).filter(StockDB.last_price != None).count()
+
+            # Signals generated today
+            today = datetime.utcnow().date()
+            signals_today = session.query(ShadowSignalDB).filter(func.date(ShadowSignalDB.timestamp) == today).count()
+
+            return {
+                "total_universe": total,
+                "evaluated": total,
+                "data_available": data_available,
+                "signal_generated_today": signals_today,
+                "f&o_eligible": fo_eligible,
+                "equity_coverage_pct": round((data_available / total * 100), 1) if total > 0 else 0.0,
+                "fo_coverage_pct": round((fo_eligible / total * 100), 1) if total > 0 else 0.0
+            }
+    except Exception as e:
+        print(f"SQL Error (Coverage): {e}")
+        return {"error": str(e)}
+
+@router.get("/signals/count")
+def get_signals_count():
+    """
+    Performance Counter for Step 4 Gate (20 Verified Outcomes).
+    """
+    try:
+        with SessionLocal() as session:
+            verified = session.query(ShadowSignalDB).filter(ShadowSignalDB.outcome_verified == True).count()
+            return {
+                "verified_outcomes": verified,
+                "target": 20,
+                "remaining": max(0, 20 - verified),
+                "gate_status": "LOCKED" if verified < 20 else "UNLOCKED"
+            }
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.get("/performance/validation")
+def get_formal_validation():
+    """
+    Step 5: Formal Performance Validation Results.
+    Authoritative from docs/nifty200.
+    """
+    import os
+    import json
+    path = "docs/nifty200/NIFTY200_STEP5_PERFORMANCE_RESULTS.json"
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Step 5 Validation results not yet generated.")
+
+    with open(path, "r") as f:
+        return json.load(f)
+
 @router.get("/summary")
 def get_shadow_summary():
     """
@@ -49,6 +111,7 @@ def get_shadow_summary():
             transactional_signals = session.query(ShadowSignalDB).count()
             active_signals = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'ACTIVE').count()
             completed_trades = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES)).count()
+            verified_trades = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES), ShadowSignalDB.outcome_verified == True).count()
 
             # Detailed breakdown
             target_hits = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'TARGET_HIT').count()
@@ -70,6 +133,7 @@ def get_shadow_summary():
                 "transactional_signals": transactional_signals,
                 "active_signals": active_signals,
                 "completed_trades": completed_trades,
+                "verified_trades": verified_trades,
                 "target_hits": target_hits,
                 "stop_hits": stop_hits,
                 "timeouts": timeouts,
@@ -77,7 +141,8 @@ def get_shadow_summary():
                 "total_signals": transactional_signals,
                 "operational_symbols": 198,
                 "unavailable_symbols": 2,
-                "equity": 1000000.0 + total_pnl
+                "equity": 1000000.0 + total_pnl,
+                "sample_status": "INSUFFICIENT SAMPLE SIZE" if verified_trades < 20 else "ADEQUATE"
             }
     except Exception as e:
         print(f"SQL Error (Summary): {e}")
@@ -207,8 +272,17 @@ def get_all_shadow_signals(
                         "status": s.status, "pnl": s.net_return,
                         "outcome_timestamp": s.outcome_timestamp.isoformat() if s.outcome_timestamp else None,
                         "exit_price": s.exit_price,
-                        "exit_reason": s.rejection_reason if s.status != 'ACTIVE' else None,
-                        "model_version": s.model_version
+                        "exit_reason": s.exit_reason,
+                        "model_version": s.model_version,
+                        "universe_version": s.universe_version,
+                        "evaluation_mode": s.evaluation_mode,
+                        "signal_eligibility": s.signal_eligibility,
+                        "data_timestamp": s.data_timestamp.isoformat() if s.data_timestamp else None,
+                        "outcome_verified": s.outcome_verified,
+                        "gross_pnl": s.gross_pnl,
+                        "net_pnl": s.net_pnl,
+                        "fees": s.fees,
+                        "slippage": s.slippage
                     } for s in signals
                 ],
                 "page": page,

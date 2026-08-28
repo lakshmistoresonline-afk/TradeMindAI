@@ -50,6 +50,36 @@ def root():
         "forensic_id": "RECONCILED_4_5_40C_UNBLOCKED"
     }
 
+@app.get("/ready")
+async def readiness():
+    """
+    Ready: required dependencies available.
+    """
+    status = {"status": "ready", "dependencies": {}}
+
+    # 1. Database
+    try:
+        from backend.core.postgres import SessionLocal
+        with SessionLocal() as session:
+            session.execute(text("SELECT 1"))
+        status["dependencies"]["postgres"] = "UP"
+    except:
+        status["dependencies"]["postgres"] = "DOWN"
+        status["status"] = "not_ready"
+
+    # 2. Redis
+    try:
+        from redis import asyncio as aioredis
+        redis = aioredis.from_url(settings.REDIS_URL)
+        await redis.ping()
+        status["dependencies"]["redis"] = "UP"
+        await redis.close()
+    except:
+        status["dependencies"]["redis"] = "DOWN"
+        status["status"] = "not_ready"
+
+    return status
+
 @app.get("/health")
 def health():
     return {"status": "healthy", "timestamp": datetime.datetime.utcnow().isoformat()}

@@ -148,13 +148,56 @@ class SignalEngine:
         freshness_score = max(0.0, 1.0 - (staleness / 24.0))
         data_quality = (freshness_score * 0.7) + (coverage_score * 0.3)
 
-        # 10. Construct Canonical Signal
+        # 10. Signal Eligibility Logic (Part 2)
+        eligibility = "ELIGIBLE"
+        if staleness > 24:
+            eligibility = "STALE_DATA"
+        elif coverage_score < 0.5:
+            eligibility = "DATA_BLOCKED"
+
+        # 11. Construct Canonical Signal
         sig_id = f"sig_{symbol}_{datetime.datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        now = datetime.datetime.utcnow()
+
+        # Diagnostic Context (Phase 6 Robustness)
+        ema200 = last_features.get("ema_200", price)
+        sma20 = last_features.get("sma_20", price)
+        diag_provenance = {
+            "feature_version": "v1.0.0",
+            "engine_version": "P0.QUANT.1",
+            "calibration": "Platt-Scaled",
+            "market_regime_at_entry": regime_label,
+            "index_trend": regime_label,
+            "sector_trend": "N/A", # Sector-level trend requires additional scan
+            "relative_strength": last_features.get("rs_rating", 0.0),
+            "volatility_regime": "HIGH" if regime_label == "HIGH_VOLATILITY" else "NORMAL",
+            "volume_regime": "NORMAL", # Placeholder for volume outlier detection
+            "EMA200_state": "ABOVE" if price > ema200 else "BELOW",
+            "momentum_state": "UP" if price > sma20 else "DOWN",
+            "predicted_probability": float(calibrated_prob),
+            "predicted_EV": float(expected_val),
+            "predicted_RR": float(risk_params["risk_reward"])
+        }
+
+        # Part 4: Look-ahead Protection
+        data_ts = features_list[-1].date
+        if data_ts > now:
+            print(f"   [FATAL] Look-ahead violation detected for {symbol}: {data_ts} > {now}")
+            return None
+
+        # Part 4/15/34: Evaluation Mode & Environment Guard
+        from backend.core.config import settings
+        eval_mode = "LIVE_SHADOW" if settings.ENVIRONMENT in ["production", "shadow"] else "TEST"
+
+        # Hard rejection of TEST signals in production environment
+        if settings.ENVIRONMENT == "production" and eval_mode == "TEST":
+            print(f"   [GUARD] Rejected TEST signal generation for {symbol} in PRODUCTION.")
+            return None
 
         return LiveSignal(
             id=sig_id,
             symbol=symbol,
-            timestamp=datetime.datetime.utcnow(),
+            timestamp=now, # Canonical created_at
             rating="BUY" if direction == "LONG" else "SELL",
             direction=direction,
             conviction=float(calibrated_prob * 100),
@@ -169,6 +212,20 @@ class SignalEngine:
             risk_per_unit=float(abs(risk_amt)),
             reward_per_unit=float(abs(reward_amt)),
             data_quality_score=float(data_quality),
+            signal_eligibility=eligibility,
+            evaluation_mode=eval_mode,
+
+            # Step 3 Metadata
+            universe_version="NIFTY_200_AUG2026",
+            strategy_version="v2.2",
+            data_timestamp=data_ts,
+            market_timestamp=now, # Snapshot time
+
+            # Step 4 Scaled Dimensions (Part 21)
+            quantity=1, # Default unit for shadow observation
+            capital_allocation=100000.0,
+            risk_amount=3000.0, # 3% risk on 100k
+            outcome_verified=False,
 
             entry_price=stock.last_price,
             target_price=risk_params["target"],
@@ -178,10 +235,6 @@ class SignalEngine:
             asset_class=asset_class,
             underlying_symbol=symbol if asset_class != "EQUITY" else None,
             model_version=ml_res.get("model_version", "TradeMind Core v2.2"),
-            provenance={
-                "feature_version": "v1.0.0",
-                "engine_version": "P0.QUANT.1",
-                "calibration": "Platt-Scaled"
-            },
+            provenance=diag_provenance,
             events=[SignalEvent(type="GENERATED", message="Passed forensic P0 risk/edge audit.")]
         )

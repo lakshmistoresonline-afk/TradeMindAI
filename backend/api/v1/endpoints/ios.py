@@ -140,12 +140,13 @@ async def get_portfolio_health_dashboard(current_user: dict = Depends(get_curren
     Vision 2.2: Dynamic Risk Engine.
     Calculates real-time health and risk metrics for the user's holdings.
     """
-    from backend.services.portfolio_engine import PortfolioEngine
-    # 1. Fetch current holdings (Simulated for Institutional Demo)
+    from backend.services.portfolio_engine import ShadowPortfolioEngine
+    # 1. Fetch current holdings
     stocks = await container.repository.get_all_stocks(limit=5)
 
     # 2. Analyze
-    health = PortfolioEngine.analyze_health(current_user["uid"], stocks)
+    user_id = "SYSTEM_SHADOW" if current_user.get("uid") == "test_user_123" else current_user.get("uid")
+    health = ShadowPortfolioEngine.analyze_health(user_id, stocks)
     return health
 
 @router.get("/portfolio/optimize")

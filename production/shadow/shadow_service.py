@@ -112,6 +112,7 @@ class ShadowService:
 
             # 5. Scan Universe (Only if market is OPEN)
             evaluations = []
+            provider_name = container.provider.__class__.__name__
             if session_type == "OPEN":
                 champions_list = await container.data_platform_repo.get_all_champion_models()
                 champion_map = {c.symbol: c for c in champions_list}
@@ -170,11 +171,12 @@ class ShadowService:
                     except Exception as e:
                         eval_data.update({"decision": "NO_TRADE_DATA_ERROR", "rejection_reason": f"EXCEPTION: {str(e)}"})
 
-                evaluations.append(eval_data)
+                    evaluations.append(eval_data)
 
                 # 6. Log Evaluations (Bulk)
                 ShadowService._log_to_csv(evaluations)
                 ShadowService._log_to_db(evaluations)
+                ShadowService._log_diagnostics(evaluations, provider_name)
             else:
                 print(f"[INFO] Market is {session_type}. Skipping signal generation.")
 
@@ -203,8 +205,29 @@ class ShadowService:
             except: pass
 
     @staticmethod
+    def _log_diagnostics(evaluations, provider_name):
+        from backend.core.postgres import ShadowScanDiagnosticDB
+        with SessionLocal() as session:
+            for ev in evaluations:
+                diag = ShadowScanDiagnosticDB(
+                    symbol=ev["symbol"],
+                    scan_timestamp=datetime.fromisoformat(ev["timestamp"]),
+                    signal_score=ev.get("calibrated_probability"),
+                    signal_decision=ev["decision"],
+                    rejection_reason=ev["rejection_reason"],
+                    model_version=ev.get("model_version"),
+                    provider_name=provider_name,
+                    provider_latency_ms=0 # Mock
+                )
+                session.add(diag)
+            session.commit()
+
+    @staticmethod
     def _log_to_db(evaluations):
         from backend.core.postgres import ShadowEventDB
+        from backend.core.config import settings
+        eval_mode = "LIVE_SHADOW" if settings.ENVIRONMENT in ["production", "shadow"] else "TEST"
+
         with SessionLocal() as session:
             for eval_data in evaluations:
                 # Basic payload extraction
@@ -224,11 +247,12 @@ class ShadowService:
                     model_version=eval_data["model_version"],
                     decision=eval_data["decision"],
                     rejection_reason=eval_data["rejection_reason"],
-                    payload_json=json.dumps(payload)
+                    payload_json=json.dumps(payload),
+                    evaluation_mode=eval_mode
                 )
                 session.add(event)
             session.commit()
-            print(f"   [DB] {len(evaluations)} events recorded to ShadowEventDB")
+            print(f"   [DB] {len(evaluations)} events recorded to ShadowEventDB [Mode: {eval_mode}]")
 
     @staticmethod
     def _init_eval_data(symbol, ts):
@@ -297,16 +321,27 @@ class ShadowService:
             if existing: return
             db_sig = ShadowSignalDB(
                 id=signal.id, timestamp=signal.timestamp, symbol=signal.symbol, direction=signal.direction,
+                asset_class=signal.asset_class,
+                instrument_id=signal.instrument_id,
+                instrument_type=signal.instrument_type,
                 raw_probability=signal.raw_probability, calibrated_probability=signal.calibrated_probability,
                 expected_value=signal.expected_value, data_quality_score=signal.data_quality_score,
                 entry_price=signal.entry_price, target_price=signal.target_price, stop_price=signal.stop_loss_price,
-                strategy_version=ShadowService.STRATEGY_VERSION, model_version=signal.model_version,
+                strategy_version=signal.strategy_version, universe_version=signal.universe_version,
+                model_version=signal.model_version,
                 feature_version=signal.provenance.get("feature_version", "v1.0.0"),
-                regime=signal.regime, status="ACTIVE", provenance_json=str(signal.provenance)
+                regime=signal.regime, status="ACTIVE", provenance_json=str(signal.provenance),
+                evaluation_mode=signal.evaluation_mode,
+                data_timestamp=signal.data_timestamp,
+                market_timestamp=signal.market_timestamp,
+                quantity=signal.quantity,
+                capital_allocation=signal.capital_allocation,
+                risk_amount=signal.risk_amount,
+                outcome_verified=signal.outcome_verified
             )
             session.add(db_sig)
             session.commit()
-            print(f"   [SHADOW] Signal Persisted: {signal.symbol} {signal.direction} @ {signal.entry_price}")
+            print(f"   [SHADOW] Signal Persisted: {signal.symbol} {signal.direction} @ {signal.entry_price} [Mode: {signal.evaluation_mode}]")
 
     @staticmethod
     async def audit_open_signals():
@@ -379,13 +414,17 @@ class ShadowService:
                         sig.realized_mfe = outcome["mfe"]
                         sig.realized_mae = outcome["mae"]
 
-                        # Apply Friction (0.20%)
-                        friction = 0.20
-                        sig.transaction_cost = 0.10
-                        sig.slippage = 0.10
-                        sig.net_return = outcome["profit_pct"] - friction
+                        # Part 21/23: Detailed Outcome Record
+                        sig.transaction_cost = outcome.get("fees", 0.10)
+                        sig.fees = outcome.get("fees", 0.10) # Synchronized field
+                        sig.slippage = outcome.get("slippage", 0.10)
+                        sig.net_return = outcome.get("net_profit_pct", outcome["profit_pct"] - 0.20)
+                        sig.net_pnl = sig.net_return
+                        sig.exit_reason = outcome["status"]
+                        sig.outcome_verified = outcome.get("outcome_verified", False)
+                        sig.pnl_percentage = outcome["profit_pct"]
 
-                        print(f"   [TERMINAL] {sig.symbol} -> {sig.status} @ {sig.outcome_timestamp} (Net: {sig.net_return:.2f}%)")
+                        print(f"   [TERMINAL] {sig.symbol} -> {sig.status} @ {sig.outcome_timestamp} (Net: {sig.net_return:.2f}%) [Verified: {sig.outcome_verified}]")
 
                         # Log Persistence Event
                         event = ShadowEventDB(

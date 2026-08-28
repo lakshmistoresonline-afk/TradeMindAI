@@ -31,6 +31,14 @@ class IStockRepository(ABC):
     async def update_analysis(self, symbol: str, analysis: Dict[str, Any]) -> None:
         pass
 
+    @abstractmethod
+    async def save_instruments(self, instruments: List[Dict[str, Any]]) -> None:
+        pass
+
+    @abstractmethod
+    async def get_instruments(self, underlying_symbol: Optional[str] = None) -> List[Dict[str, Any]]:
+        pass
+
 class IDataPlatformRepository(ABC):
     @abstractmethod
     async def save_news(self, articles: List[NewsArticle]) -> None:

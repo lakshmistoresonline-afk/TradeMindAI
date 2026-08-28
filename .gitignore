@@ -287,14 +287,16 @@ node_modules/
 Thumbs.db
 
 # IMPORTANT: NOT IGNORED
-# .env and .env.*
 # *.json, *.yaml, *.yml, *.xml, *.toml, *.ini, *.conf, *.config
 # *.properties, *.key, *.pem, *.crt, *.cer
 # firebase.json, .firebaserc, google-services.json
 # package.json, package-lock.json, yarn.lock, pnpm-lock.yaml
 # Gradle configuration, source code, SQL/data files and maintained files
 
-# Firebase Secrets (DO NOT COMMIT)
+# Secrets and Environment (EXPLICITLY IGNORED)
+.env
+.env.*
+*.env
 service-account.json
 backend/service-account.json
 

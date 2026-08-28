@@ -146,6 +146,31 @@ class HybridStockRepository(IStockRepository):
             pg.query(StockDB).filter(StockDB.symbol == symbol).update({"analysis": analysis, "updated_at": datetime.utcnow()})
             pg.commit()
 
+    async def save_instruments(self, instruments: List[Dict[str, Any]]) -> None:
+        from backend.core.postgres import InstrumentDB
+        with self.session_factory() as pg:
+            for inst_data in instruments:
+                inst_id = inst_data.get('id')
+                if not inst_id: continue
+
+                db_inst = pg.query(InstrumentDB).filter(InstrumentDB.id == inst_id).first()
+                if db_inst:
+                    for k, v in inst_data.items():
+                        setattr(db_inst, k, v)
+                else:
+                    pg.add(InstrumentDB(**inst_data))
+            pg.commit()
+
+    async def get_instruments(self, underlying_symbol: Optional[str] = None) -> List[Dict[str, Any]]:
+        from backend.core.postgres import InstrumentDB
+        with self.session_factory() as pg:
+            query = pg.query(InstrumentDB)
+            if underlying_symbol:
+                query = query.filter(InstrumentDB.underlying_symbol == underlying_symbol)
+
+            res = query.all()
+            return [{c.name: getattr(r, c.name) for c in r.__table__.columns} for r in res]
+
     async def get_instrument_by_symbol(self, symbol: str, source: str) -> Optional[Dict[str, Any]]:
         from backend.core.postgres import InstrumentDB
         with self.session_factory() as pg:
@@ -252,8 +277,29 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         with self.session_factory() as pg:
             res = pg.query(EarningsDB).filter(EarningsDB.symbol == symbol).order_by(EarningsDB.date.desc()).first()
             return EarningsData(**{c.name: getattr(res, c.name) for c in res.__table__.columns}) if res else None
-    async def save_options_chain(self, chain: OptionsChain) -> None: pass
-    async def get_latest_options_chain(self, symbol: str) -> Optional[OptionsChain]: return None
+
+    async def save_options_chain(self, chain: OptionsChain) -> None:
+        from backend.core.postgres import OptionsChainDB
+        with self.session_factory() as pg:
+            doc_id = f"{chain.symbol}_{chain.expiry.strftime('%Y-%m-%d')}"
+            db_obj = pg.query(OptionsChainDB).filter(OptionsChainDB.id == doc_id).first()
+            data = chain.model_dump()
+            data['greeks_aggregate'] = json.dumps(data['greeks_aggregate'])
+
+            if db_obj:
+                for k, v in data.items(): setattr(db_obj, k, v)
+            else:
+                pg.add(OptionsChainDB(id=doc_id, **data))
+            pg.commit()
+
+    async def get_latest_options_chain(self, symbol: str) -> Optional[OptionsChain]:
+        from backend.core.postgres import OptionsChainDB
+        with self.session_factory() as pg:
+            res = pg.query(OptionsChainDB).filter(OptionsChainDB.symbol == symbol).order_by(OptionsChainDB.last_updated.desc()).first()
+            if not res: return None
+            data = {c.name: getattr(res, c.name) for c in res.__table__.columns}
+            if data.get('greeks_aggregate'): data['greeks_aggregate'] = json.loads(data['greeks_aggregate'])
+            return OptionsChain(**data)
 
     async def save_feature_definition(self, definition: FeatureDefinition) -> None:
         with self.session_factory() as pg:
@@ -336,7 +382,13 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 except: pass
         return ModelMetadata(**data)
 
-    async def save_ml_dataset(self, dataset: MLDataset) -> None: pass
+    async def save_ml_dataset(self, dataset: MLDataset) -> None:
+        from backend.core.postgres import MLDatasetDB
+        with self.session_factory() as pg:
+            data = dataset.model_dump()
+            data['features_included'] = json.dumps(data['features_included'])
+            pg.add(MLDatasetDB(**data))
+            pg.commit()
 
     async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
         df = self.duck.create_ml_dataset(symbol, start_date.isoformat(), end_date.isoformat())
@@ -508,10 +560,14 @@ class HybridIOSRepository(IIOSRepository):
                 if val is not None:
                     data[col] = json.dumps(json_serializable(val))
 
+            # Part 10: Filter data to match DB columns
+            db_columns = {c.name for c in LiveSignalDB.__table__.columns}
+            filtered_data = {k: v for k, v in data.items() if k in db_columns}
+
             if db_sig:
-                for k, v in data.items(): setattr(db_sig, k, v)
+                for k, v in filtered_data.items(): setattr(db_sig, k, v)
             else:
-                pg.add(LiveSignalDB(**data))
+                pg.add(LiveSignalDB(**filtered_data))
             pg.commit()
 
     async def get_active_live_signals(self) -> List[LiveSignal]:

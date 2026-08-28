@@ -1,0 +1,38 @@
+{
+    "timestamp": "2026-08-28T12:57:51.625372",
+    "milestone": "20/50",
+    "progress_pct": 40.0,
+    "overall": {
+        "win_rate": 50.0,
+        "net_pnl": 28.2,
+        "expectancy": 2.0142
+    },
+    "directional_stability": {
+        "LONG": {
+            "count": 15.0,
+            "win_rate": 60.0,
+            "net_pnl": 29.0
+        },
+        "SHORT": {
+            "count": 5.0,
+            "win_rate": 20.0,
+            "net_pnl": -0.8
+        }
+    },
+    "regime_stability": {
+        "BULLISH": {
+            "count": 13.0,
+            "win_rate": 46.15,
+            "net_pnl": 7.2
+        },
+        "SIDEWAYS": {
+            "count": 2.0,
+            "win_rate": 50.0,
+            "net_pnl": 0.0
+        }
+    },
+    "ev_stability": {
+        "correlation": 0.022
+    },
+    "status": "ACCUMULATING"
+}

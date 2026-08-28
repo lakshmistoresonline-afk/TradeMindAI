@@ -181,9 +181,31 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             return {"open": last["Open"], "high": last["High"], "low": last["Low"], "close": last["Close"]}
         return {"open": 0.0, "high": 0.0, "low": 0.0, "close": 0.0}
 
-    async def get_greeks(self, symbol: str) -> Dict[str, Any]: return {}
-    async def get_expiries(self, symbol: str) -> List[datetime.datetime]: return []
-    async def get_instruments(self) -> List[Dict[str, Any]]: return []
+    async def get_greeks(self, symbol: str) -> Dict[str, Any]:
+        return {}
+
+    async def get_expiries(self, symbol: str) -> List[datetime.datetime]:
+        try:
+            mapped_sym = self._map_symbol(symbol)
+            ticker = yf.Ticker(mapped_sym)
+            try:
+                expiries = ticker.options
+            except:
+                # Fallback to yahooquery
+                yq = YQTicker(mapped_sym)
+                expiries = yq.options
+
+            if not expiries:
+                return []
+
+            return [datetime.datetime.strptime(e, "%Y-%m-%d") for e in expiries]
+        except Exception as e:
+            print(f"Error fetching expiries for {symbol}: {e}")
+            return []
+
+    async def get_instruments(self) -> List[Dict[str, Any]]:
+        # This provider doesn't have a direct instrument list API like Groww
+        return []
 
     async def get_option_chain(self, symbol: str, expiry: Optional[datetime.datetime] = None) -> OptionsChain:
         try:

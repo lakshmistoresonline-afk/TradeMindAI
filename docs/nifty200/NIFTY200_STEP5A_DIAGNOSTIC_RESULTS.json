@@ -1,0 +1,85 @@
+{
+    "audit_timestamp": "2026-08-28T11:59:38.685966",
+    "sample_size": 20,
+    "overall": {
+        "win_rate": 50.0,
+        "win_rate_ci": [
+            27.2,
+            72.8
+        ],
+        "total_net_pnl": 28.2,
+        "expectancy": 2.0142
+    },
+    "segmentation": {
+        "LONG": {
+            "count": 15,
+            "wins": 9,
+            "losses": 5,
+            "win_rate": 60.0,
+            "avg_win": 4.55,
+            "avg_loss": -3.7,
+            "net_pnl": 29.0,
+            "avg_mfe": 1.86,
+            "avg_mae": -0.9
+        },
+        "SHORT": {
+            "count": 5,
+            "wins": 1,
+            "losses": 4,
+            "win_rate": 20.0,
+            "avg_win": 9.8,
+            "avg_loss": -3.53,
+            "net_pnl": -0.8,
+            "avg_mfe": 0.41,
+            "avg_mae": -2.27
+        }
+    },
+    "ev_diagnostic": {
+        "correlation": 0.022,
+        "mean_absolute_error": 12.4558
+    },
+    "probability_calibration": {
+        "(0.0, 0.52]": {
+            "count": 15.0,
+            "actual_win_rate": 0.4667,
+            "avg_pred_prob": 0.4844
+        },
+        "(0.52, 0.6]": {
+            "count": 0.0,
+            "actual_win_rate": 0.0,
+            "avg_pred_prob": 0.0
+        },
+        "(0.6, 0.7]": {
+            "count": 0.0,
+            "actual_win_rate": 0.0,
+            "avg_pred_prob": 0.0
+        },
+        "(0.7, 1.0]": {
+            "count": 5.0,
+            "actual_win_rate": 0.6,
+            "avg_pred_prob": 0.75
+        }
+    },
+    "sector_analysis": {
+        "Financial Services": {
+            "count": 3.0,
+            "net_pnl": 0.0,
+            "win_rate": 0.3333
+        },
+        "Technology": {
+            "count": 2.0,
+            "net_pnl": 0.0,
+            "win_rate": 0.0
+        },
+        "Unknown": {
+            "count": 15.0,
+            "net_pnl": 28.2,
+            "win_rate": 0.6
+        }
+    },
+    "robustness": {
+        "pnl_minus_best_trade": 18.4,
+        "pnl_minus_worst_trade": 32.4
+    },
+    "classification": "V2.2_PROMISING_CONTINUE_SHADOW"
+}

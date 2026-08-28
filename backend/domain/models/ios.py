@@ -95,14 +95,30 @@ class LiveSignal(BaseModel):
     profit_pct: Optional[float] = None
     outcome_price: Optional[float] = None
 
-    # Universal Price Tier (Step 2C/D)
+    # Universal Price Tier (Step 2C/D/E/F)
     current_price: Optional[float] = None
     underlying_price: Optional[float] = None
     current_price_timestamp: Optional[datetime] = None
     price_source: Optional[str] = None
-    price_status: Optional[str] = None
+    price_status: Optional[str] = None # FRESH, STALE, MARKET_CLOSED, DATA_UNAVAILABLE, PROVIDER_UNSUPPORTED, INSTRUMENT_NOT_FOUND, INVALID
     price_adjustment_factor: float = 1.0
     normalized_current_price: Optional[float] = None
+    signal_eligibility: Optional[str] = None # ELIGIBLE, DATA_BLOCKED, INSTRUMENT_BLOCKED, STALE_DATA, EXPIRED_INSTRUMENT, INVALID_DATA
+    evaluation_mode: str = "LIVE_SHADOW" # LIVE_SHADOW, HISTORICAL, BACKTEST, TEST
+    universe_version: str = "NIFTY_200_AUG2026"
+    strategy_version: str = "v2.2"
+    data_timestamp: Optional[datetime] = None
+    market_timestamp: Optional[datetime] = None
+    exit_reason: Optional[str] = None
+    fees: Optional[float] = None
+    slippage: Optional[float] = None
+    net_pnl: Optional[float] = None
+    outcome_verified: bool = False
+    quantity: Optional[int] = None
+    capital_allocation: Optional[float] = None
+    risk_amount: Optional[float] = None
+    gross_pnl: Optional[float] = None
+    pnl_percentage: Optional[float] = None
 
     # Forensic Execution Fields (Step 4 Corrective)
     actual_entry_price: Optional[float] = None

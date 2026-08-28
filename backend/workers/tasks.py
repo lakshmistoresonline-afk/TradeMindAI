@@ -33,6 +33,11 @@ else:
             "schedule": crontab(minute="*/30", hour="9-16", day_of_week="mon-fri"), # 9 AM to 4 PM IST
             "options": {"queue": "shadow"}
         },
+        "run-daily-snapshot": {
+            "task": "backend.workers.tasks.run_daily_snapshot_task",
+            "schedule": crontab(minute="30", hour="16", day_of_week="mon-fri"), # 4:30 PM IST
+            "options": {"queue": "shadow"}
+        },
         "shadow-worker-heartbeat": {
             "task": "backend.workers.tasks.terminal_heartbeat", # Reuse existing for basic health
             "schedule": 60.0,
@@ -56,6 +61,12 @@ def run_shadow_cycle_task():
 
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(ShadowService.run_shadow_cycle())
+
+@celery_app.task(queue="shadow")
+def run_daily_snapshot_task():
+    from backend.workers.daily_snapshot import run_daily_snapshot
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(run_daily_snapshot())
 
 @celery_app.task
 def sync_stock_data_task(symbol: str, period="1y"):

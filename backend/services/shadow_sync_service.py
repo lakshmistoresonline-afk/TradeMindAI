@@ -161,7 +161,15 @@ class ShadowSyncService:
                 "prob": s.calibrated_probability, "ev": s.expected_value,
                 "status": s.status, "net_return": s.net_return,
                 "updated_at": datetime.utcnow().isoformat(),
-                "model_version": s.model_version
+                "model_version": s.model_version,
+
+                # Step 3A Fields
+                "universe_version": s.universe_version,
+                "evaluation_mode": s.evaluation_mode,
+                "signal_eligibility": s.signal_eligibility,
+                "data_timestamp": s.data_timestamp.isoformat() if s.data_timestamp else None,
+                "market_timestamp": s.market_timestamp.isoformat() if s.market_timestamp else None,
+                "exit_reason": s.exit_reason
             }
             sig_ref = db_client.collection("shadow_signals").document(s.id)
             batch.set(sig_ref, sig_data)
@@ -203,7 +211,8 @@ class ShadowSyncService:
                 "score": payload.get("prob"),
                 "ev": payload.get("ev", 0.0),
                 "price": payload.get("price", 0.0),
-                "model_version": ev.model_version
+                "model_version": ev.model_version,
+                "evaluation_mode": ev.evaluation_mode
             })
         batch.commit(timeout=15)
         SyncStateManager.update_last_sync("last_diag_ts", latest_eval_ts.isoformat())
