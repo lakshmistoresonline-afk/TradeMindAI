@@ -394,14 +394,12 @@ class ShadowService:
                     from backend.domain.models.ios import LiveSignal
                     sig_obj = LiveSignal(
                         id=sig.id, symbol=sig.symbol, timestamp=sig.timestamp,
+                        instrument_id=sig.instrument_id, instrument_type=sig.instrument_type,
+                        asset_class=sig.asset_class,
                         entry_price=sig.entry_price, target_price=sig.target_price, stop_loss_price=sig.stop_price,
                         direction=sig.direction, status="ACTIVE", conviction=sig.calibrated_probability*100,
-                        rating="BUY", timeframe=sig.status # Status is actually used as proxy for timeframe in some models?
-                        # No, sig.strategy_version or sig.regime?
-                        # Let's check ShadowSignalDB columns. It has strategy_version but not timeframe.
-                        # Default to SWING as seen in signal_engine.py
+                        rating="BUY", timeframe="SWING"
                     )
-                    sig_obj.timeframe = "SWING"
 
                     outcome = OutcomeEngine.evaluate_outcome(sig_obj, df_sym)
 
