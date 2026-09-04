@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 from backend.core.postgres import SessionLocal, ShadowSignalDB, ShadowEventDB
 from sqlalchemy import func
 from backend.services.portfolio_engine import ShadowPortfolioEngine
-from backend.services.monitoring_service import MonitoringService
-from backend.core.container import container
+from backend.services.forensic_analytical_service import ForensicAnalyticalService
+from backend.services.drawdown_service import DrawdownService
 
 router = APIRouter()
 
@@ -109,16 +109,18 @@ def get_shadow_summary():
     """
     try:
         state = ShadowPortfolioEngine.calculate_shadow_state()
+        forensic = ForensicAnalyticalService.get_master_metrics()
+        pop = ForensicAnalyticalService.get_population_reconciliation()
+
         with SessionLocal() as session:
             eval_cycles = session.query(ShadowEventDB.timestamp).filter(ShadowEventDB.event_type == 'EVALUATION').distinct().count()
-            verified_trades = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES), ShadowSignalDB.outcome_verified == True).count()
 
             return {
                 "evaluation_cycles": eval_cycles,
-                "transactional_signals": session.query(ShadowSignalDB).count(),
+                "transactional_signals": pop["total_unique_calls"],
                 "active_signals": state["active_count"],
                 "completed_trades": state["terminal_count"],
-                "verified_trades": verified_trades,
+                "verified_trades": forensic["sample_size"],
                 "equity": state["current_equity"],
                 "realized_pnl": state["realized_pnl"],
                 "unrealized_pnl": state["unrealized_pnl"],
@@ -127,15 +129,23 @@ def get_shadow_summary():
                 "net_exposure": state["net_exposure"],
                 "long_exposure": state["long_exposure"],
                 "short_exposure": state["short_exposure"],
-                "profit_factor": state["profit_factor"],
+                "profit_factor": forensic["profit_factor"],
                 "drawdown": state["drawdown"],
-                "brier_score": 0.2419, # Authoritative Step 1 Forensic
-                "sample_status": "INSUFFICIENT SAMPLE SIZE" if verified_trades < 20 else "ADEQUATE",
-                "milestone": "40/50"
+                "win_rate_pct": forensic["win_rate_pct"],
+                "brier_score": 0.2419,
+                "sample_status": "INSUFFICIENT SAMPLE SIZE" if forensic["sample_size"] < 20 else "ADEQUATE",
+                "milestone": "50/50"
             }
     except Exception as e:
         print(f"SQL Error (Summary): {e}")
         return {"error": str(e)}
+
+@router.get("/forensic/metrics")
+def get_master_forensic_metrics():
+    """
+    Workstream 3 & 4: Master Forensic Accuracy Metrics.
+    """
+    return ForensicAnalyticalService.get_master_metrics()
 
 @router.get("/audit/reconcile")
 async def get_reconciliation_status():

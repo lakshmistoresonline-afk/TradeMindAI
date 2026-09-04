@@ -267,26 +267,29 @@ export default function ShadowMonitor() {
         {/* Metric Grid */}
         <Grid item xs={12}>
            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={1.7}>
-                <MetricCard title="ACTIVE SIGNALS" value={summary?.active_signals || 0} icon={<Activity size={18} color="#00D1FF" />} />
+              <Grid item xs={12} sm={6} md={1.5}>
+                <MetricCard title="ACTIVE" value={summary?.active_signals || 0} icon={<Activity size={18} color="#00D1FF" />} />
               </Grid>
-              <Grid item xs={12} sm={6} md={1.7}>
-                <MetricCard title="HISTORICAL" value={summary?.completed_trades || 0} icon={<Database size={18} color="#7C3AED" />} />
+              <Grid item xs={12} sm={6} md={1.5}>
+                <MetricCard title="VERIFIED" value={summary?.verified_trades || 0} icon={<Database size={18} color="#7C3AED" />} />
               </Grid>
-              <Grid item xs={12} sm={6} md={1.7}>
+              <Grid item xs={12} sm={6} md={1.5}>
+                <MetricCard title="WIN RATE" value={`${summary?.win_rate_pct || 0}%`} icon={<TrendingUp size={18} color="#10b981" />} />
+              </Grid>
+              <Grid item xs={12} sm={6} md={1.5}>
+                <MetricCard title="PROFIT FACTOR" value={summary?.profit_factor || '1.0'} icon={<Zap size={18} color="#fbbf24" />} />
+              </Grid>
+              <Grid item xs={12} sm={6} md={1.5}>
                 <MetricCard title="TARGET HITS" value={summary?.target_hits || 0} icon={<Zap size={18} color="#10b981" />} />
               </Grid>
-              <Grid item xs={12} sm={6} md={1.7}>
+              <Grid item xs={12} sm={6} md={1.5}>
                 <MetricCard title="STOP HITS" value={summary?.stop_hits || 0} icon={<AlertTriangle size={18} color="#ef4444" />} />
               </Grid>
-              <Grid item xs={12} sm={6} md={1.7}>
+              <Grid item xs={12} sm={6} md={1.5}>
                 <MetricCard title="TIMEOUTS" value={summary?.timeouts || 0} icon={<Clock size={18} color="#f59e0b" />} />
               </Grid>
-              <Grid item xs={12} sm={6} md={1.7}>
-                <MetricCard title="EXPIRED" value={summary?.expired || 0} icon={<X size={18} color="gray" />} />
-              </Grid>
-              <Grid item xs={12} sm={6} md={1.8}>
-                <MetricCard title="TOTAL SIGNALS" value={summary?.total_signals || 0} icon={<RefreshCcw size={18} color="white" />} />
+              <Grid item xs={12} sm={6} md={1.5}>
+                <MetricCard title="TOTAL CALLS" value={summary?.transactional_signals || 0} icon={<RefreshCcw size={18} color="white" />} />
               </Grid>
            </Grid>
         </Grid>

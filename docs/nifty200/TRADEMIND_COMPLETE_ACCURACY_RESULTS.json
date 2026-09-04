@@ -1,0 +1,18 @@
+{
+    "audit_timestamp": "2026-09-04T11:58:10.430043",
+    "population": {
+        "total": 1259,
+        "verified": 50,
+        "unverified": 1195,
+        "active": 14
+    },
+    "verified_metrics": {
+        "win_rate_pct": 58.0,
+        "profit_factor": 2.72,
+        "total_net_pnl_pct": 126.75,
+        "expectancy_pct": 2.535,
+        "trade_sequence_max_drawdown_pct": 15.69,
+        "portfolio_mtm_max_drawdown_pct": 0.01
+    },
+    "classification": "V2.2_PROMISING_CONTINUE_SHADOW"
+}
