@@ -54,6 +54,11 @@ class Stock(BaseModel):
     is_fno: bool = False
     lot_size: Optional[int] = None
     index_weight: Optional[float] = None
+    index_membership: Optional[str] = None
+    universe_version: str = "NIFTY_200_AUG2026"
+    data_freshness_status: Optional[str] = None
+    missing_data_reason: Optional[str] = None
+    ingestion_timestamp: Optional[datetime] = None
     updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     def to_dict(self):

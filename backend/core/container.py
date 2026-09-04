@@ -22,6 +22,32 @@ class Container:
         self._adaptive_service = None
         self._stock_service = None
         self._signal_engine = None
+        self._universe_service = None
+        self._data_quality_service = None
+        self._derivative_service = None
+        self._reconciliation_service = None
+        self._audit_service = None
+        self._model_registry = None
+        self._audit_trail_service = None
+        self._fno_registry = None
+        self._health_service = None
+        self._provenance_service = None
+        self._quant_validation_service = None
+        self._walk_forward_service = None
+        self._experiment_service = None
+        self._backtest_audit_service = None
+        self._sector_rotation_service = None
+        self._stock_intelligence_service = None
+        self._institutional_intelligence_service = None
+        self._intelligence_synthesis_service = None
+        self._fundamental_service = None
+        self._fno_intelligence_service = None
+        self._monitoring_service = None
+        self._opportunity_radar_service = None
+        self._evidence_matrix_service = None
+        self._ai_research_service = None
+        self._historical_research_service = None
+        self._portfolio_analytics_service = None
 
     @property
     def signal_engine(self):
@@ -159,6 +185,195 @@ class Container:
             from backend.services.ios.adaptive_learning import AdaptiveLearningService
             self._adaptive_service = AdaptiveLearningService(self.data_platform_repo)
         return self._adaptive_service
+
+    @property
+    def universe_service(self):
+        if self._universe_service is None:
+            from backend.services.universe_service import UniverseService
+            self._universe_service = UniverseService(self.repository, self.provider)
+        return self._universe_service
+
+    @property
+    def data_quality_service(self):
+        if self._data_quality_service is None:
+            from backend.services.data_quality_service import DataQualityService
+            self._data_quality_service = DataQualityService()
+        return self._data_quality_service
+
+    @property
+    def derivative_service(self):
+        if self._derivative_service is None:
+            from backend.services.derivative_service import DerivativeService
+            self._derivative_service = DerivativeService(self.repository, self.provider)
+        return self._derivative_service
+
+    @property
+    def reconciliation_service(self):
+        if self._reconciliation_service is None:
+            from backend.services.reconciliation_service import ReconciliationService
+            self._reconciliation_service = ReconciliationService()
+        return self._reconciliation_service
+
+    @property
+    def audit_service(self):
+        if self._audit_service is None:
+            from backend.services.audit_service import AuditService
+            self._audit_service = AuditService()
+        return self._audit_service
+
+    @property
+    def model_registry(self):
+        if self._model_registry is None:
+            from backend.services.model_registry import ModelRegistryService
+            self._model_registry = ModelRegistryService(self.data_platform_repo)
+        return self._model_registry
+
+    @property
+    def audit_trail_service(self):
+        if self._audit_trail_service is None:
+            from backend.services.audit_trail_service import AuditTrailService
+            self._audit_trail_service = AuditTrailService()
+        return self._audit_trail_service
+
+    @property
+    def fno_registry(self):
+        if self._fno_registry is None:
+            from backend.services.fno_registry import FNORegistryService
+            self._fno_registry = FNORegistryService()
+        return self._fno_registry
+
+    @property
+    def health_service(self):
+        if self._health_service is None:
+            from backend.services.health_service import SystemHealthService
+            self._health_service = SystemHealthService()
+        return self._health_service
+
+    @property
+    def provenance_service(self):
+        if self._provenance_service is None:
+            from backend.services.provenance_service import ProvenanceService
+            self._provenance_service = ProvenanceService()
+        return self._provenance_service
+
+    @property
+    def quant_validation_service(self):
+        if self._quant_validation_service is None:
+            from backend.services.quant_validation_service import QuantitativeValidationService
+            self._quant_validation_service = QuantitativeValidationService()
+        return self._quant_validation_service
+
+    @property
+    def walk_forward_service(self):
+        if self._walk_forward_service is None:
+            from backend.services.walk_forward_service import WalkForwardValidationService
+            self._walk_forward_service = WalkForwardValidationService()
+        return self._walk_forward_service
+
+    @property
+    def experiment_service(self):
+        if self._experiment_service is None:
+            from backend.services.experiment_service import ExperimentService
+            self._experiment_service = ExperimentService()
+        return self._experiment_service
+
+    @property
+    def backtest_audit_service(self):
+        if self._backtest_audit_service is None:
+            from backend.services.backtest_audit_service import BacktestAuditService
+            self._backtest_audit_service = BacktestAuditService()
+        return self._backtest_audit_service
+
+    @property
+    def sector_rotation_service(self):
+        if self._sector_rotation_service is None:
+            from backend.services.sector_rotation_service import SectorRotationService
+            self._sector_rotation_service = SectorRotationService()
+        return self._sector_rotation_service
+
+    @property
+    def stock_intelligence_service(self):
+        if self._stock_intelligence_service is None:
+            from backend.services.stock_intelligence_service import StockIntelligenceService
+            self._stock_intelligence_service = StockIntelligenceService()
+        return self._stock_intelligence_service
+
+    @property
+    def institutional_intelligence_service(self):
+        if self._institutional_intelligence_service is None:
+            from backend.services.institutional_intelligence_service import InstitutionalIntelligenceService
+            self._institutional_intelligence_service = InstitutionalIntelligenceService()
+        return self._institutional_intelligence_service
+
+    @property
+    def intelligence_synthesis_service(self):
+        if self._intelligence_synthesis_service is None:
+            from backend.services.intelligence_synthesis_service import IntelligenceSynthesisService
+            self._intelligence_synthesis_service = IntelligenceSynthesisService()
+        return self._intelligence_synthesis_service
+
+    @property
+    def fundamental_service(self):
+        if self._fundamental_service is None:
+            from backend.services.fundamental_service import FundamentalService
+            self._fundamental_service = FundamentalService()
+        return self._fundamental_service
+
+    @property
+    def fno_intelligence_service(self):
+        if self._fno_intelligence_service is None:
+            from backend.services.fno_intelligence_service import FNOIntelligenceService
+            self._fno_intelligence_service = FNOIntelligenceService()
+        return self._fno_intelligence_service
+
+    @property
+    def monitoring_service(self):
+        if self._monitoring_service is None:
+            from backend.services.monitoring_service import MonitoringService
+            self._monitoring_service = MonitoringService()
+        return self._monitoring_service
+
+    @property
+    def monitoring_service(self):
+        if self._monitoring_service is None:
+            from backend.services.monitoring_service import MonitoringService
+            self._monitoring_service = MonitoringService()
+        return self._monitoring_service
+
+    @property
+    def opportunity_radar_service(self):
+        if self._opportunity_radar_service is None:
+            from backend.services.opportunity_radar_service import OpportunityRadarService
+            self._opportunity_radar_service = OpportunityRadarService()
+        return self._opportunity_radar_service
+
+    @property
+    def evidence_matrix_service(self):
+        if self._evidence_matrix_service is None:
+            from backend.services.evidence_matrix_service import EvidenceMatrixService
+            self._evidence_matrix_service = EvidenceMatrixService()
+        return self._evidence_matrix_service
+
+    @property
+    def ai_research_service(self):
+        if self._ai_research_service is None:
+            from backend.services.ai_research_service import AIResearchService
+            self._ai_research_service = AIResearchService()
+        return self._ai_research_service
+
+    @property
+    def historical_research_service(self):
+        if self._historical_research_service is None:
+            from backend.services.historical_research_service import HistoricalResearchService
+            self._historical_research_service = HistoricalResearchService()
+        return self._historical_research_service
+
+    @property
+    def portfolio_analytics_service(self):
+        if self._portfolio_analytics_service is None:
+            from backend.services.portfolio_analytics_service import PortfolioAnalyticsService
+            self._portfolio_analytics_service = PortfolioAnalyticsService()
+        return self._portfolio_analytics_service
 
     @property
     def stock_service(self):

@@ -179,6 +179,40 @@ class SignalEngine:
             "predicted_RR": float(risk_params["risk_reward"])
         }
 
+        # 11.5 Persist Prediction (Workstream 6)
+        from backend.domain.models.data_platform import Prediction
+        pred_id = str(uuid.uuid4())
+        prediction_obj = Prediction(
+            id=pred_id,
+            symbol=symbol,
+            timestamp=now,
+            model_version=ml_res.get("model_version", "TradeMind Core v2.2"),
+            feature_version="v1.0.0",
+            prediction="UP" if direction == "LONG" else "DOWN",
+            probability=float(calibrated_prob),
+            expected_value=float(expected_val),
+            direction=direction,
+            confidence=float(calibrated_prob),
+            regime=regime_label,
+            metadata=diag_provenance
+        )
+        await container.data_platform_repo.save_prediction(prediction_obj)
+
+        # 11.6 AI Intelligence Synthesis (Workstream 10)
+        # Fetching snapshots of other contexts
+        sector_ranks = container.sector_rotation_service.get_latest_sector_rankings()
+        stock_sector = next((s for s in sector_ranks if s['sector'] == stock.sector), {})
+        inst_bias = container.institutional_intelligence_service.get_institutional_bias()
+
+        container.intelligence_synthesis_service.synthesize_signal_intelligence(
+            symbol=symbol,
+            prediction_id=pred_id,
+            market_regime=regime_label,
+            sector_metrics=stock_sector,
+            stock_profile=diag_provenance,
+            inst_bias=inst_bias
+        )
+
         # Part 4: Look-ahead Protection
         data_ts = features_list[-1].date
         if data_ts > now:
@@ -226,6 +260,7 @@ class SignalEngine:
             capital_allocation=100000.0,
             risk_amount=3000.0, # 3% risk on 100k
             outcome_verified=False,
+            prediction_id=pred_id,
 
             entry_price=stock.last_price,
             target_price=risk_params["target"],

@@ -1,31 +1,31 @@
 # TRADEMIND AI: NIFTY 200 PHASE 6 ROBUSTNESS MONITOR
 
-**Monitor Timestamp**: 2026-08-31 08:45:39 UTC
-**Milestone**: 21 / 50 Verified Outcomes
-**Progress**: 42.0%
+**Monitor Timestamp**: 2026-09-02 08:21:34 UTC
+**Milestone**: 29 / 50 Verified Outcomes
+**Progress**: 58.0%
 
 ## 1. Overall Performance (Accumulated)
-- **Verified Trades**: 21
-- **Win Rate**: 52.38%
-- **Total Net P&L**: 31.0%
-- **Expectancy**: 2.0665%
+- **Verified Trades**: 29
+- **Win Rate**: 51.72%
+- **Total Net P&L**: 29.46%
+- **Expectancy**: 1.2807%
 
 ## 2. Directional Stability
 | Direction | Count | Win Rate | Net P&L |
 | :--- | :--- | :--- | :--- |
-| LONG | 15.0 | 60.0% | 29.0% |
-| SHORT | 6.0 | 33.33% | 2.0% |
+| LONG | 20.0 | 50.0% | 19.0% |
+| SHORT | 9.0 | 55.56% | 10.46% |
 
 ## 3. Regime Stability
 | Regime | Count | Win Rate | Net P&L |
 | :--- | :--- | :--- | :--- |
-| BULLISH | 14.0 | 50.0% | 10.0% |
+| BULLISH | 22.0 | 50.0% | 8.46% |
 | SIDEWAYS | 2.0 | 50.0% | 0.0% |
 
 ## 4. Quantitative Stability
-- **EV Correlation**: 0.0191
+- **EV Correlation**: 0.0923
 - **Conclusion**: Robustness accumulation is ongoing. Directional asymmetry (LONG outperforming SHORT) remains a key diagnostic observation.
-- **Today's Activity**: Verified 1 new terminal outcome (ATGL, SHORT, TARGET_HIT).
+- **Activity**: Verified 1 new terminal outcome (CUMMINSIND: TARGET_HIT).
 
 ## 5. Next Steps
 - Continue LIVE_SHADOW observation toward **n=30** milestone.

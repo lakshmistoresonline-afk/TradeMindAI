@@ -107,6 +107,8 @@ class LiveSignal(BaseModel):
     evaluation_mode: str = "LIVE_SHADOW" # LIVE_SHADOW, HISTORICAL, BACKTEST, TEST
     universe_version: str = "NIFTY_200_AUG2026"
     strategy_version: str = "v2.2"
+    prediction_id: Optional[str] = None
+    provenance_id: Optional[str] = None
     data_timestamp: Optional[datetime] = None
     market_timestamp: Optional[datetime] = None
     exit_reason: Optional[str] = None

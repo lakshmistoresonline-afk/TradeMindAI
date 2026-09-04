@@ -27,9 +27,11 @@ import {
   getShadowHealth,
   getShadowSignals,
   getShadowSignalsMetadata,
+  getShadowSignalDetail,
   getStocks,
   API_BASE_URL
 } from '../api/client';
+import SignalDetailView from '../components/SignalDetailView';
 
 export default function ShadowMonitor() {
   const [status, setStatus] = useState<any>(null);
@@ -48,6 +50,8 @@ export default function ShadowMonitor() {
   const [metadata, setMetadata] = useState<any>({ statuses: [], symbols: [], directions: [] });
   const [filters, setFilters] = useState({ status: 'ALL', symbol: 'ALL', direction: 'ALL', page: 1 });
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
+  const [fullDetail, setFullDetail] = useState<any>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const fetchData = useCallback(async (isManual = false) => {
     if (isManual) setRefreshing(true);
@@ -139,6 +143,20 @@ export default function ShadowMonitor() {
 
   const handleRefresh = () => fetchData(true);
 
+  const handleOpenDetail = async (sig: any) => {
+    setSelectedSignal(sig);
+    setDetailLoading(true);
+    try {
+      const detail = await getShadowSignalDetail(sig.id);
+      setFullDetail(detail);
+    } catch (err) {
+      console.error("Failed to fetch signal detail:", err);
+      setFullDetail(sig); // Fallback to shallow object
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
   };
@@ -203,10 +221,10 @@ export default function ShadowMonitor() {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>
             <Clock size={14} style={{ verticalAlign: 'middle', marginRight: 8 }} />
-            BASELINE START: {status?.baseline_start || 'N/A'} | LAST UPDATED: {lastRefreshed.toLocaleTimeString()}
+            BASELINE START: {status?.baseline_start || 'N/A'} | EQUITY: ₹{summary?.equity?.toLocaleString() || '1,000,000'} | P&L: ₹{summary?.total_pnl?.toLocaleString() || '0'}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mt: 0.5 }}>
-            LAST DATA SYNC: {formatIST(health?.last_data_sync)} | FIREBASE STATUS: {firebaseStatus} ({status?.data_source || 'N/A'}) | EQUITY: {currentEquity} | API: {status?.version || 'N/A'}
+            EXPOSURE: ₹{summary?.gross_exposure?.toLocaleString() || '0'} | PROFIT FACTOR: {summary?.profit_factor || '1.0'} | DD: {summary?.drawdown || '0.0'}%
           </Typography>
         </Box>
         <Stack direction="row" spacing={2} alignItems="center">
@@ -323,7 +341,7 @@ export default function ShadowMonitor() {
                              <Chip label={sig.status} size="small" variant="outlined" sx={{ fontWeight: 800, fontSize: '0.6rem' }} />
                           </TableCell>
                           <TableCell align="right">
-                             <IconButton size="small" onClick={() => setSelectedSignal(sig)} sx={{ color: 'primary.main' }}>
+                             <IconButton size="small" onClick={() => handleOpenDetail(sig)} sx={{ color: 'primary.main' }}>
                                 <Eye size={16} />
                              </IconButton>
                           </TableCell>
@@ -456,7 +474,7 @@ export default function ShadowMonitor() {
                            <StatusChip status={sig.status} />
                         </TableCell>
                         <TableCell align="right">
-                           <IconButton size="small" onClick={() => setSelectedSignal(sig)} sx={{ color: 'primary.main' }}>
+                           <IconButton size="small" onClick={() => handleOpenDetail(sig)} sx={{ color: 'primary.main' }}>
                               <Eye size={16} />
                            </IconButton>
                         </TableCell>
@@ -559,8 +577,8 @@ export default function ShadowMonitor() {
       {/* Detail Dialog */}
       <Dialog
         open={!!selectedSignal}
-        onClose={() => setSelectedSignal(null)}
-        maxWidth="sm"
+        onClose={() => { setSelectedSignal(null); setFullDetail(null); }}
+        maxWidth="md"
         fullWidth
         PaperProps={{ sx: { bgcolor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)' } }}
       >
@@ -568,79 +586,14 @@ export default function ShadowMonitor() {
            <>
              <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <Typography variant="h6" sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: 2 }}>
-                   SIGNAL DETAIL: {selectedSignal.symbol}
-                   <Chip
-                      label={selectedSignal.direction}
-                      size="small"
-                      sx={{
-                        fontWeight: 900, fontSize: '0.6rem',
-                        bgcolor: selectedSignal.direction === 'LONG' ? alpha('#10b981', 0.1) : alpha('#ef4444', 0.1),
-                        color: selectedSignal.direction === 'LONG' ? '#10b981' : '#ef4444'
-                      }}
-                   />
+                   SIGNAL ANALYTICS: {selectedSignal.symbol}
                 </Typography>
-                <IconButton onClick={() => setSelectedSignal(null)} size="small">
+                <IconButton onClick={() => { setSelectedSignal(null); setFullDetail(null); }} size="small">
                    <X size={18} />
                 </IconButton>
              </DialogTitle>
              <DialogContent sx={{ p: 4 }}>
-                <Grid container spacing={4}>
-                   {/* Column 1: Identity & Time */}
-                   <Grid item xs={12} md={4}>
-                      <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2 }}>IDENTITY</Typography>
-                      <DetailItem label="SIGNAL ID" value={selectedSignal.id} />
-                      <DetailItem label="STRATEGY" value="V2.2 FROZEN" />
-                      <DetailItem label="MODEL" value={selectedSignal.model_version} />
-
-                      <Box sx={{ mt: 3 }}>
-                         <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2 }}>TIMELINE</Typography>
-                         <Stack spacing={1} sx={{ mt: 1 }}>
-                            <TimelineItem label="CREATED" time={formatIST(selectedSignal.created_at || selectedSignal.timestamp)} active />
-                            <TimelineItem label="ACTIVATED" time={formatIST(selectedSignal.timestamp)} active />
-                            <TimelineItem label="LAST EVENT" time={formatIST(selectedSignal.outcome_timestamp)} active={!!selectedSignal.outcome_timestamp} />
-                         </Stack>
-                      </Box>
-                   </Grid>
-
-                   {/* Column 2: Price Levels */}
-                   <Grid item xs={12} md={4}>
-                      <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2 }}>PRICE LEVELS</Typography>
-                      <DetailItem label="ENTRY" value={selectedSignal.entry?.toFixed(2)} />
-                      <DetailItem label="TARGET" value={selectedSignal.target?.toFixed(2)} color="#10b981" />
-                      <DetailItem label="STOP-LOSS" value={selectedSignal.stop?.toFixed(2)} color="#ef4444" />
-                      <DetailItem label="CURRENT" value={selectedSignal.current_price?.toFixed(2)} bold />
-                      {selectedSignal.status !== 'ACTIVE' && (
-                        <DetailItem label="EXIT PRICE" value={selectedSignal.exit_price?.toFixed(2) || selectedSignal.current_price?.toFixed(2)} bold color="white" />
-                      )}
-                   </Grid>
-
-                   {/* Column 3: Performance */}
-                   <Grid item xs={12} md={4}>
-                      <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2 }}>PERFORMANCE</Typography>
-                      <DetailItem label="P&L" value={selectedSignal.pnl_percentage ? `${selectedSignal.pnl_percentage > 0 ? '+' : ''}${selectedSignal.pnl_percentage}%` : 'N/A'} color={selectedSignal.pnl_percentage > 0 ? '#10b981' : '#ef4444'} bold />
-                      <DetailItem label="PROBABILITY" value={selectedSignal.probability ? `${(selectedSignal.probability * 100).toFixed(2)}%` : 'N/A'} />
-                      <DetailItem label="EXPECTED VALUE" value={selectedSignal.ev ? `+${selectedSignal.ev?.toFixed(2)}` : 'N/A'} color="#10b981" />
-                      <DetailItem label="HOLDING TIME" value={formatDuration(selectedSignal.created_at || selectedSignal.timestamp, selectedSignal.outcome_timestamp)} />
-
-                      <Box sx={{ mt: 2, p: 2, bgcolor: alpha('#fff', 0.03), borderRadius: 1 }}>
-                         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 1 }}>BOUNDARY DISTANCE</Typography>
-                         <Stack spacing={1}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                               <Typography variant="caption" sx={{ fontWeight: 800 }}>Target</Typography>
-                               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 900 }}>
-                                 {selectedSignal.direction === 'LONG' ? ((selectedSignal.target - (selectedSignal.current_price || selectedSignal.entry))/ (selectedSignal.current_price || selectedSignal.entry) * 100).toFixed(2) : (((selectedSignal.current_price || selectedSignal.entry) - selectedSignal.target)/ (selectedSignal.current_price || selectedSignal.entry) * 100).toFixed(2)}%
-                               </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                               <Typography variant="caption" sx={{ fontWeight: 800 }}>Stop</Typography>
-                               <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 900 }}>
-                                 {selectedSignal.direction === 'LONG' ? (((selectedSignal.current_price || selectedSignal.entry) - selectedSignal.stop)/ (selectedSignal.current_price || selectedSignal.entry) * 100).toFixed(2) : ((selectedSignal.stop - (selectedSignal.current_price || selectedSignal.entry))/ (selectedSignal.current_price || selectedSignal.entry) * 100).toFixed(2)}%
-                               </Typography>
-                            </Box>
-                         </Stack>
-                      </Box>
-                   </Grid>
-                </Grid>
+                <SignalDetailView signal={fullDetail || selectedSignal} loading={detailLoading} />
              </DialogContent>
            </>
          )}

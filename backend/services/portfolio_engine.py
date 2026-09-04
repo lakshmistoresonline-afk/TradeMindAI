@@ -22,11 +22,22 @@ class ShadowPortfolioEngine:
             ).all()
 
             realized_pnl = 0.0
+            gross_profit = 0.0
+            gross_loss = 0.0
+
+            # For Drawdown (Simplified time-series peak tracking)
+            from backend.core.postgres import DailyMetricDB
+            metrics = session.query(DailyMetricDB.virtual_equity).order_by(DailyMetricDB.date.asc()).all()
+            equity_curve = [float(m[0]) for m in metrics]
+
             for t in terminal:
                 # P&L in currency = (Net Return % / 100) * Capital Allocation
                 alloc = t.capital_allocation or ShadowPortfolioEngine.UNIT_ALLOCATION
                 pnl_pct = t.net_return or 0.0
-                realized_pnl += (pnl_pct / 100.0) * alloc
+                pnl_amt = (pnl_pct / 100.0) * alloc
+                realized_pnl += pnl_amt
+                if pnl_amt > 0: gross_profit += pnl_amt
+                else: gross_loss += abs(pnl_amt)
 
             # 2. Active Exposure & Unrealized P&L
             active = session.query(ShadowSignalDB, StockDB.last_price, StockDB.sector).join(
@@ -36,11 +47,15 @@ class ShadowPortfolioEngine:
             allocated_capital = 0.0
             unrealized_pnl = 0.0
             sector_exposure = {}
+            long_exposure = 0.0
+            short_exposure = 0.0
             concurrent_signals = len(active)
 
             for s, lp, sector in active:
                 alloc = s.capital_allocation or ShadowPortfolioEngine.UNIT_ALLOCATION
                 allocated_capital += alloc
+                if s.direction == "LONG": long_exposure += alloc
+                else: short_exposure += alloc
 
                 # Current P&L
                 current_price = lp or s.entry_price
@@ -59,19 +74,34 @@ class ShadowPortfolioEngine:
 
             current_equity = ShadowPortfolioEngine.STARTING_CAPITAL + realized_pnl + unrealized_pnl
 
+            # Calculate Drawdown from Equity Curve
+            equity_curve.append(current_equity)
+            if equity_curve:
+                peaks = pd.Series(equity_curve).expanding().max()
+                drawdown_series = (pd.Series(equity_curve) / peaks - 1) * 100
+                max_drawdown = abs(float(drawdown_series.min()))
+            else:
+                max_drawdown = 0.0
+
+            profit_factor = gross_profit / gross_loss if gross_loss > 0 else 1.0
+
             return {
                 "starting_capital": ShadowPortfolioEngine.STARTING_CAPITAL,
                 "current_equity": round(current_equity, 2),
                 "realized_pnl": round(realized_pnl, 2),
                 "unrealized_pnl": round(unrealized_pnl, 2),
+                "total_pnl": round(realized_pnl + unrealized_pnl, 2),
                 "allocated_capital": round(allocated_capital, 2),
                 "available_capital": round(ShadowPortfolioEngine.STARTING_CAPITAL + realized_pnl - allocated_capital, 2),
                 "gross_exposure": round(allocated_capital, 2),
-                "net_exposure": round(allocated_capital, 2), # Assuming LONG-only for now
+                "net_exposure": round(long_exposure - short_exposure, 2),
+                "long_exposure": round(long_exposure, 2),
+                "short_exposure": round(short_exposure, 2),
                 "active_count": concurrent_signals,
                 "terminal_count": len(terminal),
                 "sector_exposure": sector_exposure,
-                "drawdown": 0.0 # Peak tracking needed for real DD
+                "profit_factor": round(profit_factor, 2),
+                "drawdown": round(max_drawdown, 2)
             }
 
     @staticmethod

@@ -242,16 +242,48 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         self.duck.ingest_features(vector.symbol, df)
 
     async def save_prediction(self, prediction: Prediction) -> None:
+        from backend.core.postgres import PredictionDB
         with self.session_factory() as pg:
             pg.add(PredictionDB(
+                id=prediction.id,
                 symbol=prediction.symbol,
-                date=prediction.date,
+                timestamp=prediction.timestamp,
                 model_version=prediction.model_version,
+                feature_version=prediction.feature_version,
                 prediction=prediction.prediction,
+                probability=prediction.probability,
+                expected_value=prediction.expected_value,
+                direction=prediction.direction,
                 confidence=prediction.confidence,
-                metadata_json=json.dumps(prediction.metadata) if prediction.metadata else None
+                regime=prediction.regime,
+                metadata_json=json.dumps(prediction.metadata) if prediction.metadata else None,
+                created_at=prediction.created_at
             ))
             pg.commit()
+
+    async def get_prediction(self, prediction_id: str) -> Optional[Prediction]:
+        from backend.core.postgres import PredictionDB
+        with self.session_factory() as pg:
+            res = pg.query(PredictionDB).filter(PredictionDB.id == prediction_id).first()
+            return self._map_db_to_prediction(res) if res else None
+
+    async def get_predictions(self, symbol: Optional[str] = None, limit: int = 100) -> List[Prediction]:
+        from backend.core.postgres import PredictionDB
+        with self.session_factory() as pg:
+            query = pg.query(PredictionDB)
+            if symbol:
+                query = query.filter(PredictionDB.symbol == symbol)
+            res = query.order_by(PredictionDB.timestamp.desc()).limit(limit).all()
+            return [self._map_db_to_prediction(r) for r in res]
+
+    def _map_db_to_prediction(self, db_obj: Any) -> Prediction:
+        data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
+        if data.get('metadata_json'):
+            data['metadata'] = json.loads(data['metadata_json'])
+        # Rename date to timestamp if needed for consistency with model
+        if 'date' in data:
+            data['timestamp'] = data['date']
+        return Prediction(**data)
 
     async def save_portfolio_health(self, health: PortfolioHealth) -> None: self.fs.collection("portfolio_health").document(health.user_id).set(health.model_dump())
     async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]:
@@ -367,6 +399,12 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
             if r:
                 return self._map_db_to_model_metadata(r)
             return None
+
+    async def get_model_history(self, symbol: str, limit: int = 10) -> List[ModelMetadata]:
+        from backend.core.postgres import ModelMetadataDB
+        with self.session_factory() as pg:
+            res = pg.query(ModelMetadataDB).filter(ModelMetadataDB.symbol == symbol).order_by(ModelMetadataDB.last_trained.desc()).limit(limit).all()
+            return [self._map_db_to_model_metadata(r) for r in res]
 
     async def get_all_champion_models(self) -> List[ModelMetadata]:
         from backend.core.postgres import ModelMetadataDB

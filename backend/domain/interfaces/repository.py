@@ -65,6 +65,14 @@ class IDataPlatformRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_prediction(self, prediction_id: str) -> Optional[Prediction]:
+        pass
+
+    @abstractmethod
+    async def get_predictions(self, symbol: Optional[str] = None, limit: int = 100) -> List[Prediction]:
+        pass
+
+    @abstractmethod
     async def save_portfolio_health(self, health: PortfolioHealth) -> None:
         pass
 
@@ -130,6 +138,14 @@ class IDataPlatformRepository(ABC):
 
     @abstractmethod
     async def get_champion_model(self, symbol: str) -> Optional[ModelMetadata]:
+        pass
+
+    @abstractmethod
+    async def get_model_history(self, symbol: str, limit: int = 10) -> List[ModelMetadata]:
+        pass
+
+    @abstractmethod
+    async def get_all_champion_models(self) -> List[ModelMetadata]:
         pass
 
     @abstractmethod

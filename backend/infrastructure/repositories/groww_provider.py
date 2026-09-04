@@ -37,15 +37,15 @@ class GrowwProvider(IMarketDataProvider):
 
         response = await self.client.get(url, params=params, headers=headers)
         if response.status_code != 200:
-            return {"name": symbol, "last_price": 0.0}
+            return {"name": symbol, "last_price": None}
 
         data = response.json()
         return {
             "name": data.get("companyName", symbol),
-            "last_price": data.get("ltp", 0.0),
-            "previous_close": data.get("prevClose", 0.0),
+            "last_price": data.get("ltp"),
+            "previous_close": data.get("prevClose"),
             "change_pct": data.get("dayChangePerc", 0.0),
-            "market_cap": data.get("marketCap", 0.0),
+            "market_cap": data.get("marketCap"),
             "volume": data.get("volume", 0.0)
         }
 
@@ -132,9 +132,9 @@ class GrowwProvider(IMarketDataProvider):
 
         return all_prices
 
-    async def get_ltp(self, symbol: str) -> float:
+    async def get_ltp(self, symbol: str) -> Optional[float]:
         info = await self.fetch_stock_info(symbol)
-        return info.get("last_price", 0.0)
+        return info.get("last_price")
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
         return await self.fetch_stock_info(symbol)

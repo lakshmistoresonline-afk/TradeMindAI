@@ -316,3 +316,8 @@ export const getShadowSignalsMetadata = async () => {
   const response = await apiClient.get('/shadow/signals/metadata');
   return response.data;
 };
+
+export const getShadowSignalDetail = async (id: string) => {
+  const response = await apiClient.get(`/shadow/signals/${id}`);
+  return response.data;
+};

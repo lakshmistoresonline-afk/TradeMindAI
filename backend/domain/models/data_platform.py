@@ -73,12 +73,20 @@ class FeatureVector(BaseModel):
     metadata: Dict[str, Any] = {}
 
 class Prediction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     symbol: str
-    date: datetime
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
     model_version: str
+    feature_version: Optional[str] = None
     prediction: str # UP, DOWN, NEUTRAL
-    confidence: float
-    metadata: Dict[str, Any]
+    probability: float = 0.5
+    expected_value: float = 0.0
+    direction: str = "LONG"
+    confidence: float = 0.5
+    regime: Optional[str] = None
+    is_oos: bool = True # Workstream 6: Out-of-sample flag
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class MLDataset(BaseModel):
     id: str
@@ -99,11 +107,17 @@ class ModelMetadata(BaseModel):
     accuracy: float
     precision: float
     recall: float
+    f1_score: float = 0.0
+    roc_auc: float = 0.5
+    brier_score: float = 1.0
     is_champion: bool = False
+    status: str = "CANDIDATE" # CHAMPION, CHALLENGER, CANDIDATE, RETIRED
+    health: str = "HEALTHY" # HEALTHY, DEGRADED, DRIFTED, INSUFFICIENT_DATA
     last_trained: datetime
     hyperparameters: Dict[str, Any]
     feature_importances: Dict[str, float] = {}
     calibration_metadata: Optional[Dict[str, Any]] = None # Platt Scaling params, Brier Score, etc.
+    experiment_id: Optional[str] = None
 
 class OptionsMetric(BaseModel):
     symbol: str

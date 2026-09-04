@@ -13,6 +13,10 @@ import EquitySignals from './pages/EquitySignals'
 import FuturesSignals from './pages/FuturesSignals'
 import OptionsSignals from './pages/OptionsSignals'
 import ShadowMonitor from './pages/ShadowMonitor'
+import IntelligenceDashboard from './pages/IntelligenceDashboard'
+import MarketCommandCenter from './pages/MarketCommandCenter'
+import OpportunityRadar from './pages/OpportunityRadar'
+import StockResearchTerminal from './pages/StockResearchTerminal'
 
 const darkTheme = createTheme({
   palette: {
@@ -152,6 +156,10 @@ function App() {
 
                 {/* Contextual / Advanced */}
                 <Route path="/analysis" element={<StockIntelligence />} />
+                <Route path="/intelligence" element={<IntelligenceDashboard />} />
+                <Route path="/market-command" element={<MarketCommandCenter />} />
+                <Route path="/radar" element={<OpportunityRadar />} />
+                <Route path="/research" element={<StockResearchTerminal />} />
                 <Route path="/shadow" element={<ShadowMonitor />} />
                 <Route path="/admin" element={<SystemControl />} />
                 <Route path="/settings" element={<Settings />} />

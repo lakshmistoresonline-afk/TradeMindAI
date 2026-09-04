@@ -22,7 +22,7 @@ class MLService:
         import numpy as np
         from sklearn.ensemble import RandomForestClassifier
         from sklearn.linear_model import LogisticRegression
-        from sklearn.metrics import accuracy_score, precision_score, recall_score, brier_score_loss, log_loss
+        from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, brier_score_loss, log_loss
 
         if len(features) < 150: # Increased threshold for calibration folds
             raise ValueError(f"Insufficient features for calibrated training ({len(features)})")
@@ -87,6 +87,8 @@ class MLService:
         acc = accuracy_score(y_test, y_pred)
         prec = precision_score(y_test, y_pred, zero_division=0)
         rec = recall_score(y_test, y_pred, zero_division=0)
+        f1 = f1_score(y_test, y_pred, zero_division=0)
+        auc = roc_auc_score(y_test, probs_test_calibrated) if len(np.unique(y_test)) > 1 else 0.5
 
         brier_raw = brier_score_loss(y_test, probs_test_raw)
         brier_calib = brier_score_loss(y_test, probs_test_calibrated)
@@ -111,7 +113,11 @@ class MLService:
             accuracy=float(acc),
             precision=float(prec),
             recall=float(rec),
+            f1_score=float(f1),
+            roc_auc=float(auc),
+            brier_score=float(brier_calib),
             is_champion=False,
+            status="CANDIDATE",
             last_trained=datetime.utcnow(),
             hyperparameters={"n_estimators": 100, "feature_names": feature_names},
             feature_importances=importances,

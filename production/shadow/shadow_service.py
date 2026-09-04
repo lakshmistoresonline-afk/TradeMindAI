@@ -102,9 +102,13 @@ class ShadowService:
                         if not symbol or not isinstance(p_info, dict): continue
                         curr = p_info.get('regularMarketPrice')
                         if curr:
-                            session.query(StockDB).filter(StockDB.symbol == symbol).update({"last_price": curr})
+                            session.query(StockDB).filter(StockDB.symbol == symbol).update({
+                                "last_price": curr,
+                                "updated_at": datetime.utcnow()
+                            })
                             if symbol in stock_map:
                                 stock_map[symbol].last_price = curr
+                                stock_map[symbol].updated_at = datetime.utcnow()
                     session.commit()
                 print("[+] Operational store updated with live prices.")
             except Exception as e:
@@ -340,6 +344,20 @@ class ShadowService:
                 outcome_verified=signal.outcome_verified
             )
             session.add(db_sig)
+
+            # Phase 7A: Audit Trail (Workstream 12)
+            from backend.core.postgres import ShadowEventDB
+            event = ShadowEventDB(
+                event_type="SIGNAL_GENERATED",
+                signal_id=signal.id,
+                symbol=signal.symbol,
+                timestamp=datetime.utcnow(),
+                strategy_version=ShadowService.STRATEGY_VERSION,
+                decision="TRADE_SIGNAL",
+                evaluation_mode=signal.evaluation_mode
+            )
+            session.add(event)
+
             session.commit()
             print(f"   [SHADOW] Signal Persisted: {signal.symbol} {signal.direction} @ {signal.entry_price} [Mode: {signal.evaluation_mode}]")
 

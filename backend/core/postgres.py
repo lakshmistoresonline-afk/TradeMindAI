@@ -87,6 +87,10 @@ class StockDB(Base):
     lot_size = Column(Integer)
     index_weight = Column(Float)
     index_membership = Column(String) # NIFTY_50, NIFTY_100, NIFTY_200, INDEX
+    universe_version = Column(String, default="NIFTY_200_AUG2026")
+    data_freshness_status = Column(String) # FRESH, STALE, UNAVAILABLE
+    missing_data_reason = Column(String)
+    ingestion_timestamp = Column(DateTime)
 
 class PriceDB(Base):
     __tablename__ = "historical_prices"
@@ -127,13 +131,19 @@ class RegimeDB(Base):
 
 class PredictionDB(Base):
     __tablename__ = "predictions"
-    id = Column(Integer, primary_key=True)
+    id = Column(String, primary_key=True, index=True)
     symbol = Column(String, index=True)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     model_version = Column(String)
+    feature_version = Column(String)
     prediction = Column(String)
+    probability = Column(Float)
+    expected_value = Column(Float)
+    direction = Column(String)
     confidence = Column(Float)
+    regime = Column(String)
     metadata_json = Column(String) # JSON string
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class IntelReportDB(Base):
     __tablename__ = "intel_reports"
@@ -281,6 +291,8 @@ class LiveSignalDB(Base):
     risk_amount = Column(Float)
     gross_pnl = Column(Float)
     pnl_percentage = Column(Float)
+    prediction_id = Column(String, index=True)
+    provenance_id = Column(String, index=True)
 
 class ShadowSignalDB(Base):
     __tablename__ = "shadow_signals"
@@ -326,6 +338,8 @@ class ShadowSignalDB(Base):
     pnl_percentage = Column(Float)
     fees = Column(Float)
     net_pnl = Column(Float)
+    prediction_id = Column(String, index=True)
+    provenance_id = Column(String, index=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
@@ -361,6 +375,64 @@ class ShadowScanDiagnosticDB(Base):
     provider_name = Column(String)
     provider_latency_ms = Column(Integer)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class SectorMetricDB(Base):
+    __tablename__ = "sector_metrics"
+    id = Column(Integer, primary_key=True)
+    date = Column(Date, index=True)
+    sector = Column(String, index=True)
+    relative_strength = Column(Float)
+    momentum = Column(Float)
+    trend = Column(String) # BULLISH, BEARISH, SIDEWAYS
+    volume_score = Column(Float)
+    volatility = Column(Float)
+    rank = Column(Integer)
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+
+class InstitutionalMetricDB(Base):
+    __tablename__ = "institutional_metrics"
+    date = Column(Date, primary_key=True)
+    fii_net = Column(Float)
+    dii_net = Column(Float)
+    fii_cumulative = Column(Float)
+    dii_cumulative = Column(Float)
+    sentiment_bias = Column(String) # BULLISH, BEARISH, NEUTRAL
+    institutional_pressure = Column(Float) # -1.0 to 1.0
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+
+class StockIntelligenceDB(Base):
+    __tablename__ = "stock_intelligence"
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String, index=True)
+    date = Column(Date, index=True)
+    trend_score = Column(Float)
+    momentum_score = Column(Float)
+    volatility_score = Column(Float)
+    volume_score = Column(Float)
+    rs_rating = Column(Float)
+    technical_structure = Column(String) # JSON
+    fundamental_score = Column(Float)
+    institutional_pressure = Column(Float)
+    market_regime = Column(String)
+    sector_regime = Column(String)
+    composite_intelligence_score = Column(Float)
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+
+class IntelligenceSynthesisDB(Base):
+    __tablename__ = "intelligence_synthesis"
+    id = Column(String, primary_key=True) # Usually signal_id or prediction_id
+    symbol = Column(String, index=True)
+    timestamp = Column(DateTime, index=True)
+    market_context = Column(String) # JSON
+    sector_context = Column(String) # JSON
+    technical_context = Column(String) # JSON
+    fundamental_context = Column(String) # JSON
+    institutional_context = Column(String) # JSON
+    fo_context = Column(String) # JSON
+    supporting_evidence = Column(String) # JSON
+    conflicting_evidence = Column(String) # JSON
+    risk_factors = Column(String) # JSON
+    final_interpretation = Column(String)
 
 class DailyMetricDB(Base):
     __tablename__ = "daily_metrics"

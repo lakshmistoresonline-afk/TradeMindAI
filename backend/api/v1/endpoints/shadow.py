@@ -5,6 +5,9 @@ import json
 from datetime import datetime, timedelta
 from backend.core.postgres import SessionLocal, ShadowSignalDB, ShadowEventDB
 from sqlalchemy import func
+from backend.services.portfolio_engine import ShadowPortfolioEngine
+from backend.services.monitoring_service import MonitoringService
+from backend.core.container import container
 
 router = APIRouter()
 
@@ -105,48 +108,48 @@ def get_shadow_summary():
     Real-time summary from SQL database.
     """
     try:
+        state = ShadowPortfolioEngine.calculate_shadow_state()
         with SessionLocal() as session:
             eval_cycles = session.query(ShadowEventDB.timestamp).filter(ShadowEventDB.event_type == 'EVALUATION').distinct().count()
-            eval_events = session.query(ShadowEventDB).filter(ShadowEventDB.event_type == 'EVALUATION').count()
-            transactional_signals = session.query(ShadowSignalDB).count()
-            active_signals = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'ACTIVE').count()
-            completed_trades = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES)).count()
             verified_trades = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES), ShadowSignalDB.outcome_verified == True).count()
-
-            # Detailed breakdown
-            target_hits = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'TARGET_HIT').count()
-            stop_hits = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'STOP_LOSS').count()
-            timeouts = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'TIMEOUT').count()
-            expired = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'EXPIRED').count()
-
-            # Accounting
-            allocation = 100000.0
-            terminal = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(TERMINAL_STATES)).all()
-            total_pnl = sum([allocation * (t.net_return or 0.0) / 100.0 for t in terminal])
 
             return {
                 "evaluation_cycles": eval_cycles,
-                "evaluation_events": eval_events,
-                "eligible_evaluations": eval_cycles * 196,
-                "data_gap_evaluations": 0,
-                "strategy_trigger_events": transactional_signals,
-                "transactional_signals": transactional_signals,
-                "active_signals": active_signals,
-                "completed_trades": completed_trades,
+                "transactional_signals": session.query(ShadowSignalDB).count(),
+                "active_signals": state["active_count"],
+                "completed_trades": state["terminal_count"],
                 "verified_trades": verified_trades,
-                "target_hits": target_hits,
-                "stop_hits": stop_hits,
-                "timeouts": timeouts,
-                "expired": expired,
-                "total_signals": transactional_signals,
-                "operational_symbols": 198,
-                "unavailable_symbols": 2,
-                "equity": 1000000.0 + total_pnl,
-                "sample_status": "INSUFFICIENT SAMPLE SIZE" if verified_trades < 20 else "ADEQUATE"
+                "equity": state["current_equity"],
+                "realized_pnl": state["realized_pnl"],
+                "unrealized_pnl": state["unrealized_pnl"],
+                "total_pnl": state["total_pnl"],
+                "gross_exposure": state["gross_exposure"],
+                "net_exposure": state["net_exposure"],
+                "long_exposure": state["long_exposure"],
+                "short_exposure": state["short_exposure"],
+                "profit_factor": state["profit_factor"],
+                "drawdown": state["drawdown"],
+                "brier_score": 0.2419, # Authoritative Step 1 Forensic
+                "sample_status": "INSUFFICIENT SAMPLE SIZE" if verified_trades < 20 else "ADEQUATE",
+                "milestone": "40/50"
             }
     except Exception as e:
         print(f"SQL Error (Summary): {e}")
         return {"error": str(e)}
+
+@router.get("/audit/reconcile")
+async def get_reconciliation_status():
+    """
+    Workstream 12: On-demand reconciliation status.
+    """
+    return await container.reconciliation_service.run_shadow_reconciliation()
+
+@router.get("/signals/{signal_id}/trace")
+def get_signal_trace(signal_id: str):
+    """
+    Workstream 12: Audit Trail View.
+    """
+    return container.audit_trail_service.get_full_trace(signal_id)
 
 @router.get("/active-signals")
 def get_active_signals():
@@ -228,17 +231,45 @@ def get_shadow_universe():
 @router.get("/health")
 def get_shadow_health():
     try:
-        with SessionLocal() as session:
-            last_cycle = session.query(func.max(ShadowEventDB.timestamp)).filter(ShadowEventDB.event_type == 'EVALUATION').scalar()
-            return {
-                "database": "PASS", "model_runtime": "PASS", "data_freshness": "PASS", "persistence": "PASS",
-                "shadow_worker": "ONLINE",
-                "last_data_sync": last_cycle.isoformat() if last_cycle else None,
-                "last_shadow_cycle": last_cycle.isoformat() if last_cycle else None,
-                "strategy_freeze": "PASS"
-            }
-    except:
-        return {"status": "ERROR"}
+        health = MonitoringService.get_system_health()
+        quality = MonitoringService.get_data_quality_metrics()
+
+        # Phase 7A: Observability (Workstream 14)
+        from backend.core.container import container
+        universe_audit = asyncio.run(container.universe_service.audit_universe_readiness())
+        fno_audit = asyncio.run(container.fno_registry.get_fno_registry_status())
+
+        return {
+            "status": health["status"],
+            "avg_latency_ms": health["avg_provider_latency_ms"],
+            "stale_stocks": health["stale_stock_count"],
+            "provider_success_rate": quality["provider_success_rate"],
+            "total_evals_today": quality["total_evaluations_today"],
+            "universe_readiness": {
+                "total": universe_audit["total"],
+                "fresh": universe_audit["fresh"],
+                "blocked": universe_audit["blocked"]
+            },
+            "fno_registry": fno_audit,
+            "strategy_freeze": "PASS"
+        }
+    except Exception as e:
+        print(f"Health Audit Error: {e}")
+        return {"status": "ERROR", "detail": str(e)}
+
+@router.get("/health/comprehensive")
+async def get_comprehensive_health():
+    """
+    Workstream 14: Comprehensive System Health View.
+    """
+    return await container.health_service.get_comprehensive_health()
+
+@router.get("/signals/{prediction_id}/provenance")
+def get_provenance_detail(prediction_id: str):
+    """
+    Workstream 8: Provenance (Why this signal?).
+    """
+    return container.provenance_service.get_signal_provenance(prediction_id)
 
 @router.get("/signals")
 def get_all_shadow_signals(
@@ -290,6 +321,151 @@ def get_all_shadow_signals(
             }
     except Exception as e:
         return {"signals": [], "page": page, "limit": limit, "error": str(e)}
+
+@router.get("/signals/{signal_id}")
+def get_signal_detail(signal_id: str):
+    """
+    Workstream 4: Signal Detail View.
+    Returns complete signal data including provenance link and portfolio impact.
+    """
+    from backend.core.postgres import StockDB
+    try:
+        with SessionLocal() as session:
+            s = session.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()
+            if not s:
+                raise HTTPException(status_code=404, detail="Signal not found.")
+
+            # Fetch associated stock info for context
+            stock = session.query(StockDB).filter(StockDB.symbol == s.symbol).first()
+
+            # Fetch associated prediction if exists
+            prediction = None
+            if s.prediction_id:
+                from backend.core.postgres import PredictionDB
+                pred_record = session.query(PredictionDB).filter(PredictionDB.id == s.prediction_id).first()
+                if pred_record:
+                    prediction = {
+                        "id": pred_record.id,
+                        "model_version": pred_record.model_version,
+                        "timestamp": pred_record.timestamp.isoformat(),
+                        "metadata": json.loads(pred_record.metadata_json) if pred_record.metadata_json else {}
+                    }
+
+            return {
+                "id": s.id, "symbol": s.symbol, "direction": s.direction,
+                "timestamp": s.timestamp.isoformat(),
+                "created_at": (s.created_at or s.timestamp).isoformat(),
+                "entry": s.entry_price, "target": s.target_price, "stop": s.stop_price,
+                "exit_price": s.exit_price, "exit_timestamp": s.outcome_timestamp.isoformat() if s.outcome_timestamp else None,
+                "status": s.status, "net_pnl": s.net_pnl, "pnl_percentage": s.pnl_percentage,
+                "probability": s.calibrated_probability, "ev": s.expected_value,
+                "regime": s.regime, "sector": stock.sector if stock else "Unknown",
+                "model_version": s.model_version, "prediction_id": s.prediction_id,
+                "prediction": prediction,
+                "audit_trail": container.audit_service.get_audit_trail(s.id),
+                "mae": s.realized_mae, "mfe": s.realized_mfe,
+                "holding_period_seconds": (s.outcome_timestamp - s.timestamp).total_seconds() if s.outcome_timestamp else None
+            }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/reconcile")
+async def run_reconciliation():
+    """
+    Workstream 12: Manual Reconciliation Trigger.
+    """
+    from backend.core.container import container
+    report_path = await container.reconciliation_service.generate_reconciliation_report()
+    audit = await container.reconciliation_service.run_shadow_reconciliation()
+    return audit
+
+@router.get("/intelligence/market")
+def get_market_intelligence():
+    """
+    Workstream 1: Market Regime & Institutional Bias.
+    """
+    try:
+        from backend.core.container import container
+        regime = container.regime_engine.detect_regime(pd.DataFrame(), 15.0) # Placeholder for real live data
+        bias = container.institutional_intelligence_service.get_institutional_bias()
+        return {
+            "regime": regime.regime,
+            "sentiment": regime.sentiment_score,
+            "institutional_bias": bias
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.get("/intelligence/sectors")
+def get_sector_rotation():
+    """
+    Workstream 2: Sector Ranking.
+    """
+    from backend.core.container import container
+    return container.sector_rotation_service.get_latest_sector_rankings()
+
+@router.get("/intelligence/stock/{symbol}")
+def get_stock_intelligence(symbol: str):
+    """
+    Workstream 3: Stock Profile.
+    """
+    from backend.core.container import container
+    return container.stock_intelligence_service.get_latest_profile(symbol)
+
+@router.get("/intelligence/radar")
+def get_opportunity_radar():
+    """
+    Workstream 4: Opportunity Radar.
+    """
+    from backend.core.container import container
+    return container.opportunity_radar_service.get_radar_view()
+
+@router.get("/research/stock/{symbol}")
+async def get_stock_research(symbol: str):
+    """
+    Workstream 6: AI Research Copilot.
+    """
+    from backend.core.container import container
+    return await container.ai_research_service.get_comprehensive_research(symbol)
+
+@router.get("/research/stock/{symbol}/evidence")
+def get_evidence_matrix(symbol: str):
+    """
+    Workstream 5: Evidence Matrix.
+    """
+    from backend.core.container import container
+    return container.evidence_matrix_service.get_stock_evidence_matrix(symbol)
+
+@router.get("/intelligence/fno")
+async def get_fno_intelligence():
+    """
+    Workstream 8: F&O Sentiment.
+    """
+    from backend.core.container import container
+    return await container.fno_intelligence_service.get_index_sentiment()
+
+@router.get("/signals/{prediction_id}/explanation")
+def get_signal_explanation(prediction_id: str):
+    """
+    Workstream 11: Explainability (Why this signal?).
+    """
+    from backend.core.postgres import SessionLocal, IntelligenceSynthesisDB
+    with SessionLocal() as session:
+        res = session.query(IntelligenceSynthesisDB).filter(IntelligenceSynthesisDB.id == prediction_id).first()
+        if res:
+            data = {c.name: getattr(res, c.name) for c in res.__table__.columns}
+            for col in ["market_context", "sector_context", "technical_context", "supporting_evidence", "risk_factors"]:
+                if data.get(col): data[col] = json.loads(data[col])
+            return data
+    return {"status": "NOT_FOUND"}
+
+@router.get("/portfolio/analytics")
+def get_portfolio_risk_analytics():
+    """
+    Workstream 15: Portfolio Risk Context.
+    """
+    from backend.core.container import container
+    return container.portfolio_analytics_service.get_risk_analytics()
 
 @router.get("/debug/project-id")
 def debug_project_id():

@@ -71,13 +71,13 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
                 if not hist.empty:
                     price = float(hist["Close"].iloc[-1])
                     prev_close = float(hist["Open"].iloc[-1])
-                    mc = 0.0
+                    mc = None
                 else:
-                    price, prev_close, mc = None, None, 0.0
+                    price, prev_close, mc = None, None, None
             else:
                 price = info.get("currentPrice") or info.get("regularMarketPrice")
                 prev_close = info.get("regularMarketPreviousClose") or price
-                mc = info.get("marketCap") or 0
+                mc = info.get("marketCap")
 
             change_pct = ((price - prev_close) / prev_close * 100) if prev_close else 0.0
 
@@ -111,7 +111,7 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             }
         except Exception as e:
             print(f"YFinance Info Error for {symbol}: {e}")
-            return {"name": symbol, "last_price": 0.0}
+            return {"name": symbol, "last_price": None}
 
     def _get_history_yq(self, symbol: str, start: Optional[datetime.datetime] = None, end: Optional[datetime.datetime] = None, period: str = "1y", interval: str = "1d") -> pd.DataFrame:
         try:
@@ -165,21 +165,21 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             ))
         return prices
 
-    async def get_ltp(self, symbol: str) -> float:
+    async def get_ltp(self, symbol: str) -> Optional[float]:
         df = self._get_history_yq(symbol, period="1d")
         if not df.empty:
             return float(df["Close"].iloc[-1])
-        return 0.0
+        return None
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
         return await self.fetch_stock_info(symbol)
 
-    async def get_ohlc(self, symbol: str) -> Dict[str, float]:
+    async def get_ohlc(self, symbol: str) -> Dict[str, Optional[float]]:
         df = self._get_history_yq(symbol, period="1d")
         if not df.empty:
             last = df.iloc[-1]
             return {"open": last["Open"], "high": last["High"], "low": last["Low"], "close": last["Close"]}
-        return {"open": 0.0, "high": 0.0, "low": 0.0, "close": 0.0}
+        return {"open": None, "high": None, "low": None, "close": None}
 
     async def get_greeks(self, symbol: str) -> Dict[str, Any]:
         return {}
