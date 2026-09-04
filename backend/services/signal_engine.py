@@ -213,8 +213,26 @@ class SignalEngine:
             inst_bias=inst_bias
         )
 
+        # 11.7 Generate Provenance Record (Workstream 9)
+        provenance_id = str(uuid.uuid4())
+        provenance_data = {
+            "provenance_id": provenance_id,
+            "signal_id": sig_id,
+            "prediction_id": pred_id,
+            "data_snapshot_timestamp": data_ts,
+            "model_version": ml_res.get("model_version", "TradeMind Core v2.2"),
+            "strategy_version": "v2.2",
+            "feature_version": "v1.0.0",
+            "data_sources": {"price": "YahooFinance/Groww", "indicators": "DuckDB-TA"},
+            "source_timestamps": {"market_data": data_ts.isoformat()},
+            "input_hash": str(hash(frozenset(last_features.items()))),
+            "output_hash": str(hash(frozenset(ml_res.items()))),
+            "decision_hash": str(hash(sig_id))
+        }
+        # In a full flow, we'd persist this now, but SignalEngine usually returns the object first.
+        # We'll include it in the signal object.
+
         # Part 4: Look-ahead Protection
-        data_ts = features_list[-1].date
         if data_ts > now:
             print(f"   [FATAL] Look-ahead violation detected for {symbol}: {data_ts} > {now}")
             return None
@@ -261,6 +279,7 @@ class SignalEngine:
             risk_amount=3000.0, # 3% risk on 100k
             outcome_verified=False,
             prediction_id=pred_id,
+            provenance_id=provenance_id,
 
             entry_price=stock.last_price,
             target_price=risk_params["target"],
@@ -270,6 +289,19 @@ class SignalEngine:
             asset_class=asset_class,
             underlying_symbol=symbol if asset_class != "EQUITY" else None,
             model_version=ml_res.get("model_version", "TradeMind Core v2.2"),
-            provenance=diag_provenance,
-            events=[SignalEvent(type="GENERATED", message="Passed forensic P0 risk/edge audit.")]
+            provenance=provenance_data, # Use the full provenance dict here
+            events=[SignalEvent(type="GENERATED", message="Passed forensic P0 risk/edge audit.")],
+
+            # Ledger 2.0 Extensions
+            asset_type=asset_class,
+            exchange="NSE",
+            signal_type=timeframe,
+            signal_rating="BUY" if direction == "LONG" else "SELL",
+            entry_zone_low=stock.last_price * 0.995,
+            entry_zone_high=stock.last_price * 1.005,
+            signal_timestamp=now,
+            lifecycle_state="CREATED",
+            risk_amount_abs=risk_amt,
+            reward_amount_abs=reward_amt,
+            expected_return=expected_val
         )

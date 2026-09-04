@@ -17,6 +17,7 @@ import IntelligenceDashboard from './pages/IntelligenceDashboard'
 import MarketCommandCenter from './pages/MarketCommandCenter'
 import OpportunityRadar from './pages/OpportunityRadar'
 import StockResearchTerminal from './pages/StockResearchTerminal'
+import DataQualityDashboard from './pages/DataQualityDashboard'
 
 const darkTheme = createTheme({
   palette: {
@@ -160,6 +161,7 @@ function App() {
                 <Route path="/market-command" element={<MarketCommandCenter />} />
                 <Route path="/radar" element={<OpportunityRadar />} />
                 <Route path="/research" element={<StockResearchTerminal />} />
+                <Route path="/data-quality" element={<DataQualityDashboard />} />
                 <Route path="/shadow" element={<ShadowMonitor />} />
                 <Route path="/admin" element={<SystemControl />} />
                 <Route path="/settings" element={<Settings />} />

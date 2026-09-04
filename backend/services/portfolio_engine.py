@@ -74,14 +74,19 @@ class ShadowPortfolioEngine:
 
             current_equity = ShadowPortfolioEngine.STARTING_CAPITAL + realized_pnl + unrealized_pnl
 
-            # Calculate Drawdown from Equity Curve
+            # Calculate Portfolio MTM Drawdown from Equity Curve
             equity_curve.append(current_equity)
             if equity_curve:
                 peaks = pd.Series(equity_curve).expanding().max()
                 drawdown_series = (pd.Series(equity_curve) / peaks - 1) * 100
-                max_drawdown = abs(float(drawdown_series.min()))
+                portfolio_mtm_drawdown = abs(float(drawdown_series.min()))
             else:
-                max_drawdown = 0.0
+                portfolio_mtm_drawdown = 0.0
+
+            # Calculate Trade Sequence Drawdown (Forensic)
+            from backend.services.drawdown_service import DrawdownService
+            returns_seq = [float(t.net_return) for t in terminal if t.net_return is not None]
+            trade_sequence_drawdown = DrawdownService.calculate_trade_sequence_drawdown(returns_seq)
 
             profit_factor = gross_profit / gross_loss if gross_loss > 0 else 1.0
 
@@ -101,7 +106,9 @@ class ShadowPortfolioEngine:
                 "terminal_count": len(terminal),
                 "sector_exposure": sector_exposure,
                 "profit_factor": round(profit_factor, 2),
-                "drawdown": round(max_drawdown, 2)
+                "portfolio_mtm_drawdown": round(portfolio_mtm_drawdown, 2),
+                "trade_sequence_drawdown": round(trade_sequence_drawdown, 2),
+                "drawdown": round(trade_sequence_drawdown, 2) # Backward compatibility
             }
 
     @staticmethod

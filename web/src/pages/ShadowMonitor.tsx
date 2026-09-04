@@ -48,7 +48,13 @@ export default function ShadowMonitor() {
   const [historySignals, setHistorySignals] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [metadata, setMetadata] = useState<any>({ statuses: [], symbols: [], directions: [] });
-  const [filters, setFilters] = useState({ status: 'ALL', symbol: 'ALL', direction: 'ALL', page: 1 });
+  const [filters, setFilters] = useState<any>({
+    status: 'ALL',
+    symbol: 'ALL',
+    direction: 'ALL',
+    evaluation_mode: 'ALL',
+    page: 1
+  });
   const [selectedSignal, setSelectedSignal] = useState<any>(null);
   const [fullDetail, setFullDetail] = useState<any>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -175,7 +181,7 @@ export default function ShadowMonitor() {
   const engineStatus = health?.shadow_worker === 'ONLINE' ? "STANDBY" : "OFFLINE";
   const isConnected = status?.data_source === 'FIREBASE_DIRECT' || status?.data_source === 'SQL_PRODUCTION';
   const firebaseStatus = isConnected ? 'CONNECTED' : 'LOCAL';
-  const currentEquity = summary?.equity?.toLocaleString() || '1,002,800';
+  const currentEquity = summary?.equity?.toLocaleString() || '1,000,000';
 
   const formatIST = (timestamp: string | null) => {
     if (!timestamp) return 'N/A';
@@ -224,7 +230,7 @@ export default function ShadowMonitor() {
             BASELINE START: {status?.baseline_start || 'N/A'} | EQUITY: ₹{summary?.equity?.toLocaleString() || '1,000,000'} | P&L: ₹{summary?.total_pnl?.toLocaleString() || '0'}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block', mt: 0.5 }}>
-            EXPOSURE: ₹{summary?.gross_exposure?.toLocaleString() || '0'} | PROFIT FACTOR: {summary?.profit_factor || '1.0'} | DD: {summary?.drawdown || '0.0'}%
+            PF: {summary?.profit_factor || '1.0'} | TRADE-SEQ DD: {summary?.trade_sequence_drawdown || '0.0'}% | MTM DD: {summary?.portfolio_mtm_drawdown || '0.0'}%
           </Typography>
         </Box>
         <Stack direction="row" spacing={2} alignItems="center">
@@ -237,10 +243,23 @@ export default function ShadowMonitor() {
            >
              REFRESH
            </Button>
+           <Button
+             size="small"
+             variant="outlined"
+             color="primary"
+             startIcon={<Database size={16} />}
+             onClick={async () => {
+                const res = await apiClient.get('/shadow/signals/export');
+                window.open(API_BASE_URL + '/shadow/signals/export', '_blank');
+             }}
+             sx={{ fontWeight: 800, borderRadius: 0.5 }}
+           >
+             EXPORT LEDGER
+           </Button>
            <StatusBadge label="MARKET" status={marketSession} color={marketSession === 'OPEN' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="ENGINE" status={engineStatus} color={health?.shadow_worker === 'ONLINE' ? "#10b981" : "#f59e0b"} />
-           <StatusBadge label="STRATEGY" status="FROZEN" color="#00D1FF" />
-           <StatusBadge label="SAMPLE" status={perf?.sample_status || "INSUFFICIENT"} color="#f59e0b" />
+           <StatusBadge label="STRATEGY" status="V2.2 FROZEN" color="#00D1FF" />
+           <StatusBadge label="STATISTICAL STATUS" status="PROMISING" color="#f59e0b" />
         </Stack>
       </Stack>
 
@@ -362,16 +381,16 @@ export default function ShadowMonitor() {
            <Paper sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" sx={{ mb: 3, fontWeight: 900, fontSize: '0.9rem', letterSpacing: 1 }}>PERFORMANCE MONITOR</Typography>
               <Stack spacing={3}>
-                 <PerfRow label="WIN RATE" value={`${perf?.win_rate || 0}%`} baseline="58.77%" />
-                 <PerfRow label="NET EV" value={`${perf?.net_ev || 0}%`} baseline="0.3262%" />
-                 <PerfRow label="PROB MEAN" value={perf?.probability_mean || "0.6293"} baseline="0.5870" />
+                 <PerfRow label="VERIFIED WIN RATE" value={`${summary?.win_rate_pct || 0}%`} baseline="58.00%" />
+                 <PerfRow label="PROFIT FACTOR" value={summary?.profit_factor || "1.0"} baseline="2.72" />
+                 <PerfRow label="P-VALUE" value={summary?.p_value || "0.1611"} baseline="0.1611" />
 
                  <Box sx={{ mt: 2, p: 2, bgcolor: alpha('#f59e0b', 0.05), border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: 1 }}>
                     <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
-                       <AlertTriangle size={14} /> INSUFFICIENT SAMPLE
+                       <AlertTriangle size={14} /> NOT YET STATISTICALLY SIGNIFICANT
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'slategray', display: 'block', mt: 1, fontWeight: 700 }}>
-                       Statistics are descriptive only. Statistical validation remains HOLD until 20 completed trades.
+                       Current alpha (p=0.16) is promising but remains sample-limited. Milestone 50/100 accumulation in progress to reach 95% confidence interval.
                     </Typography>
                  </Box>
               </Stack>
@@ -421,6 +440,21 @@ export default function ShadowMonitor() {
                          <MenuItem value="SHORT">SHORT</MenuItem>
                       </Select>
                    </FormControl>
+                   <FormControl size="small" sx={{ minWidth: 150 }}>
+                      <InputLabel sx={{ fontWeight: 800, fontSize: '0.7rem' }}>POPULATION</InputLabel>
+                      <Select
+                        value={filters.evaluation_mode}
+                        label="POPULATION"
+                        onChange={(e) => handleFilterChange('evaluation_mode', e.target.value)}
+                        sx={{ fontSize: '0.75rem', fontWeight: 800 }}
+                      >
+                         <MenuItem value="ALL">ALL POPULATIONS</MenuItem>
+                         <MenuItem value="LIVE_SHADOW_VERIFIED">LIVE_SHADOW_VERIFIED</MenuItem>
+                         <MenuItem value="LIVE_SHADOW_ACTIVE">LIVE_SHADOW_ACTIVE</MenuItem>
+                         <MenuItem value="LEGACY_UNVERIFIED">LEGACY_UNVERIFIED</MenuItem>
+                         <MenuItem value="HISTORICAL_RECONSTRUCTED">RECONSTRUCTED</MenuItem>
+                      </Select>
+                   </FormControl>
                 </Stack>
               </Stack>
 
@@ -434,20 +468,17 @@ export default function ShadowMonitor() {
                       <TableCell>ENTRY</TableCell>
                       <TableCell>TARGET</TableCell>
                       <TableCell>STOP</TableCell>
-                      <TableCell>EXIT</TableCell>
-                      <TableCell>EXIT TIME</TableCell>
-                      <TableCell>REASON</TableCell>
-                      <TableCell>P&L %</TableCell>
-                      <TableCell>HOLDING</TableCell>
                       <TableCell>STATUS</TableCell>
+                      <TableCell>P&L %</TableCell>
+                      <TableCell>VERIF</TableCell>
                       <TableCell align="right">DETAIL</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {historyLoading ? (
-                       <TableRow><TableCell colSpan={13} align="center" sx={{ py: 4 }}><CircularProgress size={20} /></TableCell></TableRow>
+                       <TableRow><TableCell colSpan={10} align="center" sx={{ py: 4 }}><CircularProgress size={20} /></TableCell></TableRow>
                     ) : historySignals.length === 0 ? (
-                       <TableRow><TableCell colSpan={13} align="center" sx={{ py: 4 }}><Typography variant="body2" color="text.secondary">NO SIGNALS FOUND</Typography></TableCell></TableRow>
+                       <TableRow><TableCell colSpan={10} align="center" sx={{ py: 4 }}><Typography variant="body2" color="text.secondary">NO SIGNALS FOUND</Typography></TableCell></TableRow>
                     ) : historySignals.map((sig) => (
                       <TableRow key={sig.id} hover>
                         <TableCell sx={{ fontWeight: 900 }}>{sig.symbol}</TableCell>
@@ -463,18 +494,17 @@ export default function ShadowMonitor() {
                            />
                         </TableCell>
                         <TableCell sx={{ fontSize: '0.7rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry?.toFixed(2)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.target?.toFixed(2)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.stop?.toFixed(2)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.exit_price ? sig.exit_price.toFixed(2) : '--'}</TableCell>
-                        <TableCell sx={{ fontSize: '0.7rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatIST(sig.outcome_timestamp)}</TableCell>
-                        <TableCell sx={{ fontSize: '0.6rem', fontWeight: 800 }}>{sig.exit_reason || '--'}</TableCell>
-                        <TableCell sx={{ fontWeight: 900, color: sig.pnl > 0 ? '#10b981' : sig.pnl < 0 ? '#ef4444' : 'text.secondary' }}>
-                           {sig.pnl !== null && sig.pnl !== undefined ? `${sig.pnl > 0 ? '+' : ''}${sig.pnl.toFixed(2)}%` : '--'}
-                        </TableCell>
-                        <TableCell sx={{ fontSize: '0.65rem' }}>{formatDuration(sig.created_at || sig.timestamp, sig.outcome_timestamp)}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price?.toFixed(2)}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.target_price?.toFixed(2)}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.stop_price?.toFixed(2)}</TableCell>
                         <TableCell>
                            <StatusChip status={sig.status} />
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 900, color: sig.net_pnl > 0 ? '#10b981' : sig.net_pnl < 0 ? '#ef4444' : 'text.secondary' }}>
+                           {sig.net_pnl !== null && sig.net_pnl !== undefined ? `${sig.net_pnl > 0 ? '+' : ''}${sig.net_pnl.toFixed(2)}%` : '--'}
+                        </TableCell>
+                        <TableCell>
+                           <Typography variant="caption" sx={{ fontWeight: 900 }}>L{sig.verification_level || 0}</Typography>
                         </TableCell>
                         <TableCell align="right">
                            <IconButton size="small" onClick={() => handleOpenDetail(sig)} sx={{ color: 'primary.main' }}>

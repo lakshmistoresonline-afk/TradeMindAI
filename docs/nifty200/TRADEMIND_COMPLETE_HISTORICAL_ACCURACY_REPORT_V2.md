@@ -1,30 +1,29 @@
 # TRADEMIND AI: COMPLETE HISTORICAL ACCURACY REPORT (V2)
 
-**Audit Timestamp**: 2026-09-04 11:58:10 UTC
-**Total Historical Calls**: 1259
-**Forensically Verified**: 50
+**Audit Timestamp**: 2026-09-04 12:17:29 UTC
+**Total Historical Calls**: 1,259
+**Forensically Verified**: 50 (4.0%)
 **Current Verification Level**: LEVEL 4 (EXECUTION_VERIFIED) for Shadow sample.
 
 ## 1. Executive Summary
-This report establishes the authoritative truth of TradeMind AI's predictive performance. Strategy V2.2 demonstrates a robust directional edge with a **Verified Win Rate of 58.0%** and a **Profit Factor of 2.72**.
+TradeMind AI has established a reproducible, independently audited shadow-validation pipeline for Strategy V2.2. In the current 50-observation verified sample, the system recorded a **58.0% win rate** and **2.72 profit factor**. These results are promising but remain sample-limited and are not yet statistically significant at the conventional 5% threshold.
 
 ## 2. Population Reconciliation
 | Classification | Record Count | % of Total | Truth Status |
 | :--- | :--- | :--- | :--- |
 | **REAL_LIVE_SHADOW** | 50 | 4.0% | **VERIFIED** |
 | **ACTIVE_SHADOW** | 14 | 1.1% | **MONITORING** |
-| **UNVERIFIED_HISTORICAL**| 1195 | 94.9% | UNVERIFIED |
-| **TOTAL UNIQUE CALLS** | **1259** | 100% | |
+| **UNVERIFIED_HISTORICAL**| 1,195 | 94.9% | UNVERIFIED |
+| **TOTAL UNIQUE CALLS** | **1,259** | 100% | |
 
 ## 3. Authoritative Performance (n=50 Verified)
 | Metric | Value | Institutional Interpretation |
 | :--- | :--- | :--- |
-| **Call Accuracy (WR)** | 58.0% | **PROMISING** |
-| **Profit Factor** | 2.72 | **ROBUST (> 1.5)** |
-| **Total Net P&L** | +126.75% | High Accumulation |
-| **Expectancy** | +2.535% | Significant Edge |
-| **Trade Seq Drawdown** | 15.69% | Forensic |
-| **Portfolio MTM DD** | 0.01% | Active View |
+| **Call Accuracy (WR)** | 58.00% | **PROMISING** |
+| **Profit Factor** | 2.72 | **POSITIVE — SAMPLE LIMITED** |
+| **Total Net P&L** | +126.75% | Observed Accumulation |
+| **Expectancy** | +2.535% | Observed Net Edge |
+| **Trade Seq Drawdown** | 15.69% | Reconciled |
 
 ## 4. Integrity Verification
 - **Look-ahead Guard**: **PASS**. 100% temporal isolation confirmed.

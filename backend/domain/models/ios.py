@@ -116,6 +116,7 @@ class LiveSignal(BaseModel):
     slippage: Optional[float] = None
     net_pnl: Optional[float] = None
     outcome_verified: bool = False
+    verification_level: int = 0
     quantity: Optional[int] = None
     capital_allocation: Optional[float] = None
     risk_amount: Optional[float] = None
@@ -133,6 +134,43 @@ class LiveSignal(BaseModel):
     mae: float = 0.0
     model_version: str = "TradeMind Core v2.2"
     events: List[SignalEvent] = []
+
+    # Ledger 2.0 Extensions
+    asset_type: Optional[str] = None # EQUITY, DERIVATIVE
+    exchange: str = "NSE"
+    signal_type: Optional[str] = None # SWING, INTRADAY
+    signal_rating: Optional[str] = None # BUY, SELL
+    conviction_level: Optional[str] = None # LOW, MEDIUM, HIGH
+    entry_zone_low: Optional[float] = None
+    entry_zone_high: Optional[float] = None
+
+    derivative_symbol: Optional[str] = None
+    contract_multiplier: Optional[int] = None
+    derivative_entry: Optional[float] = None
+    derivative_current: Optional[float] = None
+    derivative_target: Optional[float] = None
+    derivative_stop: Optional[float] = None
+    premium_timestamp: Optional[datetime] = None
+
+    signal_timestamp: Optional[datetime] = None
+    entry_timestamp: Optional[datetime] = None
+    exit_timestamp: Optional[datetime] = None
+
+    lifecycle_state: Optional[str] = None # CREATED, ENTERED, TERMINAL
+    outcome_status: Optional[str] = None
+
+    risk_amount_abs: Optional[float] = None
+    reward_amount_abs: Optional[float] = None
+    expected_return: Optional[float] = None
+
+    market_snapshot_id: Optional[str] = None
+    model_run_id: Optional[str] = None
+    decision_id: Optional[str] = None
+
+    created_by: str = "SYSTEM"
+    calculation_version: str = "1.0"
+    record_hash: Optional[str] = None
+    audit_status: str = "PENDING"
 
 class TradeFeedback(BaseModel):
     id: str

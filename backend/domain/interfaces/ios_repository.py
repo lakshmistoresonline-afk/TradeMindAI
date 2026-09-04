@@ -49,6 +49,26 @@ class IIOSRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_signal_by_id(self, signal_id: str) -> Optional[LiveSignal]:
+        pass
+
+    @abstractmethod
+    async def get_signal_provenance(self, signal_id: str) -> Optional[Dict[str, Any]]:
+        pass
+
+    @abstractmethod
+    async def save_shadow_signal(self, signal: LiveSignal) -> None:
+        pass
+
+    @abstractmethod
+    async def get_active_shadow_signals(self) -> List[LiveSignal]:
+        pass
+
+    @abstractmethod
+    async def get_verified_shadow_signals(self) -> List[LiveSignal]:
+        pass
+
+    @abstractmethod
     async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
         pass
 

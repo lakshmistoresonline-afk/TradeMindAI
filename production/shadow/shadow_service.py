@@ -320,46 +320,45 @@ class ShadowService:
 
     @staticmethod
     def persist_shadow_signal(signal):
-        with SessionLocal() as session:
-            existing = session.query(ShadowSignalDB).filter(ShadowSignalDB.symbol == signal.symbol, ShadowSignalDB.status == 'ACTIVE').first()
-            if existing: return
-            db_sig = ShadowSignalDB(
-                id=signal.id, timestamp=signal.timestamp, symbol=signal.symbol, direction=signal.direction,
-                asset_class=signal.asset_class,
-                instrument_id=signal.instrument_id,
-                instrument_type=signal.instrument_type,
-                raw_probability=signal.raw_probability, calibrated_probability=signal.calibrated_probability,
-                expected_value=signal.expected_value, data_quality_score=signal.data_quality_score,
-                entry_price=signal.entry_price, target_price=signal.target_price, stop_price=signal.stop_loss_price,
-                strategy_version=signal.strategy_version, universe_version=signal.universe_version,
-                model_version=signal.model_version,
-                feature_version=signal.provenance.get("feature_version", "v1.0.0"),
-                regime=signal.regime, status="ACTIVE", provenance_json=str(signal.provenance),
-                evaluation_mode=signal.evaluation_mode,
-                data_timestamp=signal.data_timestamp,
-                market_timestamp=signal.market_timestamp,
-                quantity=signal.quantity,
-                capital_allocation=signal.capital_allocation,
-                risk_amount=signal.risk_amount,
-                outcome_verified=signal.outcome_verified
-            )
-            session.add(db_sig)
+        # Workstream 20: Use Canonical Repository
+        repo = container.canonical_signal_repo
 
-            # Phase 7A: Audit Trail (Workstream 12)
-            from backend.core.postgres import ShadowEventDB
-            event = ShadowEventDB(
-                event_type="SIGNAL_GENERATED",
-                signal_id=signal.id,
-                symbol=signal.symbol,
-                timestamp=datetime.utcnow(),
-                strategy_version=ShadowService.STRATEGY_VERSION,
-                decision="TRADE_SIGNAL",
-                evaluation_mode=signal.evaluation_mode
-            )
-            session.add(event)
+        async def _run_persist():
+            # 1. Save Provenance (if available in signal object)
+            if signal.provenance and isinstance(signal.provenance, dict) and 'provenance_id' in signal.provenance:
+                await repo.save_provenance(signal.provenance)
 
-            session.commit()
+            # 2. Save Signal
+            await repo.save_signal(signal)
+
+            # 3. Mirror to Firestore (Downstream)
+            try:
+                from backend.core.database import get_db
+                db_client = get_db()
+                if db_client:
+                    # Minimal mirror for UI reactivity
+                    db_client.collection("shadow_signals").document(signal.id).set(signal.model_dump(exclude={'provenance'}))
+            except Exception as e:
+                print(f"   [SYNC] Firestore mirror failed for {signal.symbol}: {e}")
+
+            # 4. Phase 7A: Audit Trail (Workstream 12)
+            from backend.core.postgres import SessionLocal, ShadowEventDB
+            with SessionLocal() as session:
+                event = ShadowEventDB(
+                    event_type="SIGNAL_GENERATED",
+                    signal_id=signal.id,
+                    symbol=signal.symbol,
+                    timestamp=datetime.utcnow(),
+                    strategy_version=ShadowService.STRATEGY_VERSION,
+                    decision="TRADE_SIGNAL",
+                    evaluation_mode=signal.evaluation_mode
+                )
+                session.add(event)
+                session.commit()
+
             print(f"   [SHADOW] Signal Persisted: {signal.symbol} {signal.direction} @ {signal.entry_price} [Mode: {signal.evaluation_mode}]")
+
+        asyncio.create_task(_run_persist())
 
     @staticmethod
     async def audit_open_signals():
@@ -369,80 +368,69 @@ class ShadowService:
         import pytz
 
         print("[*] Auditing Lifecycle for Open Signals (Forensic)...")
+        repo = container.canonical_signal_repo
 
-        with SessionLocal() as session:
-            active_signals = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'ACTIVE').all()
-            if not active_signals:
-                print("   [INFO] No active signals to audit.")
-                return
+        active_signals = await repo.get_active_signals()
+        if not active_signals:
+            print("   [INFO] No active signals to audit.")
+            return
 
-            # 1. Bulk Fetch Intraday Data (1m for high precision)
-            symbols = [s.symbol for s in active_signals]
-            provider = container.provider
-            mapped_symbols = [provider._map_symbol(s) for s in symbols]
-            symbol_map = {provider._map_symbol(s): s for s in symbols}
+        # 1. Bulk Fetch Intraday Data (1m for high precision)
+        symbols = [s.symbol for s in active_signals]
+        provider = container.provider
+        mapped_symbols = [provider._map_symbol(s) for s in symbols]
+
+        try:
+            t = Ticker(mapped_symbols)
+            # Fetch 5-day 1m history to ensure coverage of signal lifetimes (usually 1-2 days)
+            hist_df = t.history(period="5d", interval="1m")
+        except Exception as e:
+            print(f"   [!] Failed to fetch intraday data for audit: {e}")
+            return
+
+        if hist_df.empty:
+            print("   [!] No intraday data returned for audit.")
+            return
+
+        # 2. Process each signal
+        for sig in active_signals:
+            mapped_sym = provider._map_symbol(sig.symbol)
 
             try:
-                t = Ticker(mapped_symbols)
-                # Fetch 5-day 1m history to ensure coverage of signal lifetimes (usually 1-2 days)
-                hist_df = t.history(period="5d", interval="1m")
-            except Exception as e:
-                print(f"   [!] Failed to fetch intraday data for audit: {e}")
-                return
+                # Extract data for this symbol
+                if mapped_sym not in hist_df.index.get_level_values(0):
+                    continue
 
-            if hist_df.empty:
-                print("   [!] No intraday data returned for audit.")
-                return
+                df_sym = hist_df.xs(mapped_sym, level=0).copy()
+                df_sym.index = pd.to_datetime(df_sym.index)
+                col_map = {'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}
+                df_sym = df_sym.rename(columns=col_map)
 
-            # 2. Process each signal
-            for sig in active_signals:
-                mapped_sym = provider._map_symbol(sig.symbol)
+                outcome = OutcomeEngine.evaluate_outcome(sig, df_sym)
 
-                try:
-                    # Extract data for this symbol
-                    if mapped_sym not in hist_df.index.get_level_values(0):
-                        continue
+                if outcome["status"] in ["TARGET_HIT", "STOP_LOSS", "EXPIRED"]:
+                    # Record Terminal State
+                    sig.status = outcome["status"]
+                    sig.outcome_timestamp = outcome["outcome_date"]
+                    sig.exit_price = outcome["outcome_price"]
+                    sig.exit_timestamp = outcome["outcome_date"] # Ledger 2.0 alignment
 
-                    df_sym = hist_df.xs(mapped_sym, level=0).copy()
-                    df_sym.index = pd.to_datetime(df_sym.index)
-                    col_map = {'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'}
-                    df_sym = df_sym.rename(columns=col_map)
+                    # Reconciliation & Performance
+                    sig.net_pnl = outcome.get("net_profit_pct", outcome["profit_pct"] - 0.20)
+                    sig.outcome_verified = outcome.get("outcome_verified", False)
+                    sig.pnl_percentage = outcome["profit_pct"]
+                    sig.mae = outcome.get("mae", 0.0)
+                    sig.mfe = outcome.get("mfe", 0.0)
+                    sig.verification_level = 4 # LIVE_SHADOW_VERIFIED
+                    sig.lifecycle_state = "TERMINAL"
 
-                    # Wrap in domain model for OutcomeEngine
-                    from backend.domain.models.ios import LiveSignal
-                    sig_obj = LiveSignal(
-                        id=sig.id, symbol=sig.symbol, timestamp=sig.timestamp,
-                        instrument_id=sig.instrument_id, instrument_type=sig.instrument_type,
-                        asset_class=sig.asset_class,
-                        entry_price=sig.entry_price, target_price=sig.target_price, stop_loss_price=sig.stop_price,
-                        direction=sig.direction, status="ACTIVE", conviction=sig.calibrated_probability*100,
-                        rating="BUY", timeframe="SWING"
-                    )
+                    print(f"   [TERMINAL] {sig.symbol} -> {sig.status} @ {sig.outcome_timestamp} (Net: {sig.net_pnl:.2f}%) [Verified: {sig.outcome_verified}]")
 
-                    outcome = OutcomeEngine.evaluate_outcome(sig_obj, df_sym)
+                    # Persist Update
+                    await repo.save_signal(sig)
 
-                    if outcome["status"] in ["TARGET_HIT", "STOP_LOSS", "EXPIRED"]:
-                        # Record Terminal State
-                        sig.status = outcome["status"]
-                        sig.outcome_timestamp = outcome["outcome_date"]
-                        sig.exit_price = outcome["outcome_price"]
-                        sig.realized_return = outcome["profit_pct"]
-                        sig.realized_mfe = outcome["mfe"]
-                        sig.realized_mae = outcome["mae"]
-
-                        # Part 21/23: Detailed Outcome Record
-                        sig.transaction_cost = outcome.get("fees", 0.10)
-                        sig.fees = outcome.get("fees", 0.10) # Synchronized field
-                        sig.slippage = outcome.get("slippage", 0.10)
-                        sig.net_return = outcome.get("net_profit_pct", outcome["profit_pct"] - 0.20)
-                        sig.net_pnl = sig.net_return
-                        sig.exit_reason = outcome["status"]
-                        sig.outcome_verified = outcome.get("outcome_verified", False)
-                        sig.pnl_percentage = outcome["profit_pct"]
-
-                        print(f"   [TERMINAL] {sig.symbol} -> {sig.status} @ {sig.outcome_timestamp} (Net: {sig.net_return:.2f}%) [Verified: {sig.outcome_verified}]")
-
-                        # Log Persistence Event
+                    # Log Persistence Event
+                    with SessionLocal() as session:
                         event = ShadowEventDB(
                             event_type="OUTCOME_RESOLUTION",
                             signal_id=sig.id,
@@ -452,16 +440,16 @@ class ShadowService:
                             payload_json=json.dumps(outcome, default=str)
                         )
                         session.add(event)
+                        session.commit()
 
-                        # Trigger Reporting
-                        try: ShadowReporter.generate_outcome_reports(sig.id)
-                        except: pass
+                    # Trigger Reporting
+                    try: ShadowReporter.generate_outcome_reports(sig.id)
+                    except: pass
 
-                except Exception as e:
-                    print(f"   [!] Error auditing {sig.symbol}: {e}")
+            except Exception as e:
+                print(f"   [!] Error auditing {sig.symbol}: {e}")
 
-            session.commit()
-            print("[SUCCESS] Lifecycle Audit Complete.")
+        print("[SUCCESS] Lifecycle Audit Complete.")
 
 if __name__ == "__main__":
     asyncio.run(ShadowService.run_shadow_cycle())

@@ -343,6 +343,89 @@ class ShadowSignalDB(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
+    # Ledger 2.0 Extensions
+    asset_type = Column(String(20)) # EQUITY, DERIVATIVE
+    exchange = Column(String(10), default="NSE")
+    underlying_symbol = Column(String(20))
+    signal_type = Column(String(20)) # SWING, INTRADAY
+    signal_rating = Column(String(10)) # BUY, SELL
+    conviction = Column(Float)
+    entry_zone_low = Column(Float)
+    entry_zone_high = Column(Float)
+    current_price = Column(Float)
+    price_timestamp = Column(DateTime)
+
+    # Derivative extensions
+    derivative_symbol = Column(String(50))
+    contract_multiplier = Column(Integer)
+    derivative_entry = Column(Float)
+    derivative_current = Column(Float)
+    derivative_target = Column(Float)
+    derivative_stop = Column(Float)
+    premium_timestamp = Column(DateTime)
+
+    # Timing Extensions
+    signal_timestamp = Column(DateTime)
+    last_updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    entry_timestamp = Column(DateTime)
+    exit_timestamp = Column(DateTime)
+
+    # Lifecycle Extensions
+    lifecycle_state = Column(String(30)) # CREATED, ENTERED, TERMINAL
+    outcome_status = Column(String(30))
+    verification_level = Column(Integer, default=0)
+
+    # Risk/Reward Extensions
+    risk_amount_abs = Column(Float)
+    reward_amount_abs = Column(Float)
+    expected_return = Column(Float)
+
+    # Traceability Extensions
+    feature_snapshot_id = Column(String)
+    market_snapshot_id = Column(String)
+    model_run_id = Column(String)
+    decision_id = Column(String)
+
+    # Audit Extensions
+    created_by = Column(String, default="SYSTEM")
+    calculation_version = Column(String, default="1.0")
+    pnl_engine_version = Column(String, default="1.0")
+    outcome_engine_version = Column(String, default="1.0")
+    reconstruction_version = Column(String, default="1.0")
+    last_reconciled_at = Column(DateTime)
+    record_hash = Column(String)
+    audit_status = Column(String, default="PENDING")
+
+class SignalCorrectionDB(Base):
+    __tablename__ = "signal_corrections"
+    id = Column(Integer, primary_key=True)
+    signal_id = Column(String, ForeignKey("shadow_signals.id"), index=True)
+    field_name = Column(String)
+    old_value = Column(String)
+    new_value = Column(String)
+    reason = Column(String)
+    detected_at = Column(DateTime, default=datetime.datetime.utcnow)
+    detected_by = Column(String)
+    approved_by = Column(String)
+    correction_version = Column(String)
+    evidence_reference = Column(String)
+
+class ShadowProvenanceDB(Base):
+    __tablename__ = "shadow_provenance"
+    id = Column(String, primary_key=True)
+    signal_id = Column(String, index=True)
+    prediction_id = Column(String, index=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    data_snapshot_timestamp = Column(DateTime)
+    model_version = Column(String)
+    strategy_version = Column(String)
+    feature_version = Column(String)
+    data_sources = Column(String) # JSON
+    source_timestamps = Column(String) # JSON
+    input_hash = Column(String)
+    output_hash = Column(String)
+    decision_hash = Column(String)
+
 class ShadowEventDB(Base):
     __tablename__ = "shadow_events"
     id = Column(Integer, primary_key=True)

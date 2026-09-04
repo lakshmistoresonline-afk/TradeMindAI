@@ -48,6 +48,7 @@ class Container:
         self._ai_research_service = None
         self._historical_research_service = None
         self._portfolio_analytics_service = None
+        self._canonical_signal_repo = None
 
     @property
     def signal_engine(self):
@@ -374,6 +375,14 @@ class Container:
             from backend.services.portfolio_analytics_service import PortfolioAnalyticsService
             self._portfolio_analytics_service = PortfolioAnalyticsService()
         return self._portfolio_analytics_service
+
+    @property
+    def canonical_signal_repo(self):
+        if self._canonical_signal_repo is None:
+            from backend.infrastructure.repositories.canonical_signal_repository import CanonicalSignalRepository
+            from backend.core.postgres import SessionLocal
+            self._canonical_signal_repo = CanonicalSignalRepository(SessionLocal)
+        return self._canonical_signal_repo
 
     @property
     def stock_service(self):
