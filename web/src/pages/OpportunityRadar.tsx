@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Typography, Grid, Paper, Stack, Chip, Divider,
+  Box, Typography, Grid, Paper, Stack, Chip,
   CircularProgress, alpha, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material';
 import {
-  Zap, TrendingUp, TrendingDown, Target, Search, Filter
+  TrendingUp, Target
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 

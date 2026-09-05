@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Box, Typography, Grid, Paper, Stack, Chip, Divider,
-  CircularProgress, alpha, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+  Box, Typography, Grid, Paper, Stack, Chip,
+  CircularProgress, alpha, LinearProgress
 } from '@mui/material';
 import {
-  ShieldCheck, AlertTriangle, Database, Clock, Fingerprint, Activity
+  ShieldCheck, AlertTriangle, Database, Fingerprint
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 

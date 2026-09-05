@@ -1,10 +1,10 @@
 import {
   Box, Typography, Grid, Paper, Stack, Chip, Divider,
-  Table, TableBody, TableCell, TableRow, alpha, CircularProgress, Tabs, Tab
+  alpha, CircularProgress, Tabs, Tab
 } from '@mui/material';
 import {
-  Activity, Shield, Brain, Globe, RefreshCcw,
-  CheckCircle2, Fingerprint, PieChart, TrendingUp, TrendingDown, Clock, Search, Database, Lock, AlertCircle
+  Activity, Shield, Brain, RefreshCcw,
+  Fingerprint, TrendingUp, Search, Database, Lock, AlertCircle, Zap, ShieldCheck
 } from 'lucide-react';
 import { useState } from 'react';
 

@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import {
   Activity,
-  Clock,
   RefreshCcw,
   Zap,
   AlertTriangle,
@@ -16,7 +15,11 @@ import {
   Cloud,
   Terminal,
   Eye,
-  X
+  X,
+  CheckCircle2,
+  PieChart,
+  TrendingUp,
+  Clock
 } from 'lucide-react';
 import {
   getShadowStatus,
@@ -29,7 +32,8 @@ import {
   getShadowSignalsMetadata,
   getShadowSignalDetail,
   getStocks,
-  API_BASE_URL
+  API_BASE_URL,
+  apiClient
 } from '../api/client';
 import SignalDetailView from '../components/SignalDetailView';
 
@@ -38,7 +42,6 @@ export default function ShadowMonitor() {
   const [summary, setSummary] = useState<any>(null);
   const [activeSignals, setActiveSignals] = useState<any[]>([]);
   const [universe, setUniverse] = useState<any[]>([]);
-  const [perf, setPerf] = useState<any>(null);
   const [health, setHealth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -65,7 +68,7 @@ export default function ShadowMonitor() {
       // Execute all fetches in parallel but handle them individually to prevent cascading failure
       // Added getStocks to provide live current_price for active signals (Frontend Join)
       const [
-        sStatus, sSum, sActive, sUni, sPerf, sHealth, sMeta, sStocks
+        sStatus, sSum, sActive, sUni, , sHealth, sMeta, sStocks
       ] = await Promise.all([
         getShadowStatus().catch(e => { console.error("Status fetch failed", e); return null; }),
         getShadowSummary().catch(e => { console.error("Summary fetch failed", e); return null; }),
@@ -112,7 +115,6 @@ export default function ShadowMonitor() {
 
       setActiveSignals(enrichedSignals);
       setUniverse(sUni || []);
-      if (sPerf) setPerf(sPerf);
       if (sHealth) setHealth(sHealth);
       if (sMeta) setMetadata(sMeta || { statuses: [], symbols: [], directions: [] });
 
@@ -164,7 +166,7 @@ export default function ShadowMonitor() {
   };
 
   const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
+    setFilters((prev: any) => ({ ...prev, [key]: value, page: 1 }));
   };
 
   if (loading && !status) {
@@ -179,9 +181,6 @@ export default function ShadowMonitor() {
   // Fallback for API failure
   const marketSession = status?.market_session || "UNKNOWN";
   const engineStatus = health?.shadow_worker === 'ONLINE' ? "STANDBY" : "OFFLINE";
-  const isConnected = status?.data_source === 'FIREBASE_DIRECT' || status?.data_source === 'SQL_PRODUCTION';
-  const firebaseStatus = isConnected ? 'CONNECTED' : 'LOCAL';
-  const currentEquity = summary?.equity?.toLocaleString() || '1,000,000';
 
   const formatIST = (timestamp: string | null) => {
     if (!timestamp) return 'N/A';
@@ -196,24 +195,6 @@ export default function ShadowMonitor() {
       return `${d}-${m}-${y} ${h}:${min}:${s} IST`;
     } catch {
       return timestamp;
-    }
-  };
-
-  const formatDuration = (start: string | null, end: string | null) => {
-    if (!start) return 'N/A';
-    try {
-      const s = new Date(start).getTime();
-      const e = end ? new Date(end).getTime() : new Date().getTime();
-      const diff = e - s;
-      if (diff < 0) return '0m';
-      const mins = Math.floor(diff / (1000 * 60));
-      const hrs = Math.floor(mins / 60);
-      const days = Math.floor(hrs / 24);
-      if (days > 0) return `${days}d ${hrs % 24}h`;
-      if (hrs > 0) return `${hrs}h ${mins % 60}m`;
-      return `${mins}m`;
-    } catch {
-      return 'N/A';
     }
   };
 
@@ -249,7 +230,7 @@ export default function ShadowMonitor() {
              color="primary"
              startIcon={<Database size={16} />}
              onClick={async () => {
-                const res = await apiClient.get('/shadow/signals/export');
+                await apiClient.get('/shadow/signals/export');
                 window.open(API_BASE_URL + '/shadow/signals/export', '_blank');
              }}
              sx={{ fontWeight: 800, borderRadius: 0.5 }}
@@ -535,7 +516,7 @@ export default function ShadowMonitor() {
                  <Pagination
                    count={10}
                    page={filters.page}
-                   onChange={(_, p) => setFilters(f => ({ ...f, page: p }))}
+                   onChange={(_, p) => setFilters((f: any) => ({ ...f, page: p }))}
                    size="small"
                    sx={{ '& .MuiPaginationItem-root': { fontWeight: 800 } }}
                  />
@@ -675,15 +656,6 @@ function StatusChip({ status }: { status: string }) {
   );
 }
 
-function DetailItem({ label, value, color, bold }: any) {
-  return (
-    <Box sx={{ mb: 2 }}>
-       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 0.5, letterSpacing: 1 }}>{label}</Typography>
-       <Typography variant="body2" sx={{ fontWeight: bold ? 900 : 700, color: color || 'text.primary', fontFamily: 'JetBrains Mono' }}>{value || 'N/A'}</Typography>
-    </Box>
-  );
-}
-
 function StatusBadge({ label, status, color }: any) {
   return (
     <Box sx={{ px: 2, py: 0.8, borderRadius: 1, border: `1px solid ${alpha(color, 0.2)}`, bgcolor: alpha(color, 0.05) }}>
@@ -732,15 +704,6 @@ function DiagItem({ icon, label, value }: any) {
       <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: 'primary.main', wordBreak: 'break-all' }}>
         {value}
       </Typography>
-    </Box>
-  );
-}
-
-function TimelineItem({ label, time, active }: any) {
-  return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: active ? 1 : 0.3 }}>
-       <Typography variant="caption" sx={{ fontWeight: 900, fontSize: '0.6rem' }}>{label}</Typography>
-       <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem' }}>{time || '--'}</Typography>
     </Box>
   );
 }

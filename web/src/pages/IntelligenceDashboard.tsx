@@ -4,7 +4,7 @@ import {
   CircularProgress, alpha, LinearProgress
 } from '@mui/material';
 import {
-  Brain, TrendingUp, Users, BarChart3, Globe, ShieldCheck
+  Brain, TrendingUp, Globe, ShieldCheck
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 

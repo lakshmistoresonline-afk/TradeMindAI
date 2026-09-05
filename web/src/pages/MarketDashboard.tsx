@@ -32,7 +32,7 @@ export default function MarketDashboard() {
       </Paper>
 
       <Box>
-         {activeTab === 0 && <MarketCommandCenter isConsolidated />}
+         {activeTab === 0 && <MarketCommandCenter />}
          {activeTab === 1 && (
             <Grid container spacing={3}>
                <Grid item xs={12} lg={8}>

@@ -4,10 +4,9 @@ import {
   CircularProgress, alpha, Autocomplete, TextField, Tabs, Tab
 } from '@mui/material';
 import {
-  Search, BarChart3, Fingerprint, PieChart, ShieldCheck, Microscope, History
+  PieChart, ShieldCheck, Microscope, History
 } from 'lucide-react';
 import { apiClient, getStocks } from '../api/client';
-import SignalDetailView from '../components/SignalDetailView';
 
 export default function StockResearchTerminal() {
   const [stocks, setStocks] = useState<any[]>([]);

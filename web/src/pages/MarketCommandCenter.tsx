@@ -4,7 +4,7 @@ import {
   CircularProgress, alpha, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from '@mui/material';
 import {
-  Globe, ShieldAlert, Zap, TrendingUp, BarChart3, Users, Activity
+  Globe, Zap, Users, Activity
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 
