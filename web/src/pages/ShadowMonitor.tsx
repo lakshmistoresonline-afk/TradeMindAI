@@ -290,7 +290,10 @@ export default function ShadowMonitor() {
                 <MetricCard title="ACTIVE" value={summary?.active_signals || 0} icon={<Activity size={18} color="#00D1FF" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="VERIFIED" value={summary?.verified_trades || 0} icon={<Database size={18} color="#7C3AED" />} />
+                <MetricCard title="VERIFIED" value={summary?.verified_trades || 0} icon={<CheckCircle2 size={18} color="#10b981" />} />
+              </Grid>
+              <Grid item xs={12} sm={6} md={1.5}>
+                <MetricCard title="LEGACY" value={summary?.unverified_historical || 0} icon={<Database size={18} color="slategray" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
                 <MetricCard title="WIN RATE" value={`${summary?.win_rate_pct || 0}%`} icon={<TrendingUp size={18} color="#10b981" />} />
@@ -299,13 +302,10 @@ export default function ShadowMonitor() {
                 <MetricCard title="PROFIT FACTOR" value={summary?.profit_factor || '1.0'} icon={<Zap size={18} color="#fbbf24" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="TARGET HITS" value={summary?.target_hits || 0} icon={<Zap size={18} color="#10b981" />} />
+                <MetricCard title="TRADE SEQ DD" value={`${summary?.trade_sequence_drawdown || 0}%`} icon={<AlertTriangle size={18} color="#ef4444" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="STOP HITS" value={summary?.stop_hits || 0} icon={<AlertTriangle size={18} color="#ef4444" />} />
-              </Grid>
-              <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="TIMEOUTS" value={summary?.timeouts || 0} icon={<Clock size={18} color="#f59e0b" />} />
+                <MetricCard title="PORTFOLIO DD" value={`${summary?.portfolio_mtm_drawdown || 0}%`} icon={<PieChart size={18} color="#3b82f6" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
                 <MetricCard title="TOTAL CALLS" value={summary?.transactional_signals || 0} icon={<RefreshCcw size={18} color="white" />} />

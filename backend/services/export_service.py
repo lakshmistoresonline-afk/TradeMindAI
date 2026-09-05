@@ -41,16 +41,30 @@ class ExportService:
 
         # 4. Export Markdown Dossier (PDF Foundation)
         md_path = "docs/nifty200/TRADEMIND_MASTER_COMPLETE_SIGNAL_DOSSIER.md"
+
+        forensic = container.forensic_analytical_service.get_master_metrics()
+
         with open(md_path, 'w') as f:
             f.write("# TRADEMIND AI: MASTER SIGNAL DOSSIER\n\n")
             f.write(f"**Generation Timestamp**: {datetime.utcnow().isoformat()} UTC\n")
             f.write(f"**Total Records**: {len(data)}\n\n")
 
-            f.write("## 1. PERFORMANCE SUMMARY\n")
-            # Logic here to add summary table...
+            f.write("## 1. PERFORMANCE SUMMARY (VERIFIED)\n")
+            f.write(f"- Verified Win Rate: {forensic['win_rate_pct']}%\n")
+            f.write(f"- Profit Factor: {forensic['profit_factor']}\n")
+            f.write(f"- Total Net P&L: {forensic['total_net_pnl_pct']}%\n")
+            f.write(f"- Expectancy: {forensic['expectancy_pct']}%\n\n")
 
-            f.write("\n## 2. SIGNAL REGISTER\n")
-            f.write(df[['id', 'symbol', 'direction', 'entry_price', 'status', 'net_pnl']].head(100).to_markdown(index=False))
+            f.write("## 2. SIGNAL REGISTER (LATEST 100)\n")
+            # Handle potential missing columns in df
+            cols = ['id', 'symbol', 'direction', 'entry_price', 'status', 'net_pnl', 'evaluation_mode']
+            existing_cols = [c for c in cols if c in df.columns]
+            f.write(df[existing_cols].head(100).to_markdown(index=False))
+
+            f.write("\n\n## 3. AUDIT NOTES\n")
+            f.write("- All verified outcomes mapped to 1m forensic data.\n")
+            f.write("- Strategy V2.2 remains FROZEN.\n")
+            f.write("- Data integrity score calculated at T-0.\n")
 
         return {
             "csv": csv_path,

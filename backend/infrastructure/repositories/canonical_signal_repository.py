@@ -1,4 +1,5 @@
 import json
+import hashlib
 from typing import List, Optional, Dict, Any, Callable
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -27,10 +28,16 @@ class CanonicalSignalRepository:
             db_sig = pg.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal.id).first()
             data = signal.model_dump()
 
-            # Deep serialize JSON fields
+            # 1. Automatic Record Hashing (Phase 20)
+            # Hash critical immutable fields
+            hash_data = f"{signal.id}|{signal.symbol}|{signal.direction}|{signal.entry_price}|{signal.target_price}|{signal.stop_loss_price}|{signal.strategy_version}"
+            data['record_hash'] = hashlib.sha256(hash_data.encode()).hexdigest()
+            data['last_updated_at'] = datetime.utcnow()
+
+            # 2. Deep serialize JSON fields
             for col in ['events', 'provenance']:
                 val = data.get(col)
-                if val is not None:
+                if val is not None and not isinstance(val, str):
                     data[col] = json.dumps(val)
 
             # Filter data to match DB columns

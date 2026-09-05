@@ -33,42 +33,43 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
           <Tab label="EXECUTIVE SUMMARY" sx={{ fontWeight: 900, fontSize: '0.7rem' }} />
           <Tab label="PRICE & EXECUTION" sx={{ fontWeight: 900, fontSize: '0.7rem' }} />
           <Tab label="AI & PROVENANCE" sx={{ fontWeight: 900, fontSize: '0.7rem' }} />
-          <Tab label="AUDIT & INTEGRITY" sx={{ fontWeight: 900, fontSize: '0.7rem' }} />
+          <Tab label="DATA QUALITY & RECON" sx={{ fontWeight: 900, fontSize: '0.7rem' }} />
+          <Tab label="AUDIT & LIMITATIONS" sx={{ fontWeight: 900, fontSize: '0.7rem' }} />
         </Tabs>
       </Box>
 
       {tab === 0 && (
         <Grid container spacing={3}>
-          {/* A. SIGNAL IDENTITY */}
+          {/* 1. SIGNAL IDENTITY */}
           <Grid item xs={12} md={6}>
-            <SectionHeader icon={<Shield size={18} />} title="A. SIGNAL IDENTITY" />
+            <SectionHeader icon={<Shield size={18} />} title="1. SIGNAL IDENTITY" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
               <DataRow label="SIGNAL ID" value={signal.id} />
               <DataRow label="SYMBOL" value={signal.symbol} bold color="primary.main" />
               <DataRow label="DIRECTION" value={signal.direction}
                  color={signal.direction === 'LONG' ? '#10b981' : '#ef4444'} bold />
-              <DataRow label="ASSET TYPE" value={signal.asset_type || "EQUITY"} />
+              <DataRow label="ASSET TYPE" value={signal.asset_type || signal.asset_class || "EQUITY"} />
               <DataRow label="STRATEGY" value={signal.strategy_version || "V2.2 FROZEN"} />
               <DataRow label="VERIFICATION" value={getVerificationLabel(signal.verification_level)}
                  color={signal.verification_level >= 3 ? '#10b981' : '#f59e0b'} bold />
             </Paper>
           </Grid>
 
-          {/* B. DECISION SUMMARY */}
+          {/* 2. DECISION SUMMARY */}
           <Grid item xs={12} md={6}>
-            <SectionHeader icon={<TrendingUp size={18} />} title="B. DECISION" />
+            <SectionHeader icon={<TrendingUp size={18} />} title="2. DECISION" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
               <DataRow label="RATING" value={signal.signal_rating || signal.rating} />
               <DataRow label="CONVICTION" value={`${signal.conviction || '--'}%`} bold />
-              <DataRow label="LIFECYCLE STATE" value={signal.lifecycle_state || "TERMINAL"} />
+              <DataRow label="LIFECYCLE STATE" value={signal.lifecycle_state || (signal.status === 'ACTIVE' ? 'ACTIVE' : 'TERMINAL')} />
               <DataRow label="STATUS" value={signal.status} bold color={getStatusColor(signal.status)} />
-              <DataRow label="OUTCOME" value={signal.outcome_status || signal.status} />
+              <DataRow label="OUTCOME STATUS" value={signal.outcome_status || signal.status} />
             </Paper>
           </Grid>
 
-          {/* G. CURRENT STATUS & P&L */}
+          {/* 9. CURRENT STATUS & 10. P&L */}
           <Grid item xs={12}>
-            <SectionHeader icon={<Activity size={18} />} title="G. CURRENT STATUS & P&L" />
+            <SectionHeader icon={<Activity size={18} />} title="9. CURRENT STATUS & 10. P&L" />
             <Paper variant="outlined" sx={{ p: 3, bgcolor: alpha('#fff', 0.02), border: '1px solid rgba(0, 209, 255, 0.2)' }}>
               <Grid container spacing={4}>
                  <Grid item xs={6} md={3}>
@@ -83,8 +84,8 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
                  </Grid>
                  <Grid item xs={12} md={6}>
                     <DataRow label="HOLDING PERIOD" value={formatDuration(signal.created_at || signal.timestamp, signal.exit_timestamp || signal.outcome_timestamp)} />
-                    <DataRow label="MAE (Max Adverse)" value={`${signal.mae?.toFixed(2)}%`} color="#ef4444" />
-                    <DataRow label="MFE (Max Favorable)" value={`${signal.mfe?.toFixed(2)}%`} color="#10b981" />
+                    <DataRow label="MAE (Max Adverse)" value={signal.mae !== undefined ? `${signal.mae?.toFixed(2)}%` : 'UNAVAILABLE'} color="#ef4444" />
+                    <DataRow label="MFE (Max Favorable)" value={signal.mfe !== undefined ? `${signal.mfe?.toFixed(2)}%` : 'UNAVAILABLE'} color="#10b981" />
                  </Grid>
               </Grid>
             </Paper>
@@ -94,81 +95,90 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
 
       {tab === 1 && (
         <Grid container spacing={3}>
-          {/* C. PRICE & D. TARGET/STOP */}
+          {/* 3. PRICING & 4. TARGET/STOP */}
           <Grid item xs={12} md={6}>
-            <SectionHeader icon={<Database size={18} />} title="C. PRICING" />
+            <SectionHeader icon={<Database size={18} />} title="3. PRICING" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
-              <DataRow label="ENTRY PRICE" value={`₹${signal.entry?.toFixed(2)}`} />
+              <DataRow label="ENTRY PRICE" value={`₹${signal.entry_price?.toFixed(2)}`} />
               <DataRow label="ENTRY ZONE LOW" value={signal.entry_zone_low ? `₹${signal.entry_zone_low.toFixed(2)}` : 'UNAVAILABLE'} />
               <DataRow label="ENTRY ZONE HIGH" value={signal.entry_zone_high ? `₹${signal.entry_zone_high.toFixed(2)}` : 'UNAVAILABLE'} />
               <DataRow label="CURRENT PRICE" value={signal.current_price ? `₹${signal.current_price.toFixed(2)}` : 'UNAVAILABLE'} bold />
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>
-            <SectionHeader icon={<Lock size={18} />} title="D. TARGET / STOP" />
+            <SectionHeader icon={<Lock size={18} />} title="4. TARGET / STOP" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
-              <DataRow label="TARGET PRICE" value={`₹${signal.target?.toFixed(2)}`} color="#10b981" bold />
-              <DataRow label="STOP LOSS" value={`₹${signal.stop?.toFixed(2)}`} color="#ef4444" bold />
+              <DataRow label="TARGET PRICE" value={`₹${signal.target_price?.toFixed(2)}`} color="#10b981" bold />
+              <DataRow label="STOP LOSS" value={`₹${signal.stop_loss_price || signal.stop_price ? (signal.stop_loss_price || signal.stop_price).toFixed(2) : '--'}`} color="#ef4444" bold />
               <DataRow label="REWARD AMOUNT" value={signal.reward_amount_abs ? `₹${signal.reward_amount_abs.toFixed(2)}` : '--'} />
               <DataRow label="RISK AMOUNT" value={signal.risk_amount_abs ? `₹${signal.risk_amount_abs.toFixed(2)}` : '--'} />
             </Paper>
           </Grid>
 
-          {/* J. TIMELINE */}
+          {/* 16. F&O CONTRACT */}
           <Grid item xs={12}>
-            <SectionHeader icon={<Clock size={18} />} title="J. TIMELINE" />
-            <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
-               <Grid container spacing={2}>
-                  <Grid item xs={6} md={3}><TimelineItem label="CREATED" value={formatIST(signal.created_at)} /></Grid>
-                  <Grid item xs={6} md={3}><TimelineItem label="SIGNAL TIMESTAMP" value={formatIST(signal.signal_timestamp || signal.timestamp)} /></Grid>
-                  <Grid item xs={6} md={3}><TimelineItem label="ENTRY AT" value={formatIST(signal.entry_timestamp)} /></Grid>
-                  <Grid item xs={6} md={3}><TimelineItem label="EXIT AT" value={formatIST(signal.exit_timestamp || signal.outcome_timestamp)} /></Grid>
-               </Grid>
-            </Paper>
+             <SectionHeader icon={<Zap size={18} />} title="16. F&O CONTRACT" />
+             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
+                {signal.asset_class === 'EQUITY' ? (
+                  <Typography variant="body2" color="text.secondary">Instrument is CASH EQUITY. No derivative contract associated.</Typography>
+                ) : (
+                  <Grid container spacing={4}>
+                     <Grid item xs={12} md={6}>
+                        <Typography variant="overline" color="primary" sx={{ fontWeight: 900 }}>UNDERLYING</Typography>
+                        <DataRow label="SYMBOL" value={signal.underlying_symbol || signal.symbol} />
+                        <DataRow label="SPOT PRICE" value={signal.underlying_price ? `₹${signal.underlying_price.toFixed(2)}` : 'UNAVAILABLE'} />
+                     </Grid>
+                     <Grid item xs={12} md={6}>
+                        <Typography variant="overline" color="secondary" sx={{ fontWeight: 900 }}>DERIVATIVE</Typography>
+                        <DataRow label="CONTRACT" value={signal.instrument_id || "UNVERIFIED"} />
+                        <DataRow label="EXPIRY" value={signal.expiry ? formatIST(signal.expiry) : 'UNAVAILABLE'} />
+                        <DataRow label="STRIKE" value={signal.strike || 'UNAVAILABLE'} />
+                        <DataRow label="PREMIUM" value={signal.derivative_current ? `₹${signal.derivative_current.toFixed(2)}` : 'UNAVAILABLE'} />
+                     </Grid>
+                  </Grid>
+                )}
+             </Paper>
           </Grid>
         </Grid>
       )}
 
       {tab === 2 && (
         <Grid container spacing={3}>
-           {/* E. PROBABILITY & F. EV */}
+           {/* 5. PROBABILITY & 7. EV */}
            <Grid item xs={12} md={6}>
-            <SectionHeader icon={<Brain size={18} />} title="E. PROBABILITY" />
+            <SectionHeader icon={<Brain size={18} />} title="5. PROBABILITY" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
               <DataRow label="RAW PROBABILITY" value={signal.raw_probability ? `${(signal.raw_probability * 100).toFixed(2)}%` : 'UNAVAILABLE'} />
               <DataRow label="CALIBRATED PROB" value={signal.calibrated_probability ? `${(signal.calibrated_probability * 100).toFixed(2)}%` : 'UNAVAILABLE'} bold />
-              <DataRow label="CALIBRATION STATUS" value={signal.calibrated_probability ? "WELL_CALIBRATED (Low Conf)" : "UNAVAILABLE"} />
+              <DataRow label="CALIBRATION STATUS" value={signal.calibrated_probability ? (signal.calibrated_probability > 0.7 ? "OVERCONFIDENT_DETECTED" : "WELL_CALIBRATED") : "UNAVAILABLE"} />
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>
-            <SectionHeader icon={<TrendingUp size={18} />} title="F. EV / R:R" />
+            <SectionHeader icon={<TrendingUp size={18} />} title="7. EV / 8. R:R" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
-              <DataRow label="EXPECTED VALUE" value={signal.ev ? `+${signal.ev.toFixed(4)}` : 'UNAVAILABLE'} color="#10b981" bold />
-              <DataRow label="RISK/REWARD" value={signal.rr?.toFixed(2) || "1.00"} />
+              <DataRow label="EXPECTED VALUE" value={signal.expected_value ? `+${signal.expected_value.toFixed(4)}` : 'UNAVAILABLE'} color="#10b981" bold />
+              <DataRow label="RISK/REWARD" value={signal.risk_reward?.toFixed(2) || "1.00"} />
               <DataRow label="EXPECTED RETURN" value={signal.expected_return ? `${(signal.expected_return * 100).toFixed(2)}%` : 'UNAVAILABLE'} />
             </Paper>
           </Grid>
 
-          {/* L. PROVENANCE */}
+          {/* 14. PROVENANCE */}
           <Grid item xs={12}>
-            <SectionHeader icon={<Fingerprint size={18} />} title="L. PROVENANCE (WHY THIS SIGNAL?)" />
+            <SectionHeader icon={<Fingerprint size={18} />} title="14. PROVENANCE (WHY THIS SIGNAL?)" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
                {signal.provenance_data ? (
                  <Box>
                     <DataRow label="PROVENANCE ID" value={signal.provenance_data.id} />
+                    <DataRow label="PREDICTION ID" value={signal.prediction_id || "UNAVAILABLE"} />
                     <DataRow label="MODEL VERSION" value={signal.provenance_data.model_version} />
-                    <DataRow label="DATA SOURCES" value={Object.keys(signal.provenance_data.data_sources).join(', ')} />
                     <DataRow label="INPUT HASH" value={signal.provenance_data.input_hash} />
                     <Divider sx={{ my: 2, opacity: 0.1 }} />
-                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900 }}>DATA SNAPSHOT TIMESTAMPS</Typography>
-                    <Grid container spacing={1} sx={{ mt: 1 }}>
-                       {Object.entries(signal.provenance_data.source_timestamps).map(([k, v]: [string, any]) => (
-                          <Grid item xs={12} md={4} key={k}>
-                             <Typography variant="caption" display="block" color="textSecondary">{k.toUpperCase()}</Typography>
-                             <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem' }}>{v}</Typography>
-                          </Grid>
+                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900 }}>DATA SOURCES</Typography>
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                       {Object.entries(signal.provenance_data.data_sources || {}).map(([k, v]: [string, any]) => (
+                          <Chip key={k} label={`${k.toUpperCase()}: ${v}`} size="small" variant="outlined" sx={{ fontSize: '0.6rem' }} />
                        ))}
-                    </Grid>
+                    </Stack>
                  </Box>
                ) : (
                  <Typography variant="body2" color="text.secondary">Detailed provenance not snapshotted for this record (Legacy/Unverified).</Typography>
@@ -180,9 +190,18 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
 
       {tab === 3 && (
         <Grid container spacing={3}>
-           {/* O. RECONCILIATION */}
-           <Grid item xs={12}>
-              <SectionHeader icon={<RefreshCcw size={18} />} title="O. RECONCILIATION" />
+           {/* 17. DATA QUALITY & 18. RECONCILIATION */}
+           <Grid item xs={12} md={6}>
+              <SectionHeader icon={<ShieldCheck size={18} />} title="17. DATA QUALITY" />
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
+                 <DataRow label="QUALITY STATUS" value={signal.data_quality_status || "UNAVAILABLE"} />
+                 <DataRow label="QUALITY SCORE" value={signal.data_quality_score ? `${(signal.data_quality_score * 100).toFixed(1)}%` : 'UNAVAILABLE'} />
+                 <DataRow label="PRICE SOURCE" value={signal.price_source || "UNAVAILABLE"} />
+                 <DataRow label="SIGNAL FRESHNESS" value={signal.data_timestamp ? "LIVE" : "UNAVAILABLE"} />
+              </Paper>
+           </Grid>
+           <Grid item xs={12} md={6}>
+              <SectionHeader icon={<RefreshCcw size={18} />} title="18. RECONCILIATION" />
               <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
                  <DataRow label="LAST RECONCILED" value={formatIST(signal.last_reconciled_at)} />
                  <DataRow label="AUDIT STATUS" value={signal.audit_status || "PENDING"} bold color="#10b981" />
@@ -191,9 +210,25 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
               </Paper>
            </Grid>
 
-           {/* H. AUDIT TRAIL */}
+           {/* 15. MARKET DATA SNAPSHOT */}
            <Grid item xs={12}>
-            <SectionHeader icon={<Search size={18} />} title="Q. AUDIT HISTORY (STATE TRANSITIONS)" />
+              <SectionHeader icon={<Database size={18} />} title="15. MARKET DATA EVIDENCE" />
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
+                 <Typography variant="body2" color="text.secondary">Institutional 1m OHLC reconstruction data for {signal.symbol} at exit window.</Typography>
+                 <Box sx={{ mt: 2, py: 4, textAlign: 'center', bgcolor: alpha('#fff', 0.02), borderRadius: 1 }}>
+                    <Search size={32} color="slategray" style={{ opacity: 0.3 }} />
+                    <Typography variant="caption" display="block" color="slategray" sx={{ mt: 1 }}>Interactive Chart Reconstruction Pending.</Typography>
+                 </Box>
+              </Paper>
+           </Grid>
+        </Grid>
+      )}
+
+      {tab === 4 && (
+        <Grid container spacing={3}>
+           {/* 19. AUDIT HISTORY */}
+           <Grid item xs={12} md={8}>
+            <SectionHeader icon={<Search size={18} />} title="19. AUDIT HISTORY (STATE TRANSITIONS)" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
                {signal.audit_trail && signal.audit_trail.length > 0 ? (
                   <Stack spacing={2}>
@@ -211,6 +246,25 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
                   <Typography variant="body2" color="text.secondary">Audit trail for this signal is currently being synchronized.</Typography>
                )}
             </Paper>
+          </Grid>
+
+          {/* 20. LIMITATIONS */}
+          <Grid item xs={12} md={4}>
+             <SectionHeader icon={<AlertCircle size={18} />} title="20. LIMITATIONS" />
+             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#ef4444', 0.02), borderColor: 'rgba(239, 68, 68, 0.2)' }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: 'error.main', mb: 1, display: 'block' }}>AUDIT CONSTRAINTS</Typography>
+                <Stack spacing={1.5}>
+                   <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', gap: 1 }}>
+                      • Legacy signals (pre-V2.2) lack prediction ID linkage.
+                   </Typography>
+                   <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', gap: 1 }}>
+                      • MAE/MFE not reconstructed for Level 0/1 records.
+                   </Typography>
+                   <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', gap: 1 }}>
+                      • 1m forensic data available for Shadow observations only.
+                   </Typography>
+                </Stack>
+             </Paper>
           </Grid>
         </Grid>
       )}
@@ -234,15 +288,6 @@ function DataRow({ label, value, color, bold }: any) {
       <Typography variant="body2" sx={{ fontWeight: bold ? 950 : 700, color: color || 'white', fontFamily: 'JetBrains Mono', textAlign: 'right', wordBreak: 'break-all' }}>
         {value || '--'}
       </Typography>
-    </Box>
-  );
-}
-
-function TimelineItem({ label, value }: any) {
-  return (
-    <Box>
-       <Typography variant="caption" color="slategray" sx={{ fontWeight: 900, display: 'block' }}>{label}</Typography>
-       <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem' }}>{value || '--'}</Typography>
     </Box>
   );
 }

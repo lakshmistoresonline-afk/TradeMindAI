@@ -118,9 +118,10 @@ def get_shadow_summary():
             return {
                 "evaluation_cycles": eval_cycles,
                 "transactional_signals": pop["total_unique_calls"],
-                "active_signals": state["active_count"],
+                "active_signals": pop["active_shadow"],
                 "completed_trades": state["terminal_count"],
                 "verified_trades": forensic["sample_size"],
+                "unverified_historical": pop["unverified_historical"],
                 "equity": state["current_equity"],
                 "realized_pnl": state["realized_pnl"],
                 "unrealized_pnl": state["unrealized_pnl"],
@@ -130,7 +131,6 @@ def get_shadow_summary():
                 "long_exposure": state["long_exposure"],
                 "short_exposure": state["short_exposure"],
                 "profit_factor": forensic["profit_factor"],
-                "drawdown": state["trade_sequence_drawdown"],
                 "trade_sequence_drawdown": state["trade_sequence_drawdown"],
                 "portfolio_mtm_drawdown": state["portfolio_mtm_drawdown"],
                 "win_rate_pct": forensic["win_rate_pct"],
@@ -347,6 +347,13 @@ def get_data_integrity_report():
     """
     from backend.services.data_quality_service import DataQualityService
     return DataQualityService.generate_integrity_report()
+
+@router.get("/integrity/reconciliation")
+async def get_full_reconciliation():
+    """
+    Workstream 18: End-to-End Master Reconciliation.
+    """
+    return await container.reconciliation_engine.reconcile_all()
 
 @router.get("/signals/active")
 async def get_active_shadow_signals_api():

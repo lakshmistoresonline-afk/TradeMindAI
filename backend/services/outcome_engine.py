@@ -217,6 +217,14 @@ class OutcomeEngine:
             open_price = row["Open"]
             close = row["Close"]
 
+            # Update MFE/MAE first to ensure exit candle is captured (Workstream 9/10)
+            if direction == "LONG":
+                mfe = max(mfe, ((high - actual_entry_price) / actual_entry_price) * 100)
+                mae = min(mae, ((low - actual_entry_price) / actual_entry_price) * 100)
+            else:
+                mfe = max(mfe, ((actual_entry_price - low) / actual_entry_price) * 100)
+                mae = min(mae, ((actual_entry_price - high) / actual_entry_price) * 100)
+
             # Expiry Check (Part 15)
             if ts > expiry_ts:
                 current_status = "EXPIRED"
@@ -273,14 +281,6 @@ class OutcomeEngine:
                 outcome_ts = ts.to_pydatetime()
                 events.append(SignalEvent(type="TARGET_HIT", timestamp=outcome_ts, price=exit_price, message="Target achievement verified intrabar."))
                 break
-
-            # Update MFE/MAE
-            if direction == "LONG":
-                mfe = max(mfe, ((high - actual_entry_price) / actual_entry_price) * 100)
-                mae = min(mae, ((low - actual_entry_price) / actual_entry_price) * 100)
-            else:
-                mfe = max(mfe, ((actual_entry_price - low) / actual_entry_price) * 100)
-                mae = min(mae, ((actual_entry_price - high) / actual_entry_price) * 100)
 
         # 3. Finalize P&L if terminal
         if current_status != "ACTIVE":

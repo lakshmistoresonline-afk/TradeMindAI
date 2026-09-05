@@ -23,9 +23,10 @@ class ProvenanceService:
         provenance_id = f"prov_{uuid.uuid4().hex[:12]}"
 
         # 1. Create source timestamps
+        now = datetime.datetime.utcnow()
         source_ts = {
-            "market_data": datetime.utcnow().isoformat(),
-            "snapshot_data": data_snapshot.get('timestamp', datetime.utcnow().isoformat())
+            "market_data": now.isoformat(),
+            "snapshot_data": data_snapshot.get('timestamp', now.isoformat())
         }
 
         # 2. Calculate hashes for immutability
@@ -36,7 +37,7 @@ class ProvenanceService:
             "provenance_id": provenance_id,
             "signal_id": signal_id,
             "prediction_id": prediction_id,
-            "data_snapshot_timestamp": datetime.utcnow(),
+            "data_snapshot_timestamp": now,
             "model_version": model_version,
             "strategy_version": strategy_version,
             "feature_version": feature_version,

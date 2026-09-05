@@ -187,6 +187,12 @@ class ShadowService:
             # 6. Resolve Outcomes (Always run unless weekend/holiday)
             await ShadowService.audit_open_signals()
 
+            # 6.5 Update Current Prices for ACTIVE signals (Workstream 6/7)
+            await ShadowService.update_active_signal_prices(stock_map)
+
+            # 6.5 Update Current Prices for ACTIVE signals (Workstream 6/7)
+            await ShadowService.update_active_signal_prices(stock_map)
+
             # 7. Async Firestore Sync (Best-effort, non-blocking)
             try:
                 from backend.services.shadow_sync_service import ShadowSyncService
@@ -359,6 +365,24 @@ class ShadowService:
             print(f"   [SHADOW] Signal Persisted: {signal.symbol} {signal.direction} @ {signal.entry_price} [Mode: {signal.evaluation_mode}]")
 
         asyncio.create_task(_run_persist())
+
+    @staticmethod
+    async def update_active_signal_prices(stock_map):
+        """
+        Updates current_price and price_timestamp for ACTIVE signals in the ledger.
+        """
+        repo = container.canonical_signal_repo
+        active_signals = await repo.get_active_signals()
+
+        for sig in active_signals:
+            stock = stock_map.get(sig.symbol)
+            if stock and stock.last_price:
+                sig.current_price = stock.last_price
+                sig.price_timestamp = stock.updated_at or datetime.utcnow()
+                sig.last_updated_at = datetime.utcnow()
+                await repo.save_signal(sig)
+
+        print(f"   [SHADOW] Updated current prices for {len(active_signals)} active signals.")
 
     @staticmethod
     async def audit_open_signals():

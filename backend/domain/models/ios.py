@@ -146,6 +146,9 @@ class LiveSignal(BaseModel):
 
     derivative_symbol: Optional[str] = None
     contract_multiplier: Optional[int] = None
+    strike: Optional[float] = None
+    expiry: Optional[datetime] = None
+    option_type: Optional[str] = None # CE or PE
     derivative_entry: Optional[float] = None
     derivative_current: Optional[float] = None
     derivative_target: Optional[float] = None

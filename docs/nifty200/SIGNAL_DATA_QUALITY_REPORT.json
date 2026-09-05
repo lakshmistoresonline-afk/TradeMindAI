@@ -1,17 +1,22 @@
 {
-    "report_timestamp": "2026-09-04T12:51:24.582695",
-    "population": {
-        "total_signals": 1259,
-        "verified_outcomes": 50,
-        "active_signals": 14,
-        "unverified_historical": 1195
-    },
-    "integrity_metrics": {
-        "prediction_linkage_pct": 0.0,
-        "provenance_coverage_pct": 0.0,
-        "lookahead_violation_count": 0,
-        "stale_data_stock_count": 20
-    },
-    "status": "WARNING",
-    "notes": "Prediction linkage and provenance coverage at 0% for legacy population. New signals generated via Strategy V2.2 are now 100% covered."
+    "calculation_version": "1.0",
+    "timestamp": "2026-09-05T04:26:11.474227",
+    "numerator_populated": 3926,
+    "denominator_total": 12590,
+    "completeness_score_pct": 31.18,
+    "definitions": {
+        "population": "1259 unique signals",
+        "fields_audited": [
+            "raw_probability",
+            "entry_price",
+            "target_price",
+            "stop_price",
+            "prediction_id",
+            "provenance_id",
+            "current_price",
+            "net_pnl",
+            "realized_mae",
+            "realized_mfe"
+        ]
+    }
 }

@@ -358,6 +358,9 @@ class ShadowSignalDB(Base):
     # Derivative extensions
     derivative_symbol = Column(String(50))
     contract_multiplier = Column(Integer)
+    strike = Column(Float)
+    expiry = Column(DateTime)
+    option_type = Column(String(10))
     derivative_entry = Column(Float)
     derivative_current = Column(Float)
     derivative_target = Column(Float)

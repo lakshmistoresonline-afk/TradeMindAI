@@ -49,6 +49,9 @@ class Container:
         self._historical_research_service = None
         self._portfolio_analytics_service = None
         self._canonical_signal_repo = None
+        self._forensic_analytical_service = None
+        self._export_service = None
+        self._reconciliation_engine = None
 
     @property
     def signal_engine(self):
@@ -383,6 +386,27 @@ class Container:
             from backend.core.postgres import SessionLocal
             self._canonical_signal_repo = CanonicalSignalRepository(SessionLocal)
         return self._canonical_signal_repo
+
+    @property
+    def forensic_analytical_service(self):
+        if self._forensic_analytical_service is None:
+            from backend.services.forensic_analytical_service import ForensicAnalyticalService
+            self._forensic_analytical_service = ForensicAnalyticalService()
+        return self._forensic_analytical_service
+
+    @property
+    def export_service(self):
+        if self._export_service is None:
+            from backend.services.export_service import ExportService
+            self._export_service = ExportService()
+        return self._export_service
+
+    @property
+    def reconciliation_engine(self):
+        if self._reconciliation_engine is None:
+            from backend.services.reconciliation_engine import ReconciliationEngine
+            self._reconciliation_engine = ReconciliationEngine()
+        return self._reconciliation_engine
 
     @property
     def stock_service(self):

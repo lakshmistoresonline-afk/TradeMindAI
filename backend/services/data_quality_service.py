@@ -12,8 +12,12 @@ class DataQualityService:
     def generate_integrity_report() -> Dict[str, Any]:
         with SessionLocal() as session:
             total = session.query(ShadowSignalDB).count()
-            verified = session.query(ShadowSignalDB).filter(ShadowSignalDB.outcome_verified == True).count()
-            active = session.query(ShadowSignalDB).filter(ShadowSignalDB.status == 'ACTIVE').count()
+
+            # Population Breakdown (Workstream 6/17)
+            verified = session.query(ShadowSignalDB).filter(ShadowSignalDB.evaluation_mode == 'LIVE_SHADOW_VERIFIED').count()
+            active = session.query(ShadowSignalDB).filter(ShadowSignalDB.evaluation_mode == 'LIVE_SHADOW_ACTIVE').count()
+            reconstructed = session.query(ShadowSignalDB).filter(ShadowSignalDB.evaluation_mode == 'HISTORICAL_RECONSTRUCTED').count()
+            legacy = session.query(ShadowSignalDB).filter(ShadowSignalDB.evaluation_mode == 'LEGACY_UNVERIFIED').count()
 
             # Anomalies
             missing_prediction = session.query(ShadowSignalDB).filter(ShadowSignalDB.prediction_id == None).count()

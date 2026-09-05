@@ -1,0 +1,545 @@
+{
+    "total_records": 1259,
+    "fields": {
+        "id": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "timestamp": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "symbol": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "direction": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "raw_probability": {
+            "total": 1259,
+            "populated": 53,
+            "null": 1206,
+            "percent_complete": 4.21
+        },
+        "calibrated_probability": {
+            "total": 1259,
+            "populated": 53,
+            "null": 1206,
+            "percent_complete": 4.21
+        },
+        "expected_value": {
+            "total": 1259,
+            "populated": 53,
+            "null": 1206,
+            "percent_complete": 4.21
+        },
+        "data_quality_score": {
+            "total": 1259,
+            "populated": 53,
+            "null": 1206,
+            "percent_complete": 4.21
+        },
+        "entry_price": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "target_price": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "stop_price": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "strategy_version": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "model_version": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "feature_version": {
+            "total": 1259,
+            "populated": 53,
+            "null": 1206,
+            "percent_complete": 4.21
+        },
+        "regime": {
+            "total": 1259,
+            "populated": 27,
+            "null": 1232,
+            "percent_complete": 2.14
+        },
+        "outcome": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "outcome_timestamp": {
+            "total": 1259,
+            "populated": 50,
+            "null": 1209,
+            "percent_complete": 3.97
+        },
+        "realized_return": {
+            "total": 1259,
+            "populated": 49,
+            "null": 1210,
+            "percent_complete": 3.89
+        },
+        "realized_mfe": {
+            "total": 1259,
+            "populated": 23,
+            "null": 1236,
+            "percent_complete": 1.83
+        },
+        "realized_mae": {
+            "total": 1259,
+            "populated": 23,
+            "null": 1236,
+            "percent_complete": 1.83
+        },
+        "transaction_cost": {
+            "total": 1259,
+            "populated": 23,
+            "null": 1236,
+            "percent_complete": 1.83
+        },
+        "slippage": {
+            "total": 1259,
+            "populated": 23,
+            "null": 1236,
+            "percent_complete": 1.83
+        },
+        "net_return": {
+            "total": 1259,
+            "populated": 50,
+            "null": 1209,
+            "percent_complete": 3.97
+        },
+        "status": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "rejection_reason": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "provenance_json": {
+            "total": 1259,
+            "populated": 27,
+            "null": 1232,
+            "percent_complete": 2.14
+        },
+        "created_at": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "updated_at": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "exit_price": {
+            "total": 1259,
+            "populated": 50,
+            "null": 1209,
+            "percent_complete": 3.97
+        },
+        "universe_version": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "data_timestamp": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "market_timestamp": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "evaluation_mode": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "exit_reason": {
+            "total": 1259,
+            "populated": 18,
+            "null": 1241,
+            "percent_complete": 1.43
+        },
+        "signal_eligibility": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "outcome_verified": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "quantity": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "capital_allocation": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "risk_amount": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "gross_pnl": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "pnl_percentage": {
+            "total": 1259,
+            "populated": 44,
+            "null": 1215,
+            "percent_complete": 3.49
+        },
+        "fees": {
+            "total": 1259,
+            "populated": 18,
+            "null": 1241,
+            "percent_complete": 1.43
+        },
+        "net_pnl": {
+            "total": 1259,
+            "populated": 50,
+            "null": 1209,
+            "percent_complete": 3.97
+        },
+        "asset_class": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "instrument_id": {
+            "total": 1259,
+            "populated": 27,
+            "null": 1232,
+            "percent_complete": 2.14
+        },
+        "instrument_type": {
+            "total": 1259,
+            "populated": 27,
+            "null": 1232,
+            "percent_complete": 2.14
+        },
+        "prediction_id": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "provenance_id": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "asset_type": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "exchange": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "underlying_symbol": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "signal_type": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "signal_rating": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "conviction": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "entry_zone_low": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "entry_zone_high": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "current_price": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "price_timestamp": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "derivative_symbol": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "contract_multiplier": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "derivative_entry": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "derivative_current": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "derivative_target": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "derivative_stop": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "premium_timestamp": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "signal_timestamp": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "last_updated_at": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "entry_timestamp": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "exit_timestamp": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "lifecycle_state": {
+            "total": 1259,
+            "populated": 53,
+            "null": 1206,
+            "percent_complete": 4.21
+        },
+        "outcome_status": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "verification_level": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "risk_amount_abs": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "reward_amount_abs": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "expected_return": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "feature_snapshot_id": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "market_snapshot_id": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "model_run_id": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "decision_id": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "created_by": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "calculation_version": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "pnl_engine_version": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "outcome_engine_version": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "reconstruction_version": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "last_reconciled_at": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "record_hash": {
+            "total": 1259,
+            "populated": 1259,
+            "null": 0,
+            "percent_complete": 100.0
+        },
+        "audit_status": {
+            "total": 1259,
+            "populated": 1206,
+            "null": 53,
+            "percent_complete": 95.79
+        },
+        "strike": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "expiry": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        },
+        "option_type": {
+            "total": 1259,
+            "populated": 0,
+            "null": 1259,
+            "percent_complete": 0.0
+        }
+    }
+}
