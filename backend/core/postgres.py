@@ -355,7 +355,10 @@ class ShadowSignalDB(Base):
     current_price = Column(Float)
     underlying_price = Column(Float)
     underlying_price_timestamp = Column(DateTime)
+    price_adjustment_factor = Column(Float, default=1.0)
     price_timestamp = Column(DateTime)
+    price_source = Column(String)
+    price_status = Column(String)
 
     # Derivative extensions
     derivative_symbol = Column(String(50))
@@ -383,6 +386,7 @@ class ShadowSignalDB(Base):
     # Risk/Reward Extensions
     risk_amount_abs = Column(Float)
     reward_amount_abs = Column(Float)
+    risk_reward_ratio = Column(Float)
     expected_return = Column(Float)
 
     # Traceability Extensions

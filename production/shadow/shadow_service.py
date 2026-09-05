@@ -396,6 +396,10 @@ class ShadowService:
                     await repo.save_signal(sig)
                 else:
                     print(f"   [WARN] Price resolution failed for {sig.symbol}: {res['status']}")
+                    # Explicitly mark as UNAVAILABLE if resolution fails (Phase 2E Hard Gate)
+                    sig.current_price = None
+                    sig.price_status = res["status"]
+                    await repo.save_signal(sig)
             except Exception as e:
                 print(f"   [!] Error updating price for {sig.symbol}: {e}")
 

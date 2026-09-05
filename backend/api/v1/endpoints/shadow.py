@@ -370,6 +370,7 @@ def get_signal_detail(signal_id: str):
     Returns complete signal data including provenance link and portfolio impact.
     """
     from backend.core.postgres import StockDB, ShadowProvenanceDB
+    from backend.core.container import container
     try:
         with SessionLocal() as session:
             s = session.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()

@@ -131,7 +131,9 @@ class PriceResolver:
                     result["eligibility"] = "DATA_BLOCKED"
 
             # 5. Apply Normalization (Part 17)
-            factor = signal.price_adjustment_factor
+            factor = getattr(signal, 'price_adjustment_factor', 1.0)
+            if factor is None: factor = 1.0
+
             if result["current_price"]:
                 result["normalized_current_price"] = result["current_price"] * factor
             else:

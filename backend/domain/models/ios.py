@@ -165,6 +165,7 @@ class LiveSignal(BaseModel):
 
     risk_amount_abs: Optional[float] = None
     reward_amount_abs: Optional[float] = None
+    risk_reward_ratio: Optional[float] = None
     expected_return: Optional[float] = None
 
     market_snapshot_id: Optional[str] = None

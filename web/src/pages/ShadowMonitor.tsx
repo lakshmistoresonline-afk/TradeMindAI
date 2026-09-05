@@ -330,9 +330,9 @@ export default function ShadowMonitor() {
                         <TableCell>DIRECTION</TableCell>
                         <TableCell>CREATED</TableCell>
                         <TableCell>ENTRY</TableCell>
-                        <TableCell>TARGET</TableCell>
-                        <TableCell>STOP-LOSS</TableCell>
-                        <TableCell>CURRENT</TableCell>
+                        <TableCell>OBJECTIVES</TableCell>
+                        <TableCell>UNDERLYING</TableCell>
+                        <TableCell>INSTRUMENT</TableCell>
                         <TableCell>P&L %</TableCell>
                         <TableCell>STATUS</TableCell>
                         <TableCell align="right">DETAIL</TableCell>
@@ -350,12 +350,17 @@ export default function ShadowMonitor() {
                             />
                           </TableCell>
                           <TableCell sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>{sig.entry_price ? sig.entry_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'success.main', opacity: 0.8 }}>{sig.target_price ? sig.target_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'error.main', opacity: 0.8 }}>{sig.stop_price ? sig.stop_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>{sig.current_price ? sig.current_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontWeight: 800 }}>{sig.calibrated_probability ? `${(sig.calibrated_probability * 100).toFixed(1)}%` : '--'}</TableCell>
-                          <TableCell sx={{ color: 'success.main', fontWeight: 800 }}>{sig.expected_value ? `+${sig.expected_value.toFixed(2)}` : '--'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem' }}>
+                             <Box>E: {sig.entry_price?.toFixed(2)}</Box>
+                             <Box color="success.main">T: {sig.target_price?.toFixed(2)}</Box>
+                             <Box color="error.main">S: {sig.stop_price?.toFixed(2)}</Box>
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
+                             {sig.underlying_price ? sig.underlying_price.toFixed(2) : '--'}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 900, color: 'primary.main' }}>
+                             {sig.current_price ? sig.current_price.toFixed(2) : 'UNAVAILABLE'}
+                          </TableCell>
                           <TableCell sx={{ fontWeight: 900, color: (sig.pnl_percentage || 0) >= 0 ? '#10b981' : '#ef4444' }}>
                              {sig.pnl_percentage !== undefined ? `${sig.pnl_percentage > 0 ? '+' : ''}${sig.pnl_percentage.toFixed(2)}%` : '--'}
                           </TableCell>
