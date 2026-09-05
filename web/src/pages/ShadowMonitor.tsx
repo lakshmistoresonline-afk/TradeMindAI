@@ -350,12 +350,12 @@ export default function ShadowMonitor() {
                             />
                           </TableCell>
                           <TableCell sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>{sig.entry ? sig.entry.toFixed(2) : 'DATA UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'success.main', opacity: 0.8 }}>{sig.target ? sig.target.toFixed(2) : 'DATA UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'error.main', opacity: 0.8 }}>{sig.stop ? sig.stop.toFixed(2) : 'DATA UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>{sig.current_price ? sig.current_price.toFixed(2) : 'DATA UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontWeight: 800 }}>{sig.probability ? `${(sig.probability * 100).toFixed(1)}%` : '--'}</TableCell>
-                          <TableCell sx={{ color: 'success.main', fontWeight: 800 }}>{sig.ev ? `+${sig.ev.toFixed(2)}` : '--'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>{sig.entry_price ? sig.entry_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'success.main', opacity: 0.8 }}>{sig.target_price ? sig.target_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'error.main', opacity: 0.8 }}>{sig.stop_price ? sig.stop_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>{sig.current_price ? sig.current_price.toFixed(2) : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontWeight: 800 }}>{sig.calibrated_probability ? `${(sig.calibrated_probability * 100).toFixed(1)}%` : '--'}</TableCell>
+                          <TableCell sx={{ color: 'success.main', fontWeight: 800 }}>{sig.expected_value ? `+${sig.expected_value.toFixed(2)}` : '--'}</TableCell>
                           <TableCell sx={{ fontWeight: 900, color: (sig.pnl_percentage || 0) >= 0 ? '#10b981' : '#ef4444' }}>
                              {sig.pnl_percentage !== undefined ? `${sig.pnl_percentage > 0 ? '+' : ''}${sig.pnl_percentage.toFixed(2)}%` : '--'}
                           </TableCell>

@@ -369,20 +369,37 @@ class ShadowService:
     @staticmethod
     async def update_active_signal_prices(stock_map):
         """
-        Updates current_price and price_timestamp for ACTIVE signals in the ledger.
+        Workstream 6/7/8: Canonical Price Resolution for ACTIVE signals.
+        Separates UNDERLYING from DERIVATIVE data.
         """
+        from backend.services.price_resolver import PriceResolver
         repo = container.canonical_signal_repo
         active_signals = await repo.get_active_signals()
 
         for sig in active_signals:
-            stock = stock_map.get(sig.symbol)
-            if stock and stock.last_price:
-                sig.current_price = stock.last_price
-                sig.price_timestamp = stock.updated_at or datetime.utcnow()
-                sig.last_updated_at = datetime.utcnow()
-                await repo.save_signal(sig)
+            try:
+                # 1. Resolve Prices (Instrument and Underlying)
+                res = await PriceResolver.resolve_current_price(sig)
 
-        print(f"   [SHADOW] Updated current prices for {len(active_signals)} active signals.")
+                if res["status"] == "FRESH":
+                    sig.current_price = res["current_price"]
+                    sig.price_timestamp = res["timestamp"]
+                    sig.underlying_price = res["underlying_price"]
+                    sig.underlying_price_timestamp = res["timestamp"]
+
+                    # For F&O: map to derivative fields too for Ledger 2.0 consistency
+                    if sig.asset_class in ["FUTURES", "OPTIONS"]:
+                        sig.derivative_current = res["current_price"]
+                        sig.premium_timestamp = res["timestamp"]
+
+                    sig.last_updated_at = datetime.utcnow()
+                    await repo.save_signal(sig)
+                else:
+                    print(f"   [WARN] Price resolution failed for {sig.symbol}: {res['status']}")
+            except Exception as e:
+                print(f"   [!] Error updating price for {sig.symbol}: {e}")
+
+        print(f"   [SHADOW] Price resolution cycle complete for {len(active_signals)} signals.")
 
     @staticmethod
     async def audit_open_signals():

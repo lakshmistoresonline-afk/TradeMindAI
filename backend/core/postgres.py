@@ -353,6 +353,8 @@ class ShadowSignalDB(Base):
     entry_zone_low = Column(Float)
     entry_zone_high = Column(Float)
     current_price = Column(Float)
+    underlying_price = Column(Float)
+    underlying_price_timestamp = Column(DateTime)
     price_timestamp = Column(DateTime)
 
     # Derivative extensions

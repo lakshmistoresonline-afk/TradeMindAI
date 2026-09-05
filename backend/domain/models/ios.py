@@ -98,6 +98,7 @@ class LiveSignal(BaseModel):
     # Universal Price Tier (Step 2C/D/E/F)
     current_price: Optional[float] = None
     underlying_price: Optional[float] = None
+    underlying_price_timestamp: Optional[datetime] = None
     current_price_timestamp: Optional[datetime] = None
     price_source: Optional[str] = None
     price_status: Optional[str] = None # FRESH, STALE, MARKET_CLOSED, DATA_UNAVAILABLE, PROVIDER_UNSUPPORTED, INSTRUMENT_NOT_FOUND, INVALID
