@@ -52,6 +52,7 @@ class Container:
         self._forensic_analytical_service = None
         self._export_service = None
         self._reconciliation_engine = None
+        self._certification_engine = None
 
     @property
     def signal_engine(self):
@@ -407,6 +408,13 @@ class Container:
             from backend.services.reconciliation_engine import ReconciliationEngine
             self._reconciliation_engine = ReconciliationEngine()
         return self._reconciliation_engine
+
+    @property
+    def certification_engine(self):
+        if self._certification_engine is None:
+            from backend.services.certification_engine import Phase2FCertificationEngine
+            self._certification_engine = Phase2FCertificationEngine()
+        return self._certification_engine
 
     @property
     def stock_service(self):

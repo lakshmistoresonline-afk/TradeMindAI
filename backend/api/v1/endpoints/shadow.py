@@ -348,6 +348,13 @@ def get_data_integrity_report():
     from backend.services.data_quality_service import DataQualityService
     return DataQualityService.generate_integrity_report()
 
+@router.get("/integrity/certification")
+async def get_certification_audit():
+    """
+    Workstream 20: Institutional Hard-Gate Certification.
+    """
+    return await container.certification_engine.run_certification_audit()
+
 @router.get("/integrity/reconciliation")
 async def get_full_reconciliation():
     """
@@ -357,7 +364,25 @@ async def get_full_reconciliation():
 
 @router.get("/signals/active")
 async def get_active_shadow_signals_api():
-    return await container.canonical_signal_repo.get_active_signals()
+    signals = await container.canonical_signal_repo.get_active_signals()
+    # ENFORCEMENT DATE: 2026-09-04 12:00:00
+    cutoff = datetime(2026, 9, 4, 12, 0, 0)
+
+    results = []
+    for s in signals:
+        data = {c.name: getattr(s, c.name).isoformat() if isinstance(getattr(s, c.name), datetime) else getattr(s, c.name) for c in s.__table__.columns}
+
+        # Add dynamic certification status (Workstream 35/36)
+        is_legacy = s.timestamp < cutoff
+        if is_legacy:
+            data["certification_status"] = "LEGACY"
+        elif s.prediction_id and s.provenance_id:
+            data["certification_status"] = "CERTIFIED"
+        else:
+            data["certification_status"] = "NOT_CERTIFIED"
+
+        results.append(data)
+    return results
 
 @router.get("/signals/verified")
 async def get_verified_shadow_signals_api():

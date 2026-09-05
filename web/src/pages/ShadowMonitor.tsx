@@ -334,7 +334,7 @@ export default function ShadowMonitor() {
                         <TableCell>UNDERLYING</TableCell>
                         <TableCell>INSTRUMENT</TableCell>
                         <TableCell>P&L %</TableCell>
-                        <TableCell>STATUS</TableCell>
+                        <TableCell>CERTIFICATION</TableCell>
                         <TableCell align="right">DETAIL</TableCell>
                       </TableRow>
                     </TableHead>
@@ -365,7 +365,17 @@ export default function ShadowMonitor() {
                              {sig.pnl_percentage !== undefined ? `${sig.pnl_percentage > 0 ? '+' : ''}${sig.pnl_percentage.toFixed(2)}%` : '--'}
                           </TableCell>
                           <TableCell>
-                             <Chip label={sig.status} size="small" variant="outlined" sx={{ fontWeight: 800, fontSize: '0.6rem' }} />
+                             <Chip
+                                label={sig.certification_status || 'NOT_CERTIFIED'}
+                                size="small"
+                                variant={sig.certification_status === 'CERTIFIED' ? 'filled' : 'outlined'}
+                                sx={{
+                                    fontWeight: 900, fontSize: '0.55rem', height: 18,
+                                    bgcolor: sig.certification_status === 'CERTIFIED' ? alpha('#10b981', 0.1) : alpha('#f59e0b', 0.05),
+                                    color: sig.certification_status === 'CERTIFIED' ? '#10b981' : '#f59e0b',
+                                    borderColor: sig.certification_status === 'CERTIFIED' ? '#10b981' : '#f59e0b'
+                                }}
+                             />
                           </TableCell>
                           <TableCell align="right">
                              <IconButton size="small" onClick={() => handleOpenDetail(sig)} sx={{ color: 'primary.main' }}>
