@@ -351,7 +351,7 @@ def get_data_integrity_report():
 @router.get("/integrity/certification")
 async def get_certification_audit():
     """
-    Workstream 20: Institutional Hard-Gate Certification.
+    Workstream 20: Phase 2G Institutional Certification Engine.
     """
     return await container.certification_engine.run_certification_audit()
 

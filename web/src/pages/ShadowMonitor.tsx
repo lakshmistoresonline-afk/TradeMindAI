@@ -19,7 +19,8 @@ import {
   CheckCircle2,
   PieChart,
   TrendingUp,
-  Clock
+  Clock,
+  Shield
 } from 'lucide-react';
 import {
   getShadowStatus,
@@ -44,6 +45,7 @@ export default function ShadowMonitor() {
   const [universe, setUniverse] = useState<any[]>([]);
   const [health, setHealth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [certReport, setCertReport] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
@@ -65,23 +67,22 @@ export default function ShadowMonitor() {
   const fetchData = useCallback(async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
-      // Execute all fetches in parallel but handle them individually to prevent cascading failure
-      // Added getStocks to provide live current_price for active signals (Frontend Join)
       const [
-        sStatus, sSum, sActive, sUni, , sHealth, sMeta, sStocks
+        sStatus, sSum, sActive, sUni, sHealth, sMeta, sStocks, sCert
       ] = await Promise.all([
         getShadowStatus().catch(e => { console.error("Status fetch failed", e); return null; }),
         getShadowSummary().catch(e => { console.error("Summary fetch failed", e); return null; }),
         getShadowActiveSignals().catch(e => { console.error("Active signals fetch failed", e); return []; }),
         getShadowUniverse().catch(e => { console.error("Universe fetch failed", e); return []; }),
-        getShadowPerformance().catch(e => { console.error("Performance fetch failed", e); return null; }),
         getShadowHealth().catch((e: any) => { console.error("Health fetch failed", e); return null; }),
         getShadowSignalsMetadata().catch((e: any) => { console.error("Metadata fetch failed", e); return null; }),
-        getStocks(300).catch((e: any) => { console.error("Stocks fetch failed", e); return { value: [] }; })
+        getStocks(300).catch((e: any) => { console.error("Stocks fetch failed", e); return { value: [] }; }),
+        apiClient.get('/shadow/integrity/certification').catch(e => { console.error("Cert fetch failed", e); return null; })
       ]);
 
       if (sStatus) setStatus(sStatus);
       if (sSum) setSummary(sSum);
+      if (sCert) setCertReport(sCert.data);
 
       // Map current_price from sStocks to active signals
       const stockPriceMap: Record<string, number> = {};
@@ -240,7 +241,11 @@ export default function ShadowMonitor() {
            <StatusBadge label="MARKET" status={marketSession} color={marketSession === 'OPEN' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="ENGINE" status={engineStatus} color={health?.shadow_worker === 'ONLINE' ? "#10b981" : "#f59e0b"} />
            <StatusBadge label="STRATEGY" status="V2.2 FROZEN" color="#00D1FF" />
-           <StatusBadge label="STATISTICAL STATUS" status="PROMISING" color="#f59e0b" />
+           <StatusBadge
+              label="INSTITUTIONAL"
+              status={certReport?.final_status?.replace('PHASE2G_', '') || 'PENDING'}
+              color={certReport?.overall_pass ? "#10b981" : "#ef4444"}
+           />
         </Stack>
       </Stack>
 
@@ -580,6 +585,31 @@ export default function ShadowMonitor() {
 
         {/* Diagnostics Section */}
         <Grid item xs={12} sx={{ mt: 4 }}>
+          <Accordion sx={{ bgcolor: alpha('#000', 0.2), border: '1px solid rgba(255,255,255,0.05)', mb: 2 }}>
+            <AccordionSummary expandIcon={<ChevronDown color="gray" />}>
+              <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Shield size={14} /> INSTITUTIONAL HARD-GATE STATUS (PHASE 2G)
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                 {certReport?.gates && Object.entries(certReport.gates).map(([key, gate]: [string, any]) => (
+                    <Grid item xs={12} sm={6} md={3} key={key}>
+                       <Box sx={{ p: 2, border: '1px solid', borderColor: alpha(gate.status === 'PASS' ? '#10b981' : gate.status === 'FAIL' ? '#ef4444' : '#f59e0b', 0.2), borderRadius: 1 }}>
+                          <Typography variant="caption" display="block" sx={{ fontWeight: 900, color: 'slategray', mb: 1 }}>{key.toUpperCase()}</Typography>
+                          <Chip
+                            label={gate.status}
+                            size="small"
+                            color={gate.status === 'PASS' ? 'success' : gate.status === 'FAIL' ? 'error' : 'warning'}
+                            sx={{ fontWeight: 950, fontSize: '0.6rem', height: 20 }}
+                          />
+                       </Box>
+                    </Grid>
+                 ))}
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+
           <Accordion sx={{ bgcolor: alpha('#000', 0.2), border: '1px solid rgba(255,255,255,0.05)' }}>
             <AccordionSummary expandIcon={<ChevronDown color="gray" />}>
               <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', display: 'flex', alignItems: 'center', gap: 1 }}>
