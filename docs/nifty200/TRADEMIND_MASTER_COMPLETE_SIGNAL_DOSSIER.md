@@ -1,6 +1,6 @@
 # TRADEMIND AI: MASTER SIGNAL DOSSIER
 
-**Generation Timestamp**: 2026-09-06T05:52:08.824489 UTC
+**Generation Timestamp**: 2026-09-06T06:20:11.370201 UTC
 **Total Records**: 1260
 
 ## 1. PERFORMANCE SUMMARY (VERIFIED)
@@ -13,15 +13,15 @@
 | id                                   | symbol     | direction   |   entry_price | status     |   net_pnl | evaluation_mode          |
 |:-------------------------------------|:-----------|:------------|--------------:|:-----------|----------:|:-------------------------|
 | sig_RELIANCE_1788653690              | RELIANCE   | LONG        |       1322    | ACTIVE     | nan       | LIVE_SHADOW              |
-| master_eq_TCS_122636                 | TCS        | LONG        |       4520    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
-| master_eq_ITC_122636                 | ITC        | LONG        |        495    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_opt_SBIN_860_122636           | SBIN       | LONG        |         18    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
-| master_eq_INFY_122636                | INFY       | LONG        |       1910    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
+| master_eq_ITC_122636                 | ITC        | LONG        |        495    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_eq_RELIANCE_122636            | RELIANCE   | LONG        |       2980    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
+| master_eq_INFY_122636                | INFY       | LONG        |       1910    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_fut_NIFTY_122636              | NIFTY      | LONG        |      24850    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_fut_RELIANCE_122636           | RELIANCE   | LONG        |       3010    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_eq_LT_122636                  | LT         | LONG        |       3550    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_opt_RELIANCE_3100_122636      | RELIANCE   | LONG        |         48    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
+| master_eq_TCS_122636                 | TCS        | LONG        |       4520    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_opt_NIFTY_25000_122636        | NIFTY      | LONG        |        155    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | master_fut_BANKNIFTY_122636          | BANKNIFTY  | LONG        |      52600    | ACTIVE     | nan       | LIVE_SHADOW_ACTIVE       |
 | sig_DRREDDY_202608250436             | DRREDDY    | LONG        |       1190.9  | STOP_LOSS  |  -3.2     | LIVE_SHADOW_VERIFIED     |

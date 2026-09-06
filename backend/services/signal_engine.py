@@ -270,6 +270,7 @@ class SignalEngine:
             # Step 3 Metadata
             universe_version="NIFTY_200_AUG2026",
             strategy_version="v2.2",
+            feature_version="v1.0.0",
             data_timestamp=data_ts,
             market_timestamp=now, # Snapshot time
 
@@ -283,7 +284,7 @@ class SignalEngine:
 
             entry_price=stock.last_price,
             target_price=risk_params["target"],
-            stop_loss_price=risk_params["stop_loss"],
+            stop_price=risk_params["stop_loss"],
             timeframe=timeframe,
             status="WAITING_FOR_ENTRY",
             asset_class=asset_class,
@@ -303,5 +304,10 @@ class SignalEngine:
             lifecycle_state="CREATED",
             risk_amount_abs=risk_amt,
             reward_amount_abs=reward_amt,
-            expected_return=expected_val
+            risk_reward_ratio=float(risk_params["risk_reward"]),
+            expected_return=expected_val,
+            feature_version="v1.0.0",
+            market_snapshot_id=f"snap_{symbol}_{now.strftime('%Y%m%d%H%M')}",
+            model_run_id=f"run_{ml_res.get('model_version')}",
+            decision_id=f"dec_{sig_id}"
         )

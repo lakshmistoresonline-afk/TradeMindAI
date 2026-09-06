@@ -412,8 +412,8 @@ class Container:
     @property
     def certification_engine(self):
         if self._certification_engine is None:
-            from backend.services.certification_engine_v2h import Phase2HCertificationEngine
-            self._certification_engine = Phase2HCertificationEngine()
+            from backend.services.certification_engine_v2i import Phase2ICertificationEngine
+            self._certification_engine = Phase2ICertificationEngine()
         return self._certification_engine
 
     @property

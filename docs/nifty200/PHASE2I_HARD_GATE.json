@@ -1,0 +1,66 @@
+{
+    "timestamp": "2026-09-06T06:19:38.901030",
+    "policy_version": "2I.1.0",
+    "gates": {
+        "population_integrity": {
+            "name": "population_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null
+        },
+        "current_signal_integrity": {
+            "name": "current_signal_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null
+        },
+        "active_identity": {
+            "name": "active_identity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null
+        },
+        "active_pricing": {
+            "name": "active_pricing",
+            "status": "FAIL",
+            "mandatory": true,
+            "blocking": true,
+            "reason": null
+        },
+        "fno_identity": {
+            "name": "fno_identity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null
+        },
+        "fno_pricing": {
+            "name": "fno_pricing",
+            "status": "FAIL",
+            "mandatory": true,
+            "blocking": true,
+            "reason": null
+        },
+        "temporal_isolation": {
+            "name": "temporal_isolation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null
+        }
+    },
+    "blocking_failures": [
+        "active_pricing",
+        "fno_pricing"
+    ],
+    "overall_pass": false,
+    "final_status": "PHASE2I_FAIL",
+    "summary": {
+        "total_active": 15,
+        "current_active": 1,
+        "legacy_active": 14
+    }
+}

@@ -30,7 +30,7 @@ class CanonicalSignalRepository:
 
             # 1. Automatic Record Hashing (Phase 20)
             # Hash critical immutable fields
-            hash_data = f"{signal.id}|{signal.symbol}|{signal.direction}|{signal.entry_price}|{signal.target_price}|{signal.stop_loss_price}|{signal.strategy_version}"
+            hash_data = f"{signal.id}|{signal.symbol}|{signal.direction}|{signal.entry_price}|{signal.target_price}|{signal.stop_price}|{signal.strategy_version}"
             data['record_hash'] = hashlib.sha256(hash_data.encode()).hexdigest()
             data['last_updated_at'] = datetime.utcnow()
 

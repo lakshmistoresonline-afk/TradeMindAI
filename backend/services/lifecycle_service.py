@@ -41,9 +41,9 @@ class LifecycleService:
 
         if signal.direction == "LONG":
             if current_price >= (signal.target_price or float('inf')): return "TARGET_HIT"
-            if current_price <= (signal.stop_loss_price or float('-inf')): return "STOP_LOSS"
+            if current_price <= (signal.stop_price or float('-inf')): return "STOP_LOSS"
         else:
             if current_price <= (signal.target_price or float('-inf')): return "TARGET_HIT"
-            if current_price >= (signal.stop_loss_price or float('inf')): return "STOP_LOSS"
+            if current_price >= (signal.stop_price or float('inf')): return "STOP_LOSS"
 
         return None

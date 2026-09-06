@@ -222,7 +222,7 @@ class LiveSignalDB(Base):
     conviction = Column(Float)
     entry_price = Column(Float)
     target_price = Column(Float)
-    stop_loss_price = Column(Float)
+    stop_price = Column(Float)
     timeframe = Column(String)
     status = Column(String)
 

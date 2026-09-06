@@ -588,7 +588,7 @@ export default function ShadowMonitor() {
           <Accordion sx={{ bgcolor: alpha('#000', 0.2), border: '1px solid rgba(255,255,255,0.05)', mb: 2 }}>
             <AccordionSummary expandIcon={<ChevronDown color="gray" />}>
               <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Shield size={14} /> INSTITUTIONAL HARD-GATE STATUS (PHASE 2G)
+                <Shield size={14} /> INSTITUTIONAL HARD-GATE STATUS (PHASE 2I)
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -603,6 +603,7 @@ export default function ShadowMonitor() {
                             color={gate.status === 'PASS' ? 'success' : gate.status === 'FAIL' ? 'error' : 'warning'}
                             sx={{ fontWeight: 950, fontSize: '0.6rem', height: 20 }}
                           />
+                          {gate.mandatory && <Typography variant="caption" sx={{ ml: 1, color: 'error.main', fontSize: '0.5rem', fontWeight: 900 }}>MANDATORY</Typography>}
                        </Box>
                     </Grid>
                  ))}

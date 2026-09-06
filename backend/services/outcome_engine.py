@@ -145,8 +145,8 @@ class OutcomeEngine:
             if signal.direction == "LONG" and exit_price < signal.target_price: return False
             if signal.direction == "SHORT" and exit_price > signal.target_price: return False
         elif status == "STOP_LOSS":
-            if signal.direction == "LONG" and exit_price > signal.stop_loss_price: return False
-            if signal.direction == "SHORT" and exit_price < signal.stop_loss_price: return False
+            if signal.direction == "LONG" and exit_price > signal.stop_price: return False
+            if signal.direction == "SHORT" and exit_price < signal.stop_price: return False
 
         # 3. Instrument Validation
         if not signal.instrument_id: return False
@@ -165,7 +165,7 @@ class OutcomeEngine:
         # 1. Setup Parameters
         entry_limit = signal.entry_price
         target = signal.target_price
-        stop = signal.stop_loss_price
+        stop = signal.stop_price
         direction = signal.direction # LONG or SHORT
 
         # Timezone Alignment

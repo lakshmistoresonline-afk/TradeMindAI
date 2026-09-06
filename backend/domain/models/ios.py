@@ -57,7 +57,7 @@ class LiveSignal(BaseModel):
     conviction: float
     entry_price: float
     target_price: Optional[float] = None
-    stop_loss_price: Optional[float] = None
+    stop_price: Optional[float] = None
     timeframe: str
     status: str # WAITING_FOR_ENTRY, ENTRY_TRIGGERED, ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
 
@@ -108,6 +108,7 @@ class LiveSignal(BaseModel):
     evaluation_mode: str = "LIVE_SHADOW" # LIVE_SHADOW, HISTORICAL, BACKTEST, TEST
     universe_version: str = "NIFTY_200_AUG2026"
     strategy_version: str = "v2.2"
+    feature_version: Optional[str] = None
     prediction_id: Optional[str] = None
     provenance_id: Optional[str] = None
     data_timestamp: Optional[datetime] = None

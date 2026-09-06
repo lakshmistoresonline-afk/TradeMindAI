@@ -109,7 +109,7 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
             <SectionHeader icon={<Lock size={18} />} title="4. TARGET / STOP" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
               <DataRow label="TARGET PRICE" value={`₹${signal.target_price?.toFixed(2)}`} color="#10b981" bold />
-              <DataRow label="STOP LOSS" value={`₹${signal.stop_loss_price || signal.stop_price ? (signal.stop_loss_price || signal.stop_price).toFixed(2) : '--'}`} color="#ef4444" bold />
+              <DataRow label="STOP LOSS" value={signal.stop_price ? `₹${signal.stop_price.toFixed(2)}` : '--'} color="#ef4444" bold />
               <DataRow label="REWARD AMOUNT" value={signal.reward_amount_abs ? `₹${signal.reward_amount_abs.toFixed(2)}` : '--'} />
               <DataRow label="RISK AMOUNT" value={signal.risk_amount_abs ? `₹${signal.risk_amount_abs.toFixed(2)}` : '--'} />
             </Paper>
