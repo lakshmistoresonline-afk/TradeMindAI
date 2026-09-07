@@ -261,6 +261,11 @@ class Container:
         return self._health_service
 
     @property
+    def provider_health_service(self):
+        from backend.services.provider_health_service import ProviderHealthService
+        return ProviderHealthService()
+
+    @property
     def provenance_service(self):
         if self._provenance_service is None:
             from backend.services.provenance_service import ProvenanceService
@@ -418,8 +423,8 @@ class Container:
     @property
     def certification_engine(self):
         if self._certification_engine is None:
-            from backend.services.certification_engine_v2m import Phase2MCertificationEngine
-            self._certification_engine = Phase2MCertificationEngine()
+            from backend.services.certification_engine_v2n import Phase2NCertificationEngine
+            self._certification_engine = Phase2NCertificationEngine()
         return self._certification_engine
 
     @property
