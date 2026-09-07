@@ -95,6 +95,12 @@ class Container:
             if settings.MARKET_DATA_PROVIDER == "groww":
                 from backend.infrastructure.repositories.groww_provider import GrowwProvider
                 self._provider = GrowwProvider()
+            elif settings.MARKET_DATA_PROVIDER == "upstox":
+                from backend.infrastructure.repositories.upstox_provider import UpstoxProvider
+                self._provider = UpstoxProvider()
+            elif settings.MARKET_DATA_PROVIDER == "dhan":
+                from backend.infrastructure.repositories.dhan_provider import DhanProvider
+                self._provider = DhanProvider()
             else:
                 from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
                 self._provider = YFinanceProvider()
@@ -412,8 +418,8 @@ class Container:
     @property
     def certification_engine(self):
         if self._certification_engine is None:
-            from backend.services.certification_engine_v2l import Phase2LCertificationEngine
-            self._certification_engine = Phase2LCertificationEngine()
+            from backend.services.certification_engine_v2m import Phase2MCertificationEngine
+            self._certification_engine = Phase2MCertificationEngine()
         return self._certification_engine
 
     @property

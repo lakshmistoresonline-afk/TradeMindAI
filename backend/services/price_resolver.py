@@ -25,6 +25,34 @@ class ProviderCapabilityRegistry:
                 "future_support": False, # Yahoo NSE futures are unreliable
                 "option_support": False, # Options coverage is poor
                 "exchanges": ["NSE", "BSE"]
+            },
+            "UpstoxProvider": {
+                "equity_support": True,
+                "index_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE"]
+            },
+            "DhanProvider": {
+                "equity_support": True,
+                "index_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE"]
+            },
+            "UpstoxProvider": {
+                "equity_support": True,
+                "index_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE"]
+            },
+            "DhanProvider": {
+                "equity_support": True,
+                "index_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE"]
             }
         }
         return registry.get(provider_name, {
