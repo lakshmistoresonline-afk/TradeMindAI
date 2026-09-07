@@ -52,13 +52,13 @@ class LiveSignal(BaseModel):
     id: str
     symbol: str
     timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
-    rating: str
+    rating: Optional[str] = None
     direction: str # LONG or SHORT
-    conviction: float
-    entry_price: float
+    conviction: Optional[float] = None
+    entry_price: Optional[float] = None
     target_price: Optional[float] = None
     stop_price: Optional[float] = None
-    timeframe: str
+    timeframe: Optional[str] = None
     status: str # WAITING_FOR_ENTRY, ENTRY_TRIGGERED, ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
 
     # F&O Support (RC-5)
@@ -84,6 +84,9 @@ class LiveSignal(BaseModel):
     reward_per_unit: Optional[float] = None
     data_quality_score: Optional[float] = None
     feature_snapshot_id: Optional[str] = None
+    market_snapshot_id: Optional[str] = None
+    model_run_id: Optional[str] = None
+    decision_id: Optional[str] = None
     provenance: Dict[str, Any] = Field(default_factory=dict)
 
     validated_at: Optional[datetime] = None
@@ -176,7 +179,7 @@ class LiveSignal(BaseModel):
     created_by: str = "SYSTEM"
     calculation_version: str = "1.0"
     record_hash: Optional[str] = None
-    audit_status: str = "PENDING"
+    audit_status: Optional[str] = "PENDING"
 
 class TradeFeedback(BaseModel):
     id: str

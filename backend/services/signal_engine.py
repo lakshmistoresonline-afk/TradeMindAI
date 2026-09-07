@@ -140,8 +140,8 @@ class SignalEngine:
             return None
 
         # 9. DATA QUALITY SCORE
-        last_feature_date = features_list[-1].date
-        staleness = (datetime.datetime.utcnow() - last_feature_date).total_seconds() / 3600.0 # hours
+        data_ts = features_list[-1].date
+        staleness = (datetime.datetime.utcnow() - data_ts).total_seconds() / 3600.0 # hours
 
         recent_prices = await container.repository.get_recent_prices(symbol, limit=20)
         coverage_score = min(1.0, len(recent_prices) / 20.0)
@@ -264,6 +264,7 @@ class SignalEngine:
             risk_per_unit=float(abs(risk_amt)),
             reward_per_unit=float(abs(reward_amt)),
             data_quality_score=float(data_quality),
+            feature_snapshot_id=f"feat_snap_{symbol}_{now.strftime('%Y%m%d%H%M')}",
             signal_eligibility=eligibility,
             evaluation_mode=eval_mode,
 
@@ -306,7 +307,6 @@ class SignalEngine:
             reward_amount_abs=reward_amt,
             risk_reward_ratio=float(risk_params["risk_reward"]),
             expected_return=expected_val,
-            feature_version="v1.0.0",
             market_snapshot_id=f"snap_{symbol}_{now.strftime('%Y%m%d%H%M')}",
             model_run_id=f"run_{ml_res.get('model_version')}",
             decision_id=f"dec_{sig_id}"

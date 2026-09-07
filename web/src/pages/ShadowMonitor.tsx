@@ -27,7 +27,6 @@ import {
   getShadowSummary,
   getShadowActiveSignals,
   getShadowUniverse,
-  getShadowPerformance,
   getShadowHealth,
   getShadowSignals,
   getShadowSignalsMetadata,
@@ -96,19 +95,31 @@ export default function ShadowMonitor() {
 
       const enrichedSignals = activeSignalsArray.map((sig: any) => {
         const livePrice = stockPriceMap[sig.symbol];
-        const currentPrice = sig.current_price || livePrice; // Prefer API if exists
+        const currentPrice = sig.current_price || livePrice || sig.last_price || sig.price;
 
-        let pnl = sig.pnl_percentage;
-        if (pnl === undefined && currentPrice && sig.entry) {
-          if (sig.direction === 'LONG') {
-            pnl = ((currentPrice - sig.entry) / sig.entry) * 100;
-          } else {
-            pnl = ((sig.entry - currentPrice) / sig.entry) * 100;
+        // Zero-Gap Field Mapping (Supports Ledger 1.0, 2.0 and various API formats)
+        const entry = sig.entry_price ?? sig.entry ?? sig.entryPrice;
+        const target = sig.target_price ?? sig.target ?? sig.targetPrice;
+        const stop = sig.stop_price ?? sig.stop ?? sig.stopPrice ?? sig.stop_loss_price ?? sig.stop_loss ?? sig.stopLoss;
+
+        let pnl = sig.pnl_percentage ?? sig.pnl ?? sig.profit_pct;
+        if ((pnl === undefined || pnl === null) && currentPrice && entry) {
+          const entryNum = Number(entry);
+          const currentNum = Number(currentPrice);
+          if (entryNum > 0) {
+            if (sig.direction === 'LONG') {
+              pnl = ((currentNum - entryNum) / entryNum) * 100;
+            } else {
+              pnl = ((entryNum - currentNum) / entryNum) * 100;
+            }
           }
         }
 
         return {
           ...sig,
+          entry_price: entry,
+          target_price: target,
+          stop_price: stop,
           current_price: currentPrice,
           pnl_percentage: pnl
         };
@@ -132,7 +143,24 @@ export default function ShadowMonitor() {
     setHistoryLoading(true);
     try {
       const res = await getShadowSignals(filters);
-      setHistorySignals(res.signals || []);
+      const rawSignals = res.signals || [];
+
+      const enriched = rawSignals.map((sig: any) => {
+        const entry = sig.entry_price ?? sig.entry ?? sig.entryPrice;
+        const target = sig.target_price ?? sig.target ?? sig.targetPrice;
+        const stop = sig.stop_price ?? sig.stop ?? sig.stopPrice ?? sig.stop_loss_price ?? sig.stop_loss ?? sig.stopLoss;
+        const pnl = sig.net_pnl ?? sig.pnl_percentage ?? sig.pnl ?? sig.profit_pct;
+
+        return {
+          ...sig,
+          entry_price: entry,
+          target_price: target,
+          stop_price: stop,
+          net_pnl: pnl
+        };
+      });
+
+      setHistorySignals(enriched);
     } catch (err) {
       console.error("Failed to fetch shadow history:", err);
     } finally {
@@ -149,6 +177,13 @@ export default function ShadowMonitor() {
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
+
+  useEffect(() => {
+    if (summary) {
+        console.log("[ShadowMonitor] Summary Data:", summary);
+        console.log("[ShadowMonitor] Active Signals:", activeSignals);
+    }
+  }, [summary, activeSignals]);
 
   const handleRefresh = () => fetchData(true);
 
@@ -205,7 +240,7 @@ export default function ShadowMonitor() {
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
         <Box>
           <Typography variant="h4" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-            SHADOW MONITOR <Chip label="MASTER v4.5.36" color="primary" size="small" sx={{ fontWeight: 900, borderRadius: 0.5 }} />
+            SHADOW MONITOR <Chip label="MASTER v4.5.38-FIX" color="primary" size="small" sx={{ fontWeight: 900, borderRadius: 0.5 }} />
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>
             <Clock size={14} style={{ verticalAlign: 'middle', marginRight: 8 }} />
@@ -273,28 +308,28 @@ export default function ShadowMonitor() {
         <Grid item xs={12}>
            <Grid container spacing={2}>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="ACTIVE" value={summary?.active_signals || 0} icon={<Activity size={18} color="#00D1FF" />} />
+                <MetricCard title="ACTIVE" value={summary?.active_signals ?? summary?.activeCount ?? 0} icon={<Activity size={18} color="#00D1FF" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="VERIFIED" value={summary?.verified_trades || 0} icon={<CheckCircle2 size={18} color="#10b981" />} />
+                <MetricCard title="VERIFIED" value={summary?.verified_trades ?? summary?.verifiedCount ?? 0} icon={<CheckCircle2 size={18} color="#10b981" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="LEGACY" value={summary?.unverified_historical || 0} icon={<Database size={18} color="slategray" />} />
+                <MetricCard title="LEGACY" value={summary?.unverified_historical ?? summary?.legacyCount ?? 0} icon={<Database size={18} color="slategray" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="WIN RATE" value={`${summary?.win_rate_pct || 0}%`} icon={<TrendingUp size={18} color="#10b981" />} />
+                <MetricCard title="WIN RATE" value={summary?.win_rate_pct ?? summary?.winRate ?? '0'} suffix="%" icon={<TrendingUp size={18} color="#10b981" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="PROFIT FACTOR" value={summary?.profit_factor || '1.0'} icon={<Zap size={18} color="#fbbf24" />} />
+                <MetricCard title="PROFIT FACTOR" value={summary?.profit_factor ?? summary?.profitFactor ?? '1.0'} icon={<Zap size={18} color="#fbbf24" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="TRADE SEQ DD" value={`${summary?.trade_sequence_drawdown || 0}%`} icon={<AlertTriangle size={18} color="#ef4444" />} />
+                <MetricCard title="TRADE SEQ DD" value={summary?.trade_sequence_drawdown ?? summary?.drawdown ?? '0'} suffix="%" icon={<AlertTriangle size={18} color="#ef4444" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="PORTFOLIO DD" value={`${summary?.portfolio_mtm_drawdown || 0}%`} icon={<PieChart size={18} color="#3b82f6" />} />
+                <MetricCard title="PORTFOLIO DD" value={summary?.portfolio_mtm_drawdown ?? '0'} suffix="%" icon={<PieChart size={18} color="#3b82f6" />} />
               </Grid>
               <Grid item xs={12} sm={6} md={1.5}>
-                <MetricCard title="TOTAL CALLS" value={summary?.transactional_signals || 0} icon={<RefreshCcw size={18} color="white" />} />
+                <MetricCard title="TOTAL CALLS" value={summary?.transactional_signals ?? summary?.totalCalls ?? 0} icon={<RefreshCcw size={18} color="white" />} />
               </Grid>
            </Grid>
         </Grid>
@@ -316,11 +351,12 @@ export default function ShadowMonitor() {
                         <TableCell>DIRECTION</TableCell>
                         <TableCell>CREATED</TableCell>
                         <TableCell>ENTRY</TableCell>
-                        <TableCell>OBJECTIVES</TableCell>
+                        <TableCell>TARGET</TableCell>
+                        <TableCell>STOP</TableCell>
                         <TableCell>UNDERLYING</TableCell>
                         <TableCell>INSTRUMENT</TableCell>
                         <TableCell>P&L %</TableCell>
-                        <TableCell>CERTIFICATION</TableCell>
+                        <TableCell>CERT</TableCell>
                         <TableCell align="right">DETAIL</TableCell>
                       </TableRow>
                     </TableHead>
@@ -336,19 +372,17 @@ export default function ShadowMonitor() {
                             />
                           </TableCell>
                           <TableCell sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem' }}>
-                             <Box>E: {sig.entry_price?.toFixed(2)}</Box>
-                             <Box color="success.main">T: {sig.target_price?.toFixed(2)}</Box>
-                             <Box color="error.main">S: {sig.stop_price?.toFixed(2)}</Box>
-                          </TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price ? `₹${Number(sig.entry_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: 'success.main' }}>{sig.target_price ? `₹${Number(sig.target_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: 'error.main' }}>{sig.stop_price ? `₹${Number(sig.stop_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
                           <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
-                             {sig.underlying_price ? sig.underlying_price.toFixed(2) : '--'}
+                             {sig.underlying_price ? `₹${Number(sig.underlying_price).toFixed(2)}` : '--'}
                           </TableCell>
                           <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 900, color: 'primary.main' }}>
-                             {sig.current_price ? sig.current_price.toFixed(2) : 'UNAVAILABLE'}
+                             {sig.current_price ? `₹${Number(sig.current_price).toFixed(2)}` : 'UNAVAILABLE'}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 900, color: (sig.pnl_percentage || 0) >= 0 ? '#10b981' : '#ef4444' }}>
-                             {sig.pnl_percentage !== undefined ? `${sig.pnl_percentage > 0 ? '+' : ''}${sig.pnl_percentage.toFixed(2)}%` : '--'}
+                             {sig.pnl_percentage !== undefined && sig.pnl_percentage !== null ? `${sig.pnl_percentage > 0 ? '+' : ''}${Number(sig.pnl_percentage).toFixed(2)}%` : '--'}
                           </TableCell>
                           <TableCell>
                              <Chip
@@ -495,14 +529,14 @@ export default function ShadowMonitor() {
                            />
                         </TableCell>
                         <TableCell sx={{ fontSize: '0.7rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price?.toFixed(2)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.target_price?.toFixed(2)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.stop_price?.toFixed(2)}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price ? `₹${Number(sig.entry_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.target_price ? `₹${Number(sig.target_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.stop_price ? `₹${Number(sig.stop_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
                         <TableCell>
                            <StatusChip status={sig.status} />
                         </TableCell>
-                        <TableCell sx={{ fontWeight: 900, color: sig.net_pnl > 0 ? '#10b981' : sig.net_pnl < 0 ? '#ef4444' : 'text.secondary' }}>
-                           {sig.net_pnl !== null && sig.net_pnl !== undefined ? `${sig.net_pnl > 0 ? '+' : ''}${sig.net_pnl.toFixed(2)}%` : '--'}
+                        <TableCell sx={{ fontWeight: 900, color: (sig.net_pnl || 0) > 0 ? '#10b981' : (sig.net_pnl || 0) < 0 ? '#ef4444' : 'text.secondary' }}>
+                           {sig.net_pnl !== null && sig.net_pnl !== undefined ? `${sig.net_pnl > 0 ? '+' : ''}${Number(sig.net_pnl).toFixed(2)}%` : '--'}
                         </TableCell>
                         <TableCell>
                            <Typography variant="caption" sx={{ fontWeight: 900 }}>L{sig.verification_level || 0}</Typography>

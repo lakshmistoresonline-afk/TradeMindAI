@@ -6,8 +6,19 @@ from backend.core.config import settings
 from google.cloud import firestore as google_firestore
 from google.oauth2 import service_account
 
+import datetime
+from pydantic import BaseModel
+
 # Global client cache
 _db_client = None
+
+class PydanticJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        if isinstance(obj, BaseModel):
+            return obj.model_dump()
+        return super().default(obj)
 
 def get_db():
     global _db_client

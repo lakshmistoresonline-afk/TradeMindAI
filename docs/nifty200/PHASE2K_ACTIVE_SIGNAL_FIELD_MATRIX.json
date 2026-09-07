@@ -1,0 +1,167 @@
+[
+    {
+        "id": "sig_RELIANCE_1788653690",
+        "symbol": "RELIANCE",
+        "asset_class": "EQUITY",
+        "legacy": false,
+        "current_price": 1309.199951171875,
+        "price_status": "FRESH",
+        "prediction_id": "5423fe79-82d0-4936-aa8a-0366ea38cdc7",
+        "provenance_id": "prov_1aa8e850b726",
+        "decision_id": "dec_sig_RELIANCE_1788653690"
+    },
+    {
+        "id": "master_opt_RELIANCE_3100_122636",
+        "symbol": "RELIANCE",
+        "asset_class": "OPTIONS",
+        "legacy": true,
+        "current_price": null,
+        "price_status": "PROVIDER_UNSUPPORTED",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_opt_SBIN_860_122636",
+        "symbol": "SBIN",
+        "asset_class": "OPTIONS",
+        "legacy": true,
+        "current_price": null,
+        "price_status": "PROVIDER_UNSUPPORTED",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "sig_FORTIS_202608241002",
+        "symbol": "FORTIS",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 897.4500122070312,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_fut_BANKNIFTY_122636",
+        "symbol": "BANKNIFTY",
+        "asset_class": "FUTURES",
+        "legacy": true,
+        "current_price": null,
+        "price_status": "PROVIDER_UNSUPPORTED",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_fut_RELIANCE_122636",
+        "symbol": "RELIANCE",
+        "asset_class": "FUTURES",
+        "legacy": true,
+        "current_price": null,
+        "price_status": "PROVIDER_UNSUPPORTED",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "sig_APOLLOHOSP_202608240938",
+        "symbol": "APOLLOHOSP",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 8710.5,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "sig_BIOCON_202608240939",
+        "symbol": "BIOCON",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 390.45001220703125,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_opt_NIFTY_25000_122636",
+        "symbol": "NIFTY",
+        "asset_class": "OPTIONS",
+        "legacy": true,
+        "current_price": null,
+        "price_status": "PROVIDER_UNSUPPORTED",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_fut_NIFTY_122636",
+        "symbol": "NIFTY",
+        "asset_class": "FUTURES",
+        "legacy": true,
+        "current_price": null,
+        "price_status": "PROVIDER_UNSUPPORTED",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_eq_INFY_122636",
+        "symbol": "INFY",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 1090.5999755859375,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_eq_ITC_122636",
+        "symbol": "ITC",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 263.29998779296875,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_eq_LT_122636",
+        "symbol": "LT",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 3977.5,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_eq_RELIANCE_122636",
+        "symbol": "RELIANCE",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 1309.0,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    },
+    {
+        "id": "master_eq_TCS_122636",
+        "symbol": "TCS",
+        "asset_class": "EQUITY",
+        "legacy": true,
+        "current_price": 2270.5,
+        "price_status": "FRESH",
+        "prediction_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "provenance_id": "UNAVAILABLE_PRE_LEDGER_2.0",
+        "decision_id": null
+    }
+]

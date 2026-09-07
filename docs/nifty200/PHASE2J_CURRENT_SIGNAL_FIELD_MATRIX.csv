@@ -1,0 +1,3 @@
+id,symbol,prediction_id,provenance_id,feature_snapshot_id,market_snapshot_id,model_run_id,decision_id,stop_price,current_price,price_source,price_status,overall_pass
+sig_PROOFA_1788741923,RELIANCE,2ef892de-907d-45b5-a72b-90e16457e673,4a221b5f-8558-46b1-a8a6-08c97fa6f368,feat_snap_RELIANCE_202609070615,snap_RELIANCE_202609070615,run_v2.2-champion,dec_sig_PROOFA_1788741923,1282.34,,,,PASS
+sig_RELIANCE_1788653690,RELIANCE,5423fe79-82d0-4936-aa8a-0366ea38cdc7,prov_1aa8e850b726,feat_snap_RELIANCE_202609060544,snap_RELIANCE_202609060544,run_v2.2-champion,dec_sig_RELIANCE_1788653690,1282.34,,,,PASS

@@ -35,10 +35,11 @@ class CanonicalSignalRepository:
             data['last_updated_at'] = datetime.utcnow()
 
             # 2. Deep serialize JSON fields
+            from backend.core.database import PydanticJSONEncoder
             for col in ['events', 'provenance']:
                 val = data.get(col)
                 if val is not None and not isinstance(val, str):
-                    data[col] = json.dumps(val)
+                    data[col] = json.dumps(val, cls=PydanticJSONEncoder)
 
             # Filter data to match DB columns
             db_columns = {c.name for c in ShadowSignalDB.__table__.columns}

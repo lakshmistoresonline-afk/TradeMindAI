@@ -1,0 +1,37 @@
+{
+  "phase": "2K",
+  "policy_version": "2K.1.0",
+  "timestamp": "2026-09-07T06:40:00.000Z",
+
+  "population": {
+    "total": 1260,
+    "active": 15,
+    "current_post_ledger": 1,
+    "legacy_active": 14,
+    "verified": 50
+  },
+
+  "gates": {
+    "population_integrity": "PASS",
+    "current_signal_field_completeness": "PASS",
+    "active_identity": "PASS",
+    "active_pricing": "FAIL",
+    "prediction_linkage": "PASS",
+    "provenance": "PASS",
+    "feature_snapshot": "PASS",
+    "market_snapshot": "PASS",
+    "model_run": "PASS",
+    "decision": "PASS",
+    "fno_identity": "PASS",
+    "fno_pricing": "FAIL",
+    "temporal_isolation": "PASS",
+    "neon_authority": "PASS",
+    "api_parity": "PASS"
+  },
+
+  "blocking_failures": ["active_pricing", "fno_pricing"],
+
+  "overall_pass": false,
+
+  "final_status": "PHASE2K_FAIL"
+}

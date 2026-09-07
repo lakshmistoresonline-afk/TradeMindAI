@@ -134,7 +134,6 @@ def get_shadow_summary():
                 "trade_sequence_drawdown": state["trade_sequence_drawdown"],
                 "portfolio_mtm_drawdown": state["portfolio_mtm_drawdown"],
                 "win_rate_pct": forensic["win_rate_pct"],
-                "brier_score": 0.2140,
                 "p_value": 0.1611,
                 "sample_status": "PROMISING_ACCUMULATING",
                 "milestone": "50/100"
@@ -165,42 +164,12 @@ def get_signal_trace(signal_id: str):
     return container.audit_trail_service.get_full_trace(signal_id)
 
 @router.get("/active-signals")
-def get_active_signals():
-    from backend.core.postgres import StockDB
-    try:
-        with SessionLocal() as session:
-            # Join with StockDB to get the latest price
-            active = session.query(ShadowSignalDB, StockDB.last_price).join(
-                StockDB, ShadowSignalDB.symbol == StockDB.symbol, isouter=True
-            ).filter(ShadowSignalDB.status == 'ACTIVE').all()
-
-            results = []
-            for s, lp in active:
-                current_price = lp or s.entry_price # Fallback to entry if not found
-
-                # Calculate P&L
-                pnl = 0.0
-                if current_price and s.entry_price:
-                    if s.direction == "LONG":
-                        pnl = (current_price - s.entry_price) / s.entry_price * 100
-                    else:
-                        pnl = (s.entry_price - current_price) / s.entry_price * 100
-
-                results.append({
-                    "id": s.id, "symbol": s.symbol, "direction": s.direction,
-                    "timestamp": s.timestamp.isoformat() if hasattr(s.timestamp, "isoformat") else s.timestamp,
-                    "created_at": (s.created_at or s.timestamp).isoformat() if hasattr(s.timestamp, "isoformat") else (s.created_at or s.timestamp),
-                    "updated_at": (s.updated_at or s.timestamp).isoformat() if hasattr(s.timestamp, "isoformat") else (s.updated_at or s.timestamp),
-                    "entry": s.entry_price, "target": s.target_price, "stop": s.stop_price,
-                    "current_price": current_price,
-                    "pnl_percentage": round(pnl, 2),
-                    "probability": s.calibrated_probability, "ev": s.expected_value,
-                    "model_version": s.model_version, "status": s.status
-                })
-            return results
-    except Exception as e:
-        print(f"SQL Error (Active): {e}")
-        return []
+async def get_active_shadow_signals():
+    """
+    Workstream 7/18: Reconciled Active Shadow Signals.
+    Enforces Ledger 2.0 institutional schema and certification status.
+    """
+    return await get_active_shadow_signals_api()
 
 @router.get("/performance")
 def get_shadow_performance():
@@ -351,7 +320,7 @@ def get_data_integrity_report():
 @router.get("/integrity/certification")
 async def get_certification_audit():
     """
-    Workstream 20: Phase 2G Institutional Certification Engine.
+    Workstream 20: Phase 2K Institutional Certification Engine.
     """
     return await container.certification_engine.run_certification_audit()
 
@@ -364,13 +333,20 @@ async def get_full_reconciliation():
 
 @router.get("/signals/active")
 async def get_active_shadow_signals_api():
+    from backend.core.container import container
     signals = await container.canonical_signal_repo.get_active_signals()
     # ENFORCEMENT DATE: 2026-09-04 12:00:00
     cutoff = datetime(2026, 9, 4, 12, 0, 0)
 
     results = []
     for s in signals:
-        data = {c.name: getattr(s, c.name).isoformat() if isinstance(getattr(s, c.name), datetime) else getattr(s, c.name) for c in s.__table__.columns}
+        # Pydantic model dump
+        data = s.model_dump()
+
+        # Formatting timestamps for JSON
+        for k, v in data.items():
+            if isinstance(v, datetime):
+                data[k] = v.isoformat()
 
         # Add dynamic certification status (Workstream 35/36)
         is_legacy = s.timestamp < cutoff
