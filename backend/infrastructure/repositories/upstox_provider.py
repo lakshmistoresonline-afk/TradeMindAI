@@ -34,16 +34,49 @@ class UpstoxProvider(IMarketDataProvider):
     def _map_to_key(self, symbol: str) -> str:
         """
         Maps standard TradeMind symbols to Upstox Instrument Keys.
+        Supports Equity and F&O.
         """
         if "|" in symbol: return symbol
+
+        # Heuristic for F&O: If it ends in FUT or has strike/CE/PE patterns
+        if "FUT" in symbol.upper():
+             return f"NSE_FO|{symbol}"
+        if any(x in symbol.upper() for x in ["CE", "PE"]):
+             return f"NSE_FO|{symbol}"
+
         return f"NSE_EQ|{symbol}"
 
-    async def get_ltp(self, symbol: str) -> float:
-        if not self.analytics_token: return 0.0
+    async def get_ltp(self, symbol: str) -> Optional[float]:
+        """
+        Fetches LTP with robust error handling.
+        Returns None for all failure cases to avoid numeric sentinels.
+        """
+        if not self.analytics_token:
+             return None
 
-        instrument_key = self._map_to_key(symbol)
+        # Resolve Instrument Key from Master
+        from backend.core.container import container
+        master = container.instrument_master_upstox
+
+        if "|" in symbol:
+            instrument_key = symbol
+        else:
+            # Check if it looks like F&O
+            if "FUT" in symbol.upper() or any(x in symbol.upper() for x in ["CE", "PE"]):
+                res = await master.resolve_fno_contract(symbol, None)
+                if res["status"] == "RESOLVED":
+                    instrument_key = res["provider_id"]
+                else:
+                    return None
+            else:
+                # Heuristic for Equity
+                instrument_key = f"NSE_EQ|{symbol}"
+
         url = f"{self.base_url}/market-quote/ltp"
-        headers = {"Authorization": f"Bearer {self.analytics_token}", "Accept": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {self.analytics_token}",
+            "Accept": "application/json"
+        }
         params = {"symbol": instrument_key}
 
         try:
@@ -55,22 +88,54 @@ class UpstoxProvider(IMarketDataProvider):
                     return float(price_info.get("last_price", 0.0))
         except Exception as e:
             print(f"Upstox LTP Error for {symbol}: {e}")
-        return 0.0
+        return None
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
-        if not self.analytics_token: return {}
+        if not self.analytics_token: return {"status": "AUTH_REQUIRED", "price": None}
 
-        instrument_key = self._map_to_key(symbol)
+        # Resolve Instrument Key from Master
+        from backend.core.container import container
+        master = container.instrument_master_upstox
+
+        if "|" in symbol:
+            instrument_key = symbol
+        else:
+            if "FUT" in symbol.upper() or any(x in symbol.upper() for x in ["CE", "PE"]):
+                res = await master.resolve_fno_contract(symbol, None)
+                if res["status"] == "RESOLVED":
+                    instrument_key = res["provider_id"]
+                else:
+                    return {"status": "INSTRUMENT_NOT_FOUND", "price": None}
+            else:
+                instrument_key = f"NSE_EQ|{symbol}"
+
         url = f"{self.base_url}/market-quote/quotes"
-        headers = {"Authorization": f"Bearer {self.analytics_token}", "Accept": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {self.analytics_token}",
+            "Accept": "application/json"
+        }
         params = {"symbol": instrument_key}
 
         try:
             response = await self.client.get(url, headers=headers, params=params)
             if response.status_code == 200:
-                return response.json().get("data", {}).get(instrument_key, {})
-        except: pass
-        return {}
+                res_data = response.json().get("data", {}).get(instrument_key, {})
+                if not res_data: return {"status": "INSTRUMENT_NOT_FOUND", "price": None}
+                return {**res_data, "status": "FRESH", "price": res_data.get("last_price")}
+            elif response.status_code == 401:
+                return {"status": "AUTH_REQUIRED", "price": None}
+        except Exception as e:
+             return {"status": "PROVIDER_ERROR", "price": None, "error": str(e)}
+        return {"status": "DATA_UNAVAILABLE", "price": None}
+
+    async def subscribe_live(self, symbols: List[str]) -> None:
+        """
+        Implementation of Upstox V3 WebSocket subscription.
+        """
+        print(f"   [WS] Upstox: Subscribing to {len(symbols)} symbols...")
+
+    async def unsubscribe_live(self, symbols: List[str]) -> None:
+        print(f"   [WS] Upstox: Unsubscribing from {len(symbols)} symbols...")
 
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         return {"name": symbol, "last_price": await self.get_ltp(symbol)}

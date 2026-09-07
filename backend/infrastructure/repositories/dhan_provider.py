@@ -31,28 +31,67 @@ class DhanProvider(IMarketDataProvider):
         self.client = httpx.AsyncClient(timeout=30.0)
 
     def _map_to_id(self, symbol: str) -> str:
+        """
+        Maps standard TradeMind symbols to Dhan Security IDs (Numerical).
+        """
+        # Heuristic for F&O: Requires real instrument master for numerical IDs
         return symbol
 
-    async def get_ltp(self, symbol: str) -> float:
-        if not self.access_token: return 0.0
+    async def get_ltp(self, symbol: str) -> Optional[float]:
+        """
+        Fetches LTP using Dhan marketfeed API.
+        Returns None for all failure cases.
+        """
+        if not self.access_token:
+             return None
 
-        security_id = self._map_to_id(symbol)
+        # Resolve Security ID from Master
+        from backend.core.container import container
+        master = container.instrument_master_dhan
+
+        if symbol.isdigit():
+            security_id = symbol
+        else:
+            # Try to resolve F&O or Equity
+            res = await master.resolve_fno_contract(symbol, None)
+            if res["status"] == "RESOLVED":
+                security_id = res["provider_id"]
+            else:
+                return None
+
         url = f"{self.base_url}/marketfeed/ltp"
-        headers = {"access-token": self.access_token, "Content-Type": "application/json"}
-        payload = {"instruments": [{"exchangeSegment": "NSE_EQ", "securityId": security_id}]}
+        headers = {
+            "access-token": self.access_token,
+            "Content-Type": "application/json"
+        }
+        # Dhan typically uses POST for multiple symbols in the v2 marketfeed
+        payload = {
+            "instruments": [{"exchangeSegment": "NSE_EQ", "securityId": security_id}]
+        }
 
         try:
             response = await self.client.post(url, headers=headers, json=payload)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("status") == "success":
-                    return float(data.get("data", {}).get(security_id, {}).get("last_price", 0.0))
+                    price_info = data.get("data", {}).get(security_id)
+                    if price_info:
+                         return float(price_info.get("last_price", 0.0))
         except Exception as e:
             print(f"Dhan LTP Error for {symbol}: {e}")
-        return 0.0
+        return None
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
-        return {"last_price": await self.get_ltp(symbol)}
+        ltp = await self.get_ltp(symbol)
+        if ltp is None:
+             return {"status": "DATA_UNAVAILABLE", "price": None}
+        return {"last_price": ltp, "status": "FRESH", "price": ltp}
+
+    async def subscribe_live(self, symbols: List[str]) -> None:
+        print(f"   [WS] Dhan: Subscribing to {len(symbols)} symbols...")
+
+    async def unsubscribe_live(self, symbols: List[str]) -> None:
+        print(f"   [WS] Dhan: Unsubscribing from {len(symbols)} symbols...")
 
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         return {"name": symbol, "last_price": await self.get_ltp(symbol)}

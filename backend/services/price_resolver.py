@@ -48,27 +48,38 @@ class ProviderCapabilityRegistry:
 class PriceResolver:
     """
     Workstream 15: Institutional Multi-Provider Price Resolver.
-    Implements deterministic failover: Upstox -> Dhan -> YFinance -> UNAVAILABLE.
+    Implements deterministic failover: Upstox -> Dhan -> Groww -> YFinance.
+    Enforces strict F&O-only routing for derivative premiums.
     """
 
-    FAILOVER_SEQUENCE = ["upstox", "dhan", "groww", "yfinance"]
+    EQUITY_SEQUENCE = ["upstox", "dhan", "groww", "yfinance"]
+    FNO_SEQUENCE = ["upstox", "dhan", "groww"] # YFinance FORBIDDEN for F&O
 
     @classmethod
     async def resolve_current_price(cls, signal: LiveSignal) -> Dict[str, Any]:
         """
         Entry point for institutional price resolution.
         """
-        # 1. Determine priority sequence
-        primary = settings.MARKET_DATA_PROVIDER
-        sequence = [primary] + [p for p in cls.FAILOVER_SEQUENCE if p != primary]
+        asset_class = signal.asset_class
 
-        # 2. Iterate through providers
+        # 1. Select Sequence
+        if asset_class in ["FUTURES", "OPTIONS"]:
+             sequence = cls.FNO_SEQUENCE
+        else:
+             sequence = cls.EQUITY_SEQUENCE
+
+        # 2. Re-prioritize based on settings
+        primary = settings.MARKET_DATA_PROVIDER
+        if primary in sequence:
+            sequence = [primary] + [p for p in sequence if p != primary]
+
+        # 3. Iterate through providers
         for provider_code in sequence:
             res = await cls._try_resolve_with_provider(signal, provider_code)
             if res["status"] == "FRESH":
                 return res
 
-        # 3. Final Fallback (NULL)
+        # 4. Final Fallback (NULL)
         return {
             "current_price": None,
             "underlying_price": None,

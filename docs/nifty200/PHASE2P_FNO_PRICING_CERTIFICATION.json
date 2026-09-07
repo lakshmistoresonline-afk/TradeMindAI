@@ -1,0 +1,229 @@
+{
+    "phase": "2P",
+    "timestamp": "2026-09-07T13:32:53.836006",
+    "policy_version": "2P.1.0",
+    "population": {
+        "total": 1260,
+        "active": 15,
+        "fno_active": 6,
+        "verified": 50
+    },
+    "gates": {
+        "population_integrity": {
+            "name": "population_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:49.187748"
+        },
+        "v22_freeze": {
+            "name": "v22_freeze",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:49.187748"
+        },
+        "instrument_master_integrity": {
+            "name": "instrument_master_integrity",
+            "status": "FAIL",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {
+                "status": "CONFIGURATION_REQUIRED",
+                "provider": "Upstox",
+                "timestamp": "2026-09-07T13:32:53.226356",
+                "record_count": 0,
+                "reason": "No instruments found in Neon for provider Upstox. Sync required."
+            },
+            "timestamp": "2026-09-07T13:32:53.226356"
+        },
+        "upstox_implementation": {
+            "name": "upstox_implementation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.226356"
+        },
+        "dhan_implementation": {
+            "name": "dhan_implementation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.226356"
+        },
+        "upstox_authentication": {
+            "name": "upstox_authentication",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "dhan_authentication": {
+            "name": "dhan_authentication",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "provider_activation": {
+            "name": "provider_activation",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "upstox_fno_quote": {
+            "name": "upstox_fno_quote",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "dhan_fno_quote": {
+            "name": "dhan_fno_quote",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "fno_derivative_pricing": {
+            "name": "fno_derivative_pricing",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "price_freshness": {
+            "name": "price_freshness",
+            "status": "DATA_UNAVAILABLE",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Reason required for non-PASS status",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "fno_identity": {
+            "name": "fno_identity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "underlying_derivative_separation": {
+            "name": "underlying_derivative_separation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "failover_logic": {
+            "name": "failover_logic",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "timestamp_integrity": {
+            "name": "timestamp_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "neon_authority": {
+            "name": "neon_authority",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "firestore_mirror": {
+            "name": "firestore_mirror",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "api_parity": {
+            "name": "api_parity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "dashboard_runtime": {
+            "name": "dashboard_runtime",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "failure_injection": {
+            "name": "failure_injection",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        },
+        "audit_reconciliation": {
+            "name": "audit_reconciliation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-07T13:32:53.836006"
+        }
+    },
+    "blocking_failures": [
+        "instrument_master_integrity",
+        "upstox_authentication",
+        "dhan_authentication",
+        "provider_activation",
+        "upstox_fno_quote",
+        "dhan_fno_quote",
+        "fno_derivative_pricing",
+        "price_freshness"
+    ],
+    "overall_pass": false,
+    "final_status": "PHASE2P_FAIL"
+}

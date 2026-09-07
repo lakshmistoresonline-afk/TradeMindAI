@@ -216,6 +216,14 @@ class IMarketDataProvider(ABC):
     async def get_option_chain(self, symbol: str, expiry: Optional[datetime] = None) -> OptionsChain:
         pass
 
+    @abstractmethod
+    async def subscribe_live(self, symbols: List[str]) -> None:
+        pass
+
+    @abstractmethod
+    async def unsubscribe_live(self, symbols: List[str]) -> None:
+        pass
+
 class INewsProvider(ABC):
     @abstractmethod
     async def fetch_latest_news(self, symbol: str) -> List[NewsArticle]:

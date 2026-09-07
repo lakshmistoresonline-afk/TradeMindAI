@@ -53,6 +53,8 @@ class Container:
         self._export_service = None
         self._reconciliation_engine = None
         self._certification_engine = None
+        self._instrument_master_upstox = None
+        self._instrument_master_dhan = None
 
     @property
     def signal_engine(self):
@@ -423,9 +425,23 @@ class Container:
     @property
     def certification_engine(self):
         if self._certification_engine is None:
-            from backend.services.certification_engine_v2n import Phase2NCertificationEngine
-            self._certification_engine = Phase2NCertificationEngine()
+            from backend.services.certification_engine_v2p import Phase2PCertificationEngine
+            self._certification_engine = Phase2PCertificationEngine()
         return self._certification_engine
+
+    @property
+    def instrument_master_upstox(self):
+        if self._instrument_master_upstox is None:
+            from backend.services.instrument_master_service import InstrumentMasterService
+            self._instrument_master_upstox = InstrumentMasterService("Upstox")
+        return self._instrument_master_upstox
+
+    @property
+    def instrument_master_dhan(self):
+        if self._instrument_master_dhan is None:
+            from backend.services.instrument_master_service import InstrumentMasterService
+            self._instrument_master_dhan = InstrumentMasterService("Dhan")
+        return self._instrument_master_dhan
 
     @property
     def stock_service(self):
