@@ -1,0 +1,107 @@
+{
+    "phase": "2L",
+    "policy_version": "2L.1.0",
+    "timestamp": "2026-09-07T09:03:40.944952",
+    "population": {
+        "total": 1260,
+        "active": 15,
+        "current_post_ledger": 1,
+        "legacy_active": 14,
+        "verified": 50
+    },
+    "gates": {
+        "population_integrity": {
+            "name": "population_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "current_signal_integrity": {
+            "name": "current_signal_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "feature_snapshot": {
+            "name": "feature_snapshot",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "market_snapshot": {
+            "name": "market_snapshot",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "model_run": {
+            "name": "model_run",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "decision": {
+            "name": "decision",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "equity_current_pricing": {
+            "name": "equity_current_pricing",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "fno_derivative_pricing": {
+            "name": "fno_derivative_pricing",
+            "status": "FAIL",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Derivative premium unavailable for RELIANCE3100CE",
+            "evidence": null
+        },
+        "temporal_isolation": {
+            "name": "temporal_isolation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "neon_authority": {
+            "name": "neon_authority",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        },
+        "api_parity": {
+            "name": "api_parity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": null,
+            "evidence": null
+        }
+    },
+    "blocking_failures": [
+        "fno_derivative_pricing"
+    ],
+    "overall_pass": false,
+    "final_status": "PHASE2L_FAIL"
+}

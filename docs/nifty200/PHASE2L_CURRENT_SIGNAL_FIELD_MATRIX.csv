@@ -1,0 +1,2 @@
+id,symbol,entry,target,stop,current,price_status,pred,prov,data_ts,market_ts,recon_ts,audit
+sig_RELIANCE_1788653690,RELIANCE,1322.0,1360.0,1282.34,1309.199951171875,FRESH,5423fe79-82d0-4936-aa8a-0366ea38cdc7,prov_1aa8e850b726,2026-09-06 05:44:50.507716,2026-09-06 05:44:50.507716,2026-09-07 08:34:11.709158,CERTIFIED

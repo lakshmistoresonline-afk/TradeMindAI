@@ -20,6 +20,12 @@ class ForensicAnalyticalService:
                 ShadowSignalDB.outcome_verified == True
             ).all()
 
+            # Fallback check if boolean filter is problematic in some SQL dialects
+            if not resolved:
+                resolved = session.query(ShadowSignalDB).filter(
+                    text("outcome_verified = TRUE")
+                ).all()
+
             df = pd.DataFrame([{
                 "id": s.id, "status": s.status, "net_pnl": s.net_pnl, "direction": s.direction
             } for s in resolved])

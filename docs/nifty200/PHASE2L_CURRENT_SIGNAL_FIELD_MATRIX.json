@@ -1,0 +1,17 @@
+[
+    {
+        "id": "sig_RELIANCE_1788653690",
+        "symbol": "RELIANCE",
+        "entry": 1322.0,
+        "target": 1360.0,
+        "stop": 1282.34,
+        "current": 1309.199951171875,
+        "price_status": "FRESH",
+        "pred": "5423fe79-82d0-4936-aa8a-0366ea38cdc7",
+        "prov": "prov_1aa8e850b726",
+        "data_ts": "2026-09-06 05:44:50.507716",
+        "market_ts": "2026-09-06 05:44:50.507716",
+        "recon_ts": "2026-09-07 08:34:11.709158",
+        "audit": "CERTIFIED"
+    }
+]

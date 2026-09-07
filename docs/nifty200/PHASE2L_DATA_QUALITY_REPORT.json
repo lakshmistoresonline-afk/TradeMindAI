@@ -1,0 +1,15 @@
+{
+    "timestamp": "2026-09-07T08:42:58.535404",
+    "metrics": {
+        "total_population": 1260,
+        "current_completeness": 100.0,
+        "active_pricing_failure_ids": [
+            "master_opt_RELIANCE_3100_122636",
+            "master_opt_SBIN_860_122636",
+            "master_fut_BANKNIFTY_122636",
+            "master_fut_RELIANCE_122636",
+            "master_opt_NIFTY_25000_122636",
+            "master_fut_NIFTY_122636"
+        ]
+    }
+}

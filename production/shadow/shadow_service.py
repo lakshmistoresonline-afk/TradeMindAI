@@ -387,6 +387,10 @@ class ShadowService:
                     sig.underlying_price = res["underlying_price"]
                     sig.underlying_price_timestamp = res["timestamp"]
 
+                    # Ledger 2.0 Compliance: Populate all audit-ready timestamps
+                    sig.data_timestamp = res["timestamp"]
+                    sig.market_timestamp = res["timestamp"]
+
                     # For F&O: map to derivative fields too for Ledger 2.0 consistency
                     if sig.asset_class in ["FUTURES", "OPTIONS"]:
                         sig.derivative_current = res["current_price"]

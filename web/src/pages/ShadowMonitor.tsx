@@ -146,9 +146,9 @@ export default function ShadowMonitor() {
       const rawSignals = res.signals || [];
 
       const enriched = rawSignals.map((sig: any) => {
-        const entry = sig.entry_price ?? sig.entry ?? sig.entryPrice;
-        const target = sig.target_price ?? sig.target ?? sig.targetPrice;
-        const stop = sig.stop_price ?? sig.stop ?? sig.stopPrice ?? sig.stop_loss_price ?? sig.stop_loss ?? sig.stopLoss;
+        const entry = sig.entry_price || sig.entry || sig.entryPrice;
+        const target = sig.target_price || sig.target || sig.targetPrice;
+        const stop = sig.stop_price || sig.stop || sig.stopPrice || sig.stop_loss_price || sig.stop_loss || sig.stopLoss;
         const pnl = sig.net_pnl ?? sig.pnl_percentage ?? sig.pnl ?? sig.profit_pct;
 
         return {
@@ -372,11 +372,11 @@ export default function ShadowMonitor() {
                             />
                           </TableCell>
                           <TableCell sx={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price ? `₹${Number(sig.entry_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: 'success.main' }}>{sig.target_price ? `₹${Number(sig.target_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
-                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: 'error.main' }}>{sig.stop_price ? `₹${Number(sig.stop_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price ? `₹${Number(sig.entry_price).toFixed(2)}` : sig.entry ? `₹${Number(sig.entry).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: 'success.main' }}>{sig.target_price ? `₹${Number(sig.target_price).toFixed(2)}` : sig.target ? `₹${Number(sig.target).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                          <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: 'error.main' }}>{sig.stop_price ? `₹${Number(sig.stop_price).toFixed(2)}` : sig.stop ? `₹${Number(sig.stop).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
                           <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
-                             {sig.underlying_price ? `₹${Number(sig.underlying_price).toFixed(2)}` : '--'}
+                             {sig.underlying_price ? `₹${Number(sig.underlying_price).toFixed(2)}` : sig.underlying ? `₹${Number(sig.underlying).toFixed(2)}` : '--'}
                           </TableCell>
                           <TableCell sx={{ fontFamily: 'JetBrains Mono', fontWeight: 900, color: 'primary.main' }}>
                              {sig.current_price ? `₹${Number(sig.current_price).toFixed(2)}` : 'UNAVAILABLE'}
@@ -529,9 +529,9 @@ export default function ShadowMonitor() {
                            />
                         </TableCell>
                         <TableCell sx={{ fontSize: '0.7rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>{formatIST(sig.created_at || sig.timestamp)}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price ? `₹${Number(sig.entry_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.target_price ? `₹${Number(sig.target_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
-                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.stop_price ? `₹${Number(sig.stop_price).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem' }}>{sig.entry_price ? `₹${Number(sig.entry_price).toFixed(2)}` : sig.entry ? `₹${Number(sig.entry).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.target_price ? `₹${Number(sig.target_price).toFixed(2)}` : sig.target ? `₹${Number(sig.target).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
+                        <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', opacity: 0.7 }}>{sig.stop_price ? `₹${Number(sig.stop_price).toFixed(2)}` : sig.stop ? `₹${Number(sig.stop).toFixed(2)}` : 'UNAVAILABLE'}</TableCell>
                         <TableCell>
                            <StatusChip status={sig.status} />
                         </TableCell>
@@ -746,13 +746,15 @@ function PerfRow({ label, value, baseline }: any) {
   );
 }
 
-function MetricCard({ title, value, icon }: any) {
+function MetricCard({ title, value, icon, suffix }: any) {
   return (
     <Paper sx={{ p: 2.5, border: '1px solid rgba(255,255,255,0.05)' }}>
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
         <Box>
           <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1.5 }}>{title}</Typography>
-          <Typography variant="h4" sx={{ fontWeight: 950, mt: 1, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 950, mt: 1, fontFamily: 'JetBrains Mono' }}>
+            {value}{suffix}
+          </Typography>
         </Box>
         <Box sx={{ p: 1, bgcolor: alpha('#fff', 0.03), borderRadius: 1 }}>{icon}</Box>
       </Stack>
