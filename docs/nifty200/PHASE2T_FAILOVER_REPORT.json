@@ -1,0 +1,6 @@
+{
+    "logic": "Upstox -> Dhan -> UNAVAILABLE",
+    "equity_logic": "Upstox -> Dhan -> YFinance",
+    "status": "PASS",
+    "simulated_test": true
+}
