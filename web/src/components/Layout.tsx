@@ -35,14 +35,13 @@ export const NotificationContext = createContext({
 export const useNotification = () => useContext(NotificationContext);
 
 const menuItems = [
-  { text: 'TERMINAL', icon: <LayoutDashboard size={20} />, path: '/' },
-  { text: 'SHADOW MONITOR', icon: <Fingerprint size={20} />, path: '/shadow' },
-  { text: 'EQUITY SIGNALS', icon: <Activity size={20} />, path: '/signals/equity' },
-  { text: 'FUTURES SIGNALS', icon: <TrendingUp size={20} />, path: '/signals/futures' },
-  { text: 'OPTIONS SIGNALS', icon: <Zap size={20} />, path: '/signals/options' },
-  { text: 'AUDIT ARCHIVE', icon: <History size={20} />, path: '/history' },
-  { text: 'LABORATORY', icon: <Search size={20} />, path: '/analysis' },
-  { text: 'MARKET PULSE', icon: <LineChart size={20} />, path: '/market' },
+  { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/' },
+  { text: 'EQUITY SCANNER', icon: <Search size={20} />, path: '/scanner' },
+  { text: 'SIGNALS', icon: <Activity size={20} />, path: '/signals' },
+  { text: 'WATCHLIST', icon: <Zap size={20} />, path: '/watchlist' },
+  { text: 'MARKET', icon: <LineChart size={20} />, path: '/market' },
+  { text: 'ACCURACY', icon: <TrendingUp size={20} />, path: '/accuracy' },
+  { text: 'RESEARCH', icon: <Fingerprint size={20} />, path: '/research' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -192,11 +191,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>Alpha Tier Node: 7421</Typography>
                 </Box>
                 <Divider sx={{ opacity: 0.05 }} />
-                <MenuItem onClick={() => { handleProfileClose(); navigate('/settings'); }} sx={{ py: 1.5 }}>
-                  <ListItemIcon><Settings size={18} color="slategray" /></ListItemIcon>
-                  <ListItemText primary="Terminal Settings" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
+                <MenuItem onClick={() => { handleProfileClose(); navigate('/methodology'); }} sx={{ py: 1.5 }}>
+                  <ListItemIcon><Search size={18} color="slategray" /></ListItemIcon>
+                  <ListItemText primary="Methodology" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
                 </MenuItem>
-                <MenuItem onClick={() => { handleProfileClose(); navigate('/admin'); }} sx={{ py: 1.5 }}>
+                <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.5 }}>
                   <ListItemIcon><Activity size={18} color="slategray" /></ListItemIcon>
                   <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
                 </MenuItem>

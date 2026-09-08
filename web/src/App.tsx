@@ -2,49 +2,28 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
 import DashboardTerminal from './pages/DashboardTerminal'
-import MarketDashboard from './pages/MarketDashboard'
-import PortfolioDashboard from './pages/PortfolioDashboard'
-import HistoryDashboard from './pages/HistoryDashboard'
-import StockIntelligence from './pages/StockIntelligence'
-import Settings from './pages/Settings'
-import Login from './pages/Login'
-import SystemControl from './pages/SystemControl'
+import EquityScanner from './pages/EquityScanner'
 import EquitySignals from './pages/EquitySignals'
-import FuturesSignals from './pages/FuturesSignals'
-import OptionsSignals from './pages/OptionsSignals'
-import ShadowMonitor from './pages/ShadowMonitor'
-import IntelligenceDashboard from './pages/IntelligenceDashboard'
-import MarketCommandCenter from './pages/MarketCommandCenter'
-import OpportunityRadar from './pages/OpportunityRadar'
-import StockResearchTerminal from './pages/StockResearchTerminal'
-import DataQualityDashboard from './pages/DataQualityDashboard'
+import SignalHistory from './pages/SignalHistory'
+import SignalDetail from './pages/SignalDetail'
+import MarketOverview from './pages/MarketOverview'
+import Accuracy from './pages/Accuracy'
+import Research from './pages/Research'
+import SystemStatus from './pages/SystemStatus'
+import Methodology from './pages/Methodology'
+import Login from './pages/Login'
+import Settings from './pages/Settings'
 
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
-    primary: {
-      main: '#00D1FF', // Electric Cyan
-    },
-    secondary: {
-      main: '#7C3AED', // AI Violet
-    },
-    background: {
-      default: '#020617',
-      paper: '#0f172a',
-    },
-    success: {
-      main: '#10b981', // Emerald
-    },
-    error: {
-      main: '#ef4444', // Red
-    },
-    warning: {
-      main: '#f59e0b', // Amber
-    },
-    text: {
-      primary: '#f8fafc',
-      secondary: '#94a3b8',
-    },
+    primary: { main: '#00D1FF' },
+    secondary: { main: '#7C3AED' },
+    background: { default: '#020617', paper: '#0f172a' },
+    success: { main: '#10b981' },
+    error: { main: '#ef4444' },
+    warning: { main: '#f59e0b' },
+    text: { primary: '#f8fafc', secondary: '#94a3b8' },
   },
   typography: {
     fontFamily: '"Inter", "JetBrains Mono", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -65,71 +44,23 @@ const darkTheme = createTheme({
       styleOverrides: {
         body: {
           backgroundColor: '#020617',
-          scrollbarColor: "#111821 #070A0F",
-          "&::-webkit-scrollbar, & *::-webkit-scrollbar": {
-            width: 8,
-            height: 8,
-          },
-          "&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": {
-            borderRadius: 8,
-            backgroundColor: "#111821",
-            border: "2px solid #070A0F",
-          },
-          "&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus": {
-            backgroundColor: "#1e293b",
-          },
-          "&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active": {
-            backgroundColor: "#1e293b",
-          },
-          "&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover": {
-            backgroundColor: "#1e293b",
-          },
+          "&::-webkit-scrollbar, & *::-webkit-scrollbar": { width: 8, height: 8 },
+          "&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": { borderRadius: 8, backgroundColor: "#111821" },
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-          backgroundColor: '#0f172a',
-          border: '1px solid rgba(255,255,255,0.05)',
-          borderRadius: 8,
-        },
+        root: { backgroundImage: 'none', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8 },
       },
     },
     MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontWeight: 700,
-          borderRadius: 6,
-          padding: '8px 16px',
-        }
-      }
-    },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          fontWeight: 800,
-          fontSize: '0.75rem',
-          letterSpacing: '0.05em',
-        }
-      }
+      styleOverrides: { root: { textTransform: 'none', fontWeight: 700, borderRadius: 6 } }
     },
     MuiTableCell: {
       styleOverrides: {
-        root: {
-          borderBottom: '1px solid rgba(255,255,255,0.03)',
-          padding: '12px 16px',
-        },
-        head: {
-          fontWeight: 800,
-          color: '#64748b',
-          fontSize: '0.65rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          backgroundColor: '#0f172a',
-        }
+        root: { borderBottom: '1px solid rgba(255,255,255,0.03)', padding: '12px 16px' },
+        head: { fontWeight: 800, color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.1em' }
       }
     }
   },
@@ -146,24 +77,24 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<DashboardTerminal />} />
-                <Route path="/signals" element={<Navigate to="/signals/equity" replace />} />
-                <Route path="/signals/equity" element={<EquitySignals />} />
-                <Route path="/signals/futures" element={<FuturesSignals />} />
-                <Route path="/signals/options" element={<OptionsSignals />} />
+                <Route path="/scanner" element={<EquityScanner />} />
 
-                <Route path="/market" element={<MarketDashboard />} />
-                <Route path="/portfolio" element={<PortfolioDashboard />} />
-                <Route path="/history" element={<HistoryDashboard />} />
+                <Route path="/signals" element={<Navigate to="/signals/active" replace />} />
+                <Route path="/signals/active" element={<EquitySignals />} />
+                <Route path="/signals/history" element={<SignalHistory />} />
+                <Route path="/signals/:id" element={<SignalDetail />} />
 
-                {/* Contextual / Advanced */}
-                <Route path="/analysis" element={<StockIntelligence />} />
-                <Route path="/intelligence" element={<IntelligenceDashboard />} />
-                <Route path="/market-command" element={<MarketCommandCenter />} />
-                <Route path="/radar" element={<OpportunityRadar />} />
-                <Route path="/research" element={<StockResearchTerminal />} />
-                <Route path="/data-quality" element={<DataQualityDashboard />} />
-                <Route path="/shadow" element={<ShadowMonitor />} />
-                <Route path="/admin" element={<SystemControl />} />
+                <Route path="/watchlist" element={<Navigate to="/scanner" replace />} />
+
+                <Route path="/market" element={<Navigate to="/market/overview" replace />} />
+                <Route path="/market/overview" element={<MarketOverview />} />
+
+                <Route path="/accuracy" element={<Accuracy />} />
+                <Route path="/research" element={<Research />} />
+
+                <Route path="/status" element={<SystemStatus />} />
+                <Route path="/methodology" element={<Methodology />} />
+
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>

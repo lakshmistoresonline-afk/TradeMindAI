@@ -1,0 +1,14 @@
+{
+  "removed_features": [
+    "F&O signals and terminals",
+    "Option chains",
+    "Futures quote displays",
+    "Generic portfolio management",
+    "Broker order execution buttons",
+    "Crypto and Forex dashboards",
+    "Developer infrastructure debug panels from public UI",
+    "Duplicate BUY/SELL screens",
+    "Empty placeholder widgets"
+  ],
+  "rationale": "Repositioning the platform as a professional NIFTY-200 Equity Intelligence platform. Non-equity features create clutter and dilute the product message."
+}
