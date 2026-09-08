@@ -428,9 +428,24 @@ class Container:
     @property
     def certification_engine(self):
         if self._certification_engine is None:
-            from backend.services.certification_engine_v2t import Phase2TCertificationEngine
-            self._certification_engine = Phase2TCertificationEngine()
+            from backend.services.certification_engine_v2u import Phase2UCertificationEngine
+            self._certification_engine = Phase2UCertificationEngine()
         return self._certification_engine
+
+    @property
+    def provider_angelone(self):
+        from backend.infrastructure.repositories.angelone_provider import AngelOneProvider
+        return AngelOneProvider()
+
+    @property
+    def provider_upstox(self):
+        from backend.infrastructure.repositories.upstox_provider import UpstoxProvider
+        return UpstoxProvider()
+
+    @property
+    def provider_dhan(self):
+        from backend.infrastructure.repositories.dhan_provider import DhanProvider
+        return DhanProvider()
 
     @property
     def instrument_master_upstox(self):

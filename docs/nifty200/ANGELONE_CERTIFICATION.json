@@ -1,0 +1,61 @@
+{
+    "provider": "AngelOne",
+    "gates": {
+        "implementation": {
+            "name": "AngelOne_implementation",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-08T10:31:25.387670"
+        },
+        "configuration": {
+            "name": "AngelOne_configuration",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Institutional reason required.",
+            "evidence": {},
+            "timestamp": "2026-09-08T10:31:25.752586"
+        },
+        "authentication": {
+            "name": "AngelOne_authentication",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Institutional reason required.",
+            "evidence": {},
+            "timestamp": "2026-09-08T10:31:25.752586"
+        },
+        "instrument_master": {
+            "name": "AngelOne_instrument_master",
+            "status": "CONFIGURATION_REQUIRED",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "No instruments synced in Neon.",
+            "evidence": {},
+            "timestamp": "2026-09-08T10:31:25.752586"
+        },
+        "equity_live": {
+            "name": "AngelOne_equity_live",
+            "status": "DATA_UNAVAILABLE",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Institutional reason required.",
+            "evidence": {},
+            "timestamp": "2026-09-08T10:31:25.752586"
+        },
+        "fno_live": {
+            "name": "AngelOne_fno_live",
+            "status": "DATA_UNAVAILABLE",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Institutional reason required.",
+            "evidence": {},
+            "timestamp": "2026-09-08T10:31:25.752586"
+        }
+    },
+    "overall_pass": false,
+    "status": "ANGELONE_ACTIVATION_PENDING"
+}

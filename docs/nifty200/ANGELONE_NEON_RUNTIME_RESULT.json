@@ -1,8 +1,0 @@
-{
-    "authority": "Neon/PostgreSQL",
-    "fno_extension_schema": "Ledger 2.0",
-    "persistence_status": "READY",
-    "real_data_persisted": false,
-    "last_audit": "2026-09-08T14:55:00Z",
-    "verdict": "Neon is synchronized but contains zero live Angel One quotes due to missing credentials."
-}

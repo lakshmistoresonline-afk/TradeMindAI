@@ -1,8 +1,0 @@
-{
-    "api_endpoint": "/api/v1/shadow/active-signals",
-    "parity_neon": "MATCH",
-    "fno_field_serialization": "PASS",
-    "live_data_presence": "NONE",
-    "timestamp": "2026-09-08T14:55:00Z",
-    "verdict": "API is correctly configured but correctly returns UNAVAILABLE status for Angel One fields."
-}

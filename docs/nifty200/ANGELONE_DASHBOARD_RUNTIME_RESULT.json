@@ -1,8 +1,0 @@
-{
-    "dashboard": "Shadow Monitor Monitor",
-    "parity_api": "MATCH",
-    "fno_ui_separation": "VERIFIED",
-    "zero_fabrication_ui": "PASS",
-    "timestamp": "2026-09-08T14:55:00Z",
-    "verdict": "Dashboard correctly displays UNAVAILABLE for premiums when Angel One is unauthenticated."
-}
