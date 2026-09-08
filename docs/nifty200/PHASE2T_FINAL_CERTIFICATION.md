@@ -10,7 +10,7 @@ OVERALL PASS: **FALSE**
 | v22_integrity | **PASS** | YES | NO | PASS |
 | zero_fabrication | **PASS** | YES | NO | PASS |
 | instrument_master | **FAIL** | YES | YES | No instruments found in Neon for provider Upstox. Sync required. |
-| provider_authentication | **CONFIGURATION_REQUIRED** | YES | YES | Production credentials (Analytics/Access Tokens) are missing. |
+| provider_authentication | **CONFIGURATION_REQUIRED** | YES | YES | Production credentials (Analytics/Access/AngelOne Tokens) are missing. |
 | fno_identity | **PASS** | YES | NO | PASS |
 | live_quote | **CONFIGURATION_REQUIRED** | YES | YES | Live premiums blocked by missing production authentication. |
 | fno_pricing | **CONFIGURATION_REQUIRED** | YES | YES | Live premiums blocked by missing production authentication. |

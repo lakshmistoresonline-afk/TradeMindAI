@@ -1,6 +1,6 @@
 {
     "phase": "2T",
-    "timestamp": "2026-09-08T05:14:06.896088",
+    "timestamp": "2026-09-08T10:24:14.158621",
     "policy_version": "2T.1.0",
     "population": {
         "total": 1260,
@@ -16,7 +16,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:03.394440"
+            "timestamp": "2026-09-08T10:24:10.459645"
         },
         "v22_integrity": {
             "name": "v22_integrity",
@@ -25,7 +25,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:03.394440"
+            "timestamp": "2026-09-08T10:24:10.459645"
         },
         "zero_fabrication": {
             "name": "zero_fabrication",
@@ -34,7 +34,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:03.394440"
+            "timestamp": "2026-09-08T10:24:10.459645"
         },
         "instrument_master": {
             "name": "instrument_master",
@@ -45,20 +45,20 @@
             "evidence": {
                 "status": "CONFIGURATION_REQUIRED",
                 "provider": "Upstox",
-                "timestamp": "2026-09-08T05:14:06.471230",
+                "timestamp": "2026-09-08T10:24:13.476014",
                 "record_count": 0,
                 "reason": "No instruments found in Neon for provider Upstox. Sync required."
             },
-            "timestamp": "2026-09-08T05:14:06.471230"
+            "timestamp": "2026-09-08T10:24:13.476014"
         },
         "provider_authentication": {
             "name": "provider_authentication",
             "status": "CONFIGURATION_REQUIRED",
             "mandatory": true,
             "blocking": true,
-            "reason": "Production credentials (Analytics/Access Tokens) are missing.",
+            "reason": "Production credentials (Analytics/Access/AngelOne Tokens) are missing.",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "fno_identity": {
             "name": "fno_identity",
@@ -67,7 +67,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "live_quote": {
             "name": "live_quote",
@@ -76,7 +76,7 @@
             "blocking": true,
             "reason": "Live premiums blocked by missing production authentication.",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "fno_pricing": {
             "name": "fno_pricing",
@@ -85,7 +85,7 @@
             "blocking": true,
             "reason": "Live premiums blocked by missing production authentication.",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "quote_freshness": {
             "name": "quote_freshness",
@@ -94,7 +94,7 @@
             "blocking": true,
             "reason": "Final institutional reason required.",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "anti_contamination": {
             "name": "anti_contamination",
@@ -103,7 +103,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "failover": {
             "name": "failover",
@@ -112,7 +112,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "neon_authority": {
             "name": "neon_authority",
@@ -121,7 +121,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "api_parity": {
             "name": "api_parity",
@@ -130,7 +130,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "dashboard_parity": {
             "name": "dashboard_parity",
@@ -139,7 +139,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "security": {
             "name": "security",
@@ -148,7 +148,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "regression_tests": {
             "name": "regression_tests",
@@ -157,7 +157,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         },
         "real_trading_disabled": {
             "name": "real_trading_disabled",
@@ -166,7 +166,7 @@
             "blocking": false,
             "reason": "PASS",
             "evidence": {},
-            "timestamp": "2026-09-08T05:14:06.896088"
+            "timestamp": "2026-09-08T10:24:14.158621"
         }
     },
     "blocking_failures": [

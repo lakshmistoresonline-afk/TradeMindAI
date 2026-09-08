@@ -1,119 +1,106 @@
 [
     {
-        "trademind_id": "master_opt_RELIANCE_3100_122636",
-        "instrument_id": "RELIANCE3100CE",
-        "underlying": "RELIANCE",
+        "id": "master_opt_RELIANCE_3100_122636",
+        "symbol": "RELIANCE",
+        "instr": "RELIANCE3100CE",
         "expiry": "2026-09-08 12:26:36.295273",
-        "strike": 3100.0,
-        "type": "CE",
-        "resolution_status": "PASS"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "master_opt_SBIN_860_122636",
-        "instrument_id": "SBIN860CE",
-        "underlying": "SBIN",
+        "id": "master_opt_SBIN_860_122636",
+        "symbol": "SBIN",
+        "instr": "SBIN860CE",
         "expiry": "2026-09-08 12:26:36.295273",
-        "strike": 860.0,
-        "type": "CE",
-        "resolution_status": "PASS"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "866f671b-a9d4-407c-917f-824db23ffc1c",
-        "instrument_id": null,
-        "underlying": "NIFTY",
+        "id": "866f671b-a9d4-407c-917f-824db23ffc1c",
+        "symbol": "NIFTY",
+        "instr": null,
         "expiry": "2026-08-15 11:59:29.918401",
-        "strike": 24000.0,
-        "type": "PE",
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "master_fut_BANKNIFTY_122636",
-        "instrument_id": "BANKNIFTY26AUGFUT",
-        "underlying": "BANKNIFTY",
+        "id": "master_fut_BANKNIFTY_122636",
+        "symbol": "BANKNIFTY",
+        "instr": "BANKNIFTY26AUGFUT",
         "expiry": "2026-09-08 12:26:36.295273",
-        "strike": null,
-        "type": null,
-        "resolution_status": "PASS"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "master_fut_RELIANCE_122636",
-        "instrument_id": "RELIANCE26AUGFUT",
-        "underlying": "RELIANCE",
+        "id": "master_fut_RELIANCE_122636",
+        "symbol": "RELIANCE",
+        "instr": "RELIANCE26AUGFUT",
         "expiry": "2026-09-08 12:26:36.295273",
-        "strike": null,
-        "type": null,
-        "resolution_status": "PASS"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "f03124e1-ed0f-40d2-bcb2-bd13682750ab",
-        "instrument_id": null,
-        "underlying": "NIFTY",
+        "id": "f03124e1-ed0f-40d2-bcb2-bd13682750ab",
+        "symbol": "NIFTY",
+        "instr": null,
         "expiry": "2026-08-27 11:59:29.918401",
-        "strike": null,
-        "type": null,
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "21a52a86-d543-49a2-8cfe-f056417305cd",
-        "instrument_id": null,
-        "underlying": "TCS",
+        "id": "21a52a86-d543-49a2-8cfe-f056417305cd",
+        "symbol": "TCS",
+        "instr": null,
         "expiry": "2026-08-27 11:59:29.918401",
-        "strike": 4500.0,
-        "type": "CE",
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "28b6c1c6-ae07-4eac-92ac-02d326b0441d",
-        "instrument_id": null,
-        "underlying": "RELIANCE",
+        "id": "28b6c1c6-ae07-4eac-92ac-02d326b0441d",
+        "symbol": "RELIANCE",
+        "instr": null,
         "expiry": "2026-08-27 11:59:29.918401",
-        "strike": 3000.0,
-        "type": "CE",
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "61ac1904-ba26-47e4-977e-8145b663478b",
-        "instrument_id": null,
-        "underlying": "BANKNIFTY",
+        "id": "61ac1904-ba26-47e4-977e-8145b663478b",
+        "symbol": "BANKNIFTY",
+        "instr": null,
         "expiry": "2026-08-27 11:59:29.918401",
-        "strike": null,
-        "type": null,
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "6675d119-839d-4666-bef0-4365b5c3a226",
-        "instrument_id": null,
-        "underlying": "SBIN",
+        "id": "6675d119-839d-4666-bef0-4365b5c3a226",
+        "symbol": "SBIN",
+        "instr": null,
         "expiry": "2026-08-15 11:59:29.918401",
-        "strike": null,
-        "type": null,
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "8634b13e-32b5-4150-83a6-920c17ca6685",
-        "instrument_id": null,
-        "underlying": "INFY",
+        "id": "8634b13e-32b5-4150-83a6-920c17ca6685",
+        "symbol": "INFY",
+        "instr": null,
         "expiry": "2026-08-15 11:59:29.918401",
-        "strike": 1900.0,
-        "type": "CE",
-        "resolution_status": "FAIL"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "master_opt_NIFTY_25000_122636",
-        "instrument_id": "NIFTY25000CE",
-        "underlying": "NIFTY",
+        "id": "master_opt_NIFTY_25000_122636",
+        "symbol": "NIFTY",
+        "instr": "NIFTY25000CE",
         "expiry": "2026-09-08 12:26:36.295273",
-        "strike": 25000.0,
-        "type": "CE",
-        "resolution_status": "PASS"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     },
     {
-        "trademind_id": "master_fut_NIFTY_122636",
-        "instrument_id": "NIFTY26AUGFUT",
-        "underlying": "NIFTY",
+        "id": "master_fut_NIFTY_122636",
+        "symbol": "NIFTY",
+        "instr": "NIFTY26AUGFUT",
         "expiry": "2026-09-08 12:26:36.295273",
-        "strike": null,
-        "type": null,
-        "resolution_status": "PASS"
+        "mapping_logic": "6-tier_precision_match",
+        "status": "LOGIC_PASS_DATA_PENDING"
     }
 ]
