@@ -1,0 +1,74 @@
+[
+    {
+        "signal_id": "sig_RELIANCE_1788653690",
+        "symbol": "RELIANCE",
+        "current_price": 1309.199951171875,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "sig_FORTIS_202608241002",
+        "symbol": "FORTIS",
+        "current_price": 897.4500122070312,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "sig_APOLLOHOSP_202608240938",
+        "symbol": "APOLLOHOSP",
+        "current_price": 8710.5,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "sig_BIOCON_202608240939",
+        "symbol": "BIOCON",
+        "current_price": 390.45001220703125,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "master_eq_INFY_122636",
+        "symbol": "INFY",
+        "current_price": 1090.5999755859375,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "master_eq_ITC_122636",
+        "symbol": "ITC",
+        "current_price": 263.29998779296875,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "master_eq_LT_122636",
+        "symbol": "LT",
+        "current_price": 3977.5,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "master_eq_RELIANCE_122636",
+        "symbol": "RELIANCE",
+        "current_price": 1309.0,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    },
+    {
+        "signal_id": "master_eq_TCS_122636",
+        "symbol": "TCS",
+        "current_price": 2270.5,
+        "freshness": "FRESH",
+        "lineage": "PASS",
+        "status": "CERTIFIED"
+    }
+]

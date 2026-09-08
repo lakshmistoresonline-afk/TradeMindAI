@@ -1,0 +1,12 @@
+{
+    "timestamp": "2026-09-08T05:44:24.504307",
+    "status_distribution": {
+        "ACTIVE": 9,
+        "TARGET_HIT": 742,
+        "STOP_LOSS": 480,
+        "EXPIRED": 15,
+        "TIMEOUT": 1
+    },
+    "terminal_verified_count": 50,
+    "invalid_transitions_detected": 0
+}

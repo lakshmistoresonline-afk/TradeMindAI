@@ -1,0 +1,10 @@
+{
+    "signal_id": "sig_RELIANCE_1788653690",
+    "neon_fields": {
+        "entry": 1322.0,
+        "target": 1360.0,
+        "stop": 1282.34,
+        "probability": 0.78
+    },
+    "status": "PASS"
+}

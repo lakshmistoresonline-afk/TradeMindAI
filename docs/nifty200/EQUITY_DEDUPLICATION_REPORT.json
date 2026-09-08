@@ -1,0 +1,2018 @@
+{
+    "timestamp": "2026-09-08T05:49:34.426540",
+    "duplicate_signal_groups": 402,
+    "total_duplicated_count": 804,
+    "details": [
+        {
+            "symbol": "MPHASIS",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BALKRISIND",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RECLTD",
+            "minute": "2026-08-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CUMMINSIND",
+            "minute": "2026-05-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GODREJCP",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PAYTM",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ZYDUSLIFE",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MRF",
+            "minute": "2026-05-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "AXISBANK",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "WIPRO",
+            "minute": "2026-06-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SIEMENS",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PIIND",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PIDILITIND",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HEROMOTOCO",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MAHABANK",
+            "minute": "2026-07-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASTRAL",
+            "minute": "2026-06-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TITAN",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CANBK",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SHRIRAMFIN",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PAGEIND",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "VBL",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "POWERGRID",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SIEMENS",
+            "minute": "2026-04-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LICHSGFIN",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BEL",
+            "minute": "2026-06-17 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "KOTAKBANK",
+            "minute": "2026-06-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "UNITDSPR",
+            "minute": "2026-07-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NTPC",
+            "minute": "2026-07-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IRCTC",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIGI",
+            "minute": "2026-04-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HEROMOTOCO",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "VEDL",
+            "minute": "2026-06-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GRASIM",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GODREJCP",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "COLPAL",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BHARTIARTL",
+            "minute": "2026-05-17 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "AMBUJACEM",
+            "minute": "2026-06-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TORNTPHARM",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANDHANBNK",
+            "minute": "2026-05-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IRCTC",
+            "minute": "2026-07-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "EICHERMOT",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CONCOR",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ULTRACEMCO",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PAGEIND",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANKBARODA",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "APOLLOHOSP",
+            "minute": "2026-08-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NMDC",
+            "minute": "2026-06-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBIN",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ESCORTS",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ZYDUSLIFE",
+            "minute": "2026-08-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "KOTAKBANK",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HDFCLIFE",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HEROMOTOCO",
+            "minute": "2026-08-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "AMBUJACEM",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MRF",
+            "minute": "2026-05-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RELIANCE",
+            "minute": "2026-04-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJ-AUTO",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RVNL",
+            "minute": "2026-07-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CGPOWER",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANKINDIA",
+            "minute": "2026-04-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CUMMINSIND",
+            "minute": "2026-05-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASHOKLEY",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATACOMM",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HAVELLS",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PFC",
+            "minute": "2026-05-31 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INFY",
+            "minute": "2026-07-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TRENT",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CANBK",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "WIPRO",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JSWSTEEL",
+            "minute": "2026-08-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIBANK",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NHPC",
+            "minute": "2026-06-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SYNGENE",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PRESTIGE",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HDFCBANK",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJFINSV",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANKINDIA",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BALKRISIND",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HDFCLIFE",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIENT",
+            "minute": "2026-06-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MPHASIS",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDIANB",
+            "minute": "2026-06-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TITAN",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBIN",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SHREECEM",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SHRIRAMFIN",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ULTRACEMCO",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "POWERGRID",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANKBARODA",
+            "minute": "2026-06-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIBANK",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDUSTOWER",
+            "minute": "2026-06-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MARUTI",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SONACOMS",
+            "minute": "2026-08-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BPCL",
+            "minute": "2026-05-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NYKAA",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIPRULI",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GODREJCP",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "VBL",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NYKAA",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJ-AUTO",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATASTEEL",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PATANJALI",
+            "minute": "2026-07-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "UPL",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUNPHARMA",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BRITANNIA",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TITAN",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIBANK",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HCLTECH",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PFC",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDHOTEL",
+            "minute": "2026-07-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GODREJPROP",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUPREMEIND",
+            "minute": "2026-03-31 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IRFC",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PRESTIGE",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INFY",
+            "minute": "2026-06-18 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASHOKLEY",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASTRAL",
+            "minute": "2026-08-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIPRULI",
+            "minute": "2026-06-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BEL",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ATGL",
+            "minute": "2026-05-25 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TIINDIA",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MARICO",
+            "minute": "2026-06-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BIOCON",
+            "minute": "2026-08-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ABB",
+            "minute": "2026-04-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RELIANCE",
+            "minute": "2026-04-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HAL",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJFINSV",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PNB",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "COALINDIA",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CANBK",
+            "minute": "2026-06-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "COLPAL",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NESTLEIND",
+            "minute": "2026-08-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DEEPAKNTR",
+            "minute": "2026-06-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TRENT",
+            "minute": "2026-08-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DLF",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBICARD",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "KOTAKBANK",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MAHABANK",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "M&M",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TECHM",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RVNL",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BHARTIARTL",
+            "minute": "2026-07-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDIANB",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASIANPAINT",
+            "minute": "2026-04-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "UNITDSPR",
+            "minute": "2026-07-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MPHASIS",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HINDALCO",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DEEPAKNTR",
+            "minute": "2026-06-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJFINANCE",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BHARTIARTL",
+            "minute": "2026-06-18 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TECHM",
+            "minute": "2026-05-31 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HDFCBANK",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATACOMM",
+            "minute": "2026-06-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GLAND",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDUSTOWER",
+            "minute": "2026-04-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUNPHARMA",
+            "minute": "2026-07-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIENSOL",
+            "minute": "2026-06-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SONACOMS",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PAGEIND",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GAIL",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "COALINDIA",
+            "minute": "2026-06-24 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DEEPAKNTR",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CUMMINSIND",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JINDALSTEL",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RVNL",
+            "minute": "2026-05-31 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBICARD",
+            "minute": "2026-07-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HAL",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANKINDIA",
+            "minute": "2026-06-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "M&M",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TORNTPHARM",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RELIANCE",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "POLYCAB",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "WIPRO",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "AXISBANK",
+            "minute": "2026-07-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LT",
+            "minute": "2026-08-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "UNITDSPR",
+            "minute": "2026-08-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BOSCHLTD",
+            "minute": "2026-08-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "YESBANK",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BHEL",
+            "minute": "2026-06-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MAXHEALTH",
+            "minute": "2026-06-24 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBILIFE",
+            "minute": "2026-07-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBILIFE",
+            "minute": "2026-07-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BPCL",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIENSOL",
+            "minute": "2026-07-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CGPOWER",
+            "minute": "2026-07-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "M&M",
+            "minute": "2026-08-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MARUTI",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "EICHERMOT",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MAXHEALTH",
+            "minute": "2026-08-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBIN",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJ-AUTO",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DABUR",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GLAND",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BIOCON",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDHOTEL",
+            "minute": "2026-06-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SHREECEM",
+            "minute": "2026-08-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PRESTIGE",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIGREEN",
+            "minute": "2026-07-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDHOTEL",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SHREECEM",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUNTV",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JINDALSTEL",
+            "minute": "2026-07-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JUBLFOOD",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DALBHARAT",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANKBARODA",
+            "minute": "2026-06-17 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GRASIM",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "POLYCAB",
+            "minute": "2026-06-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PIIND",
+            "minute": "2026-07-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NESTLEIND",
+            "minute": "2026-07-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MRF",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ITC",
+            "minute": "2026-06-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BALKRISIND",
+            "minute": "2026-07-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CONCOR",
+            "minute": "2026-08-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TORNTPHARM",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SRF",
+            "minute": "2026-08-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IDFCFIRSTB",
+            "minute": "2026-06-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HINDALCO",
+            "minute": "2026-08-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJFINANCE",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TRENT",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IDFCFIRSTB",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DLF",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HCLTECH",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LICI",
+            "minute": "2026-08-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDUSINDBK",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LICI",
+            "minute": "2026-06-17 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HINDUNILVR",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ACC",
+            "minute": "2026-06-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDIANB",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ONGC",
+            "minute": "2026-05-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MARICO",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUNTV",
+            "minute": "2026-07-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NMDC",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJFINANCE",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TECHM",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SHRIRAMFIN",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PATANJALI",
+            "minute": "2026-06-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ATGL",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SRF",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GAIL",
+            "minute": "2026-05-24 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DLF",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASIANPAINT",
+            "minute": "2026-05-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PIDILITIND",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDUSINDBK",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIGI",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TCS",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HINDUNILVR",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CIPLA",
+            "minute": "2026-06-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BEL",
+            "minute": "2026-05-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NYKAA",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "VEDL",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LT",
+            "minute": "2026-06-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SIEMENS",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANDHANBNK",
+            "minute": "2026-06-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDUSTOWER",
+            "minute": "2026-05-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JSWENERGY",
+            "minute": "2026-07-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SONACOMS",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PIDILITIND",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "POWERGRID",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DRREDDY",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ABB",
+            "minute": "2026-05-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJHLDNG",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ULTRACEMCO",
+            "minute": "2026-07-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GAIL",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ESCORTS",
+            "minute": "2026-05-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RECLTD",
+            "minute": "2026-07-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASIANPAINT",
+            "minute": "2026-04-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TCS",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ONGC",
+            "minute": "2026-06-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUNTV",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PAYTM",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ACC",
+            "minute": "2026-06-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HCLTECH",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ONGC",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JSWENERGY",
+            "minute": "2026-05-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ITC",
+            "minute": "2026-05-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUPREMEIND",
+            "minute": "2026-05-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATAPOWER",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JSWSTEEL",
+            "minute": "2026-06-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ITC",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MARICO",
+            "minute": "2026-05-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIPOWER",
+            "minute": "2026-05-25 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DRREDDY",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IOC",
+            "minute": "2026-05-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JSWSTEEL",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PATANJALI",
+            "minute": "2026-05-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "UPL",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ZYDUSLIFE",
+            "minute": "2026-05-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIENT",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBICARD",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BIOCON",
+            "minute": "2026-07-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIPORTS",
+            "minute": "2026-07-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "VBL",
+            "minute": "2026-07-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LICHSGFIN",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NMDC",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "AMBUJACEM",
+            "minute": "2026-06-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIGREEN",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASTRAL",
+            "minute": "2026-07-08 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PIIND",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GODREJPROP",
+            "minute": "2026-06-24 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "COALINDIA",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PNB",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NHPC",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CIPLA",
+            "minute": "2026-05-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GRASIM",
+            "minute": "2026-05-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "COLPAL",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIGI",
+            "minute": "2026-06-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NTPC",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ICICIPRULI",
+            "minute": "2026-03-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DABUR",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ABB",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DALBHARAT",
+            "minute": "2026-07-20 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CHOLAFIN",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATACOMM",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JUBLFOOD",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIENSOL",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SYNGENE",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LICHSGFIN",
+            "minute": "2026-08-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INFY",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HAVELLS",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIENT",
+            "minute": "2026-06-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIPOWER",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CHOLAFIN",
+            "minute": "2026-07-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "APOLLOHOSP",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIGREEN",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BOSCHLTD",
+            "minute": "2026-08-04 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BHEL",
+            "minute": "2026-05-24 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LT",
+            "minute": "2026-07-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JSWENERGY",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NHPC",
+            "minute": "2026-08-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IOC",
+            "minute": "2026-03-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JUBLFOOD",
+            "minute": "2026-07-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TIINDIA",
+            "minute": "2026-07-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HAL",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CONCOR",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUNPHARMA",
+            "minute": "2026-07-26 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "VEDL",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "APOLLOHOSP",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATACONSUM",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BRITANNIA",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATAPOWER",
+            "minute": "2026-06-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ASHOKLEY",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATAPOWER",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IDFCFIRSTB",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATACONSUM",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIPOWER",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "EICHERMOT",
+            "minute": "2026-05-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BRITANNIA",
+            "minute": "2026-05-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BOSCHLTD",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TCS",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SYNGENE",
+            "minute": "2026-04-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CIPLA",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATASTEEL",
+            "minute": "2026-07-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SUPREMEIND",
+            "minute": "2026-06-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IOC",
+            "minute": "2026-03-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MARUTI",
+            "minute": "2026-03-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HDFCLIFE",
+            "minute": "2026-06-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MAHABANK",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "AXISBANK",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ESCORTS",
+            "minute": "2026-05-18 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PNB",
+            "minute": "2026-07-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "LICI",
+            "minute": "2026-07-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IRFC",
+            "minute": "2026-06-23 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BPCL",
+            "minute": "2026-06-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "POLYCAB",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PAYTM",
+            "minute": "2026-07-12 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "INDUSINDBK",
+            "minute": "2026-05-05 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DALBHARAT",
+            "minute": "2026-07-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NTPC",
+            "minute": "2026-06-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATACONSUM",
+            "minute": "2026-06-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TIINDIA",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "RECLTD",
+            "minute": "2026-06-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "MAXHEALTH",
+            "minute": "2026-05-28 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "PFC",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CHOLAFIN",
+            "minute": "2026-07-22 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DABUR",
+            "minute": "2026-08-03 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BANDHANBNK",
+            "minute": "2026-07-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HINDUNILVR",
+            "minute": "2026-07-14 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HAVELLS",
+            "minute": "2026-05-31 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIPORTS",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "DRREDDY",
+            "minute": "2026-07-16 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HDFCBANK",
+            "minute": "2026-08-06 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GLAND",
+            "minute": "2026-08-09 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJFINSV",
+            "minute": "2026-08-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "JINDALSTEL",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IRFC",
+            "minute": "2026-06-10 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJHLDNG",
+            "minute": "2026-06-07 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ADANIPORTS",
+            "minute": "2026-07-01 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "NESTLEIND",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "UPL",
+            "minute": "2026-08-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SRF",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "TATASTEEL",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ACC",
+            "minute": "2026-07-02 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "ATGL",
+            "minute": "2026-07-21 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "GODREJPROP",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BAJAJHLDNG",
+            "minute": "2026-07-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "SBILIFE",
+            "minute": "2026-08-13 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "HINDALCO",
+            "minute": "2026-08-11 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "CGPOWER",
+            "minute": "2026-06-30 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "YESBANK",
+            "minute": "2026-07-29 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "YESBANK",
+            "minute": "2026-07-19 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "IRCTC",
+            "minute": "2026-07-27 18:30:00",
+            "count": 2
+        },
+        {
+            "symbol": "BHEL",
+            "minute": "2026-07-15 18:30:00",
+            "count": 2
+        }
+    ],
+    "status": "FAIL"
+}

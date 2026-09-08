@@ -1,0 +1,71 @@
+{
+    "phase": "EQUITY_HARDENING",
+    "timestamp": "2026-09-08T05:43:01.609250",
+    "population": {
+        "total_equity_signals": 1247,
+        "active": 9,
+        "verified": 50,
+        "unverified": 1188
+    },
+    "gates": {
+        "universe_integrity": {
+            "name": "universe_integrity",
+            "status": "FAIL",
+            "mandatory": true,
+            "blocking": true,
+            "reason": "Expected 200 constituents, found 210.",
+            "evidence": {},
+            "timestamp": "2026-09-08T05:43:01.306223"
+        },
+        "signal_schema": {
+            "name": "signal_schema",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-08T05:43:01.308223"
+        },
+        "prediction_lineage": {
+            "name": "prediction_lineage",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-08T05:43:01.609250"
+        },
+        "v22_freeze": {
+            "name": "v22_freeze",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-08T05:43:01.609250"
+        },
+        "temporal_integrity": {
+            "name": "temporal_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-08T05:43:01.609250"
+        },
+        "pnl_integrity": {
+            "name": "pnl_integrity",
+            "status": "PASS",
+            "mandatory": true,
+            "blocking": false,
+            "reason": "PASS",
+            "evidence": {},
+            "timestamp": "2026-09-08T05:43:01.609250"
+        }
+    },
+    "blocking_failures": [
+        "universe_integrity"
+    ],
+    "overall_pass": false,
+    "final_status": "EQUITY_CERTIFICATION_BLOCKED"
+}
