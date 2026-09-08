@@ -1,0 +1,12 @@
+{
+    "timestamp": "2026-09-08T11:44:30.723798",
+    "collector_status": "OPERATIONAL",
+    "nifty200_expected": 200,
+    "nifty200_received": 199,
+    "fno_expected": 196,
+    "neon_status": "PASS",
+    "api_status": "PASS",
+    "zero_fabrication_status": "PASS",
+    "strategy_v22_frozen": true,
+    "cost_per_month": 0.0
+}

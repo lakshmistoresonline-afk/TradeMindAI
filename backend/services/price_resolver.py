@@ -12,6 +12,12 @@ class ProviderCapabilityRegistry:
         Defines what each provider can safely support.
         """
         registry = {
+            "NSEOpenProvider": {
+                "equity_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE"]
+            },
             "AngelOneProvider": {
                 "equity_support": True,
                 "future_support": True,
@@ -58,8 +64,8 @@ class PriceResolver:
     Enforces strict F&O-only routing for derivative premiums.
     """
 
-    EQUITY_SEQUENCE = ["angelone", "upstox", "dhan", "groww", "yfinance"]
-    FNO_SEQUENCE = ["angelone", "upstox", "dhan", "groww"] # YFinance FORBIDDEN for F&O
+    EQUITY_SEQUENCE = ["nse_open", "angelone", "upstox", "dhan", "groww", "yfinance"]
+    FNO_SEQUENCE = ["nse_open", "angelone", "upstox", "dhan", "groww"] # YFinance FORBIDDEN for F&O
 
     @classmethod
     async def resolve_current_price(cls, signal: LiveSignal) -> Dict[str, Any]:
@@ -99,6 +105,7 @@ class PriceResolver:
     @staticmethod
     async def _try_resolve_with_provider(signal: LiveSignal, provider_code: str) -> Dict[str, Any]:
         # Local instantiation to avoid container pollution during failover
+        from backend.infrastructure.repositories.nse_open_provider import NSEOpenProvider
         from backend.infrastructure.repositories.angelone_provider import AngelOneProvider
         from backend.infrastructure.repositories.upstox_provider import UpstoxProvider
         from backend.infrastructure.repositories.dhan_provider import DhanProvider
@@ -106,6 +113,7 @@ class PriceResolver:
         from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
 
         providers = {
+            "nse_open": NSEOpenProvider,
             "angelone": AngelOneProvider,
             "upstox": UpstoxProvider,
             "dhan": DhanProvider,

@@ -106,6 +106,9 @@ class Container:
             elif settings.MARKET_DATA_PROVIDER == "angelone":
                 from backend.infrastructure.repositories.angelone_provider import AngelOneProvider
                 self._provider = AngelOneProvider()
+            elif settings.MARKET_DATA_PROVIDER == "nse_open":
+                from backend.infrastructure.repositories.nse_open_provider import NSEOpenProvider
+                self._provider = NSEOpenProvider()
             else:
                 from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
                 self._provider = YFinanceProvider()
