@@ -1,14 +1,18 @@
 {
-  "removed_features": [
-    "F&O signals and terminals",
-    "Option chains",
-    "Futures quote displays",
-    "Generic portfolio management",
-    "Broker order execution buttons",
-    "Crypto and Forex dashboards",
-    "Developer infrastructure debug panels from public UI",
-    "Duplicate BUY/SELL screens",
-    "Empty placeholder widgets"
+  "removed_pages": [
+    "AICopilot.tsx",
+    "Portfolio.tsx",
+    "OptionsSignals.tsx",
+    "FuturesSignals.tsx",
+    "OpportunityRadar.tsx",
+    "ShadowMonitor.tsx",
+    "DataQualityDashboard.tsx"
   ],
-  "rationale": "Repositioning the platform as a professional NIFTY-200 Equity Intelligence platform. Non-equity features create clutter and dilute the product message."
+  "removed_features": [
+    "Broker order buttons",
+    "Option chain displays",
+    "Theoretical pricing widgets",
+    "Infrastructure debug panels"
+  ],
+  "rationale": "Strict focus on NIFTY-200 Equity Intelligence."
 }

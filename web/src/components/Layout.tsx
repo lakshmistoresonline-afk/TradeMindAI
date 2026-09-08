@@ -3,10 +3,8 @@ import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButto
 import {
   LayoutDashboard,
   Zap,
-  History,
   Search,
   Bot,
-  Settings,
   LogOut,
   Activity,
   Menu as MenuIcon,
@@ -21,7 +19,6 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme, Fab } from '@mui/material';
 import CommandPalette from './CommandPalette';
-import AICopilot from '../pages/AICopilot';
 import { API_BASE_URL, getMarketStats } from '../api/client';
 
 const drawerWidth = 260;
@@ -308,7 +305,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <IconButton onClick={() => setCopilotOpen(false)} sx={{ color: 'slategray' }}><X size={20} /></IconButton>
            </Box>
            <Box sx={{ height: 'calc(100% - 80px)' }}>
-              <AICopilot isDrawer stockContext={copilotContext} />
+              <Box sx={{ p: 4, textAlign: 'center' }}>
+                 <Typography color="textSecondary" variant="body2">AI Copilot context integration pending.</Typography>
+              </Box>
            </Box>
         </Drawer>
 

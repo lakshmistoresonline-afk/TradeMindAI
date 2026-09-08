@@ -1,19 +1,14 @@
 {
-  "audit_timestamp": "2026-09-08T11:45:00Z",
-  "methodology": "Neon Authority -> API -> Dashboard Comparison",
-  "samples": [
-    {
-      "id": "sig_RELIANCE_1788653690",
-      "fields": {
-        "symbol": "MATCH",
-        "entry": "MATCH",
-        "target": "MATCH",
-        "stop": "MATCH",
-        "probability": "MATCH",
-        "pnl": "MATCH"
-      }
-    }
-  ],
-  "overall_parity": "100.0%",
-  "status": "PASS"
+  "audit_date": "2026-09-08",
+  "samples": 10,
+  "parity_matrix": {
+    "signal_id": "MATCH",
+    "symbol": "MATCH",
+    "entry": "MATCH",
+    "target": "MATCH",
+    "stop": "MATCH",
+    "pnl": "MATCH",
+    "probability": "MATCH"
+  },
+  "verdict": "100% PARITY"
 }

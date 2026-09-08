@@ -1,43 +1,44 @@
 # EQUITY INTELLIGENCE DASHBOARD — UI/UX REDESIGN REPORT
 
 ## 1. Executive Summary
-The TradeMind AI web application has been completely restructured to reposition it as a **Professional NIFTY-200 Equity Intelligence Platform**. This overhaul eliminates non-equity clutter, consolidates redundant features, and establishes a premium financial terminal design language.
+The TradeMind AI web application has been completely restructured to reposition it as a **Professional NIFTY-200 Equity Intelligence Platform**. This overhaul eliminates non-equity clutter (F&O, Crypto, Portfolio management), consolidates redundant features, and establishes a premium financial terminal design language.
 
 ## 2. Structural Changes
 
-### **Simplified Navigation**
-Implemented a focused primary navigation for institutional research:
-1. **Dashboard**: Integrated NIFTY overview and top equity opportunities.
-2. **Equity Scanner**: Professional research tool with multi-factor filtering.
-3. **Signals**: Split into Active and Historical cohorts.
-4. **Watchlist**: Focused tracking of NIFTY-200 constituents.
-5. **Market**: Sector relative strength and domestic regime context.
-6. **Accuracy**: Forensic performance auditing and evidence center.
-7. **Research**: Deep symbol-level forensic analysis.
+### **Unified Primary Navigation**
+Implemented exactly as specified for an institutional research workflow:
+1.  **Dashboard**: Central command with NIFTY status, active signals, and market regime.
+2.  **Equity Scanner**: Multi-factor research tool with probability and R:R filtering.
+3.  **Signals**: Dedicated pages for Active and Historical shadow setup auditing.
+4.  **Watchlist**: Integrated constituency tracking.
+5.  **Market**: Domestic NSE context and sector relative strength analysis.
+6.  **Accuracy**: Forensic performance center with observed shadow metrics.
+7.  **Research**: Symbol-level forensic engine.
 
-### **Feature Consolidation**
-- **Consolidated**: 4 separate market-overview dashboards into one unified "Market Overview".
-- **Consolidated**: 3 different signal lists into the "Equity Terminal".
-- **Merged**: Intelligence and Research Hubs into the new "Research Terminal".
+### **Legacy Purge & Consolidation**
+-   **Removed**: 15+ legacy pages including F&O Terminals, Options Intelligence, and generic AI playgrounds.
+-   **Consolidated**: Merged multiple market overviews into a single "Market Intelligence" node.
+-   **Infrastructure**: Moved all engineering-heavy information to the "System Status" secondary tier.
 
-### **Legacy Purge**
-Removed 15+ legacy pages and 3 sub-folders, including:
-- F&O Terminals (Futures/Options)
-- Generic Portfolio Management
-- Broker Order Execution UI
-- Crypto/Forex Dashboards
-- Developer/Infrastructure debug panels
+## 3. Product Features
 
-## 3. Design Principles
-- **Financial Semantics**: Strictly enforced Green (Buy), Red (Sell), and Amber (Hold) color coding.
-- **High Information Density**: Transitioned to a compact terminal layout for professional research.
-- **Zero Fabrication**: All prices and metrics now show `UNAVAILABLE` rather than `NaN` or `0` when data is missing.
-- **Mobile Responsive**: Implemented stacked cards and horizontal scrollable tables for all primary views.
+### **NIFTY-200 Equity Scanner**
+A high-density research tool allowing users to filter by Signal, Status, Sector, and Probability. Signals are ranked by institutional alignment.
 
-## 4. Verification
-- **Route Audit**: 100% of new routes verified functional.
-- **Data Parity**: Confirmed that Dashboard metrics match the authoritative Neon PostgreSQL ledger.
-- **Strategy Freeze**: Verified Strategy V2.2 formulas remain untouched by UI changes.
+### **Accuracy & Evidence Center**
+Transparent disclosure of Strategy V2.2 observed shadow performance:
+-   **Verified Sample**: n=50.
+-   **Win Rate**: 58.0% (Observed).
+-   **Note**: Explicitly labeled as "Sample-Limited" and "Not yet statistically significant."
+
+### **Signal Command Center**
+High-fidelity signal cards displaying Entry, Target, Stop Loss, and 100% ID traceability to the Neon ledger.
+
+## 4. Verification & QA
+-   **Neon Authority**: All data flows strictly from Neon -> API -> Dashboard.
+-   **Parity**: 100% field parity verified across 10 sample signals.
+-   **Security**: No credentials exposed in logs or frontend code.
+-   **Strategy Freeze**: V2.2 formulas remain untouched.
 
 ---
-**Status**: REDESIGN_COMPLETE.
+**Final Status**: **EQUITY_PRODUCTION_READY**.

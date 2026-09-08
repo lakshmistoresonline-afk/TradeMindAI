@@ -32,7 +32,7 @@ export default function Methodology() {
                <Typography variant="body1" sx={{ color: '#fff', fontWeight: 700, mb: 2 }}>consensual decision engine</Typography>
                <Typography sx={{ color: 'slategray', lineHeight: 1.8 }}>
                   Our V2.2 model utilizes a **Platt-Scaled ensemble** architecture. A final signal is only generated when multiple agents
-                  (Trend, Momentum, and Institutional) reach a combined confidence threshold of **> 52%**.
+                  (Trend, Momentum, and Institutional) reach a combined confidence threshold of **&gt; 52%**.
                </Typography>
             </Paper>
          </section>

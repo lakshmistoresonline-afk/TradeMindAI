@@ -1,25 +1,22 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Paper, Grid, Stack, TextField, MenuItem, Slider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, alpha } from '@mui/material';
-import { Search, Filter, ArrowRight, TrendingUp, Zap, Target } from 'lucide-react';
+import { Box, Typography, Paper, Grid, TextField, MenuItem, Slider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, alpha } from '@mui/material';
+import { Search, ArrowRight } from 'lucide-react';
 import { getStocks, getLiveSignalsAudit } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useNavigate } from 'react-router-dom';
 
 export default function EquityScanner() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [stocks, setStocks] = useState<any[]>([]);
 
   // Filters
   const [signalFilter, setSignalFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ACTIVE');
   const [minProb, setMinProb] = useState(50);
-  const [minRR, setMinRR] = useState(1.0);
   const [sectorFilter, setSectorFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchData = async () => {
-    setLoading(true);
     try {
       const [stocksData, signalsData] = await Promise.all([getStocks(), getLiveSignalsAudit()]);
       const stockMap = new Map((stocksData || []).map((s: any) => [s.symbol, s]));
@@ -37,8 +34,6 @@ export default function EquityScanner() {
       setStocks(combined);
     } catch (e) {
       console.error("Scanner data sync failed:", e);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -56,13 +51,12 @@ export default function EquityScanner() {
       const matchesSignal = signalFilter === 'ALL' || s.decision.rating.includes(signalFilter);
       const matchesStatus = statusFilter === 'ALL' || s.status === statusFilter;
       const matchesProb = (s.calibrated_probability * 100) >= minProb;
-      const matchesRR = (s.risk_reward_ratio || 1.0) >= minRR;
       const matchesSector = sectorFilter === 'ALL' || s.sector === sectorFilter;
       const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchesSignal && matchesStatus && matchesProb && matchesRR && matchesSector && matchesSearch;
+      return matchesSignal && matchesStatus && matchesProb && matchesSector && matchesSearch;
     }).sort((a, b) => (b.calibrated_probability || 0) - (a.calibrated_probability || 0));
-  }, [stocks, signalFilter, statusFilter, minProb, minRR, sectorFilter, searchQuery]);
+  }, [stocks, signalFilter, statusFilter, minProb, sectorFilter, searchQuery]);
 
   return (
     <Box sx={{ pb: 8 }}>
@@ -127,7 +121,6 @@ export default function EquityScanner() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 size="small"
-                InputProps={{ startAdornment: <Search size={16} style={{ marginRight: 8, color: 'slategray' }} /> }}
               />
            </Grid>
         </Grid>
@@ -189,7 +182,7 @@ export default function EquityScanner() {
                    <Button
                     size="small"
                     endIcon={<ArrowRight size={14} />}
-                    onClick={() => navigate(`/signals/${s.id}`)}
+                    onClick={() => navigate(`/signals/${s.id}`, { state: { signal: s } })}
                     sx={{ color: 'primary.main', fontWeight: 800 }}
                    >
                      ANALYZE

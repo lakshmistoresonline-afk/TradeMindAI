@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, alpha, Divider, LinearProgress } from '@mui/material';
-import { Globe, TrendingUp, Activity, BarChart2 } from 'lucide-react';
+import { Globe, TrendingUp } from 'lucide-react';
 import { getMarketStats } from '../api/client';
 
 export default function MarketOverview() {

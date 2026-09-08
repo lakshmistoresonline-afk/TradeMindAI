@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Paper, Stack, Chip, IconButton, Button, Skeleton, Divider, alpha } from '@mui/material';
-import { RefreshCw, ChevronRight, Activity, TrendingUp, Bot, ArrowUpRight, ArrowDownRight, LayoutDashboard, Database, ShieldCheck, Globe, Zap } from 'lucide-react';
+import { Box, Typography, Grid, Paper, Stack, Chip, Button, Skeleton, Divider, alpha } from '@mui/material';
+import { ChevronRight } from 'lucide-react';
 import { getStocks, getLiveSignalsAudit, getPerformanceSummary, getPerformanceSignals, getMarketStats } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
@@ -18,8 +18,7 @@ export default function DashboardTerminal() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [stocksData, liveSignalsData, summaryData, allSignalsData, statsData] = await Promise.all([
-        getStocks(),
+      const [liveSignalsData, summaryData, allSignalsData, statsData] = await Promise.all([
         getLiveSignalsAudit(),
         getPerformanceSummary(),
         getPerformanceSignals(),
@@ -110,7 +109,6 @@ export default function DashboardTerminal() {
       </Stack>
 
       <Grid container spacing={4}>
-         {/* 3. Active Signal Command Center */}
          <Grid item xs={12} lg={9}>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1 }}>ACTIVE EQUITY SIGNALS</Typography>
@@ -132,7 +130,6 @@ export default function DashboardTerminal() {
             )}
          </Grid>
 
-         {/* 4. Triage Sidebar */}
          <Grid item xs={12} lg={3}>
             <Stack spacing={4}>
                <Box>
@@ -206,84 +203,22 @@ function SidebarStat({ label, value, color }: any) {
    );
 }
 
-function DashboardSignalRail({ title, signals, type, loading }: any) {
-   const navigate = useNavigate();
-   const segmentPath = type === 'EQUITY' ? 'equity' : type === 'FUTURES' ? 'futures' : 'options';
-   return (
-      <Box>
-         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-               <Box sx={{ width: 4, height: 18, bgcolor: type === 'EQUITY' ? '#10b981' : type === 'FUTURES' ? '#00D1FF' : '#7C3AED', borderRadius: 4 }} />
-               <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 0.5, color: '#e2e8f0' }}>{title}</Typography>
-               <Chip label={`${signals.length} ACTIVE`} size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)', color: 'slategray' }} />
-            </Stack>
-            <Button size="small" onClick={() => navigate(`/signals/${segmentPath}`)} endIcon={<ChevronRight size={14} />} sx={{ color: 'slategray', fontWeight: 800, textTransform: 'none' }}>View Terminal</Button>
-         </Box>
-
-         {loading ? (
-            <Grid container spacing={2}>
-               {[1,2,3].map(i => (
-                  <Grid item xs={12} md={4} key={i}><Skeleton variant="rectangular" height={320} sx={{ borderRadius: 1 }} /></Grid>
-               ))}
-            </Grid>
-         ) : signals.length > 0 ? (
-            <Grid container spacing={2}>
-               {signals.slice(0, 3).map((s: any) => (
-                  <Grid item xs={12} md={4} key={s.id || s.symbol}>
-                     <LiveSignalCard stock={s} decision={s.decision} />
-                  </Grid>
-               ))}
-            </Grid>
-         ) : (
-            <Paper sx={{ py: 8, textAlign: 'center', border: '1px dashed rgba(255,255,255,0.03)', bgcolor: alpha('#0f172a', 0.3) }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>SCANNING {type} NODES FOR ALPHA...</Typography>
-            </Paper>
-         )}
-      </Box>
-   );
-}
-
-function MarketTickerItem({ label, data, isVix = false, isBreadth = false }: any) {
+function MarketTickerItem({ label, data }: any) {
   if (!data) return <Skeleton width={100} height={40} />;
-  const isPositive = isVix ? data.change < 0 : data.change >= 0;
+  const isPositive = data.change >= 0;
   return (
     <Box sx={{ minWidth: 140 }}>
        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
        <Stack direction="row" spacing={1.5} alignItems="baseline">
           <Typography sx={{ fontWeight: 900, fontSize: '1rem', fontFamily: 'JetBrains Mono', color: '#fff' }}>
-             {isBreadth ? `${data.advancing}/${data.declining}` : data.value.toLocaleString()}
+             {data.value.toLocaleString()}
           </Typography>
-          {!isBreadth && (
-            <Stack direction="row" spacing={0.2} alignItems="center">
-               {isPositive ? <ArrowUpRight size={12} color="#10b981" /> : <ArrowDownRight size={12} color="#ef4444" />}
-               <Typography sx={{ fontWeight: 900, fontSize: '0.7rem', color: isPositive ? '#10b981' : '#ef4444' }}>
-                  {data.change}%
-               </Typography>
-            </Stack>
-          )}
+          <Stack direction="row" spacing={0.2} alignItems="center">
+             <Typography sx={{ fontWeight: 900, fontSize: '0.7rem', color: isPositive ? '#10b981' : '#ef4444' }}>
+                {isPositive ? '+' : ''}{data.change}%
+             </Typography>
+          </Stack>
        </Stack>
     </Box>
   );
-}
-
-function StatusBadge({ label, status, icon }: any) {
-   return (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, border: '1px solid rgba(255,255,255,0.05)', px: 1.5, py: 0.5, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }}>
-         <Box sx={{ color: 'slategray' }}>{icon}</Box>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.6rem' }}>{label}:</Typography>
-         <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 900, fontSize: '0.6rem' }}>{status}</Typography>
-      </Box>
-   );
-}
-
-function IntelligenceItem({ label, value, icon, color = 'slategray' }: any) {
-   return (
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-         <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{ color }}>{icon}</Box>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}</Typography>
-         </Stack>
-         <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
-      </Box>
-   );
 }

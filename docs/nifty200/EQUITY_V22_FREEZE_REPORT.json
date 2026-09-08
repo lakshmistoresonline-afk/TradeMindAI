@@ -1,11 +1,6 @@
 {
   "strategy": "V2.2",
+  "status": "FROZEN",
   "hash_verification": "MATCH",
-  "files_audited": [
-    "SignalEngine.py",
-    "RiskEngine.py",
-    "OutcomeEngine.py"
-  ],
-  "result": "FROZEN",
-  "status": "PASS"
+  "unauthorized_changes": 0
 }

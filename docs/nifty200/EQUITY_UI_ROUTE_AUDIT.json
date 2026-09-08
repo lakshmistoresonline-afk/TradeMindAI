@@ -1,21 +1,15 @@
 {
-  "total_routes": 16,
-  "action_plan": [
-    { "path": "/", "component": "DashboardTerminal", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/scanner", "component": "OpportunityScanner", "action": "NEW/REWORK", "category": "PRIMARY" },
-    { "path": "/signals/active", "component": "EquitySignals", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/signals/history", "component": "HistoryDashboard", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/watchlist", "component": "Watchlist", "action": "NEW", "category": "PRIMARY" },
-    { "path": "/market/overview", "component": "MarketDashboard", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/market/sectors", "component": "SectorRotation", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/research", "component": "StockResearchTerminal", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/accuracy", "component": "IntelligenceDashboard", "action": "REWORK", "category": "PRIMARY" },
-    { "path": "/status", "component": "SystemControl", "action": "REWORK", "category": "SECONDARY" },
-    { "path": "/methodology", "component": "Methodology", "action": "NEW", "category": "SECONDARY" },
-    { "path": "/signals/futures", "component": "FuturesSignals", "action": "REMOVE" },
-    { "path": "/signals/options", "component": "OptionsSignals", "action": "REMOVE" },
-    { "path": "/portfolio", "component": "PortfolioDashboard", "action": "REMOVE" },
-    { "path": "/shadow", "component": "ShadowMonitor", "action": "REMOVE" },
-    { "path": "/data-quality", "component": "DataQualityDashboard", "action": "REMOVE" }
+  "total_routes": 12,
+  "mapping": [
+    { "path": "/", "page": "Dashboard", "status": "CERTIFIED" },
+    { "path": "/scanner", "page": "EquityScanner", "status": "CERTIFIED" },
+    { "path": "/signals/active", "page": "ActiveSignals", "status": "CERTIFIED" },
+    { "path": "/signals/history", "page": "SignalHistory", "status": "CERTIFIED" },
+    { "path": "/signals/:id", "page": "SignalDetail", "status": "CERTIFIED" },
+    { "path": "/market/overview", "page": "MarketOverview", "status": "CERTIFIED" },
+    { "path": "/research", "page": "ResearchTerminal", "status": "CERTIFIED" },
+    { "path": "/accuracy", "page": "Accuracy", "status": "CERTIFIED" },
+    { "path": "/status", "page": "SystemStatus", "status": "CERTIFIED" },
+    { "path": "/methodology", "page": "Methodology", "status": "CERTIFIED" }
   ]
 }

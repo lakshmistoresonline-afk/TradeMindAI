@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Paper, Stack, Chip, Divider, alpha, Button } from '@mui/material';
+import { Box, Typography, Grid, Paper, Stack, Chip, Divider } from '@mui/material';
 import { useParams, useLocation } from 'react-router-dom';
-import { Activity, Target, Zap, ShieldCheck, Clock, FileText } from 'lucide-react';
-import { getLiveSignalDetail } from '../api/client';
+import { apiClient } from '../api/client';
 
 export default function SignalDetail() {
   const { id } = useParams();

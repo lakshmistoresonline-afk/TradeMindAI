@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Grid, Stack, Chip, Divider, LinearProgress } from '@mui/material';
-import { Server, Database, Activity, ShieldCheck, Globe } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Stack, Chip, LinearProgress } from '@mui/material';
+import { Database, Activity, Globe } from 'lucide-react';
 import { getDataHealth } from '../api/client';
 
 export default function SystemStatus() {

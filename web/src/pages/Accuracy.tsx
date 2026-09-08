@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Paper, Stack, Divider, alpha, LinearProgress } from '@mui/material';
-import { ShieldCheck, BarChart2, Target, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Box, Typography, Grid, Paper, Stack, alpha } from '@mui/material';
+import { BarChart2, AlertTriangle } from 'lucide-react';
 import { getPerformanceSummary } from '../api/client';
 
 export default function Accuracy() {
-  const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<any>(null);
 
   useEffect(() => {
     getPerformanceSummary().then(data => {
       setSummary(data);
-      setLoading(false);
     });
   }, []);
 

@@ -1,17 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, alpha } from '@mui/material';
-import { History, Search, Download } from 'lucide-react';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, TextField, MenuItem, alpha } from '@mui/material';
 import { getPerformanceSignals } from '../api/client';
 
 export default function SignalHistory() {
   const [signals, setSignals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
 
   useEffect(() => {
     getPerformanceSignals().then(data => {
       setSignals(data || []);
-      setLoading(false);
     });
   }, []);
 
