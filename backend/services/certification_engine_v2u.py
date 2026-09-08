@@ -20,7 +20,7 @@ class Phase2UCertificationEngine:
             "status": status, # PASS, FAIL, NOT_APPLICABLE, CONFIGURATION_REQUIRED, DATA_UNAVAILABLE, PROVIDER_SPECIFIC
             "mandatory": mandatory,
             "blocking": mandatory and status in ["FAIL", "CONFIGURATION_REQUIRED", "DATA_UNAVAILABLE"],
-            "reason": reason or ("PASS" if status == "PASS" else "Institutional reason required."),
+            "reason": reason or ("PASS" if status == "PASS" else "N/A"),
             "evidence": evidence or {},
             "timestamp": datetime.datetime.utcnow().isoformat()
         }
@@ -52,20 +52,39 @@ class Phase2UCertificationEngine:
                   provider = DhanProvider()
 
         auth_status = "CONFIGURATION_REQUIRED"
-        if provider_name == "AngelOne":
-             if provider.api_key and provider.client_code: auth_status = "PASS"
-        elif provider_name == "Upstox":
-             if provider.analytics_token: auth_status = "PASS"
-        elif provider_name == "Dhan":
-             if provider.access_token: auth_status = "PASS"
+        config_reason = None
+        auth_reason = None
 
-        gates["configuration"] = cls.evaluate_gate(f"{provider_name}_configuration", auth_status)
-        gates["authentication"] = cls.evaluate_gate(f"{provider_name}_authentication", "CONFIGURATION_REQUIRED" if auth_status != "PASS" else "PASS")
+        if provider_name == "AngelOne":
+             if provider.api_key and provider.client_code:
+                  auth_status = "PASS"
+             else:
+                  config_reason = "ANGELONE_API_KEY, ANGELONE_CLIENT_CODE, ANGELONE_PIN and ANGELONE_TOTP_SECRET are absent from the production environment."
+                  auth_reason = "Authentication was not attempted because required Angel One production credentials are absent."
+        elif provider_name == "Upstox":
+             if provider.analytics_token:
+                  auth_status = "PASS"
+             else:
+                  config_reason = "UPSTOX_ANALYTICS_TOKEN is absent."
+                  auth_reason = "Authentication was not attempted because Upstox credentials are absent."
+        elif provider_name == "Dhan":
+             if provider.access_token:
+                  auth_status = "PASS"
+             else:
+                  config_reason = "DHAN_ACCESS_TOKEN is absent."
+                  auth_reason = "Authentication was not attempted because Dhan credentials are absent."
+
+        gates["configuration"] = cls.evaluate_gate(f"{provider_name}_configuration", auth_status, reason=config_reason)
+        gates["authentication"] = cls.evaluate_gate(f"{provider_name}_authentication", "CONFIGURATION_REQUIRED" if auth_status != "PASS" else "PASS", reason=auth_reason)
 
         # 3. Instrument Master Gate
         master_service = getattr(container, f"instrument_master_{provider_name.lower()}", None)
         master_status = "CONFIGURATION_REQUIRED"
         master_reason = "No instruments synced in Neon."
+
+        if provider_name == "AngelOne" and auth_status != "PASS":
+             master_reason = "Angel One instrument-master synchronization has not occurred because an authenticated Angel One session is required."
+
         if master_service:
             await master_service.refresh_master()
             master_audit = master_service.audit_metadata
@@ -74,14 +93,25 @@ class Phase2UCertificationEngine:
                  master_reason = None
             else:
                  master_status = "CONFIGURATION_REQUIRED"
-                 master_reason = master_audit.get("reason")
+                 # Keep existing reason if it's more specific than the default
+                 if master_audit.get("reason"):
+                      master_reason = master_audit.get("reason")
 
         gates["instrument_master"] = cls.evaluate_gate(f"{provider_name}_instrument_master", master_status, reason=master_reason)
 
         # 4. Data Gates (Runtime Evidence)
-        # For current audit, if not authenticated, we can't have live data
-        gates["equity_live"] = cls.evaluate_gate(f"{provider_name}_equity_live", "DATA_UNAVAILABLE" if auth_status != "PASS" else "PASS")
-        gates["fno_live"] = cls.evaluate_gate(f"{provider_name}_fno_live", "DATA_UNAVAILABLE" if auth_status != "PASS" else "PASS")
+        equity_live_status = "PASS" if auth_status == "PASS" else "DATA_UNAVAILABLE"
+        equity_live_reason = None
+        if provider_name == "AngelOne" and auth_status != "PASS":
+             equity_live_reason = "No genuine Angel One equity quote was retrieved because Angel One authentication is unavailable."
+
+        fno_live_status = "PASS" if auth_status == "PASS" else "DATA_UNAVAILABLE"
+        fno_live_reason = None
+        if provider_name == "AngelOne" and auth_status != "PASS":
+             fno_live_reason = "No genuine Angel One derivative quote was retrieved because Angel One authentication is unavailable."
+
+        gates["equity_live"] = cls.evaluate_gate(f"{provider_name}_equity_live", equity_live_status, reason=equity_live_reason)
+        gates["fno_live"] = cls.evaluate_gate(f"{provider_name}_fno_live", fno_live_status, reason=fno_live_reason)
 
         # 5. Result
         blocking_failures = [g["name"] for g in gates.values() if g["blocking"]]
@@ -123,7 +153,7 @@ class Phase2UCertificationEngine:
             blocking_failures = [g["name"] for g in gates.values() if g["blocking"]]
             # Note: For Global Pass, we still need at least ONE F&O provider to be live
             if not angel_audit["overall_pass"] and not upstox_audit["overall_pass"] and not dhan_audit["overall_pass"]:
-                 gates["fno_derivative_pricing"] = cls.evaluate_gate("fno_derivative_pricing", "CONFIGURATION_REQUIRED", reason="No authenticated F&O providers available.")
+                 gates["fno_derivative_pricing"] = cls.evaluate_gate("fno_derivative_pricing", "CONFIGURATION_REQUIRED", reason="No authenticated F&O provider is currently available to supply genuine derivative prices.")
             else:
                  gates["fno_derivative_pricing"] = cls.evaluate_gate("fno_derivative_pricing", "PASS")
 
