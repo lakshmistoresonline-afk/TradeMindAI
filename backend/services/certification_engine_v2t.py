@@ -54,18 +54,22 @@ class Phase2TCertificationEngine:
             )
 
             # 3. Authentication Gates
+            from backend.infrastructure.repositories.angelone_provider import AngelOneProvider
             from backend.infrastructure.repositories.upstox_provider import UpstoxProvider
             from backend.infrastructure.repositories.dhan_provider import DhanProvider
+
+            angel = AngelOneProvider()
             upstox = UpstoxProvider()
             dhan = DhanProvider()
 
             upstox_auth = "PASS" if upstox.analytics_token else "CONFIGURATION_REQUIRED"
             dhan_auth = "PASS" if dhan.access_token else "CONFIGURATION_REQUIRED"
+            angel_auth = "PASS" if angel.api_key and angel.client_code else "CONFIGURATION_REQUIRED"
 
             gates["provider_authentication"] = cls.evaluate_gate(
                 "provider_authentication",
-                "PASS" if upstox_auth == "PASS" or dhan_auth == "PASS" else "CONFIGURATION_REQUIRED",
-                reason="Production credentials (Analytics/Access Tokens) are missing."
+                "PASS" if upstox_auth == "PASS" or dhan_auth == "PASS" or angel_auth == "PASS" else "CONFIGURATION_REQUIRED",
+                reason="Production credentials (Analytics/Access/AngelOne Tokens) are missing."
             )
 
             # 4. F&O Quote retrieval (Live Verification)

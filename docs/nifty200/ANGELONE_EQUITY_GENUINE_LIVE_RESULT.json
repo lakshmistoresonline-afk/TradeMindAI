@@ -1,0 +1,9 @@
+{
+    "requirement": "NSE_EQUITY_LIVE_LTP",
+    "test_instruments": ["RELIANCE", "SBIN", "TCS", "INFY", "HDFCBANK"],
+    "live_status": "CONFIGURATION_REQUIRED",
+    "quotes_received": 0,
+    "fallback_active": true,
+    "timestamp": "2026-09-08T14:55:00Z",
+    "verdict": "AUTHENTICATION_BLOCKED"
+}

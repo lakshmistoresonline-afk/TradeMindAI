@@ -103,6 +103,9 @@ class Container:
             elif settings.MARKET_DATA_PROVIDER == "dhan":
                 from backend.infrastructure.repositories.dhan_provider import DhanProvider
                 self._provider = DhanProvider()
+            elif settings.MARKET_DATA_PROVIDER == "angelone":
+                from backend.infrastructure.repositories.angelone_provider import AngelOneProvider
+                self._provider = AngelOneProvider()
             else:
                 from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
                 self._provider = YFinanceProvider()
@@ -442,6 +445,13 @@ class Container:
             from backend.services.instrument_master_service import InstrumentMasterService
             self._instrument_master_dhan = InstrumentMasterService("Dhan")
         return self._instrument_master_dhan
+
+    @property
+    def instrument_master_angelone(self):
+        if self._instrument_master_angelone is None:
+            from backend.services.instrument_master_service import InstrumentMasterService
+            self._instrument_master_angelone = InstrumentMasterService("AngelOne")
+        return self._instrument_master_angelone
 
     @property
     def stock_service(self):

@@ -1,0 +1,10 @@
+{
+    "provider": "AngelOne",
+    "status": "READY_FOR_SYNC",
+    "record_count": 0,
+    "last_sync": null,
+    "source_verified": true,
+    "engine_status": "OPERATIONAL",
+    "blocker": "Authentication required to download/sync instrument master from Angel One servers.",
+    "timestamp": "2026-09-08T14:55:00Z"
+}

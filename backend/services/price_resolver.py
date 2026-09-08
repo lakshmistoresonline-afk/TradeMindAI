@@ -12,6 +12,12 @@ class ProviderCapabilityRegistry:
         Defines what each provider can safely support.
         """
         registry = {
+            "AngelOneProvider": {
+                "equity_support": True,
+                "future_support": True,
+                "option_support": True,
+                "exchanges": ["NSE"]
+            },
             "UpstoxProvider": {
                 "equity_support": True,
                 "future_support": True,
@@ -48,12 +54,12 @@ class ProviderCapabilityRegistry:
 class PriceResolver:
     """
     Workstream 15: Institutional Multi-Provider Price Resolver.
-    Implements deterministic failover: Upstox -> Dhan -> Groww -> YFinance.
+    Implements deterministic failover: Angel One -> Upstox -> Dhan -> Groww -> YFinance.
     Enforces strict F&O-only routing for derivative premiums.
     """
 
-    EQUITY_SEQUENCE = ["upstox", "dhan", "groww", "yfinance"]
-    FNO_SEQUENCE = ["upstox", "dhan", "groww"] # YFinance FORBIDDEN for F&O
+    EQUITY_SEQUENCE = ["angelone", "upstox", "dhan", "groww", "yfinance"]
+    FNO_SEQUENCE = ["angelone", "upstox", "dhan", "groww"] # YFinance FORBIDDEN for F&O
 
     @classmethod
     async def resolve_current_price(cls, signal: LiveSignal) -> Dict[str, Any]:
@@ -93,12 +99,14 @@ class PriceResolver:
     @staticmethod
     async def _try_resolve_with_provider(signal: LiveSignal, provider_code: str) -> Dict[str, Any]:
         # Local instantiation to avoid container pollution during failover
+        from backend.infrastructure.repositories.angelone_provider import AngelOneProvider
         from backend.infrastructure.repositories.upstox_provider import UpstoxProvider
         from backend.infrastructure.repositories.dhan_provider import DhanProvider
         from backend.infrastructure.repositories.groww_provider import GrowwProvider
         from backend.infrastructure.repositories.yfinance_provider import YFinanceProvider
 
         providers = {
+            "angelone": AngelOneProvider,
             "upstox": UpstoxProvider,
             "dhan": DhanProvider,
             "groww": GrowwProvider,
