@@ -239,5 +239,8 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
     def _dummy_chain(self, symbol: str) -> OptionsChain:
         return OptionsChain(symbol=symbol, expiry=datetime.datetime.utcnow(), underlying_price=0.0, pcr=1.0, max_pain=0.0, total_oi=0, iv_atm=0.0, greeks_aggregate={}, last_updated=datetime.datetime.utcnow())
 
+    async def subscribe_live(self, symbols: List[str]) -> None: pass
+    async def unsubscribe_live(self, symbols: List[str]) -> None: pass
+
     async def fetch_latest_news(self, symbol: str) -> List[NewsArticle]: return []
     async def fetch_daily_flow(self) -> InstitutionalFlow: return InstitutionalFlow(date=datetime.datetime.utcnow(), fii_net=0.0, dii_net=0.0, market_sentiment="Neutral")

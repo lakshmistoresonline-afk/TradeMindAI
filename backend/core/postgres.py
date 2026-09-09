@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
@@ -104,7 +104,7 @@ class PriceDB(Base):
     volume = Column(BigInteger)
     open_interest = Column(BigInteger)
     source = Column(String)
-    indicators = Column(String) # JSON string
+    indicators = Column(JSON) # Changed from String to JSON for Postgres compatibility
 
 class FeatureDefinitionDB(Base):
     __tablename__ = "feature_definitions"
@@ -555,9 +555,13 @@ class ModelMetadataDB(Base):
     symbol = Column(String, index=True)
     version = Column(String)
     type = Column(String)
+    status = Column(String, default="CANDIDATE")
     accuracy = Column(Float)
     precision = Column(Float)
     recall = Column(Float)
+    f1_score = Column(Float)
+    roc_auc = Column(Float)
+    brier_score = Column(Float)
     is_champion = Column(Boolean, default=False)
     last_trained = Column(DateTime, default=datetime.datetime.utcnow)
     hyperparameters = Column(String) # JSON string

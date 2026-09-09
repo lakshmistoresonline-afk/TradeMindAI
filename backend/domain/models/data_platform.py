@@ -105,14 +105,14 @@ class ModelMetadata(BaseModel):
     symbol: str
     version: str
     type: str # RANDOM_FOREST, LSTM, XGBOOST
-    accuracy: float
-    precision: float
-    recall: float
-    f1_score: float = 0.0
-    roc_auc: float = 0.5
-    brier_score: float = 1.0
+    accuracy: float = 0.5
+    precision: float = 0.0
+    recall: float = 0.0
+    f1_score: Optional[float] = 0.0
+    roc_auc: Optional[float] = 0.5
+    brier_score: Optional[float] = 1.0
     is_champion: bool = False
-    status: str = "CANDIDATE" # CHAMPION, CHALLENGER, CANDIDATE, RETIRED
+    status: Optional[str] = "CANDIDATE" # CHAMPION, CHALLENGER, CANDIDATE, RETIRED
     health: str = "HEALTHY" # HEALTHY, DEGRADED, DRIFTED, INSUFFICIENT_DATA
     last_trained: datetime
     hyperparameters: Dict[str, Any]

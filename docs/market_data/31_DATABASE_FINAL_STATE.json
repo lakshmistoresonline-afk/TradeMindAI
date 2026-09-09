@@ -1,0 +1,14 @@
+{
+    "timestamp": "2026-09-09T07:30:00",
+    "status": "OPERATIONAL",
+    "counts": {
+        "instruments": 202,
+        "equities": 200,
+        "historical_prices": 54470,
+        "model_registry": 55,
+        "shadow_signals": 63,
+        "active_signals": 13,
+        "verified_signals": 50,
+        "feature_files": 196
+    }
+}

@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Optional
 import datetime
 import uuid
+import json
+import hashlib
 from backend.domain.models.ios import LiveSignal, SignalEvent
 from backend.services.regime_engine import MarketRegimeEngine
 from backend.services.risk_engine import RiskEngine
@@ -18,13 +20,16 @@ class SignalEngine:
         features_list: Optional[List[Any]] = None,
         current_dd: Optional[float] = None,
         champion: Optional[ModelMetadata] = None,
-        save_prediction: bool = True
+        save_prediction: bool = True,
+        evaluation_timestamp: Optional[datetime.datetime] = None
     ) -> Optional[LiveSignal]:
         """
         Master Signal Generation Node.
         Implements No-Trade Engine and Probability Calibration.
         Optimized for bulk scans by accepting pre-fetched data.
         """
+        now = evaluation_timestamp or datetime.datetime.utcnow()
+
         # 1. Fetch Fresh Data (if not provided)
         if stock is None:
             stock = await container.repository.get_stock_by_symbol(symbol)
@@ -34,8 +39,8 @@ class SignalEngine:
         if features_list is None:
             features_list = await container.data_platform_repo.get_features_by_range(
                 symbol,
-                datetime.datetime.utcnow() - datetime.timedelta(days=7),
-                datetime.datetime.utcnow()
+                now - datetime.timedelta(days=7),
+                now
             )
         if not features_list: return None
         last_features = features_list[-1].features
@@ -108,7 +113,7 @@ class SignalEngine:
 
         # B. Data Freshness Gate (Max 24h)
         last_feature_date = features_list[-1].date
-        if (datetime.datetime.utcnow() - last_feature_date).total_seconds() > 86400:
+        if (now - last_feature_date).total_seconds() > 86400:
             rejection_reason = "STALE_MARKET_DATA"
 
         # C. Liquidity Gate (Min 10M Avg Volume)
@@ -141,7 +146,7 @@ class SignalEngine:
 
         # 9. DATA QUALITY SCORE
         data_ts = features_list[-1].date
-        staleness = (datetime.datetime.utcnow() - data_ts).total_seconds() / 3600.0 # hours
+        staleness = (now - data_ts).total_seconds() / 3600.0 # hours
 
         recent_prices = await container.repository.get_recent_prices(symbol, limit=20)
         coverage_score = min(1.0, len(recent_prices) / 20.0)
@@ -156,7 +161,7 @@ class SignalEngine:
             eligibility = "DATA_BLOCKED"
 
         # 11. Construct Canonical Signal
-        sig_id = f"sig_{symbol}_{datetime.datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        sig_id = f"sig_{symbol}_{now.strftime('%Y%m%d%H%M')}"
         now = datetime.datetime.utcnow()
 
         # Diagnostic Context (Phase 6 Robustness)
@@ -215,6 +220,11 @@ class SignalEngine:
 
         # 11.7 Generate Provenance Record (Workstream 9)
         provenance_id = str(uuid.uuid4())
+
+        # Serialize for hashing (Phase 7 Reliability)
+        feat_str = json.dumps(last_features, sort_keys=True)
+        res_str = json.dumps(ml_res, sort_keys=True, default=str)
+
         provenance_data = {
             "provenance_id": provenance_id,
             "signal_id": sig_id,
@@ -225,9 +235,9 @@ class SignalEngine:
             "feature_version": "v1.0.0",
             "data_sources": {"price": "YahooFinance/Groww", "indicators": "DuckDB-TA"},
             "source_timestamps": {"market_data": data_ts.isoformat()},
-            "input_hash": str(hash(frozenset(last_features.items()))),
-            "output_hash": str(hash(frozenset(ml_res.items()))),
-            "decision_hash": str(hash(sig_id))
+            "input_hash": hashlib.sha256(feat_str.encode()).hexdigest(),
+            "output_hash": hashlib.sha256(res_str.encode()).hexdigest(),
+            "decision_hash": hashlib.sha256(sig_id.encode()).hexdigest()
         }
         # In a full flow, we'd persist this now, but SignalEngine usually returns the object first.
         # We'll include it in the signal object.

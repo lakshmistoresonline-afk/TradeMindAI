@@ -23,10 +23,15 @@ class DuckDBEngine:
         """
         file_path = os.path.join(self.feature_storage, f"{symbol}.parquet")
 
+        # Cleanup incoming df for any accidental duplicate columns
+        df = df.loc[:, ~df.columns.duplicated()].copy()
+
         # Append logic: Read existing, concat, write new
         if os.path.exists(file_path):
             existing_df = pd.read_parquet(file_path)
-            # Ensure unique dates
+            # Cleanup existing for any historical duplicates
+            existing_df = existing_df.loc[:, ~existing_df.columns.duplicated()].copy()
+
             combined_df = pd.concat([existing_df, df]).drop_duplicates(subset=['date'])
             combined_df.to_parquet(file_path, index=False)
         else:
