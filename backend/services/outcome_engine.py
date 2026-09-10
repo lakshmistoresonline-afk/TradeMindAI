@@ -57,7 +57,7 @@ class OutcomeEngine:
         # Part 13 & 14: P&L and Progress Safety
         entry = signal.entry_price
         target = signal.target_price
-        stop = signal.stop_loss_price
+        stop = signal.stop_price
         current = signal.current_price
         direction = signal.direction
 

@@ -1,0 +1,1214 @@
+{
+    "summary": {
+        "equity_count": 200,
+        "historical_price_count": 114664,
+        "distinct_symbols": 200,
+        "earliest_date": "2021-09-09T00:00:00",
+        "latest_date": "2026-09-09T00:00:00",
+        "unique_trading_dates_in_db": 1239,
+        "avg_records_per_symbol": 573.32,
+        "symbols_less_than_5y": 200
+    },
+    "symbols": [
+        {
+            "symbol": "HDFCLIFE",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "BHEL",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "PFC",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "INDIANB",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TATASTEEL",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BIOCON",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "MAXHEALTH",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "UBL",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BALKRISIND",
+            "record_count": 988,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "IDFCFIRSTB",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "GODREJCP",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BRITANNIA",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HINDPETRO",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SONACOMS",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "MAZDOCK",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "KALYANKJIL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "CANBK",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "EXIDEIND",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ASTRAL",
+            "record_count": 250,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-04 00:00:00"
+        },
+        {
+            "symbol": "IRB",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ADANIENT",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "CIPLA",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SKFINDIA",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HDFCBANK",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "NTPC",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "HINDALCO",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "GAIL",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "NESTLEIND",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BEL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "AXISBANK",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "APOLLOTYRE",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "M&M",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "WHIRLPOOL",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "NATIONALUM",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "EICHERMOT",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "FEDERALBNK",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "CANFINHOME",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "UCOBANK",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "INDUSTOWER",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ASHOKLEY",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "TRENT",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "PEL",
+            "record_count": 211,
+            "earliest": "2025-11-07 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PAYTM",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SHRIRAMFIN",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "BANKNIFTY",
+            "record_count": 986,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SBILIFE",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "KARURVYSYA",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-07 00:00:00"
+        },
+        {
+            "symbol": "MGL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "L&TFH",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TRIDENT",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BANKBARODA",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "HAVELLS",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BERGEPAINT",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "APOLLOHOSP",
+            "record_count": 988,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TATACOMM",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BOSCHLTD",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SAIL",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ICICIPRULI",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PETRONET",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "RELIANCE",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PIIND",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "LT",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "FORTIS",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "BANKINDIA",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "LICI",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ADANIENSOL",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "CGPOWER",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "COROMANDEL",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ZYDUSLIFE",
+            "record_count": 501,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "GMRINFRA",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "IGL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "MFSL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ACC",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "TITAN",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BATAINDIA",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "DIXON",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "NAVINFLUOR",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "TIINDIA",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ULTRACEMCO",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "MARICO",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "INDHOTEL",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PAGEIND",
+            "record_count": 250,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "KOTAKBANK",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "INFY",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "AMBUJACEM",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HUDCO",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "TORNTPHARM",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "POONAWALLA",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "NMDC",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "GLENMARK",
+            "record_count": 250,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "NYKAA",
+            "record_count": 946,
+            "earliest": "2021-11-10 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ADANIPORTS",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HAL",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HINDCOPPER",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BLUEDART",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ATGL",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SRF",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "M&MFIN",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ASIANPAINT",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SUZLON",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "INDIAMART",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "UNIONBANK",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BPCL",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ABB",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "PHOENIXLTD",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-07 00:00:00"
+        },
+        {
+            "symbol": "DIVISLAB",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TCS",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "LICHSGFIN",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "RADICO",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PERSISTENT",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "CHOLAFIN",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "COALINDIA",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SUNPHARMA",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SIEMENS",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "NHPC",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TATAELXSI",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "UNITDSPR",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "JUBLFOOD",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "NIFTY",
+            "record_count": 248,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ESCORTS",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "DEEPAKNTR",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "CUMMINSIND",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "GRASIM",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "DLF",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "CROMPTON",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "KANSAINER",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SUPREMEIND",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "KPITTECH",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "RECLTD",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TATACONSUM",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "INDIGO",
+            "record_count": 250,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BHARATFORG",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "VBL",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "POWERGRID",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SBICARD",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "MUTHOOTFIN",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "COLPAL",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "IOC",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "CHAMBLFERT",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SJVN",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SYNGENE",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ZOMATO",
+            "record_count": 738,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2024-09-06 00:00:00"
+        },
+        {
+            "symbol": "TATAMOTORS",
+            "record_count": 208,
+            "earliest": "2025-11-12 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BHARTIARTL",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BANDHANBNK",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "OBEROIRLTY",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "PIDILITIND",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ITC",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "PNB",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "HINDUNILVR",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PATANJALI",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "COFORGE",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "INDUSINDBK",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "YESBANK",
+            "record_count": 738,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2024-09-06 00:00:00"
+        },
+        {
+            "symbol": "DELHIVERY",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SHREECEM",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ONGC",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "BAJFINANCE",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "TECHM",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ICICIBANK",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "PRESTIGE",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "PVRINOX",
+            "record_count": 986,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "BAJAJFINSV",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "ADANIPOWER",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "DABUR",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BAJAJ-AUTO",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "JINDALSTEL",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "POLYCAB",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HINDZINC",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "CONCOR",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "SUNTV",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "MRF",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "KEI",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "MAHABANK",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "BAJAJHLDNG",
+            "record_count": 988,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "IRCTC",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "MPHASIS",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HEROMOTOCO",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "IRFC",
+            "record_count": 989,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "HCLTECH",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "WIPRO",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "JSWSTEEL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "DRREDDY",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ADANIGREEN",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "GODREJPROP",
+            "record_count": 990,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "RVNL",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "VEDL",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "MARUTI",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "IDBI",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "VOLTAS",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "LUPIN",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "SBIN",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "DALBHARAT",
+            "record_count": 988,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "ICICIGI",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TATAPOWER",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "JSWENERGY",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "AUROPHARMA",
+            "record_count": 987,
+            "earliest": "2021-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "TORNTPOWER",
+            "record_count": 251,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        },
+        {
+            "symbol": "OIL",
+            "record_count": 249,
+            "earliest": "2024-09-09 00:00:00",
+            "latest": "2026-09-09 00:00:00"
+        },
+        {
+            "symbol": "MANAPPURAM",
+            "record_count": 252,
+            "earliest": "2025-09-08 00:00:00",
+            "latest": "2026-09-08 00:00:00"
+        }
+    ]
+}

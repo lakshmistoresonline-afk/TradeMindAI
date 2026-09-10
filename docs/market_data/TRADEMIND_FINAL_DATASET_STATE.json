@@ -1,0 +1,23 @@
+{
+    "timestamp": "2026-09-10T05:27:24.967304",
+    "git_commit": "LATEST",
+    "universe_count": 202,
+    "equity_count": 200,
+    "historical_price_count": 114665,
+    "historical_replay_signal_count": 74,
+    "historical_active_signal_count": 3,
+    "historical_resolved_signal_count": 71,
+    "target_hit_count": 0,
+    "stop_loss_count": 71,
+    "timeout_count": 0,
+    "expired_count": 0,
+    "current_active_signal_count": 13,
+    "verified_reference_signal_count": 50,
+    "prediction_count": 2480,
+    "decision_count": 137,
+    "future_data_violations": 0,
+    "v22_frozen": true,
+    "earliest_historical_date": "2021-09-09T00:00:00",
+    "latest_historical_date": "2026-09-09T00:00:00",
+    "historical_days": 1239
+}

@@ -340,6 +340,8 @@ class ShadowSignalDB(Base):
     net_pnl = Column(Float)
     prediction_id = Column(String, index=True)
     provenance_id = Column(String, index=True)
+    run_id = Column(String, index=True)
+    dataset_type = Column(String, index=True) # V2.2_VERIFIED_REFERENCE, V2.2_HISTORICAL_REPLAY, V2.2_CURRENT_SHADOW
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
