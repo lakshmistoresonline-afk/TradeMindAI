@@ -1,0 +1,14 @@
+{
+    "timestamp": "2026-09-10T16:00:00",
+    "gates": {
+        "population_integrity": "PASS",
+        "nifty200_coverage": "PARTIAL",
+        "historical_data_coverage": "PASS",
+        "signal_generation_integrity": "PASS",
+        "outcome_integrity": "PASS",
+        "pnl_integrity": "PASS",
+        "no_lookahead": "PASS",
+        "v22_freeze": "PASS"
+    },
+    "verdict": "STRATEGY_WEAK_IN_TESTED_SAMPLE"
+}

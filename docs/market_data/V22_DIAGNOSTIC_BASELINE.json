@@ -1,0 +1,18 @@
+{
+    "universe_count": 0,
+    "equity_count": 200,
+    "historical_price_count": 114665,
+    "historical_days": 1239,
+    "historical_replay_signal_count": 61,
+    "historical_active_signal_count": 1,
+    "historical_resolved_signal_count": 60,
+    "target_hit_count": 24,
+    "stop_loss_count": 36,
+    "timeout_count": 0,
+    "expired_count": 0,
+    "current_active_signal_count": 13,
+    "verified_reference_signal_count": 50,
+    "prediction_count": 4319,
+    "decision_count": 124,
+    "champion_models": 101
+}
