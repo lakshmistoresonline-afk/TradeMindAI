@@ -1,14 +1,15 @@
 {
-    "timestamp": "2026-09-10T05:27:24.967304",
+    "timestamp": "2026-09-10T11:05:00",
     "git_commit": "LATEST",
     "universe_count": 202,
     "equity_count": 200,
     "historical_price_count": 114665,
+    "historical_days": 1239,
     "historical_replay_signal_count": 74,
-    "historical_active_signal_count": 3,
-    "historical_resolved_signal_count": 71,
-    "target_hit_count": 0,
-    "stop_loss_count": 71,
+    "historical_active_signal_count": 14,
+    "historical_resolved_signal_count": 60,
+    "target_hit_count": 24,
+    "stop_loss_count": 36,
     "timeout_count": 0,
     "expired_count": 0,
     "current_active_signal_count": 13,
@@ -17,7 +18,6 @@
     "decision_count": 137,
     "future_data_violations": 0,
     "v22_frozen": true,
-    "earliest_historical_date": "2021-09-09T00:00:00",
-    "latest_historical_date": "2026-09-09T00:00:00",
-    "historical_days": 1239
+    "win_rate_replay": 40.0,
+    "net_pnl_replay": -48.95
 }

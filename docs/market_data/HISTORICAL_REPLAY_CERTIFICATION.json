@@ -1,0 +1,21 @@
+{
+    "timestamp": "2026-09-10T11:00:00",
+    "status": "PASS",
+    "gates": {
+        "population_integrity": "PASS",
+        "universe_integrity": "PARTIAL",
+        "historical_data_integrity": "PARTIAL",
+        "signal_generation_integrity": "PASS",
+        "target_stop_integrity": "PASS",
+        "outcome_integrity": "PASS",
+        "pnl_integrity": "PASS",
+        "no_lookahead": "PASS",
+        "v22_freeze": "PASS"
+    },
+    "replay_summary": {
+        "resolved_signals": 60,
+        "win_rate_pct": 40.0,
+        "net_pnl_pct": -48.95
+    },
+    "overall_verdict": "TRADEMIND_DATASET_OPERATIONAL_WITH_LIMITATIONS"
+}

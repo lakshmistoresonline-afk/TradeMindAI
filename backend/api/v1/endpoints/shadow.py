@@ -128,6 +128,9 @@ def get_shadow_summary():
             # Win Rate for Replay
             replay_win_rate = (replay_hits / replay_resolved * 100) if replay_resolved > 0 else 0.0
 
+            # Replay Net P&L (from resolved)
+            replay_pnl = session.query(func.sum(ShadowSignalDB.net_return)).filter(ShadowSignalDB.dataset_type == 'V2.2_HISTORICAL_REPLAY', ShadowSignalDB.status != 'ACTIVE').scalar() or 0.0
+
             return {
                 "transactional_signals": total_unique_calls,
                 "active_signals": active_shadow,
@@ -136,7 +139,8 @@ def get_shadow_summary():
                     "total": replay_count,
                     "resolved": replay_resolved,
                     "target_hits": replay_hits,
-                    "win_rate_pct": round(replay_win_rate, 2)
+                    "win_rate_pct": round(replay_win_rate, 2),
+                    "net_pnl_pct": round(replay_pnl, 2)
                 },
                 "current_shadow": current_count,
                 "profit_factor": 2.72, # From verified benchmark
