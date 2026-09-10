@@ -21,8 +21,9 @@ class SignalEngine:
         current_dd: Optional[float] = None,
         champion: Optional[ModelMetadata] = None,
         save_prediction: bool = True,
-        evaluation_timestamp: Optional[datetime.datetime] = None
-    ) -> Optional[LiveSignal]:
+        evaluation_timestamp: Optional[datetime.datetime] = None,
+        return_rejection: bool = False
+    ) -> Any:
         """
         Master Signal Generation Node.
         Implements No-Trade Engine and Probability Calibration.
@@ -34,7 +35,7 @@ class SignalEngine:
         # 1. Fetch Fresh Data (if not provided)
         if stock is None:
             stock = await container.repository.get_stock_by_symbol(symbol)
-        if not stock: return None
+        if not stock: return ("NO_STOCK_DATA" if return_rejection else None)
 
         # 2. Extract Features (Time-Safe) (if not provided)
         if features_list is None:
@@ -43,7 +44,7 @@ class SignalEngine:
                 eval_time - datetime.timedelta(days=7),
                 eval_time
             )
-        if not features_list: return None
+        if not features_list: return ("NO_FEATURES" if return_rejection else None)
         last_features = features_list[-1].features
 
         # 3. Model Inference (Champion Model)
@@ -53,6 +54,9 @@ class SignalEngine:
             champion=champion,
             save=save_prediction
         )
+
+        if not ml_res or ml_res.get("status") == "ERROR":
+             return ("INFERENCE_FAILED" if return_rejection else None)
 
         prob_up = ml_res.get("metadata", {}).get("calibrated_probability_up", 0.5)
         raw_prob_up = ml_res.get("metadata", {}).get("raw_probability_up", 0.5)
@@ -66,9 +70,7 @@ class SignalEngine:
         # Vision 2.2: Use Close price at eval_time for entry baseline
         price = last_features.get("Close") or last_features.get("close") or (stock.last_price if not evaluation_timestamp else 0.0)
 
-        print(f"   [DEBUG] Signal for {symbol} @ {eval_time}: price={price}, last_features_keys={list(last_features.keys())[:5]}")
-
-        if price == 0: return None
+        if price == 0: return ("ZERO_PRICE" if return_rejection else None)
 
         atr = last_features.get("ATR") or last_features.get("Atr") or (price * 0.02)
         risk_params = RiskEngine.calculate_trade_parameters(
@@ -77,7 +79,7 @@ class SignalEngine:
             atr
         )
 
-        if not risk_params: return None
+        if not risk_params: return ("RISK_CALC_FAILED" if return_rejection else None)
 
         # P1 Optimization: Override to proven 3%/3% fixed target/stop for SWING
         risk_params["target"] = price * (1.03 if direction == "LONG" else 0.97)
@@ -145,7 +147,7 @@ class SignalEngine:
 
         if rejection_reason:
             # print(f"   [NO_TRADE] {symbol} rejected: {rejection_reason}")
-            return None
+            return (rejection_reason if return_rejection else None)
 
         # 9. DATA QUALITY SCORE
         data_ts = features_list[-1].date
