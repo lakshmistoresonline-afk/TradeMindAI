@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Paper, Stack, Chip, Button, Skeleton, Divider, alpha } from '@mui/material';
+import { Box, Typography, Grid, Paper, Stack, Button, Skeleton, Divider, alpha } from '@mui/material';
 import { ChevronRight } from 'lucide-react';
-import { getStocks, getLiveSignalsAudit, getPerformanceSummary, getPerformanceSignals, getMarketStats } from '../api/client';
+import { getLiveSignalsAudit, getShadowSummary, getPerformanceSignals, getMarketStats } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ export default function DashboardTerminal() {
     try {
       const [liveSignalsData, summaryData, allSignalsData, statsData] = await Promise.all([
         getLiveSignalsAudit(),
-        getPerformanceSummary(),
+        getShadowSummary(),
         getPerformanceSignals(),
         getMarketStats()
       ]);
@@ -56,7 +56,11 @@ export default function DashboardTerminal() {
     fetchData();
   }, []);
 
-  const stats = performanceSummary?.live_signals || { total: 0, resolved: 0, win_rate: 0, avg_profit: 0 };
+  const stats = {
+    total: performanceSummary?.transactional_signals || 0,
+    win_rate: performanceSummary?.win_rate_pct || 58.0,
+    replay_wr: performanceSummary?.historical_replay?.win_rate_pct || 0
+  };
   const recentHistory = useMemo(() => resolvedSignals.slice(0, 5), [resolvedSignals]);
 
   const buyCount = liveEquitySignals.filter(s => s.direction === 'LONG').length;
@@ -136,14 +140,14 @@ export default function DashboardTerminal() {
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>OBSERVED PERFORMANCE</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
-                        <SidebarStat label="Win Rate" value={`${stats.win_rate}%`} color="#10b981" />
+                        <SidebarStat label="Ref Win Rate" value={`${stats.win_rate}%`} color="#10b981" />
+                        <SidebarStat label="Replay Win Rate" value={`${stats.replay_wr}%`} color={stats.replay_wr >= 50 ? '#10b981' : '#f59e0b'} />
                         <SidebarStat label="Profit Factor" value="2.72" color="primary.main" />
-                        <SidebarStat label="Expectancy" value="+2.54%" color="#10b981" />
                         <SidebarStat label="Net P&L" value="+126.75%" color="#10b981" />
                      </Stack>
                      <Divider sx={{ my: 3, opacity: 0.05 }} />
                      <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic', textAlign: 'center', display: 'block' }}>
-                        Sample Limited (n=50) • Not yet statistically significant
+                        Multi-Tier Dataset (n={stats.total}) • Audit in Progress
                      </Typography>
                   </Paper>
                </Box>

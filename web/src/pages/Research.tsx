@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Box, Typography, Grid, Paper, Stack, Chip, Divider,
-  CircularProgress, alpha, Autocomplete, TextField, Tabs, Tab
+  CircularProgress, Autocomplete, TextField
 } from '@mui/material';
-import { PieChart, ShieldCheck, Microscope, History, Search } from 'lucide-react';
+import { History, Search } from 'lucide-react';
 import { apiClient, getStocks } from '../api/client';
 
 export default function Research() {

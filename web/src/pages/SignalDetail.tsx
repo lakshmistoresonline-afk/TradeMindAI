@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Chip, Divider } from '@mui/material';
 import { useParams, useLocation } from 'react-router-dom';
-import { apiClient } from '../api/client';
 
 export default function SignalDetail() {
   const { id } = useParams();

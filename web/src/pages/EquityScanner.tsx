@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, TextField, MenuItem, Slider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, alpha } from '@mui/material';
-import { Search, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { getStocks, getLiveSignalsAudit } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useNavigate } from 'react-router-dom';

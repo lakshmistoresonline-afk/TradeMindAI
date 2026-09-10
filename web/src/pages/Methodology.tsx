@@ -1,5 +1,4 @@
 import { Box, Typography, Paper, Stack, Divider } from '@mui/material';
-import { BookOpen, ShieldCheck, Zap, TrendingUp } from 'lucide-react';
 
 export default function Methodology() {
   return (

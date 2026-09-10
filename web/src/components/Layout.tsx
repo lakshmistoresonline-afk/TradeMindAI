@@ -25,8 +25,7 @@ const drawerWidth = 260;
 
 // Notification Context
 export const NotificationContext = createContext({
-  showNotification: (_message: string, _severity: 'success' | 'error' | 'info' | 'warning') => {},
-  setCopilotContext: (_context: any) => {}
+  showNotification: (_message: string, _severity: 'success' | 'error' | 'info' | 'warning') => {}
 });
 
 export const useNotification = () => useContext(NotificationContext);
@@ -49,7 +48,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [copilotOpen, setCopilotOpen] = useState(false);
-  const [copilotContext, setCopilotContext] = useState<any>(null);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [marketStats, setMarketStats] = useState<any>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -95,7 +93,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const currentPath = location.pathname + location.search;
 
   return (
-    <NotificationContext.Provider value={{ showNotification, setCopilotContext }}>
+    <NotificationContext.Provider value={{ showNotification }}>
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#020617' }}>
         <CommandPalette />
         <AppBar

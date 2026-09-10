@@ -143,6 +143,7 @@ def get_shadow_summary():
                     "net_pnl_pct": round(replay_pnl, 2)
                 },
                 "current_shadow": current_count,
+                "equity": 1000000.0 + (replay_pnl * 1000), # Simple approximation for UI
                 "profit_factor": 2.72, # From verified benchmark
                 "win_rate_pct": 58.0,  # From verified benchmark
                 "sample_status": "FOUNDATION_REBUILT",
