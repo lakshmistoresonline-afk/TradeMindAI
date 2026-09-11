@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, TextField, MenuItem, Slider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, alpha } from '@mui/material';
 import { ArrowRight } from 'lucide-react';
-import { getStocks, getLiveSignalsAudit } from '../api/client';
+import { getStocks, getEquitySignals } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,18 +11,20 @@ export default function EquityScanner() {
 
   // Filters
   const [signalFilter, setSignalFilter] = useState('ALL');
-  const [statusFilter, setStatusFilter] = useState('ACTIVE');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [minProb, setMinProb] = useState(50);
   const [sectorFilter, setSectorFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchData = async () => {
     try {
-      const [stocksData, signalsData] = await Promise.all([getStocks(), getLiveSignalsAudit()]);
+      const [stocksData, signalsData] = await Promise.all([
+        getStocks(),
+        getEquitySignals({ limit: 500 })
+      ]);
       const stockMap = new Map((stocksData || []).map((s: any) => [s.symbol, s]));
 
       const combined = (signalsData || [])
-        .filter((s: any) => s.asset_class === 'EQUITY' || !s.asset_class)
         .map((s: any) => {
             const stockInfo = stockMap.get(s.symbol) || {};
             return {

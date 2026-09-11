@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Paper, Stack, Chip, Divider } from '@mui/material';
+import { Box, Typography, Grid, Paper, Stack, Chip, Divider, Skeleton, alpha } from '@mui/material';
 import { useParams, useLocation } from 'react-router-dom';
+import { getEquitySignalDetail } from '../api/client';
 
 export default function SignalDetail() {
   const { id } = useParams();
@@ -10,19 +11,28 @@ export default function SignalDetail() {
 
   useEffect(() => {
     if (id) {
-       // Mock for now or real fetch if API exists
-       // Assuming signal object might be passed in state
        if (location.state?.signal) {
            setSignal(location.state.signal);
            setLoading(false);
        } else {
-           // Placeholder fetch
-           setLoading(false);
+           getEquitySignalDetail(id).then(data => {
+             setSignal(data);
+             setLoading(false);
+           }).catch(() => setLoading(false));
        }
     }
   }, [id, location.state]);
 
-  if (loading) return null;
+  if (loading) return (
+     <Box sx={{ p: 4 }}>
+        <Skeleton variant="rectangular" height={100} sx={{ mb: 4 }} />
+        <Grid container spacing={4}>
+           <Grid item xs={12} md={8}><Skeleton variant="rectangular" height={400} /></Grid>
+           <Grid item xs={12} md={4}><Skeleton variant="rectangular" height={400} /></Grid>
+        </Grid>
+     </Box>
+  );
+
   if (!signal) return <Typography sx={{ p: 10 }}>Signal not found in production ledger.</Typography>;
 
   return (
@@ -35,7 +45,7 @@ export default function SignalDetail() {
                <Chip label={signal.status} color="primary" sx={{ fontWeight: 900, height: 24, borderRadius: 0.5 }} />
             </Stack>
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
-               {signal.direction} SIGNAL • STRATEGY V2.2
+               {signal.direction} SIGNAL • STRATEGY {signal.strategy_version}
             </Typography>
          </Box>
          <Box sx={{ textAlign: 'right' }}>
@@ -57,19 +67,31 @@ export default function SignalDetail() {
                </Grid>
             </Paper>
 
-            <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>AI INTELLIGENCE & EVIDENCE</Typography>
                <Grid container spacing={4}>
-                  <PlanItem label="CALIBRATED PROBABILITY" value={`${((signal.calibrated_probability || 0.6) * 100).toFixed(1)}%`} color="primary.main" />
+                  <PlanItem label="CALIBRATED PROB" value={`${((signal.calibrated_probability || 0) * 100).toFixed(1)}%`} color="primary.main" />
                   <PlanItem label="EXPECTED VALUE" value={`₹${(signal.expected_value || 0).toFixed(2)}`} color="#10b981" />
-                  <PlanItem label="MARKET REGIME" value={signal.regime || 'BULLISH'} />
-                  <PlanItem label="DATA QUALITY" value="HIGH" color="#10b981" />
+                  <PlanItem label="MARKET REGIME" value={signal.regime || 'SIDEWAYS'} />
+                  <PlanItem label="DATA QUALITY" value={signal.data_quality_status || 'UNKNOWN'} color={signal.data_quality_status === 'FRESH' ? "#10b981" : "orange"} />
                </Grid>
                <Divider sx={{ my: 4, opacity: 0.05 }} />
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, lineHeight: 1.6, display: 'block' }}>
-                  Institutional accumulation detected in {signal.symbol} order blocks. Signal aligns with MTF structural breakout on 1H timeframe. Model consensus 84% based on historical fractal similarity.
+                  {signal.provenance?.evidence || "Forensic evidence generated at signal time. Strategy V2.2 deterministic logic applied."}
                </Typography>
             </Paper>
+
+            {signal.outcome && (
+               <Paper sx={{ p: 4, bgcolor: alpha('#10b981', 0.02), border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>OUTCOME & P&L</Typography>
+                  <Grid container spacing={4}>
+                     <PlanItem label="EXIT PRICE" value={`₹${signal.exit_price?.toLocaleString()}`} />
+                     <PlanItem label="REALIZED RETURN" value={`${(signal.realized_return || 0).toFixed(2)}%`} color={(signal.realized_return || 0) >= 0 ? "#10b981" : "#ef4444"} />
+                     <PlanItem label="NET P&L" value={`₹${(signal.net_pnl || 0).toLocaleString()}`} color={(signal.net_pnl || 0) >= 0 ? "#10b981" : "#ef4444"} />
+                     <PlanItem label="HOLDING PERIOD" value={`${signal.holding_period_days || 0} Days`} />
+                  </Grid>
+               </Paper>
+            )}
          </Grid>
 
          {/* 3. Market Data & Trace */}
@@ -78,19 +100,32 @@ export default function SignalDetail() {
                <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>LIVE MARKET DATA</Typography>
                   <Stack spacing={2}>
-                     <TraceItem label="Current Price" value={`₹${(signal.current_price || signal.entry_price).toLocaleString()}`} />
-                     <TraceItem label="Freshness" value="LIVE" color="#10b981" />
-                     <TraceItem label="Price Source" value={signal.price_source || 'YFinance'} />
+                     <TraceItem label="Current Price" value={`₹${(signal.current_price || 0).toLocaleString()}`} />
+                     <TraceItem label="Freshness" value={signal.current_price_status || 'LIVE'} color={signal.current_price_status === 'FRESH' ? "#10b981" : "slategray"} />
+                     <TraceItem label="Price Source" value={signal.current_price_source || 'YFinance'} />
+                     <TraceItem label="Price Timestamp" value={new Date(signal.current_price_timestamp).toLocaleTimeString()} />
                   </Stack>
                </Paper>
 
                <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>SIGNAL PROVENANCE</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>SIGNAL LINEAGE</Typography>
                   <Stack spacing={2}>
                      <TraceItem label="Prediction ID" value={signal.prediction_id || 'N/A'} small />
+                     <TraceItem label="Model ID" value={signal.model_id || 'N/A'} small />
+                     <TraceItem label="Feature Snapshot" value={signal.feature_snapshot_id || 'N/A'} small />
                      <TraceItem label="Provenance ID" value={signal.provenance_id || 'N/A'} small />
-                     <TraceItem label="Feature Version" value="v1.0.0" />
-                     <TraceItem label="Model Version" value="v2.2-Champion" />
+                     <Divider sx={{ my: 1, opacity: 0.05 }} />
+                     <TraceItem label="Signal Version" value={signal.signal_version} />
+                     <TraceItem label="Model Version" value={signal.model_version} />
+                  </Stack>
+               </Paper>
+
+               <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>TIMING</Typography>
+                  <Stack spacing={2}>
+                     <TraceItem label="Decision Time" value={new Date(signal.decision_timestamp).toLocaleString()} small />
+                     <TraceItem label="Data Time" value={new Date(signal.data_timestamp).toLocaleString()} small />
+                     <TraceItem label="Created Time" value={new Date(signal.timestamp).toLocaleString()} small />
                   </Stack>
                </Paper>
             </Stack>

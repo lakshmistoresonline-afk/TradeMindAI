@@ -1,0 +1,47 @@
+{
+  "run_id": "run_c514a17b",
+  "total_symbols": 5,
+  "signals_generated": 0,
+  "accounting": [
+    {
+      "research_run_id": "run_c514a17b",
+      "symbol": "ABB",
+      "status": "REPLAY_ENGINE_DEFECT",
+      "bars_evaluated": 0,
+      "signals_generated": 0,
+      "failure_reason": "EXCEPTION: 'YFinanceProvider' object has no attribute 'get_history'"
+    },
+    {
+      "research_run_id": "run_c514a17b",
+      "symbol": "ACC",
+      "status": "REPLAY_ENGINE_DEFECT",
+      "bars_evaluated": 0,
+      "signals_generated": 0,
+      "failure_reason": "EXCEPTION: 'YFinanceProvider' object has no attribute 'get_history'"
+    },
+    {
+      "research_run_id": "run_c514a17b",
+      "symbol": "ADANIENSOL",
+      "status": "REPLAY_ENGINE_DEFECT",
+      "bars_evaluated": 0,
+      "signals_generated": 0,
+      "failure_reason": "EXCEPTION: 'YFinanceProvider' object has no attribute 'get_history'"
+    },
+    {
+      "research_run_id": "run_c514a17b",
+      "symbol": "ADANIENT",
+      "status": "REPLAY_ENGINE_DEFECT",
+      "bars_evaluated": 0,
+      "signals_generated": 0,
+      "failure_reason": "EXCEPTION: 'YFinanceProvider' object has no attribute 'get_history'"
+    },
+    {
+      "research_run_id": "run_c514a17b",
+      "symbol": "ADANIGREEN",
+      "status": "REPLAY_ENGINE_DEFECT",
+      "bars_evaluated": 0,
+      "signals_generated": 0,
+      "failure_reason": "EXCEPTION: 'YFinanceProvider' object has no attribute 'get_history'"
+    }
+  ]
+}

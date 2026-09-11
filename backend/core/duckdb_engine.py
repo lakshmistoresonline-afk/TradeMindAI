@@ -32,7 +32,7 @@ class DuckDBEngine:
             # Cleanup existing for any historical duplicates
             existing_df = existing_df.loc[:, ~existing_df.columns.duplicated()].copy()
 
-            combined_df = pd.concat([existing_df, df]).drop_duplicates(subset=['date'])
+            combined_df = pd.concat([existing_df, df]).drop_duplicates(subset=['date'], keep='last')
             combined_df.to_parquet(file_path, index=False)
         else:
             df.to_parquet(file_path, index=False)

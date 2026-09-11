@@ -1,1 +1,0 @@
-sector,signal_id,symbol,direction,signal_timestamp,created_at,entry_price,target_price,stop_price,raw_probability,probability,expected_value,regime,strategy_version,model_version,prediction_id,provenance_id,outcome_timestamp,exit_price,terminal_state,net_pnl,realized_return,transaction_cost,slippage,mae,mfe,data_timestamp,market_timestamp,sector,industry,days_held

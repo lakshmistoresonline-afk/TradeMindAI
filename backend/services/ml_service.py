@@ -168,7 +168,11 @@ class MLService:
             prediction=prediction_label,
             probability=float(calibrated_prob),
             confidence=float(calibrated_prob if calibrated_prob > 0.5 else 1-calibrated_prob),
-            metadata={"calibrated_probability_up": float(calibrated_prob), "is_calibrated": calibrator is not None}
+            metadata={
+                "calibrated_probability_up": float(calibrated_prob),
+                "raw_probability_up": float(raw_prob),
+                "is_calibrated": calibrator is not None
+            }
         )
         if save:
             await self.repository.save_prediction(prediction)

@@ -1,13 +1,12 @@
 import axios from 'axios';
 
-export const API_BASE_URL = 'https://trademind-api-production.up.railway.app/api/v1';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://trademind-api-production.up.railway.app/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer internal_demo_token'
+    'Content-Type': 'application/json'
   },
 });
 
@@ -319,5 +318,31 @@ export const getShadowSignalsMetadata = async () => {
 
 export const getShadowSignalDetail = async (id: string) => {
   const response = await apiClient.get(`/shadow/signals/${id}`);
+  return response.data;
+};
+
+// Canonical Equity Intelligence API (Phase 35)
+export const getEquitySignals = async (params: any = {}) => {
+  const response = await apiClient.get('/equity/signals', { params });
+  return response.data;
+};
+
+export const getEquitySignalDetail = async (id: string) => {
+  const response = await apiClient.get(`/equity/signals/${id}`);
+  return response.data;
+};
+
+export const getEquityPerformance = async () => {
+  const response = await apiClient.get('/equity/performance');
+  return response.data;
+};
+
+export const getEquityAccuracy = async () => {
+  const response = await apiClient.get('/equity/accuracy');
+  return response.data;
+};
+
+export const getEquityMarketState = async () => {
+  const response = await apiClient.get('/equity/market');
   return response.data;
 };

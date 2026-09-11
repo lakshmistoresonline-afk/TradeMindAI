@@ -1,0 +1,25 @@
+{
+  "status": "FINAL_EQUITY_CONDITIONAL",
+  "certification_date": "2026-09-11T10:30:00Z",
+  "gates": {
+    "v22_freeze": "PASS",
+    "universe_integrity": "PASS",
+    "model_coverage": "PASS",
+    "signal_integrity": "PASS",
+    "neon_authority": "PASS",
+    "hosted_runtime": "FAIL"
+  },
+  "metrics": {
+    "monitored_universe": 200,
+    "available_models": 198,
+    "active_signals": 17,
+    "historical_replay_win_rate": 58.0
+  },
+  "blocking_issues": [
+    {
+      "gate": "Hosted Runtime",
+      "reason": "Production API returns 404 for /equity endpoints",
+      "action": "Trigger backend deployment"
+    }
+  ]
+}

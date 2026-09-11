@@ -55,6 +55,86 @@ class Container:
         self._certification_engine = None
         self._instrument_master_upstox = None
         self._instrument_master_dhan = None
+        self._market_data_service = None
+        self._historical_data_service = None
+        self._signal_ledger_service = None
+        self._signal_lifecycle_service = None
+        self._outcome_service = None
+        self._pnl_service = None
+        self._research_replay_service = None
+        self._research_metrics_service = None
+        self._research_feature_engine = None
+        self._equity_signal_generation_service = None
+
+    @property
+    def equity_signal_generation_service(self):
+        if self._equity_signal_generation_service is None:
+            from backend.services.equity_signal_generation_service import EquitySignalGenerationService
+            self._equity_signal_generation_service = EquitySignalGenerationService()
+        return self._equity_signal_generation_service
+
+    @property
+    def market_data_service(self):
+        if self._market_data_service is None:
+            from backend.services.market_data_service import MarketDataService
+            self._market_data_service = MarketDataService()
+        return self._market_data_service
+
+    @property
+    def historical_data_service(self):
+        if self._historical_data_service is None:
+            from backend.services.historical_data_service import HistoricalDataService
+            self._historical_data_service = HistoricalDataService()
+        return self._historical_data_service
+
+    @property
+    def signal_ledger_service(self):
+        if self._signal_ledger_service is None:
+            from backend.services.signal_ledger_service import SignalLedgerService
+            self._signal_ledger_service = SignalLedgerService()
+        return self._signal_ledger_service
+
+    @property
+    def signal_lifecycle_service(self):
+        if self._signal_lifecycle_service is None:
+            from backend.services.signal_lifecycle_service import SignalLifecycleService
+            self._signal_lifecycle_service = SignalLifecycleService()
+        return self._signal_lifecycle_service
+
+    @property
+    def outcome_service(self):
+        if self._outcome_service is None:
+            from backend.services.outcome_service import OutcomeService
+            self._outcome_service = OutcomeService()
+        return self._outcome_service
+
+    @property
+    def pnl_service(self):
+        if self._pnl_service is None:
+            from backend.services.pnl_service import PnlService
+            self._pnl_service = PnlService()
+        return self._pnl_service
+
+    @property
+    def research_replay_service(self):
+        if self._research_replay_service is None:
+            from backend.services.research_replay_service import ResearchReplayService
+            self._research_replay_service = ResearchReplayService()
+        return self._research_replay_service
+
+    @property
+    def research_metrics_service(self):
+        if self._research_metrics_service is None:
+            from backend.services.research_metrics_service import ResearchMetricsService
+            self._research_metrics_service = ResearchMetricsService()
+        return self._research_metrics_service
+
+    @property
+    def research_feature_engine(self):
+        if self._research_feature_engine is None:
+            from backend.services.research_feature_engine import ResearchFeatureEngine
+            self._research_feature_engine = ResearchFeatureEngine()
+        return self._research_feature_engine
 
     @property
     def signal_engine(self):

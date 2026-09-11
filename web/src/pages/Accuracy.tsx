@@ -1,47 +1,54 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, alpha } from '@mui/material';
 import { BarChart2, AlertTriangle, History } from 'lucide-react';
-import { getShadowSummary } from '../api/client';
+import { getEquityAccuracy } from '../api/client';
 
 export default function Accuracy() {
   const [summary, setSummary] = useState<any>(null);
 
   useEffect(() => {
-    getShadowSummary().then(data => {
+    getEquityAccuracy().then((data: any) => {
       setSummary(data);
     });
   }, []);
 
   const stats = {
-    win_rate: summary?.win_rate_pct || 58.0,
-    profit_factor: summary?.profit_factor || 2.72
+    win_rate: summary?.historical_replay?.win_rate || 0,
+    profit_factor: summary?.verified_benchmark?.profit_factor || 0,
+    expectancy: summary?.historical_replay?.expectancy || 0,
+    net_pnl: summary?.historical_replay?.net_pnl || 0,
+    sample_size: summary?.historical_replay?.n || 0
   };
 
-  const replay = summary?.historical_replay || { total: 0, win_rate_pct: 0, net_pnl_pct: 0 };
+  const replay = {
+    total: summary?.historical_replay?.n || 0,
+    win_rate_pct: summary?.historical_replay?.win_rate || 0,
+    net_pnl_pct: summary?.historical_replay?.net_pnl || 0
+  };
 
   return (
     <Box sx={{ pb: 10 }}>
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>ACCURACY & EVIDENCE</Typography>
         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
-           INSTITUTIONAL PERFORMANCE AUDIT • MULTI-TIER DATASET
+           INSTITUTIONAL PERFORMANCE AUDIT • V2.2 CANONICAL DATASET
         </Typography>
       </Box>
 
       {/* Hero Stats: Verified Reference */}
-      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: 'primary.main' }}>VERIFIED REFERENCE BENCHMARK (n=50)</Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: 'primary.main' }}>V2.2 AUTHORITATIVE PERFORMANCE (n={stats.sample_size})</Typography>
       <Grid container spacing={3} sx={{ mb: 6 }}>
          <Grid item xs={12} md={3}>
-            <StatCard label="WR (REF)" value={`${stats.win_rate}%`} color="#10b981" />
+            <StatCard label="WIN RATE" value={`${stats.win_rate}%`} color="#10b981" />
          </Grid>
          <Grid item xs={12} md={3}>
-            <StatCard label="PF (REF)" value={stats.profit_factor} color="primary.main" />
+            <StatCard label="PROFIT FACTOR" value={stats.profit_factor} color="primary.main" />
          </Grid>
          <Grid item xs={12} md={3}>
-            <StatCard label="EXPECTANCY" value="+2.53%" color="#10b981" />
+            <StatCard label="EXPECTANCY" value={`${stats.expectancy > 0 ? '+' : ''}${stats.expectancy}%`} color="#10b981" />
          </Grid>
          <Grid item xs={12} md={3}>
-            <StatCard label="NET P&L" value="+126.75%" color="#10b981" />
+            <StatCard label="NET P&L" value={`${stats.net_pnl > 0 ? '+' : ''}${stats.net_pnl}%`} color="#10b981" />
          </Grid>
       </Grid>
 
@@ -79,7 +86,7 @@ export default function Accuracy() {
             <Box>
                <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>OBSERVED SHADOW PERFORMANCE</Typography>
                <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 500 }}>
-                  These metrics are derived from a **Sample-Limited cohort (n=50)** of verified shadow execution results.
+                  These metrics are derived from a **Sample-Limited cohort (n={stats.sample_size})** of verified shadow execution results.
                   The Strategy V2.2 performance is monitored daily but is **not yet statistically significant**.
                </Typography>
             </Box>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton } from '@mui/material';
 import { Clock, ShieldAlert, RefreshCw, Search, Activity, Info } from 'lucide-react';
-import { getStocks, getLiveSignalsAudit } from '../api/client';
+import { getStocks, getEquitySignals } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
@@ -25,15 +25,14 @@ export default function EquitySignals() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [stocksData, liveSignalsData] = await Promise.all([
+      const [stocksData, signalsData] = await Promise.all([
         getStocks(),
-        getLiveSignalsAudit()
+        getEquitySignals({ limit: 200 })
       ]);
 
       const stockMap = new Map((stocksData || []).map((s: any) => [s.symbol, s]));
 
-      const normalizedLive = (liveSignalsData || [])
-        .filter((ls: any) => (ls.asset_class === 'EQUITY' || !ls.asset_class))
+      const combined = (signalsData || [])
         .map((ls: any) => {
           const stockInfo = stockMap.get(ls.symbol) || {};
           return {
@@ -41,22 +40,9 @@ export default function EquitySignals() {
             ...ls,
             decision: normalizeAITradeDecision({...stockInfo, ...ls})
           };
-        });
-
-      const liveSymbols = new Set(normalizedLive.map((s: any) => s.symbol));
-      const normalizedStocks = (stocksData || [])
-        .filter((s: any) => !liveSymbols.has(s.symbol))
-        .map((s: any) => ({
-          ...s,
-          decision: normalizeAITradeDecision(s)
-        }));
-
-      const combined = [
-        ...normalizedLive,
-        ...normalizedStocks
-      ].sort((a: any, b: any) => {
-          const timeA = new Date(a.decision?.generatedAt || a.timestamp || 0).getTime();
-          const timeB = new Date(b.decision?.generatedAt || b.timestamp || 0).getTime();
+        }).sort((a: any, b: any) => {
+          const timeA = new Date(a.decision_timestamp || a.timestamp || 0).getTime();
+          const timeB = new Date(b.decision_timestamp || b.timestamp || 0).getTime();
           return timeB - timeA;
       });
 

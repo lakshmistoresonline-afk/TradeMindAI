@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
@@ -216,15 +216,128 @@ class LiveSignalDB(Base):
     __tablename__ = "live_signals"
     id = Column(String, primary_key=True, index=True)
     symbol = Column(String, index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
-    rating = Column(String)
-    direction = Column(String)
-    conviction = Column(Float)
+    company_name = Column(String)
+    exchange = Column(String, default="NSE")
+    isin = Column(String)
+    asset_type = Column(String) # EQUITY, DERIVATIVE
+    instrument_id = Column(String)
+    instrument_type = Column(String)
+    direction = Column(String) # LONG, SHORT
+    timeframe = Column(String)
+    strategy_version = Column(String, default="v2.2")
+    signal_version = Column(String, default="1.0")
+
+    # Timing
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    signal_timestamp = Column(DateTime)
+    decision_timestamp = Column(DateTime)
+    data_timestamp = Column(DateTime)
+    feature_timestamp = Column(DateTime)
+    prediction_timestamp = Column(DateTime)
+    price_timestamp = Column(DateTime)
+    timezone = Column(String, default="UTC")
+    timestamp = Column(DateTime) # Legacy alias
+
+    # Trade Plan
     entry_price = Column(Float)
+    entry_zone_low = Column(Float)
+    entry_zone_high = Column(Float)
     target_price = Column(Float)
     stop_price = Column(Float)
-    timeframe = Column(String)
-    status = Column(String)
+    current_price = Column(Float)
+    risk_reward_ratio = Column(Float)
+
+    # Intelligence
+    raw_probability = Column(Float)
+    calibrated_probability = Column(Float)
+    expected_value = Column(Float)
+    opportunity_score = Column(Float)
+    confidence = Column(Float)
+    signal_score = Column(Float)
+
+    regime = Column(String)
+    regime_probability = Column(Float)
+    risk_reward = Column(Float) # Legacy
+    risk_per_unit = Column(Float)
+    reward_per_unit = Column(Float)
+    risk_amount_abs = Column(Float)
+    reward_amount_abs = Column(Float)
+
+    # Lineage
+    model_id = Column(String)
+    model_version = Column(String)
+    model_hash = Column(String)
+    model_run_id = Column(String)
+
+    feature_snapshot_id = Column(String)
+    feature_version = Column(String)
+    feature_hash = Column(String)
+
+    prediction_id = Column(String, index=True)
+    provenance_id = Column(String, index=True)
+    provenance = Column(String) # JSON string
+    data_source = Column(String)
+    data_source_timestamp = Column(DateTime)
+    dataset_id = Column(String)
+    dataset_hash = Column(String)
+
+    # Lifecycle
+    status = Column(String) # WAITING_FOR_ENTRY, ACTIVE, etc.
+    lifecycle_state = Column(String)
+    activated_at = Column(DateTime)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    exit_at = Column(DateTime)
+    outcome_timestamp = Column(DateTime)
+
+    # Outcome
+    outcome = Column(String) # TARGET_HIT, STOP_LOSS, etc.
+    exit_price = Column(Float)
+    exit_reason = Column(String)
+    realized_return = Column(Float)
+    gross_pnl = Column(Float)
+    transaction_cost = Column(Float)
+    slippage = Column(Float)
+    net_pnl = Column(Float)
+    realized_mae = Column(Float)
+    realized_mfe = Column(Float)
+    holding_period_days = Column(Float)
+    profit_pct = Column(Float) # Legacy alias
+
+    # Quality
+    price_status = Column(String) # Alias for current_price_status
+    current_price_status = Column(String)
+    current_price_source = Column(String)
+    current_price_timestamp = Column(DateTime)
+    data_quality_status = Column(String)
+    validation_status = Column(String)
+    audit_status = Column(String, default="PENDING")
+    last_reconciled_at = Column(DateTime)
+    record_hash = Column(String)
+    data_quality_score = Column(Float)
+
+    # Universal Price Tier
+    underlying_price = Column(Float)
+    price_source = Column(String)
+    price_adjustment_factor = Column(Float, default=1.0)
+    normalized_current_price = Column(Float)
+
+    __table_args__ = (
+        UniqueConstraint('symbol', 'strategy_version', 'direction', 'decision_timestamp', name='_symbol_strategy_direction_ts_uc'),
+    )
+
+    mfe = Column(Float) # Legacy
+    mae = Column(Float) # Legacy
+    events = Column(String) # JSON string
+
+    # Step 3 Separation
+    evaluation_mode = Column(String, default="LIVE_SHADOW")
+    universe_version = Column(String, default="NIFTY_200_AUG2026")
+    signal_eligibility = Column(String)
+    outcome_verified = Column(Boolean, default=False)
+    quantity = Column(Integer)
+    capital_allocation = Column(Float)
+    risk_amount = Column(Float)
+    pnl_percentage = Column(Float)
 
     # F&O Support
     asset_class = Column(String(20), default="EQUITY")
@@ -233,66 +346,13 @@ class LiveSignalDB(Base):
     option_type = Column(String(10))
     expiry = Column(DateTime)
     lot_size = Column(Integer)
-
-    # Canonical Identity
-    instrument_id = Column(String)
-    instrument_type = Column(String)
-
-    # Quantitative Intelligence
-    raw_probability = Column(Float)
-    calibrated_probability = Column(Float)
-    expected_value = Column(Float)
-    regime = Column(String)
-    regime_probability = Column(Float)
-    risk_reward = Column(Float)
-    risk_per_unit = Column(Float)
-    reward_per_unit = Column(Float)
-    data_quality_score = Column(Float)
-    feature_snapshot_id = Column(String)
-    provenance = Column(String) # JSON string
-
+    rating = Column(String) # Legacy
+    conviction = Column(Float) # Legacy
     validated_at = Column(DateTime)
     triggered_at = Column(DateTime)
     trigger_price = Column(Float)
     trigger_condition = Column(String)
-
     outcome_date = Column(DateTime)
-    profit_pct = Column(Float)
-    outcome_price = Column(Float)
-
-    # Universal Price Tier
-    current_price = Column(Float)
-    underlying_price = Column(Float)
-    current_price_timestamp = Column(DateTime)
-    price_source = Column(String)
-    price_status = Column(String) # FRESH, STALE, DATA_UNAVAILABLE
-    price_adjustment_factor = Column(Float, default=1.0)
-    normalized_current_price = Column(Float)
-
-    mfe = Column(Float)
-    mae = Column(Float)
-    model_version = Column(String)
-    events = Column(String) # JSON string
-
-    # Step 3 Separation
-    evaluation_mode = Column(String, default="LIVE_SHADOW")
-    universe_version = Column(String, default="NIFTY_200_AUG2026")
-    strategy_version = Column(String, default="v2.2")
-    data_timestamp = Column(DateTime)
-    market_timestamp = Column(DateTime)
-    exit_reason = Column(String)
-    fees = Column(Float)
-    slippage = Column(Float)
-    net_pnl = Column(Float)
-    signal_eligibility = Column(String)
-    outcome_verified = Column(Boolean, default=False)
-    quantity = Column(Integer)
-    capital_allocation = Column(Float)
-    risk_amount = Column(Float)
-    gross_pnl = Column(Float)
-    pnl_percentage = Column(Float)
-    prediction_id = Column(String, index=True)
-    provenance_id = Column(String, index=True)
 
 class ShadowSignalDB(Base):
     __tablename__ = "shadow_signals"

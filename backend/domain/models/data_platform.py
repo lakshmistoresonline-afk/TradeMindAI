@@ -151,6 +151,23 @@ class PortfolioHealth(BaseModel):
     asset_correlation: float = 0.5
     var_95: float = 0.0 # Value at Risk
 
+class ResearchRun(BaseModel):
+    id: str
+    strategy_version: str = "v2.2"
+    model_version: Optional[str] = None
+    dataset_id: str = "NIFTY_200_AUG2026"
+    dataset_hash: Optional[str] = None
+    universe_count: int = 200
+    eligible_count: int = 0
+    replay_attempted: int = 0
+    replay_completed: int = 0
+    signal_count: int = 0
+    resolved_count: int = 0
+    active_count: int = 0
+    start_timestamp: datetime = Field(default_factory=datetime.utcnow)
+    end_timestamp: Optional[datetime] = None
+    status: str = "PENDING" # RUNNING, COMPLETED, FAILED
+
 class Alert(BaseModel):
     id: str
     symbol: str

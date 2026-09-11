@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Grid, Stack, Chip, LinearProgress } from '@mui/material';
-import { Database, Activity, Globe } from 'lucide-react';
+import { Database, Activity } from 'lucide-react';
 import { getDataHealth } from '../api/client';
 
 export default function SystemStatus() {
@@ -9,6 +9,8 @@ export default function SystemStatus() {
   useEffect(() => {
     getDataHealth().then(setHealth);
   }, []);
+
+  const components = health?.components || {};
 
   return (
     <Box sx={{ pb: 8 }}>
@@ -24,10 +26,15 @@ export default function SystemStatus() {
             <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4 }}>CORE INFRASTRUCTURE</Typography>
                <Stack spacing={3}>
-                  <StatusRow label="Signal Engine (V2.2)" status="OPERATIONAL" icon={<Activity size={18} />} color="#10b981" />
-                  <StatusRow label="Neon PostgreSQL Authority" status="STABLE" icon={<Database size={18} />} color="#00D1FF" />
-                  <StatusRow label="Firebase Mirror Sync" status="OPERATIONAL" icon={<Globe size={18} />} color="#10b981" />
-                  <StatusRow label="Market Data (YFinance)" status="DEGRADED" icon={<Globe size={18} />} color="#f59e0b" />
+                  {Object.entries(components).map(([name, status]) => (
+                     <StatusRow
+                        key={name}
+                        label={name}
+                        status={status as string}
+                        icon={name.includes('Database') ? <Database size={18} /> : <Activity size={18} />}
+                        color={status === 'HEALTHY' ? "#10b981" : status === 'DEGRADED' ? "orange" : "#ef4444"}
+                     />
+                  ))}
                </Stack>
             </Paper>
          </Grid>
@@ -38,12 +45,21 @@ export default function SystemStatus() {
                <Box sx={{ mb: 4 }}>
                   <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, mb: 1, display: 'block' }}>UNIVERSE COVERAGE</Typography>
                   <LinearProgress variant="determinate" value={100} sx={{ height: 6, borderRadius: 2 }} />
-                  <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900, mt: 1, display: 'block' }}>200/200 CONSTITUENTS</Typography>
+                  <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900, mt: 1, display: 'block' }}>
+                     {health?.universe?.total || 200}/{health?.universe?.total || 200} CONSTITUENTS
+                  </Typography>
                </Box>
                <Box>
                   <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, mb: 1, display: 'block' }}>DATA FRESHNESS</Typography>
-                  <LinearProgress variant="determinate" value={health?.database?.freshness_pct || 0} color="success" sx={{ height: 6, borderRadius: 2 }} />
-                  <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900, mt: 1, display: 'block' }}>{health?.database?.freshness_pct?.toFixed(1) || 0}% SYNCED</Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={health?.universe?.total ? (health.universe.fresh / health.universe.total * 100) : 0}
+                    color="success"
+                    sx={{ height: 6, borderRadius: 2 }}
+                  />
+                  <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900, mt: 1, display: 'block' }}>
+                     {health?.universe?.fresh || 0} SYNCED • {health?.universe?.blocked || 0} BLOCKED
+                  </Typography>
                </Box>
             </Paper>
          </Grid>

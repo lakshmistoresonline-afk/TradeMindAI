@@ -10,8 +10,10 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '.')))
 load_dotenv('backend/.env')
 os.environ["TRADEMIND_EXECUTION_MODE"] = "local"
 
+import pytest
 from backend.core.container import container
 
+@pytest.mark.asyncio
 async def test_ranges():
     symbol = "RELIANCE"
     dp_repo = container.data_platform_repo

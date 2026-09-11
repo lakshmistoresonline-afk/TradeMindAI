@@ -8,6 +8,8 @@ class UniverseService:
     Workstream 1: NIFTY 200 Production Universe Management.
     Ensures exactly 200 constituents are monitored with explicit states.
     """
+    NIFTY_200_CONSTITUENTS = NIFTY_200_CONSTITUENTS
+
     def __init__(self, repository: IStockRepository, provider: IMarketDataProvider):
         self.repository = repository
         self.provider = provider

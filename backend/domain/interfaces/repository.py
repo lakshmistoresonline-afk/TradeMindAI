@@ -179,6 +179,10 @@ class IMarketDataProvider(ABC):
         pass
 
     @abstractmethod
+    async def get_history(self, symbol: str, start_date: datetime, end_date: Optional[datetime] = None, interval: str = "1d") -> pd.DataFrame:
+        pass
+
+    @abstractmethod
     async def get_historical_candles(
         self,
         symbol: str,

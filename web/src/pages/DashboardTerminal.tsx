@@ -1,7 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Button, Skeleton, Divider, alpha } from '@mui/material';
 import { ChevronRight } from 'lucide-react';
-import { getLiveSignalsAudit, getShadowSummary, getPerformanceSignals, getMarketStats } from '../api/client';
+import {
+  getEquitySignals,
+  getEquityPerformance,
+  getEquityMarketState,
+  getMarketStats
+} from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 import { useNavigate } from 'react-router-dom';
@@ -13,37 +18,29 @@ export default function DashboardTerminal() {
   const [marketStats, setMarketStats] = useState<any>(null);
   const [liveEquitySignals, setLiveEquitySignals] = useState<any[]>([]);
   const [performanceSummary, setPerformanceSummary] = useState<any>(null);
-  const [resolvedSignals, setResolvedSignals] = useState<any[]>([]);
+  const [marketState, setMarketState] = useState<any>(null);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [liveSignalsData, summaryData, allSignalsData, statsData] = await Promise.all([
-        getLiveSignalsAudit(),
-        getShadowSummary(),
-        getPerformanceSignals(),
+      const [signalsData, perfData, marketData, statsData] = await Promise.all([
+        getEquitySignals({ limit: 10 }),
+        getEquityPerformance(),
+        getEquityMarketState(),
         getMarketStats()
       ]);
 
       setMarketStats(statsData);
-      setPerformanceSummary(summaryData);
+      setPerformanceSummary(perfData);
+      setMarketState(marketData);
 
-      const normalizedAll = (liveSignalsData || [])
-        .filter((ls: any) => (ls.asset_class === 'EQUITY' || !ls.asset_class))
+      const normalized = (signalsData || [])
         .map((ls: any) => ({
           ...ls,
           decision: normalizeAITradeDecision(ls)
         }));
 
-      setLiveEquitySignals(normalizedAll);
-
-      const resolved = (allSignalsData || [])
-        .filter((s: any) =>
-            ['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'CANCELLED', 'COMPLETED'].includes(s.status || s.outcome)
-        )
-        .sort((a: any, b: any) => new Date(b.timestamp || b.date || 0).getTime() - new Date(a.timestamp || a.date || 0).getTime());
-
-      setResolvedSignals(resolved);
+      setLiveEquitySignals(normalized);
 
     } catch (e) {
       console.error("Dashboard Sync Failed:", e);
@@ -57,11 +54,11 @@ export default function DashboardTerminal() {
   }, []);
 
   const stats = {
-    total: performanceSummary?.transactional_signals || 0,
-    win_rate: performanceSummary?.win_rate_pct || 58.0,
-    replay_wr: performanceSummary?.historical_replay?.win_rate_pct || 0
+    total: performanceSummary?.sample_size || 0,
+    win_rate: performanceSummary?.win_rate || 0,
+    net_pnl: performanceSummary?.net_pnl || 0,
+    profit_factor: performanceSummary?.profit_factor || 0
   };
-  const recentHistory = useMemo(() => resolvedSignals.slice(0, 5), [resolvedSignals]);
 
   const buyCount = liveEquitySignals.filter(s => s.direction === 'LONG').length;
   const sellCount = liveEquitySignals.filter(s => s.direction === 'SHORT').length;
@@ -78,7 +75,7 @@ export default function DashboardTerminal() {
            <Grid item xs={12} md={8}>
               <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                  <Grid container spacing={4}>
-                    <HeroStat label="MARKET REGIME" value={marketStats?.Regime?.toUpperCase() || 'NEUTRAL'} color="#10b981" />
+                    <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'NEUTRAL'} color="#10b981" />
                     <HeroStat label="MONITORED EQUITIES" value="200" />
                     <HeroStat label="ACTIVE SIGNALS" value={liveEquitySignals.length} color="primary.main" />
                     <HeroStat label="HIGH CONFIDENCE" value={highConfidence} color="#7C3AED" />
@@ -140,37 +137,14 @@ export default function DashboardTerminal() {
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>OBSERVED PERFORMANCE</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
-                        <SidebarStat label="Ref Win Rate" value={`${stats.win_rate}%`} color="#10b981" />
-                        <SidebarStat label="Replay Win Rate" value={`${stats.replay_wr}%`} color={stats.replay_wr >= 50 ? '#10b981' : '#f59e0b'} />
-                        <SidebarStat label="Profit Factor" value="2.72" color="primary.main" />
-                        <SidebarStat label="Net P&L" value="+126.75%" color="#10b981" />
+                        <SidebarStat label="Win Rate" value={`${stats.win_rate}%`} color="#10b981" />
+                        <SidebarStat label="Profit Factor" value={stats.profit_factor} color="primary.main" />
+                        <SidebarStat label="Net P&L" value={`${stats.net_pnl > 0 ? '+' : ''}${stats.net_pnl}%`} color={stats.net_pnl >= 0 ? '#10b981' : '#ef4444'} />
                      </Stack>
                      <Divider sx={{ my: 3, opacity: 0.05 }} />
                      <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic', textAlign: 'center', display: 'block' }}>
-                        Multi-Tier Dataset (n={stats.total}) • Audit in Progress
+                        Authoritative Dataset (n={stats.total})
                      </Typography>
-                  </Paper>
-               </Box>
-
-               <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>RECENT OUTCOMES</Typography>
-                  <Paper sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1, overflow: 'hidden' }}>
-                     {recentHistory.map((s: any, i: number) => (
-                        <Box key={i} sx={{ p: 1.5, borderBottom: '1px solid rgba(255,255,255,0.03)', '&:last-child': { border: 0 } }}>
-                           <Stack direction="row" justifyContent="space-between" alignItems="center">
-                              <Box>
-                                 <Typography sx={{ fontWeight: 900, fontSize: '0.75rem', color: '#fff' }}>{s.symbol}</Typography>
-                                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>{s.direction}</Typography>
-                              </Box>
-                              <Box sx={{ textAlign: 'right' }}>
-                                 <Typography sx={{ fontWeight: 900, fontSize: '0.75rem', color: (s.profit_pct || 0) >= 0 ? '#10b981' : '#ef4444' }}>
-                                    {(s.profit_pct || 0) >= 0 ? '+' : ''}{(s.profit_pct || 0).toFixed(1)}%
-                                 </Typography>
-                                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>{s.status?.replace(/_/g, ' ')}</Typography>
-                              </Box>
-                           </Stack>
-                        </Box>
-                     ))}
                   </Paper>
                </Box>
             </Stack>

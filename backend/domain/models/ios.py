@@ -51,135 +51,119 @@ class SignalEvent(BaseModel):
 class LiveSignal(BaseModel):
     id: str
     symbol: str
-    timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
-    rating: Optional[str] = None
-    direction: str # LONG or SHORT
-    conviction: Optional[float] = None
-    entry_price: Optional[float] = None
-    target_price: Optional[float] = None
-    stop_price: Optional[float] = None
-    timeframe: Optional[str] = None
-    status: str # WAITING_FOR_ENTRY, ENTRY_TRIGGERED, ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
-
-    # F&O Support (RC-5)
-    asset_class: str = "EQUITY" # EQUITY, FUTURES, OPTIONS
-    underlying_symbol: Optional[str] = None
-    strike: Optional[float] = None
-    option_type: Optional[str] = None # CE or PE
-    expiry: Optional[datetime] = None
-    lot_size: Optional[int] = None
-
-    # Canonical Identity (Step 2C Upgrade)
+    company_name: Optional[str] = None
+    exchange: str = "NSE"
+    isin: Optional[str] = None
+    asset_type: Optional[str] = None # EQUITY, DERIVATIVE
     instrument_id: Optional[str] = None
     instrument_type: Optional[str] = None
+    direction: str # LONG or SHORT
+    timeframe: Optional[str] = None
+    strategy_version: str = "v2.2"
+    signal_version: str = "1.0"
 
-    # Quantitative Intelligence (P0 Update)
+    # Timing
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    signal_timestamp: Optional[datetime] = None
+    decision_timestamp: Optional[datetime] = None
+    data_timestamp: Optional[datetime] = None
+    feature_timestamp: Optional[datetime] = None
+    prediction_timestamp: Optional[datetime] = None
+    price_timestamp: Optional[datetime] = None
+    timezone: str = "UTC"
+    timestamp: Optional[datetime] = None # Legacy alias
+
+    # Price
+    entry_price: Optional[float] = None
+    entry_zone_low: Optional[float] = None
+    entry_zone_high: Optional[float] = None
+    target_price: Optional[float] = None
+    stop_price: Optional[float] = None
+    current_price: Optional[float] = None
+    risk_reward_ratio: Optional[float] = None
+
+    # Intelligence
     raw_probability: Optional[float] = None
     calibrated_probability: Optional[float] = None
     expected_value: Optional[float] = None
+    opportunity_score: Optional[float] = None
+    confidence: Optional[float] = None
+    signal_score: Optional[float] = None
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
-    risk_reward: Optional[float] = None
-    risk_per_unit: Optional[float] = None
-    reward_per_unit: Optional[float] = None
-    data_quality_score: Optional[float] = None
-    feature_snapshot_id: Optional[str] = None
-    market_snapshot_id: Optional[str] = None
+
+    # Lineage
+    model_id: Optional[str] = None
+    model_version: str = "TradeMind Core v2.2"
+    model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
-    decision_id: Optional[str] = None
-    provenance: Dict[str, Any] = Field(default_factory=dict)
 
-    validated_at: Optional[datetime] = None
-    triggered_at: Optional[datetime] = None
-    trigger_price: Optional[float] = None
-    trigger_condition: Optional[str] = None
-
-    outcome_date: Optional[datetime] = None
-    profit_pct: Optional[float] = None
-    outcome_price: Optional[float] = None
-
-    # Universal Price Tier (Step 2C/D/E/F)
-    current_price: Optional[float] = None
-    underlying_price: Optional[float] = None
-    underlying_price_timestamp: Optional[datetime] = None
-    current_price_timestamp: Optional[datetime] = None
-    price_source: Optional[str] = None
-    price_status: Optional[str] = None # FRESH, STALE, MARKET_CLOSED, DATA_UNAVAILABLE, PROVIDER_UNSUPPORTED, INSTRUMENT_NOT_FOUND, INVALID
-    price_adjustment_factor: float = 1.0
-    normalized_current_price: Optional[float] = None
-    signal_eligibility: Optional[str] = None # ELIGIBLE, DATA_BLOCKED, INSTRUMENT_BLOCKED, STALE_DATA, EXPIRED_INSTRUMENT, INVALID_DATA
-    evaluation_mode: str = "LIVE_SHADOW" # LIVE_SHADOW, HISTORICAL, BACKTEST, TEST
-    universe_version: str = "NIFTY_200_AUG2026"
-    strategy_version: str = "v2.2"
+    feature_snapshot_id: Optional[str] = None
     feature_version: Optional[str] = None
+    feature_hash: Optional[str] = None
+
     prediction_id: Optional[str] = None
     provenance_id: Optional[str] = None
-    data_timestamp: Optional[datetime] = None
-    market_timestamp: Optional[datetime] = None
+    provenance: Dict[str, Any] = Field(default_factory=dict)
+    data_source: Optional[str] = None
+    data_source_timestamp: Optional[datetime] = None
+    dataset_id: Optional[str] = None
+    dataset_hash: Optional[str] = None
+
+    # Lifecycle
+    status: str # WAITING_FOR_ENTRY, ACTIVE, etc.
+    lifecycle_state: Optional[str] = None
+    activated_at: Optional[datetime] = None
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    exit_at: Optional[datetime] = None
+    outcome_timestamp: Optional[datetime] = None
+
+    # Outcome
+    outcome: Optional[str] = None
+    exit_price: Optional[float] = None
     exit_reason: Optional[str] = None
-    fees: Optional[float] = None
+    holding_period_days: Optional[float] = None
+    realized_return: Optional[float] = None
+    gross_pnl: Optional[float] = None
+    transaction_cost: Optional[float] = None
     slippage: Optional[float] = None
     net_pnl: Optional[float] = None
-    outcome_verified: bool = False
-    verification_level: int = 0
+    realized_mae: Optional[float] = None
+    realized_mfe: Optional[float] = None
+
+    # Quality
+    current_price_status: Optional[str] = None
+    current_price_source: Optional[str] = None
+    current_price_timestamp: Optional[datetime] = None
+    data_quality_status: Optional[str] = None
+    validation_status: Optional[str] = None
+    audit_status: str = "PENDING"
+    last_reconciled_at: Optional[datetime] = None
+    record_hash: Optional[str] = None
+    data_quality_score: Optional[float] = None
+
+    # Legacy/Internal Compatibility
+    rating: Optional[str] = None
+    conviction: Optional[float] = None
+    asset_class: str = "EQUITY"
+    underlying_symbol: Optional[str] = None
+    strike: Optional[float] = None
+    option_type: Optional[str] = None
+    expiry: Optional[datetime] = None
+    lot_size: Optional[int] = None
     quantity: Optional[int] = None
     capital_allocation: Optional[float] = None
-    risk_amount: Optional[float] = None
-    gross_pnl: Optional[float] = None
-    pnl_percentage: Optional[float] = None
-
-    # Forensic Execution Fields (Step 4 Corrective)
-    actual_entry_price: Optional[float] = None
-    entry_execution_type: Optional[str] = None # NORMAL, FAVORABLE_GAP, INTRABAR
-    bars_to_entry: int = 0
-    bars_in_position: int = 0
-    bars_to_expiry: int = 0
-
+    signal_eligibility: Optional[str] = None
+    evaluation_mode: str = "LIVE_SHADOW"
+    universe_version: str = "NIFTY_200_AUG2026"
+    data_timestamp_legacy: Optional[datetime] = None # Field rename safety
+    market_timestamp: Optional[datetime] = None
+    outcome_verified: bool = False
+    events: List[SignalEvent] = []
     mfe: float = 0.0
     mae: float = 0.0
-    model_version: str = "TradeMind Core v2.2"
-    events: List[SignalEvent] = []
-
-    # Ledger 2.0 Extensions
-    asset_type: Optional[str] = None # EQUITY, DERIVATIVE
-    exchange: str = "NSE"
-    signal_type: Optional[str] = None # SWING, INTRADAY
-    signal_rating: Optional[str] = None # BUY, SELL
-    conviction_level: Optional[str] = None # LOW, MEDIUM, HIGH
-    entry_zone_low: Optional[float] = None
-    entry_zone_high: Optional[float] = None
-
-    derivative_symbol: Optional[str] = None
-    contract_multiplier: Optional[int] = None
-    strike: Optional[float] = None
-    expiry: Optional[datetime] = None
-    option_type: Optional[str] = None # CE or PE
-    derivative_entry: Optional[float] = None
-    derivative_current: Optional[float] = None
-    derivative_target: Optional[float] = None
-    derivative_stop: Optional[float] = None
-    premium_timestamp: Optional[datetime] = None
-
-    signal_timestamp: Optional[datetime] = None
-    entry_timestamp: Optional[datetime] = None
-    exit_timestamp: Optional[datetime] = None
-
-    lifecycle_state: Optional[str] = None # CREATED, ENTERED, TERMINAL
-    outcome_status: Optional[str] = None
-
-    risk_amount_abs: Optional[float] = None
-    reward_amount_abs: Optional[float] = None
-    risk_reward_ratio: Optional[float] = None
-    expected_return: Optional[float] = None
-
-    market_snapshot_id: Optional[str] = None
-    model_run_id: Optional[str] = None
-    decision_id: Optional[str] = None
-
-    created_by: str = "SYSTEM"
-    calculation_version: str = "1.0"
-    record_hash: Optional[str] = None
-    audit_status: Optional[str] = "PENDING"
+    profit_pct: Optional[float] = None
 
 class TradeFeedback(BaseModel):
     id: str

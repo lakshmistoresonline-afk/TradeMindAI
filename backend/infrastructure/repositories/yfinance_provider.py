@@ -153,6 +153,11 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
         df = self._get_history_yq(symbol, period=period, interval=interval)
         return df
 
+    async def get_history(self, symbol: str, start_date: datetime.datetime, end_date: Optional[datetime.datetime] = None, interval: str = "1d") -> pd.DataFrame:
+        if not end_date:
+            end_date = datetime.datetime.utcnow()
+        return self._get_history_yq(symbol, start=start_date, end=end_date, interval=interval)
+
     async def get_historical_candles(self, symbol: str, start_date: datetime.datetime, end_date: datetime.datetime, interval: str) -> List[StockPrice]:
         df = self._get_history_yq(symbol, start=start_date, end=end_date, interval=interval)
         prices = []

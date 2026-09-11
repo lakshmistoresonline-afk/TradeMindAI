@@ -5,7 +5,7 @@ from sqlalchemy import func
 from backend.core.postgres import SessionLocal, ShadowSignalDB, StockDB
 from backend.domain.models.data_platform import PortfolioHealth
 
-class ShadowPortfolioEngine:
+class PortfolioEngine:
     """
     Step 4: Hardened Shadow Portfolio Engine.
     Tracks virtual capital, exposure, and performance for Strategy V2.2.
@@ -32,7 +32,7 @@ class ShadowPortfolioEngine:
 
             for t in terminal:
                 # P&L in currency = (Net Return % / 100) * Capital Allocation
-                alloc = t.capital_allocation or ShadowPortfolioEngine.UNIT_ALLOCATION
+                alloc = t.capital_allocation or PortfolioEngine.UNIT_ALLOCATION
                 pnl_pct = t.net_return or 0.0
                 pnl_amt = (pnl_pct / 100.0) * alloc
                 realized_pnl += pnl_amt
@@ -52,7 +52,7 @@ class ShadowPortfolioEngine:
             concurrent_signals = len(active)
 
             for s, lp, sector in active:
-                alloc = s.capital_allocation or ShadowPortfolioEngine.UNIT_ALLOCATION
+                alloc = s.capital_allocation or PortfolioEngine.UNIT_ALLOCATION
                 allocated_capital += alloc
                 if s.direction == "LONG": long_exposure += alloc
                 else: short_exposure += alloc
@@ -72,7 +72,7 @@ class ShadowPortfolioEngine:
                 sec = sector or "Unknown"
                 sector_exposure[sec] = sector_exposure.get(sec, 0.0) + alloc
 
-            current_equity = ShadowPortfolioEngine.STARTING_CAPITAL + realized_pnl + unrealized_pnl
+            current_equity = PortfolioEngine.STARTING_CAPITAL + realized_pnl + unrealized_pnl
 
             # Calculate Portfolio MTM Drawdown from Equity Curve
             equity_curve.append(current_equity)
@@ -91,13 +91,13 @@ class ShadowPortfolioEngine:
             profit_factor = gross_profit / gross_loss if gross_loss > 0 else 1.0
 
             return {
-                "starting_capital": ShadowPortfolioEngine.STARTING_CAPITAL,
+                "starting_capital": PortfolioEngine.STARTING_CAPITAL,
                 "current_equity": round(current_equity, 2),
                 "realized_pnl": round(realized_pnl, 2),
                 "unrealized_pnl": round(unrealized_pnl, 2),
                 "total_pnl": round(realized_pnl + unrealized_pnl, 2),
                 "allocated_capital": round(allocated_capital, 2),
-                "available_capital": round(ShadowPortfolioEngine.STARTING_CAPITAL + realized_pnl - allocated_capital, 2),
+                "available_capital": round(PortfolioEngine.STARTING_CAPITAL + realized_pnl - allocated_capital, 2),
                 "gross_exposure": round(allocated_capital, 2),
                 "net_exposure": round(long_exposure - short_exposure, 2),
                 "long_exposure": round(long_exposure, 2),
@@ -117,7 +117,7 @@ class ShadowPortfolioEngine:
         Connects API to real shadow stats for SYSTEM_SHADOW.
         """
         if user_id == "SYSTEM_SHADOW":
-            state = ShadowPortfolioEngine.calculate_shadow_state()
+            state = PortfolioEngine.calculate_shadow_state()
             return PortfolioHealth(
                 user_id=user_id,
                 health_score=85.0,
@@ -139,3 +139,6 @@ class ShadowPortfolioEngine:
             expected_annual_return=12.5,
             max_drawdown=5.2
         )
+
+# Backward Compatibility
+ShadowPortfolioEngine = PortfolioEngine

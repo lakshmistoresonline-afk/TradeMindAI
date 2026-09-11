@@ -1,0 +1,34 @@
+{
+    "ABB": {
+        "status": "REPLAYED",
+        "bars_evaluated": 1,
+        "signals": 0,
+        "rejections": {
+            "TREND_CONFLICT_BULLISH": 1
+        }
+    },
+    "ADANIENSOL": {
+        "status": "REPLAYED",
+        "bars_evaluated": 1,
+        "signals": 0,
+        "rejections": {
+            "TREND_CONFLICT_BULLISH": 1
+        }
+    },
+    "ADANIPOWER": {
+        "status": "REPLAYED",
+        "bars_evaluated": 123,
+        "signals": 0,
+        "rejections": {
+            "TREND_CONFLICT_BULLISH": 123
+        }
+    },
+    "APOLLOHOSP": {
+        "status": "REPLAYED",
+        "bars_evaluated": 2,
+        "signals": 0,
+        "rejections": {
+            "TREND_CONFLICT_BULLISH": 2
+        }
+    }
+}

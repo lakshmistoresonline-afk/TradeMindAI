@@ -123,6 +123,8 @@ class FeatureStoreService:
         atr_series = df_ta[atr_col] if atr_col in df_ta.columns else pd.Series(close * 0.02, index=df_ta.index)
 
         features = {
+            "Close": float(close),
+            "ATR": float(get_val("ATR", close * 0.02)),
             # Core Technical
             "trend_ema_cross": float(ema20 > ema50) if (ema20 and ema50) else 0.5,
             "ema_200": float(ema200) if ema200 else close,
@@ -160,3 +162,56 @@ class FeatureStoreService:
             {"date": "Jan 2024", "symbol": "TCS", "similarity": 82, "outcome": "+8.2%", "context": "Sector accumulation phase."},
             {"date": "May 2021", "symbol": symbol, "similarity": 78, "outcome": "-4.1%", "context": "Overextended momentum."}
         ]
+
+    async def update_features(self, symbol: str):
+        """
+        Retrieves recent prices, calculates technical indicators,
+        extracts model features and persists to analytical engine.
+        """
+        from backend.analysis.technical import TechnicalAnalysis
+        from backend.core.container import container
+        import pandas as pd
+
+        # 1. Fetch recent prices
+        recent_prices = await container.repository.get_recent_prices(symbol, limit=500)
+        if not recent_prices:
+            return
+
+        # 2. Convert to DataFrame
+        # Skip conversion if already a DF? No, get_recent_prices returns list of StockPrice
+        df = pd.DataFrame([p.model_dump() for p in recent_prices])
+        if df.empty: return
+
+        print(f"      [DEBUG] {symbol} Prices fetched: {len(df)}")
+
+        df['date'] = pd.to_datetime(df['date'])
+        df.set_index('date', inplace=True)
+        df.sort_index(inplace=True)
+
+        # 3. Calculate Technical Indicators
+        df_ta = TechnicalAnalysis.calculate_indicators(df)
+        print(f"      [DEBUG] {symbol} Indicators calculated. Tail Close: {df_ta['Close'].iloc[-1]}")
+
+        # 5. Optimized: Just ingest the last row for now (Production Refresh)
+        last_row_features = self.extract_institutional_features(df_ta, smc_data={}, timestamp=df_ta.index[-1])
+
+        await self.ingest_features(symbol, df_ta.index[-1], last_row_features)
+
+        # 2. Convert to DataFrame
+        df = pd.DataFrame([p.model_dump() for p in recent_prices])
+        df['date'] = pd.to_datetime(df['date'])
+        df.set_index('date', inplace=True)
+
+        # 3. Calculate Technical Indicators
+        df_ta = TechnicalAnalysis.calculate_indicators(df)
+
+        # 4. Extract Model Features (Time-Safe)
+        for ts, row in df_ta.iterrows():
+            # In production we usually only need to ingest the latest missing ones
+            # For quick ingest, we'll just do the last few
+            pass
+
+        # 5. Optimized: Just ingest the last row for now (Production Refresh)
+        last_row_features = self.extract_institutional_features(df_ta, smc_data={}, timestamp=df_ta.index[-1])
+
+        await self.ingest_features(symbol, df_ta.index[-1], last_row_features)

@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-09-11T10:25:00Z",
+  "audit_run_id": "temp_audit_001",
+  "signals_audited": 17,
+  "future_data_count": 0,
+  "future_feature_count": 0,
+  "future_prediction_input_count": 0,
+  "look_ahead_violations": [],
+  "status": "PASS"
+}
