@@ -1,7 +1,36 @@
 import datetime
 from typing import List, Dict, Any, Optional
 from backend.domain.interfaces.repository import IStockRepository, IMarketDataProvider
-from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+try:
+    from scripts.universe.nifty200_canonical import NIFTY_200_CONSTITUENTS
+except ModuleNotFoundError:
+    # Fallback if scripts package is not in python path (e.g. docker)
+    NIFTY_200_CONSTITUENTS = [
+        "ABB", "ACC", "ADANIENT", "ADANIPORTS", "ADANIPOWER", "ATGL", "ADANIENSOL", "AMBUJACEM", "APOLLOHOSP", "ASIANPAINT",
+        "ASTRAL", "AUROPHARMA", "DMART", "AXISBANK", "BSE", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BAJAJHLDNG", "BALKRISIND",
+        "BANDHANBNK", "BANKBARODA", "BANKINDIA", "MAHABANK", "BATAINDIA", "BEL", "BEML", "BHARATFORG", "BHEL", "BPCL",
+        "BHARTIARTL", "BIOCON", "BOSCHLTD", "BRITANNIA", "CGPOWER", "CANBK", "CHOLAFIN", "CIPLA", "COALINDIA", "COFORGE",
+        "COLPAL", "CONCOR", "COROMANDEL", "CROMPTON", "CUMMINSIND", "DLF", "DABUR", "DALBHARAT", "DEEPAKNTR", "DELHIVERY",
+        "DIVISLAB", "DIXON", "LALPATHLAB", "DRREDDY", "EICHERMOT", "ESCORTS", "NYKAA", "FEDERALBNK", "FACT", "FORTIS",
+        "GAIL", "GMRINFRA", "GODREJCP", "GODREJIND", "GODREJPROP", "GRASIM", "GUJGASLTD", "GSPL", "HCLTECH", "HDFCAMC",
+        "HDFCBANK", "HDFCLIFE", "HAVELLS", "HEROMOTOCO", "HINDALCO", "HAL", "HINDPETRO", "HINDUNILVR", "HINDZINC", "HUDCO",
+        "ICICIBANK", "ICICIGI", "ICICIPRULI", "IDBI", "IDFCFIRSTB", "ITC", "INDIANB", "INDHOTEL", "IOC", "IRCTC",
+        "IRFC", "IGL", "INDUSINDBK", "NAUKRI", "INFY", "INDIGO", "IPCALAB", "JIOFIN", "JSWENERGY", "JSWSTEEL",
+        "JINDALSTEL", "JINDALSTEL", "KALYANKJIL", "KOTAKBANK", "KPRMILL", "L&TFH", "LTTS", "LICHSGFIN", "LTIM", "LT",
+        "LAURUSLABS", "LICI", "LUPIN", "MRF", "LODHA", "M&MFIN", "M&M", "MANAPPURAM", "MARICO", "MARUTI",
+        "MFSL", "MAXHEALTH", "MAZDOCK", "METROPOLIS", "MUTHOOTFIN", "NHPC", "NMDC", "NTPC", "NATIONALUM", "NAVINFLUOR",
+        "NESTLEIND", "OBEROIRLTY", "ONGC", "OIL", "ONE97", "PIIND", "PAGEIND", "PATANJALI", "PERSISTENT", "PETRONET",
+        "PIDILITIND", "PEL", "POLYCAB", "POONAWALLA", "PFC", "POWERGRID", "PRESTIGE", "PNB", "RECLTD", "RVNL",
+        "RELIANCE", "SBICARD", "SBILIFE", "SJVN", "SRF", "MOTHERSON", "SHREECEM", "SHRIRAMFIN", "SIEMENS", "SONACOMS",
+        "SBIN", "SAIL", "SUNPHARMA", "SUNTV", "SUPREMEIND", "SUZLON", "SYNGENE", "TVSMOTOR", "TATACHEM", "TATACOMM",
+        "TCS", "TATACONSUM", "TATAELXSI", "TATAMOTORS", "TATAPOWER", "TATASTEEL", "TTML", "TECHM", "TITAN", "TORNTPOWER",
+        "TORNTPHARM", "TRENT", "TRIDENT", "TIINDIA", "UCOBANK", "UNOMINDA", "UPL", "ULTRACEMCO", "UNIONBANK", "UBL",
+        "VBL", "VEDL", "VOLTAS", "WHIRLPOOL", "WIPRO", "YESBANK", "ZOMATO", "ZYDUSLIFE"
+    ]
 
 class UniverseService:
     """
