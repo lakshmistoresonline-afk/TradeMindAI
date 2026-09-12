@@ -30,8 +30,12 @@ RUN pip install pandas-ta --no-deps
 # This ensures /app/backend/ exists for imports to work
 COPY backend/ backend/
 
+# Copy docs for freeze manifest
+COPY docs/ docs/
+
 # Ensure start script is executable
 RUN chmod +x backend/start.sh
+
 
 # Run using the start script
 CMD ["backend/start.sh"]
