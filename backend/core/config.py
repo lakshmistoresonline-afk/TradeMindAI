@@ -47,10 +47,8 @@ class Settings(BaseSettings):
 
     @validator("SECRET_KEY")
     def validate_secret_key(cls, v: str, values: dict) -> str:
-        # In this specific deployment context, allow default SECRET_KEY
-        # to ensure the application boots if it's missing from Railway variables.
-        # if values.get("ENVIRONMENT") == "production" and v == "SECRET":
-        #    raise ValueError("SECRET_KEY must be set in production environment")
+        if values.get("ENVIRONMENT") == "production" and v == "SECRET":
+            raise ValueError("SECRET_KEY must be set in production environment")
         return v
 
     ALGORITHM: str = "HS256"
