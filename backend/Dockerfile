@@ -30,6 +30,9 @@ RUN pip install pandas-ta --no-deps
 # This ensures /app/backend/ exists for imports to work
 COPY backend/ backend/
 
+# Copy scripts for universe and other shared modules
+COPY scripts/ scripts/
+
 # Copy docs for freeze manifest
 COPY docs/ docs/
 

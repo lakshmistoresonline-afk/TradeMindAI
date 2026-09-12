@@ -6,11 +6,17 @@ from typing import Dict, Any, List
 class V22FreezeVerificationService:
     @staticmethod
     def calculate_hash(file_path: str) -> str:
-        sha256_hash = hashlib.sha256()
+        """
+        Calculates SHA256 hash of file content.
+        Normalizes line endings to \n to ensure cross-platform consistency.
+        """
         with open(file_path, "rb") as f:
-            for byte_block in iter(lambda: f.read(4096), b""):
-                sha256_hash.update(byte_block)
-        return sha256_hash.hexdigest().upper()
+            content = f.read()
+
+        # Normalize line endings: CRLF -> LF
+        normalized_content = content.replace(b"\r\n", b"\n")
+
+        return hashlib.sha256(normalized_content).hexdigest().upper()
 
     @staticmethod
     def verify_freeze() -> Dict[str, Any]:
