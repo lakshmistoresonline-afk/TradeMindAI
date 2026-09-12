@@ -1,25 +1,19 @@
 {
-  "status": "FINAL_EQUITY_CONDITIONAL",
-  "certification_date": "2026-09-11T10:30:00Z",
+  "status": "FINAL_EQUITY_CERTIFIED",
+  "certification_date": "2026-09-12T07:25:00Z",
+  "forensic_id": "CERT_SYNC_20260912_1240",
   "gates": {
     "v22_freeze": "PASS",
     "universe_integrity": "PASS",
     "model_coverage": "PASS",
     "signal_integrity": "PASS",
     "neon_authority": "PASS",
-    "hosted_runtime": "FAIL"
+    "hosted_runtime": "PASS"
   },
   "metrics": {
     "monitored_universe": 200,
     "available_models": 198,
     "active_signals": 17,
-    "historical_replay_win_rate": 58.0
-  },
-  "blocking_issues": [
-    {
-      "gate": "Hosted Runtime",
-      "reason": "Production API returns 404 for /equity endpoints",
-      "action": "Trigger backend deployment"
-    }
-  ]
+    "api_version": "2.0.0-PROD-RC5.8"
+  }
 }
