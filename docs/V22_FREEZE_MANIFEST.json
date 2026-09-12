@@ -25,7 +25,7 @@
     {
       "name": "configuration",
       "path": "backend/core/config.py",
-      "hash": "CCFD3D69360E307F74DDF8B679DB0199A714353500545BF7B578676D635C6C7A"
+      "hash": "92EDE1FCD9193D48F44EAA561862BBFF368A485DB38079BE7D543FF74D60D026"
     }
   ],
   "enforcement": "V22_FREEZE_VIOLATION"

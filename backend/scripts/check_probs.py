@@ -14,7 +14,7 @@ def main():
 
     engine = create_engine(DATABASE_URL)
     with engine.connect() as conn:
-        res = conn.execute(text("SELECT symbol, calibrated_probability FROM live_signals;"))
+        res = conn.execute(text("SELECT symbol, direction, decision_timestamp, calibrated_probability FROM live_signals ORDER BY symbol, decision_timestamp;"))
         rows = res.fetchall()
         print(f"Total signals: {len(rows)}")
         for r in rows:
