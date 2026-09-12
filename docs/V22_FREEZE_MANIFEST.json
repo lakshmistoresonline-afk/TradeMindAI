@@ -1,32 +1,32 @@
-﻿{
-    "strategy_version":  "v2.2",
-    "freeze_date":  "2026-09-11",
-    "files":  [
-                  {
-                      "name":  "signal_engine",
-                      "path":  "backend/services/signal_engine.py",
-                      "hash":  "90E4B640A855F7763A5DA61CDDF9DBCDDA27B50473D31ECD5362EF4865C60201"
-                  },
-                  {
-                      "name":  "outcome_engine",
-                      "path":  "backend/services/outcome_engine.py",
-                      "hash":  "460F8567D40699827D6262528132D89E144598AA02AFADDBC2FE6C7095CF6AD4"
-                  },
-                  {
-                      "name":  "risk_engine_service",
-                      "path":  "backend/services/risk_engine.py",
-                      "hash":  "BE1DC856903B7F86D0B4D642DF8425E26C340BC9F62BC2041026A68A950769FD"
-                  },
-                  {
-                      "name":  "risk_core",
-                      "path":  "backend/core/risk.py",
-                      "hash":  "9910889561C6A941E7D011EF6EF53A28285F7CF7FDE4CE4BDEECBD27003CB830"
-                  },
-                  {
-                      "name":  "configuration",
-                      "path":  "backend/core/config.py",
-                      "hash":  "CCFD3D69360E307F74DDF8B679DB0199A714353500545BF7B578676D635C6C7A"
-                  }
-              ],
-    "enforcement":  "V22_FREEZE_VIOLATION"
+{
+  "strategy_version": "v2.2",
+  "freeze_date": "2026-09-11",
+  "files": [
+    {
+      "name": "signal_engine",
+      "path": "backend/services/signal_engine.py",
+      "hash": "90E4B640A855F7763A5DA61CDDF9DBCDDA27B50473D31ECD5362EF4865C60201"
+    },
+    {
+      "name": "outcome_engine",
+      "path": "backend/services/outcome_engine.py",
+      "hash": "460F8567D40699827D6262528132D89E144598AA02AFADDBC2FE6C7095CF6AD4"
+    },
+    {
+      "name": "risk_engine_service",
+      "path": "backend/services/risk_engine.py",
+      "hash": "BE1DC856903B7F86D0B4D642DF8425E26C340BC9F62BC2041026A68A950769FD"
+    },
+    {
+      "name": "risk_core",
+      "path": "backend/core/risk.py",
+      "hash": "9910889561C6A941E7D011EF6EF53A28285F7CF7FDE4CE4BDEECBD27003CB830"
+    },
+    {
+      "name": "configuration",
+      "path": "backend/core/config.py",
+      "hash": "CCFD3D69360E307F74DDF8B679DB0199A714353500545BF7B578676D635C6C7A"
+    }
+  ],
+  "enforcement": "V22_FREEZE_VIOLATION"
 }
