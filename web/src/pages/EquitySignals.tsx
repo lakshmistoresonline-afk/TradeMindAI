@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton } from '@mui/material';
-import { ShieldAlert, RefreshCw, Search, Activity, Info } from 'lucide-react';
+import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Tooltip } from '@mui/material';
+import { ShieldAlert, RefreshCw, Search, Activity, Info, HelpCircle } from 'lucide-react';
 import { getEquitySignals } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
@@ -51,7 +51,7 @@ export default function EquitySignals() {
   const counts = useMemo(() => {
     return {
       all: signals.length,
-      swing: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').length,
+      swing: signals.filter(s => s.decision.timeframe === 'SWING').length,
       short: signals.filter(s => s.decision.timeframe === 'SHORT').length,
       long: signals.filter(s => s.decision.timeframe === 'LONG').length
     };
@@ -67,7 +67,7 @@ export default function EquitySignals() {
         if (!matchesSearch) return false;
 
         if (universe === 'ALL') return true;
-        if (universe === 'SWING_PRIMARY') return s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY';
+        if (universe === 'SWING_PRIMARY') return s.decision.timeframe === 'SWING';
         if (universe === 'SHORT_EXPERIMENTAL') return s.decision.timeframe === 'SHORT';
         if (universe === 'LONG_SELECTIVE') return s.decision.timeframe === 'LONG';
 
@@ -89,7 +89,7 @@ export default function EquitySignals() {
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: connectionStatus === 'ONLINE' ? '#10b981' : '#ef4444' }}>
-                  NODE: {connectionStatus}
+                  NODE: {connectionStatus} (SHADOW MODE)
                </Typography>
             </Stack>
          </Box>
@@ -211,8 +211,7 @@ export default function EquitySignals() {
             <Box>
                <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>FORENSIC SIGNAL PROTOCOL</Typography>
                <Typography variant="caption" sx={{ color: 'slategray', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
-                  Authoritative signals are derived from institutional order flow and V2.2 structural breakout logic.
-                  PRIMARY SWING signals require OOS AUC &gt; 0.60. SELECTIVE LONG signals require AUC &gt; 0.70 with specialized symbol evidence.
+                  Authoritative signals are derived from institutional order flow and Strategy V2.2 breakout logic.
                   Latest sync confirmed at {latestUpdate} IST.
                </Typography>
             </Box>

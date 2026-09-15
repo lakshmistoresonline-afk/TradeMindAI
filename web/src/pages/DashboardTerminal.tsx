@@ -60,8 +60,8 @@ export default function DashboardTerminal() {
 
   const counts = useMemo(() => {
     return {
-      swingPrimary: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').length,
-      longSelective: signals.filter(s => s.decision.timeframe === 'LONG' && s.decision.qualityClass === 'SELECTIVE').length,
+      swingPrimary: signals.filter(s => s.decision.timeframe === 'SWING').length,
+      longSelective: signals.filter(s => s.decision.timeframe === 'LONG').length,
       shortExperimental: signals.filter(s => s.decision.timeframe === 'SHORT').length,
       total: signals.length
     };
@@ -140,7 +140,7 @@ export default function DashboardTerminal() {
                      </Box>
                      {counts.swingPrimary > 0 ? (
                         <Grid container spacing={2}>
-                           {signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').map((s) => (
+                           {signals.filter(s => s.decision.timeframe === 'SWING').map((s) => (
                               <Grid item xs={12} md={4} key={s.id}>
                                  <LiveSignalCard stock={s} decision={s.decision} />
                               </Grid>
@@ -162,7 +162,7 @@ export default function DashboardTerminal() {
                      </Box>
                      {counts.longSelective > 0 ? (
                         <Grid container spacing={2}>
-                           {signals.filter(s => s.decision.timeframe === 'LONG' && s.decision.qualityClass === 'SELECTIVE').map((s) => (
+                           {signals.filter(s => s.decision.timeframe === 'LONG').map((s) => (
                               <Grid item xs={12} md={4} key={s.id}>
                                  <LiveSignalCard stock={s} decision={s.decision} />
                               </Grid>
