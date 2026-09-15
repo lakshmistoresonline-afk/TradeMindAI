@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Dict, Any, Optional
+from sqlalchemy import func, or_
 from backend.core.container import container
 from backend.domain.models.ios import LiveSignal
 from backend.services.signal_ledger_service import SignalLedgerService
 from backend.services.signal_lifecycle_service import SignalLifecycleService
 from backend.services.research_metrics_service import ResearchMetricsService
 import datetime
+from sqlalchemy import func
 
 router = APIRouter()
 
@@ -153,6 +155,7 @@ async def get_equity_history(
     horizon: Optional[str] = None,
     quality: Optional[str] = None,
     status: Optional[str] = None,
+    direction: Optional[str] = None,
     page: int = 1,
     limit: int = 50
 ):
@@ -166,12 +169,19 @@ async def get_equity_history(
 
         # Apply Filters
         if symbol and symbol != "ALL":
-            query = query.filter(ShadowSignalDB.symbol == symbol)
+            # Search by Symbol or Signal ID
+            query = query.filter(or_(ShadowSignalDB.symbol.ilike(f"%{symbol}%"), ShadowSignalDB.id.ilike(f"%{symbol}%")))
         if horizon and horizon != "ALL":
-            # Map Horizon to signal_type if necessary
+            # Map Horizon to signal_type (Authoritative Horizon Column)
             query = query.filter(ShadowSignalDB.signal_type == horizon)
         if quality and quality != "ALL":
             query = query.filter(ShadowSignalDB.quality_class == quality)
+        if direction and direction != "ALL":
+            # Support both Direction and Rating columns
+            if direction == "LONG":
+                query = query.filter(or_(ShadowSignalDB.direction == "LONG", ShadowSignalDB.signal_rating == "BUY"))
+            else:
+                query = query.filter(or_(ShadowSignalDB.direction == "SHORT", ShadowSignalDB.signal_rating == "SELL"))
         if status and status != "ALL":
             query = query.filter(ShadowSignalDB.status == status)
         else:
@@ -179,6 +189,26 @@ async def get_equity_history(
             query = query.filter(ShadowSignalDB.status != "ACTIVE")
 
         total = query.count()
+
+        # Summary stats for the currently filtered set (minus status filter)
+        # Always exclude ACTIVE for history summary
+        base_query = session.query(ShadowSignalDB).filter(ShadowSignalDB.status != "ACTIVE")
+
+        if symbol and symbol != "ALL":
+            base_query = base_query.filter(or_(ShadowSignalDB.symbol.ilike(f"%{symbol}%"), ShadowSignalDB.id.ilike(f"%{symbol}%")))
+        if horizon and horizon != "ALL": base_query = base_query.filter(ShadowSignalDB.signal_type == horizon)
+        if quality and quality != "ALL": base_query = base_query.filter(ShadowSignalDB.quality_class == quality)
+        if direction and direction != "ALL":
+            if direction == "LONG":
+                base_query = base_query.filter(or_(ShadowSignalDB.direction == "LONG", ShadowSignalDB.signal_rating == "BUY"))
+            else:
+                base_query = base_query.filter(or_(ShadowSignalDB.direction == "SHORT", ShadowSignalDB.signal_rating == "SELL"))
+
+        target_hits = base_query.filter(ShadowSignalDB.status == "TARGET_HIT").count()
+        stop_losses = base_query.filter(ShadowSignalDB.status == "STOP_LOSS").count()
+        expired = base_query.filter(ShadowSignalDB.status == "EXPIRED").count()
+        filtered_history_total = base_query.count()
+
         db_signals = query.order_by(ShadowSignalDB.timestamp.desc()).offset((page-1)*limit).limit(limit).all()
 
         results = []
@@ -201,7 +231,14 @@ async def get_equity_history(
             "records": results,
             "total": total,
             "page": page,
-            "limit": limit
+            "limit": limit,
+            "summary": {
+                "total": filtered_history_total,
+                "target_hits": target_hits,
+                "stop_losses": stop_losses,
+                "expired": expired,
+                "other": filtered_history_total - (target_hits + stop_losses + expired)
+            }
         }
 
 @router.get("/verify-freeze")
