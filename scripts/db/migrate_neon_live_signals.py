@@ -15,10 +15,14 @@ print(f"Connecting to: {db_url[:50]}...")
 engine = sqlalchemy.create_engine(db_url)
 try:
     with engine.connect() as conn:
-        print("[*] Adding quality_class column to live_signals...")
+        print("[*] Ensuring quality_class exists in live_signals...")
         conn.execute(text("ALTER TABLE live_signals ADD COLUMN IF NOT EXISTS quality_class VARCHAR"))
+
+        print("[*] Ensuring quality_class exists in shadow_signals...")
+        conn.execute(text("ALTER TABLE shadow_signals ADD COLUMN IF NOT EXISTS quality_class VARCHAR"))
+
         conn.commit()
-        print("[+] Migration successful.")
+        print("[+] Migrations successful.")
 except Exception as e:
     print(f"Error: {e}")
 finally:

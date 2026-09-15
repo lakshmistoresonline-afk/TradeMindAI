@@ -110,8 +110,31 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     qualityClass: qualityClass as any,
     assetClass: signal.asset_class || 'EQUITY',
     underlyingSymbol: signal.symbol,
-    priceStatus: signal.data_quality_status || 'FRESH'
+    priceStatus: signal.data_quality_status || 'FRESH',
+
+    // Historical Fields
+    exitPrice: parseNum(signal.exit_price),
+    exitReason: signal.exit_reason,
+    realizedReturn: parseNum(signal.realized_return || signal.pnl_percentage),
+    netPnL: parseNum(signal.net_pnl),
+    holdingPeriodDays: parseNum(signal.holding_period_days),
+    mae: parseNum(signal.realized_mae || signal.mae),
+    mfe: parseNum(signal.realized_mfe || signal.mfe),
+    outcome: signal.outcome,
+    closedAt: ensureUTC(signal.outcome_timestamp || signal.exit_at)
   };
+};
+
+/**
+ * Unified Signal Mapping Logic
+ * Every frontend page should use this to transform backend signal objects.
+ */
+export const mapCanonicalSignal = (signal: any): any => {
+    const decision = normalizeAITradeDecision(signal);
+    return {
+        ...signal,
+        decision
+    };
 };
 
 export const useAITradeDecision = (stock: any): AITradeDecision => {

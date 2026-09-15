@@ -1,16 +1,25 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton } from '@mui/material';
-import { ShieldAlert, RefreshCw, Search, Activity, Info } from 'lucide-react';
-import { getEquitySignals } from '../api/client';
-import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
+import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip } from '@mui/material';
+import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
+import { getEquitySignals, getEquityHistory } from '../api/client';
+import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
+import { useNavigate } from 'react-router-dom';
 
 export default function EquitySignals() {
-  const [activeTab, setActiveTab] = useState(1); // Default to SWING PRIMARY (index 1)
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<'ACTIVE' | 'HISTORY'>('ACTIVE');
+  const [activeTab, setActiveTab] = useState(1); // Default to SWING (index 1)
   const [signals, setSignals] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // History Pagination
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [totalHistory, setTotalHistory] = useState(0);
 
   const { connectionStatus } = useTurboSync();
 
@@ -25,20 +34,29 @@ export default function EquitySignals() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const signalsData = await getEquitySignals({ limit: 100 });
-      const normalized = (Array.isArray(signalsData) ? signalsData : [])
-        .map((s: any) => ({
-          ...s,
-          decision: normalizeAITradeDecision(s)
-        })).sort((a: any, b: any) => {
-          const timeA = new Date(a.decision?.generatedAt || 0).getTime();
-          const timeB = new Date(b.decision?.generatedAt || 0).getTime();
-          return timeB - timeA;
-        });
-
-      setSignals(normalized);
+      if (mode === 'ACTIVE') {
+        const signalsData = await getEquitySignals({ limit: 100 });
+        const normalized = (Array.isArray(signalsData) ? signalsData : [])
+          .map((s: any) => mapCanonicalSignal(s))
+          .sort((a: any, b: any) => {
+            const timeA = new Date(a.decision?.generatedAt || 0).getTime();
+            const timeB = new Date(b.decision?.generatedAt || 0).getTime();
+            return timeB - timeA;
+          });
+        setSignals(normalized);
+      } else {
+        const params: any = {
+            page: page + 1,
+            limit: rowsPerPage,
+            symbol: searchQuery || undefined
+        };
+        const historyData = await getEquityHistory(params);
+        const records = (historyData?.records || []).map((r: any) => mapCanonicalSignal(r));
+        setHistory(records);
+        setTotalHistory(historyData?.total || 0);
+      }
     } catch (e) {
-      console.error("Failed to sync equity signals:", e);
+      console.error("Failed to sync equity data:", e);
     } finally {
       setLoading(false);
     }
@@ -46,7 +64,7 @@ export default function EquitySignals() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [mode, page, rowsPerPage]);
 
   const counts = useMemo(() => {
     return {
@@ -58,6 +76,8 @@ export default function EquitySignals() {
   }, [signals]);
 
   const filteredSignals = useMemo(() => {
+    if (mode === 'HISTORY') return history;
+
     const universe = universes[activeTab].value;
 
     return signals.filter(s => {
@@ -73,7 +93,7 @@ export default function EquitySignals() {
 
         return false;
     });
-  }, [signals, activeTab, searchQuery, universes]);
+  }, [signals, history, mode, activeTab, searchQuery, universes]);
 
   const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
@@ -89,7 +109,7 @@ export default function EquitySignals() {
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: connectionStatus === 'ONLINE' ? '#10b981' : '#ef4444' }}>
-                  NODE: {connectionStatus} (SHADOW MODE)
+                  NODE: {connectionStatus}
                </Typography>
             </Stack>
          </Box>
@@ -112,6 +132,7 @@ export default function EquitySignals() {
                   placeholder="FILTER BY TICKER..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => { if (e.key === 'Enter') fetchData(); }}
                   sx={{ ml: 1.5, flex: 1, fontSize: '0.8rem', fontWeight: 800, color: 'white' }}
                />
             </Box>
@@ -121,88 +142,187 @@ export default function EquitySignals() {
          </Stack>
       </Box>
 
-      {/* 2. Signal Summary Ribbon */}
-      <Grid container spacing={2} sx={{ mb: 4 }}>
-         <Grid item xs={6} md={3}>
-            <SummaryStat label="TOTAL ACTIVE" value={counts.all} color="primary.main" />
-         </Grid>
-         <Grid item xs={6} md={3}>
-            <SummaryStat label="PRIMARY SWING" value={counts.swing} color="#10b981" />
-         </Grid>
-         <Grid item xs={6} md={3}>
-            <SummaryStat label="SELECTIVE LONG" value={counts.long} color="#00D1FF" />
-         </Grid>
-         <Grid item xs={6} md={3}>
-            <SummaryStat label="EXPERIMENTAL SHORT" value={counts.short} color="slategray" />
-         </Grid>
-      </Grid>
+      {/* 2. Mode Switch */}
+      <Box sx={{ mb: 4 }}>
+         <Stack direction="row" spacing={1}>
+            <ModeButton active={mode === 'ACTIVE'} onClick={() => { setMode('ACTIVE'); setPage(0); }}>ACTIVE SIGNALS</ModeButton>
+            <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setPage(0); }}>SIGNAL HISTORY</ModeButton>
+         </Stack>
+      </Box>
 
-      {/* 3. Universe Selectors */}
-      <Paper sx={{ mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 0.5, width: 'fit-content' }}>
-        <Tabs
-            value={activeTab}
-            onChange={(_, v) => setActiveTab(v)}
-            sx={{
-                minHeight: 44,
-                '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
-                '& .MuiTab-root': {
-                    color: 'slategray',
-                    fontWeight: 950,
-                    fontSize: '0.7rem',
-                    minWidth: 160,
-                    textTransform: 'none',
-                    '&.Mui-selected': { color: 'white' }
-                }
-            }}
-        >
-            {universes.map((u) => (
-                <Tab key={u.value} label={u.label} />
-            ))}
-        </Tabs>
-      </Paper>
+      {mode === 'ACTIVE' ? (
+        <>
+            {/* 3. Active Signal Summary */}
+            <Grid container spacing={2} sx={{ mb: 4 }}>
+                <Grid item xs={6} md={3}>
+                    <SummaryStat label="TOTAL ACTIVE" value={counts.all} color="primary.main" />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                    <SummaryStat label="SWING" value={counts.swing} color="#10b981" />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                    <SummaryStat label="LONG" value={counts.long} color="#00D1FF" />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                    <SummaryStat label="SHORT" value={counts.short} color="slategray" />
+                </Grid>
+            </Grid>
 
-      {/* 4. Data Grid */}
-      {loading ? (
-         <Grid container spacing={3}>
-            {[1,2,3,4,5,6].map(i => (
-               <Grid item xs={12} md={6} lg={4} key={i}>
-                  <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }} />
-               </Grid>
-            ))}
-         </Grid>
-      ) : (
-         <Box>
-            {filteredSignals.length > 0 ? (
-               <Grid container spacing={3}>
-                  {filteredSignals.map((s) => (
-                     <Grid item xs={12} md={6} lg={4} key={s.id}>
-                        <LiveSignalCard stock={s} decision={s.decision} />
-                     </Grid>
-                  ))}
-               </Grid>
+            {/* 4. Active Universe Selectors */}
+            <Paper sx={{ mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 0.5, width: 'fit-content' }}>
+                <Tabs
+                    value={activeTab}
+                    onChange={(_, v) => setActiveTab(v)}
+                    sx={{
+                        minHeight: 44,
+                        '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
+                        '& .MuiTab-root': {
+                            color: 'slategray',
+                            fontWeight: 950,
+                            fontSize: '0.7rem',
+                            minWidth: 160,
+                            textTransform: 'none',
+                            '&.Mui-selected': { color: 'white' }
+                        }
+                    }}
+                >
+                    {universes.map((u) => (
+                        <Tab key={u.value} label={u.label} />
+                    ))}
+                </Tabs>
+            </Paper>
+
+            {/* 5. Active Signal Grid */}
+            {loading ? (
+                <Grid container spacing={3}>
+                    {[1,2,3,4,5,6].map(i => (
+                        <Grid item xs={12} md={6} lg={4} key={i}>
+                            <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }} />
+                        </Grid>
+                    ))}
+                </Grid>
             ) : (
-               <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
-                  <ShieldAlert size={56} color="slategray" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>
-                     {universes[activeTab].label} — NO QUALIFIED SIGNALS
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1, opacity: 0.5, fontWeight: 700 }}>
-                     The quantitative engine has not identified any signals meeting the {universes[activeTab].label} evidence gates.
-                  </Typography>
-                  <Button
-                    variant="text"
-                    size="small"
-                    sx={{ mt: 4, fontWeight: 900, color: '#10b981', textTransform: 'none' }}
-                    onClick={() => {setSearchQuery(''); setActiveTab(0);}}
-                  >
-                    VIEW ALL ACTIVE SIGNALS
-                  </Button>
-               </Paper>
+                <Box>
+                    {filteredSignals.length > 0 ? (
+                        <Grid container spacing={3}>
+                            {filteredSignals.map((s) => (
+                                <Grid item xs={12} md={6} lg={4} key={s.id}>
+                                    <LiveSignalCard stock={s} decision={s.decision} />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : (
+                        <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
+                            <ShieldAlert size={56} color="slategray" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>
+                                {universes[activeTab].label} — NO QUALIFIED SIGNALS
+                            </Typography>
+                        </Paper>
+                    )}
+                </Box>
             )}
-         </Box>
+        </>
+      ) : (
+        /* 6. Signal History View */
+        <Box>
+            <Paper sx={{ p: 3, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+               <Stack direction="row" spacing={4} alignItems="center">
+                  <Box>
+                     <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 0.5 }}>HISTORICAL SIGNALS</Typography>
+                     <Typography variant="h4" sx={{ fontWeight: 950, color: 'primary.main', fontFamily: 'JetBrains Mono' }}>{totalHistory.toLocaleString()}</Typography>
+                  </Box>
+                  <Divider orientation="vertical" flexItem sx={{ opacity: 0.05 }} />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate('/performance')}
+                    startIcon={<TrendingUp size={14} />}
+                    sx={{ color: '#10b981', borderColor: alpha('#10b981', 0.3), fontWeight: 800 }}
+                  >
+                     VIEW PERFORMANCE ANALYSIS →
+                  </Button>
+               </Stack>
+            </Paper>
+
+            <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+               <Table sx={{ minWidth: 1200 }}>
+                  <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
+                     <TableRow>
+                        <TableCell>DATE</TableCell>
+                        <TableCell>SYMBOL</TableCell>
+                        <TableCell>DIRECTION</TableCell>
+                        <TableCell>HORIZON</TableCell>
+                        <TableCell>ENTRY</TableCell>
+                        <TableCell>EXIT</TableCell>
+                        <TableCell>OUTCOME</TableCell>
+                        <TableCell>RETURN %</TableCell>
+                        <TableCell>PROB</TableCell>
+                        <TableCell>EV</TableCell>
+                        <TableCell align="right">ACTION</TableCell>
+                     </TableRow>
+                  </TableHead>
+                  <TableBody>
+                     {loading ? (
+                        [1,2,3,4,5].map(i => (
+                           <TableRow key={i}><TableCell colSpan={11}><Skeleton height={40} /></TableCell></TableRow>
+                        ))
+                     ) : history.length > 0 ? (
+                        history.map((s) => (
+                           <TableRow key={s.id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
+                              <TableCell sx={{ fontWeight: 700, color: 'slategray' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
+                              <TableCell>
+                                 <Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono' }}>{s.symbol}</Typography>
+                              </TableCell>
+                              <TableCell>
+                                 <MuiChip
+                                    label={s.decision.rating}
+                                    size="small"
+                                    sx={{
+                                        fontWeight: 950, fontSize: '0.6rem',
+                                        bgcolor: alpha(s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444', 0.1),
+                                        color: s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444'
+                                    }}
+                                 />
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 800, fontSize: '0.7rem' }}>{s.decision.timeframe}</TableCell>
+                              <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
+                              <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>{s.decision.exitPrice ? `₹${s.decision.exitPrice.toLocaleString()}` : '—'}</TableCell>
+                              <TableCell>
+                                 <OutcomeBadge outcome={s.decision.status} />
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444' }}>
+                                 {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(2)}%` : '—'}
+                              </TableCell>
+                              <TableCell sx={{ fontWeight: 800, color: 'primary.main' }}>{s.decision.conviction}%</TableCell>
+                              <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>{s.decision.expectedValue ? `₹${s.decision.expectedValue.toFixed(1)}` : '—'}</TableCell>
+                              <TableCell align="right">
+                                 <Button size="small" onClick={() => navigate(`/signals/${s.id}`)} sx={{ fontWeight: 900, fontSize: '0.65rem' }}>DETAILS</Button>
+                              </TableCell>
+                           </TableRow>
+                        ))
+                     ) : (
+                        <TableRow>
+                           <TableCell colSpan={11} sx={{ py: 10, textAlign: 'center' }}>
+                              <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>NO HISTORICAL SIGNAL DATA AVAILABLE</Typography>
+                           </TableCell>
+                        </TableRow>
+                     )}
+                  </TableBody>
+               </Table>
+               <TablePagination
+                  component="div"
+                  count={totalHistory}
+                  page={page}
+                  onPageChange={(_, p) => setPage(p)}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+                  sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', color: 'slategray' }}
+               />
+            </TableContainer>
+        </Box>
       )}
 
-      {/* 5. Footer Metadata */}
+      {/* 7. Terminal Metadata Footer */}
       <Box sx={{ mt: 10, p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
          <Stack direction="row" spacing={3} alignItems="flex-start">
             <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 1 }}>
@@ -212,7 +332,8 @@ export default function EquitySignals() {
                <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>FORENSIC SIGNAL PROTOCOL</Typography>
                <Typography variant="caption" sx={{ color: 'slategray', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
                   Authoritative signals are derived from institutional order flow and Strategy V2.2 breakout logic.
-                  Latest sync confirmed at {latestUpdate} IST.
+                  All historical outcomes are verified against NSE Spot closing nodes.
+                  Last sync confirmed at {latestUpdate} IST.
                </Typography>
             </Box>
          </Stack>
@@ -221,11 +342,47 @@ export default function EquitySignals() {
   );
 }
 
+function ModeButton({ active, children, onClick }: any) {
+    return (
+        <Button
+            onClick={onClick}
+            sx={{
+                px: 3, py: 1,
+                borderRadius: 0.5,
+                bgcolor: active ? 'primary.main' : 'transparent',
+                color: active ? '#000' : 'slategray',
+                fontWeight: 950,
+                fontSize: '0.75rem',
+                border: active ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                '&:hover': { bgcolor: active ? 'primary.main' : 'rgba(255,255,255,0.03)' }
+            }}
+        >
+            {children}
+        </Button>
+    );
+}
+
 function SummaryStat({ label, value, color }: any) {
     return (
         <Paper sx={{ p: 2, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.03)' }}>
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
         </Paper>
+    );
+}
+
+function OutcomeBadge({ outcome }: { outcome: string }) {
+    let color = 'slategray';
+    let icon = <Clock size={12} />;
+
+    if (outcome === 'TARGET_HIT') { color = '#10b981'; icon = <CheckCircle size={12} />; }
+    if (outcome === 'STOP_LOSS' || outcome === 'STOP_HIT') { color = '#ef4444'; icon = <XCircle size={12} />; }
+    if (outcome === 'EXPIRED') { color = 'orange'; icon = <AlertCircle size={12} />; }
+
+    return (
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ color, fontWeight: 900, fontSize: '0.65rem' }}>
+            {icon}
+            <Typography variant="caption" sx={{ fontWeight: 950, fontSize: '0.65rem' }}>{outcome?.replace(/_/g, ' ')}</Typography>
+        </Stack>
     );
 }

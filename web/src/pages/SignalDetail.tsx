@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Chip, Divider, Skeleton, alpha } from '@mui/material';
 import { useParams, useLocation } from 'react-router-dom';
 import { getEquitySignalDetail } from '../api/client';
+import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 
 export default function SignalDetail() {
   const { id } = useParams();
@@ -12,11 +13,11 @@ export default function SignalDetail() {
   useEffect(() => {
     if (id) {
        if (location.state?.signal) {
-           setSignal(location.state.signal);
+           setSignal(mapCanonicalSignal(location.state.signal));
            setLoading(false);
        } else {
            getEquitySignalDetail(id).then(data => {
-             setSignal(data);
+             setSignal(mapCanonicalSignal(data));
              setLoading(false);
            }).catch(() => setLoading(false));
        }
@@ -56,12 +57,17 @@ export default function SignalDetail() {
                )}
             </Stack>
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
-               {signal.direction} {signal.timeframe} SIGNAL • STRATEGY {signal.strategy_version}
+               {signal.direction} {signal.decision.timeframe} SIGNAL • STRATEGY {signal.strategy_version}
             </Typography>
          </Box>
          <Box sx={{ textAlign: 'right' }}>
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>SIGNAL ID</Typography>
             <Typography variant="body2" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono' }}>{signal.id}</Typography>
+            <Chip
+                label={signal.decision.qualityClass}
+                size="small"
+                sx={{ mt: 1, fontWeight: 900, fontSize: '0.6rem' }}
+            />
          </Box>
       </Box>
 
@@ -71,20 +77,20 @@ export default function SignalDetail() {
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>TRADE PLAN</Typography>
                <Grid container spacing={4}>
-                  <PlanItem label="ENTRY PRICE" value={`₹${signal.entry_price?.toLocaleString()}`} />
-                  <PlanItem label="PRIMARY TARGET" value={`₹${signal.target_price?.toLocaleString()}`} color="#10b981" />
-                  <PlanItem label="STOP LOSS" value={`₹${signal.stop_price?.toLocaleString()}`} color="#ef4444" />
-                  <PlanItem label="RISK/REWARD" value={`1:${signal.risk_reward_ratio?.toFixed(1) || '1.0'}`} color="primary.main" />
+                  <PlanItem label="ENTRY PRICE" value={`₹${signal.decision.entry?.toLocaleString()}`} />
+                  <PlanItem label="PRIMARY TARGET" value={`₹${signal.decision.target?.toLocaleString()}`} color="#10b981" />
+                  <PlanItem label="STOP LOSS" value={`₹${signal.decision.stopLoss?.toLocaleString()}`} color="#ef4444" />
+                  <PlanItem label="RISK/REWARD" value={signal.decision.riskReward} color="primary.main" />
                </Grid>
             </Paper>
 
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>FORENSIC EVIDENCE & PROBABILITY</Typography>
                <Grid container spacing={4}>
-                  <PlanItem label="MODEL PROBABILITY" value={`${((signal.calibrated_probability || 0) * 100).toFixed(1)}%`} color="primary.main" />
-                  <PlanItem label="EXPECTED VALUE" value={`${(signal.expected_value || 0).toFixed(2)}%`} color="#10b981" />
+                  <PlanItem label="MODEL PROBABILITY" value={`${signal.decision.conviction}%`} color="primary.main" />
+                  <PlanItem label="EXPECTED VALUE" value={`₹${(signal.decision.expectedValue || 0).toFixed(2)}`} color="#10b981" />
                   <PlanItem label="MARKET REGIME" value={signal.regime || 'SIDEWAYS'} />
-                  <PlanItem label="DATA FRESHNESS" value={signal.data_quality_status || 'UNKNOWN'} color={signal.data_quality_status === 'FRESH' ? "#10b981" : "orange"} />
+                  <PlanItem label="DATA STATUS" value={signal.decision.priceStatus} color={signal.decision.priceStatus === 'FRESH' ? "#10b981" : "orange"} />
                </Grid>
                <Divider sx={{ my: 4, opacity: 0.05 }} />
                <Box>
@@ -95,14 +101,14 @@ export default function SignalDetail() {
                </Box>
             </Paper>
 
-            {signal.outcome && (
+            {signal.decision.status !== 'ACTIVE' && signal.decision.status !== 'WAITING_FOR_ENTRY' && (
                <Paper sx={{ p: 4, bgcolor: alpha('#10b981', 0.02), border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>OUTCOME & P&L</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>OUTCOME FORENSICS</Typography>
                   <Grid container spacing={4}>
-                     <PlanItem label="EXIT PRICE" value={`₹${signal.exit_price?.toLocaleString()}`} />
-                     <PlanItem label="REALIZED RETURN" value={`${(signal.realized_return || 0).toFixed(2)}%`} color={(signal.realized_return || 0) >= 0 ? "#10b981" : "#ef4444"} />
-                     <PlanItem label="NET P&L" value={`₹${(signal.net_pnl || 0).toLocaleString()}`} color={(signal.net_pnl || 0) >= 0 ? "#10b981" : "#ef4444"} />
-                     <PlanItem label="HOLDING PERIOD" value={`${signal.holding_period_days || 0} Days`} />
+                     <PlanItem label="EXIT PRICE" value={signal.decision.exitPrice ? `₹${signal.decision.exitPrice.toLocaleString()}` : '—'} />
+                     <PlanItem label="REALIZED RETURN" value={`${(signal.decision.realizedReturn || 0).toFixed(2)}%`} color={(signal.decision.realizedReturn || 0) >= 0 ? "#10b981" : "#ef4444"} />
+                     <PlanItem label="NET P&L" value={signal.decision.netPnL ? `₹${signal.decision.netPnL.toLocaleString()}` : '—'} color={(signal.decision.netPnL || 0) >= 0 ? "#10b981" : "#ef4444"} />
+                     <PlanItem label="OUTCOME" value={signal.decision.status} />
                   </Grid>
                </Paper>
             )}
@@ -114,10 +120,10 @@ export default function SignalDetail() {
                <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>LIVE MARKET DATA</Typography>
                   <Stack spacing={2}>
-                     <TraceItem label="Current Price" value={`₹${(signal.current_price || 0).toLocaleString()}`} />
-                     <TraceItem label="Freshness" value={signal.current_price_status || 'LIVE'} color={signal.current_price_status === 'FRESH' ? "#10b981" : "slategray"} />
+                     <TraceItem label="Current Price" value={`₹${(signal.decision.normalizedCurrentPrice || 0).toLocaleString()}`} />
+                     <TraceItem label="Freshness" value={signal.decision.priceStatus} color={signal.decision.priceStatus === 'FRESH' ? "#10b981" : "slategray"} />
                      <TraceItem label="Price Source" value={signal.current_price_source || 'YFinance'} />
-                     <TraceItem label="Price Timestamp" value={new Date(signal.current_price_timestamp).toLocaleTimeString()} />
+                     <TraceItem label="Price Timestamp" value={signal.current_price_timestamp ? new Date(signal.current_price_timestamp).toLocaleTimeString() : '—'} />
                   </Stack>
                </Paper>
 

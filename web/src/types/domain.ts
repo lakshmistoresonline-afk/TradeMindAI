@@ -63,6 +63,15 @@ export interface AITradeDecision {
   underlyingPrice?: number;
   priceStatus?: string;
   qualityClass?: 'PRIMARY' | 'SELECTIVE' | 'EXPERIMENTAL' | 'UNCLASSIFIED';
+
+  // Historical Outcomes (Consolidated with Legacy mae/mfe)
+  exitPrice?: number;
+  exitReason?: string;
+  realizedReturn?: number;
+  netPnL?: number;
+  holdingPeriodDays?: number;
+  outcome?: string;
+  closedAt?: string;
 }
 
 export interface MarketSnapshot {

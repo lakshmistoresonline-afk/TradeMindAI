@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Grid, Paper, Stack, alpha, Divider } from '@mui/material';
+import { Box, Typography, Grid, Paper, Stack, alpha, Divider, Button } from '@mui/material';
 import { ShieldCheck } from 'lucide-react';
 import { getEquityAccuracy } from '../api/client';
+import { useNavigate } from 'react-router-dom';
 
 export default function Performance() {
   const [summary, setSummary] = useState<any>(null);
@@ -63,6 +64,7 @@ export default function Performance() {
 
 function HorizonSection({ title, stats, description, color }: any) {
    const hasData = stats && stats.sample_size > 0;
+   const navigate = useNavigate();
 
    return (
       <Box sx={{ mb: 8 }}>
@@ -81,6 +83,16 @@ function HorizonSection({ title, stats, description, color }: any) {
             <MetricBox label="LOG LOSS" value={hasData ? stats.logloss.toFixed(3) : '—'} />
             <MetricBox label="ECE" value={hasData ? stats.ece.toFixed(3) : '—'} />
          </Grid>
+         <Box sx={{ mt: 3, textAlign: 'right' }}>
+            <Button
+                variant="text"
+                size="small"
+                onClick={() => navigate('/signals')}
+                sx={{ color: 'primary.main', fontWeight: 900, fontSize: '0.7rem' }}
+            >
+                VIEW UNDERLYING SIGNAL HISTORY →
+            </Button>
+         </Box>
          {!hasData && (
             <Typography variant="caption" sx={{ color: 'slategray', mt: 2, display: 'block', fontStyle: 'italic' }}>
                NO CURRENTLY QUALIFIED PRODUCTION SIGNALS

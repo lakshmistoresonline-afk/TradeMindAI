@@ -1,15 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Button, Skeleton, Divider, alpha, Collapse, Chip } from '@mui/material';
 import { TrendingUp, ShieldCheck, Zap } from 'lucide-react';
-import {
-  getEquitySignals,
-  getEquityPerformance,
-  getEquityMarketState,
-  getMarketStats
-} from '../api/client';
-import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
+import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 import { useNavigate } from 'react-router-dom';
+import { getEquitySignals, getEquityPerformance, getEquityMarketState, getMarketStats, getEquityHistory } from '../api/client';
 
 export default function DashboardTerminal() {
   const navigate = useNavigate();
@@ -18,6 +13,7 @@ export default function DashboardTerminal() {
 
   const [marketStats, setMarketStats] = useState<any>(null);
   const [signals, setSignals] = useState<any[]>([]);
+  const [recentHistory, setRecentHistory] = useState<any[]>([]);
   const [performanceSummary, setPerformanceSummary] = useState<any>(null);
   const [marketState, setMarketState] = useState<any>(null);
 
@@ -28,23 +24,23 @@ export default function DashboardTerminal() {
         getEquitySignals({ limit: 100 }),
         getEquityPerformance(),
         getEquityMarketState(),
-        getMarketStats()
+        getMarketStats(),
+        getEquityHistory({ limit: 5 })
       ]);
 
       const signalsData = results[0].status === 'fulfilled' ? (results[0].value || []) : [];
       const perfData = results[1].status === 'fulfilled' ? results[1].value : null;
       const marketData = results[2].status === 'fulfilled' ? results[2].value : null;
       const statsData = results[3].status === 'fulfilled' ? results[3].value : null;
+      const historyData = results[4].status === 'fulfilled' ? results[4].value : null;
 
       setMarketStats(statsData);
       setPerformanceSummary(perfData);
       setMarketState(marketData);
+      setRecentHistory((historyData?.records || []).map((r: any) => mapCanonicalSignal(r)));
 
       const normalized = (Array.isArray(signalsData) ? signalsData : [])
-        .map((s: any) => ({
-          ...s,
-          decision: normalizeAITradeDecision(s)
-        }));
+        .map((s: any) => mapCanonicalSignal(s));
 
       setSignals(normalized);
     } catch (e) {
@@ -217,6 +213,38 @@ export default function DashboardTerminal() {
                         <Chip label="FRESH" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 950, bgcolor: alpha('#10b981', 0.1), color: '#10b981' }} />
                         <Typography variant="caption" sx={{ color: 'slategray', ml: 1.5, fontWeight: 700 }}>NSE STREAM ACTIVE</Typography>
                      </Box>
+                  </Paper>
+               </Box>
+
+               {/* RECENT SIGNAL ACTIVITY */}
+               <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>RECENT SIGNAL ACTIVITY</Typography>
+                  <Paper sx={{ p: 2, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                     {recentHistory.length > 0 ? (
+                        <Stack spacing={2}>
+                           {recentHistory.map((s) => (
+                              <Box key={s.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                 <Box>
+                                    <Typography variant="caption" sx={{ fontWeight: 900, color: '#fff' }}>{s.symbol}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'slategray', display: 'block', fontSize: '0.5rem' }}>{s.decision.status}</Typography>
+                                 </Box>
+                                 <Typography variant="caption" sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444' }}>
+                                    {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(1)}%` : '—'}
+                                 </Typography>
+                              </Box>
+                           ))}
+                           <Button
+                              fullWidth
+                              size="small"
+                              onClick={() => navigate('/signals')}
+                              sx={{ mt: 1, fontSize: '0.6rem', fontWeight: 900, color: 'primary.main' }}
+                           >
+                              VIEW FULL HISTORY →
+                           </Button>
+                        </Stack>
+                     ) : (
+                        <Typography variant="caption" sx={{ color: 'slategray', display: 'block', py: 2, textAlign: 'center' }}>NO RECENT CLOSED CALLS</Typography>
+                     )}
                   </Paper>
                </Box>
 

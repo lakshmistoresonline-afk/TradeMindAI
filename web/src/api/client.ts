@@ -59,6 +59,11 @@ export const getEquityMarketState = async () => {
   return response.data;
 };
 
+export const getEquityHistory = async (params: any = {}) => {
+  const response = await apiClient.get('/equity/history', { params });
+  return response.data;
+};
+
 // --- OBSOLETE / DEPRECATED ENDPOINTS (Satisfying legacy components) ---
 export const getStockNews = async (..._args: any[]) => ([]);
 export const getStockTimeline = async (..._args: any[]) => ([]);

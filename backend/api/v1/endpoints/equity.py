@@ -147,6 +147,63 @@ async def get_market_state():
         "universe": "NIFTY-200"
     }
 
+@router.get("/history")
+async def get_equity_history(
+    symbol: Optional[str] = None,
+    horizon: Optional[str] = None,
+    quality: Optional[str] = None,
+    status: Optional[str] = None,
+    page: int = 1,
+    limit: int = 50
+):
+    """
+    GET /api/v1/equity/history
+    Returns historical signal records from the shadow_signals ledger.
+    """
+    from backend.core.postgres import SessionLocal, ShadowSignalDB
+    with SessionLocal() as session:
+        query = session.query(ShadowSignalDB)
+
+        # Apply Filters
+        if symbol and symbol != "ALL":
+            query = query.filter(ShadowSignalDB.symbol == symbol)
+        if horizon and horizon != "ALL":
+            # Map Horizon to signal_type if necessary
+            query = query.filter(ShadowSignalDB.signal_type == horizon)
+        if quality and quality != "ALL":
+            query = query.filter(ShadowSignalDB.quality_class == quality)
+        if status and status != "ALL":
+            query = query.filter(ShadowSignalDB.status == status)
+        else:
+            # Default: show only terminal/closed signals in history
+            query = query.filter(ShadowSignalDB.status != "ACTIVE")
+
+        total = query.count()
+        db_signals = query.order_by(ShadowSignalDB.timestamp.desc()).offset((page-1)*limit).limit(limit).all()
+
+        results = []
+        for s in db_signals:
+            # Map DB to Dict
+            data = {c.name: getattr(s, c.name) for c in s.__table__.columns}
+            # Normalize timestamps
+            for k, v in data.items():
+                if isinstance(v, datetime.datetime):
+                    data[k] = v.isoformat()
+
+            # Canonical Mapping for Frontend Compatibility
+            data["timeframe"] = data.get("signal_type") or data.get("timeframe") or "SWING"
+            data["direction"] = data.get("signal_rating") or data.get("direction")
+            data["quality_class"] = data.get("quality_class") or ("PRIMARY" if data["timeframe"] == "SWING" else "EXPERIMENTAL")
+
+            results.append(data)
+
+        return {
+            "records": results,
+            "total": total,
+            "page": page,
+            "limit": limit
+        }
+
 @router.get("/verify-freeze")
 async def verify_v22_freeze():
     from backend.services.freeze_verification_service import V22FreezeVerificationService
