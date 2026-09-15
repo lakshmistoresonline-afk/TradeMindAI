@@ -98,17 +98,17 @@ export default function DashboardTerminal() {
                         <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>High-Frequency Research</Typography>
                     </Box>
                     <Box sx={{ ml: 'auto', textAlign: 'right' }}>
-                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STATUS: PRODUCTION HARDENED</Typography>
-                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>SHADOW SIGNAL MODE</Typography>
+                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
+                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>QUALITY: V2.3 (HARDENED)</Typography>
                     </Box>
                  </Stack>
               </Paper>
            </Grid>
            <Grid item xs={12} md={4}>
               <Paper sx={{ p: 3, height: '100%', bgcolor: alpha('#00D1FF', 0.03), border: '1px solid rgba(0, 209, 255, 0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>TRADING EXECUTION</Typography>
-                 <Typography variant="h4" sx={{ fontWeight: 950, color: '#ef4444' }}>LOCKED</Typography>
-                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1 }}>BROKER CONNECTIVITY: DISABLED</Typography>
+                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>SHADOW SIGNAL MODE</Typography>
+                 <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>ACTIVE</Typography>
+                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1 }}>REAL TRADING: DISABLED</Typography>
               </Paper>
            </Grid>
         </Grid>
