@@ -43,9 +43,20 @@ export default function SignalDetail() {
             <Stack direction="row" spacing={2} alignItems="center">
                <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -1 }}>{signal.symbol}</Typography>
                <Chip label={signal.status} color="primary" sx={{ fontWeight: 900, height: 24, borderRadius: 0.5 }} />
+               {signal.quality_class && (
+                  <Chip
+                    label={signal.quality_class}
+                    variant="outlined"
+                    sx={{
+                      fontWeight: 950, height: 24, borderRadius: 0.5,
+                      borderColor: signal.quality_class === 'PRIMARY' ? '#10b981' : signal.quality_class === 'SELECTIVE' ? '#00D1FF' : 'slategray',
+                      color: signal.quality_class === 'PRIMARY' ? '#10b981' : signal.quality_class === 'SELECTIVE' ? '#00D1FF' : 'slategray'
+                    }}
+                  />
+               )}
             </Stack>
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
-               {signal.direction} SIGNAL • STRATEGY {signal.strategy_version}
+               {signal.direction} {signal.timeframe} SIGNAL • STRATEGY {signal.strategy_version}
             </Typography>
          </Box>
          <Box sx={{ textAlign: 'right' }}>
@@ -68,17 +79,20 @@ export default function SignalDetail() {
             </Paper>
 
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-               <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>AI INTELLIGENCE & EVIDENCE</Typography>
+               <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4, letterSpacing: 1 }}>FORENSIC EVIDENCE & PROBABILITY</Typography>
                <Grid container spacing={4}>
-                  <PlanItem label="CALIBRATED PROB" value={`${((signal.calibrated_probability || 0) * 100).toFixed(1)}%`} color="primary.main" />
-                  <PlanItem label="EXPECTED VALUE" value={`₹${(signal.expected_value || 0).toFixed(2)}`} color="#10b981" />
+                  <PlanItem label="MODEL PROBABILITY" value={`${((signal.calibrated_probability || 0) * 100).toFixed(1)}%`} color="primary.main" />
+                  <PlanItem label="EXPECTED VALUE" value={`${(signal.expected_value || 0).toFixed(2)}%`} color="#10b981" />
                   <PlanItem label="MARKET REGIME" value={signal.regime || 'SIDEWAYS'} />
-                  <PlanItem label="DATA QUALITY" value={signal.data_quality_status || 'UNKNOWN'} color={signal.data_quality_status === 'FRESH' ? "#10b981" : "orange"} />
+                  <PlanItem label="DATA FRESHNESS" value={signal.data_quality_status || 'UNKNOWN'} color={signal.data_quality_status === 'FRESH' ? "#10b981" : "orange"} />
                </Grid>
                <Divider sx={{ my: 4, opacity: 0.05 }} />
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, lineHeight: 1.6, display: 'block' }}>
-                  {signal.provenance?.evidence || "Forensic evidence generated at signal time. Strategy V2.2 deterministic logic applied."}
-               </Typography>
+               <Box>
+                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>WHY THIS SIGNAL EXISTS</Typography>
+                  <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700, lineHeight: 1.6 }}>
+                     {signal.provenance?.evidence || "Signal identified via V2.2 structural breakout logic combined with V2.3 ML classification. Forensic validation of institutional order flow confirmed at decision timestamp."}
+                  </Typography>
+               </Box>
             </Paper>
 
             {signal.outcome && (
@@ -108,24 +122,14 @@ export default function SignalDetail() {
                </Paper>
 
                <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>SIGNAL LINEAGE</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>SIGNAL METADATA</Typography>
                   <Stack spacing={2}>
-                     <TraceItem label="Prediction ID" value={signal.prediction_id || 'N/A'} small />
-                     <TraceItem label="Model ID" value={signal.model_id || 'N/A'} small />
-                     <TraceItem label="Feature Snapshot" value={signal.feature_snapshot_id || 'N/A'} small />
-                     <TraceItem label="Provenance ID" value={signal.provenance_id || 'N/A'} small />
-                     <Divider sx={{ my: 1, opacity: 0.05 }} />
-                     <TraceItem label="Signal Version" value={signal.signal_version} />
+                     <TraceItem label="Signal ID" value={signal.id} small />
                      <TraceItem label="Model Version" value={signal.model_version} />
-                  </Stack>
-               </Paper>
-
-               <Paper sx={{ p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3 }}>TIMING</Typography>
-                  <Stack spacing={2}>
-                     <TraceItem label="Decision Time" value={new Date(signal.decision_timestamp).toLocaleString()} small />
-                     <TraceItem label="Data Time" value={new Date(signal.data_timestamp).toLocaleString()} small />
-                     <TraceItem label="Created Time" value={new Date(signal.timestamp).toLocaleString()} small />
+                     <TraceItem label="Strategy" value="FROZEN V2.2" />
+                     <Divider sx={{ my: 1, opacity: 0.05 }} />
+                     <TraceItem label="Created At" value={new Date(signal.timestamp).toLocaleString()} small />
+                     <TraceItem label="Data Timestamp" value={new Date(signal.data_timestamp).toLocaleString()} small />
                   </Stack>
                </Paper>
             </Stack>

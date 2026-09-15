@@ -9,6 +9,7 @@ class RiskEngine:
         price: float,
         direction: str,
         atr: float,
+        horizon: str = "SWING",
         risk_per_trade: float = 0.02, # 2% of capital
         capital: float = 1000000.0    # 10 Lakhs baseline
     ) -> Dict[str, Any]:
@@ -18,10 +19,18 @@ class RiskEngine:
         if price <= 0 or atr <= 0:
             return {}
 
-        # 1. Stop Loss (2.0x ATR multiplier for Swing)
-        stop_mult = 2.0
+        # 1. Horizon-Specific Multipliers
+        horizon_configs = {
+            "SHORT": {"stop_mult": 1.5, "rr": 2.0},
+            "SWING": {"stop_mult": 2.0, "rr": 2.5},
+            "LONG": {"stop_mult": 3.0, "rr": 3.0}
+        }
+        config = horizon_configs.get(horizon, horizon_configs["SWING"])
+
+        stop_mult = config["stop_mult"]
+        rr_ratio = config["rr"]
+
         risk_amt = atr * stop_mult
-        rr_ratio = settings.DEFAULT_RISK_REWARD
 
         if direction == "LONG":
             stop_loss = price - risk_amt

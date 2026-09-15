@@ -79,73 +79,75 @@ class FeatureStoreService:
     def extract_institutional_features(self, df_ta: Any, smc_data: Dict[str, Any], timestamp: Optional[datetime] = None) -> Dict[str, Any]:
         """
         Canonical Time-Safe Feature Engineering.
-        If timestamp is provided, ensures no data > timestamp is used.
+        Vision 2.2 Hardening: Removed accuracy-damaging constant fallbacks.
         """
         if df_ta is None or df_ta.empty:
             return {}
 
         import pandas as pd
         import math
+        import numpy as np
 
         # 1. TIME-SAFE SLICING
         if timestamp:
-            # Ensure index is datetime and sorted
             df_ta = df_ta[df_ta.index <= timestamp]
             if df_ta.empty: return {}
 
         last_row = df_ta.iloc[-1]
         data_ts = df_ta.index[-1]
 
-        if timestamp and data_ts > timestamp:
-            raise ValueError(f"CRITICAL: Look-ahead detected. Data timestamp {data_ts} > Target timestamp {timestamp}")
-
-        # Resilient value extractor
-        def get_val(key, default=0.0):
+        # Resilient value extractor (returns NaN instead of 0.0 for missing data)
+        def get_val(key):
             # Try exact, then capitalized, then uppercase
-            val = last_row.get(key)
-            if val is None: val = last_row.get(key.capitalize())
-            if val is None: val = last_row.get(key.upper())
+            for k in [key, key.capitalize(), key.upper()]:
+                if k in last_row:
+                    val = last_row.get(k)
+                    if val is not None and not (isinstance(val, float) and math.isnan(val)):
+                        return float(val)
+            return np.nan
 
-            if val is None or (isinstance(val, float) and math.isnan(val)):
-                return default
-            return val
-
-        ema20 = get_val("EMA_20")
-        ema50 = get_val("EMA_50")
-        ema200 = get_val("EMA_200")
-        sma20 = get_val("SMA_20", ema20)
         close = get_val("Close")
-        bbl = get_val("BBL", get_val("BBL_5_2.0", close * 0.95))
-        bbu = get_val("BBU", get_val("BBU_5_2.0", close * 1.05))
 
-        # Series access for rolling stats
-        atr_col = "ATR" if "ATR" in df_ta.columns else "Atr" if "Atr" in df_ta.columns else "atr"
-        atr_series = df_ta[atr_col] if atr_col in df_ta.columns else pd.Series(close * 0.02, index=df_ta.index)
-
+        # Core Technical Features
         features = {
-            "Close": float(close),
-            "ATR": float(get_val("ATR", close * 0.02)),
-            # Core Technical
-            "trend_ema_cross": float(ema20 > ema50) if (ema20 and ema50) else 0.5,
-            "ema_200": float(ema200) if ema200 else close,
-            "sma_20": float(sma20),
-            "momentum_rsi": float(get_val("RSI", 50.0) / 100.0),
-            "volatility_bb": float((close - bbl) / (bbu - bbl + 1e-9)),
-            "volume_relative": float(get_val("Volume") / df_ta["Volume"].tail(20).mean()) if "Volume" in df_ta.columns and df_ta["Volume"].tail(20).mean() != 0 else 1.0,
-
-            # SMC Logic (Refined for P1: Detection of RECENT events)
-            "smc_bullish_ob": float(any(ob["type"] == "bullish" and ob.get("index", 0) >= (len(df_ta) - 2) for ob in smc_data.get("order_blocks", []))),
-            "smc_bearish_ob": float(any(ob["type"] == "bearish" and ob.get("index", 0) >= (len(df_ta) - 2) for ob in smc_data.get("order_blocks", []))),
-
-            # ICT Concepts
-            "ict_liquidity_void": float(last_row.get("High", 0) < df_ta["Low"].iloc[-2]) or float(last_row.get("Low", 0) > df_ta["High"].iloc[-2]) if len(df_ta) > 2 else 0.0,
-
-            # Market Regime (P1 Upgrade)
-            "market_volatility_z": float((get_val("ATR") - atr_series.tail(50).mean()) / (atr_series.tail(50).std() + 1e-9)),
-
-            # Contextual Data (Categorical converted to numeric)
-            "market_cap_class": 3.0 if last_row.get("market_cap", 0) > 2e11 else 2.0 if last_row.get("market_cap", 0) > 5e9 else 1.0,
+            "Close": close,
+            "High": get_val("High"),
+            "Low": get_val("Low"),
+            "ATR": get_val("ATR"),
+            "natr": get_val("natr"),
+            "ema_20": get_val("ema_20"),
+            "ema_50": get_val("ema_50"),
+            "ema_100": get_val("ema_100"),
+            "ema_200": get_val("ema_200"),
+            "ema_20_slope": get_val("ema_20_slope"),
+            "ema_200_slope": get_val("ema_200_slope"),
+            "sma_20": get_val("sma_20"),
+            "momentum_rsi": get_val("momentum_rsi"),
+            "momentum_roc": get_val("momentum_roc"),
+            "macd": get_val("macd"),
+            "macd_hist": get_val("macd_hist"),
+            "stoch_k": get_val("stoch_k"),
+            "momentum_cci": get_val("momentum_cci"),
+            "adx": get_val("adx"),
+            "dmp": get_val("dmp"),
+            "dmn": get_val("dmn"),
+            "volatility_bb_width": get_val("volatility_bb_width"),
+            "volatility_bb_pct": get_val("volatility_bb_pct"),
+            "hist_vol": get_val("hist_vol"),
+            "volume_relative": get_val("volume_relative"),
+            "obv": get_val("obv"),
+            "mfi": get_val("mfi"),
+            "trend_ema_cross": get_val("trend_ema_cross"),
+            "market_volatility_z": get_val("market_volatility_z"),
+            "market_cap_class": get_val("market_cap_class"),
         }
+
+        # Derived distance features
+        if not math.isnan(close):
+            if not math.isnan(features["ema_200"]):
+                features["dist_ema_200"] = (close - features["ema_200"]) / features["ema_200"]
+            if not math.isnan(features["sma_20"]):
+                features["dist_sma_20"] = (close - features["sma_20"]) / features["sma_20"]
 
         return features
 
@@ -153,15 +155,9 @@ class FeatureStoreService:
         """
         Vision 2.0: AI Similarity Engine.
         Finds historical periods with similar feature vectors.
+        [FORENSIC_UPDATE]: Hardcoded patterns removed. Implementation pending valid similarity engine.
         """
-        # 1. Fetch current vector
-        # 2. Fetch historical vectors from repository
-        # 3. Calculate cosine similarity (Simplified for now)
-        return [
-            {"date": "Oct 2022", "symbol": symbol, "similarity": 94, "outcome": "+12.5%", "context": "Post-earnings consolidation."},
-            {"date": "Jan 2024", "symbol": "TCS", "similarity": 82, "outcome": "+8.2%", "context": "Sector accumulation phase."},
-            {"date": "May 2021", "symbol": symbol, "similarity": 78, "outcome": "-4.1%", "context": "Overextended momentum."}
-        ]
+        return []
 
     async def update_features(self, symbol: str):
         """
@@ -191,25 +187,6 @@ class FeatureStoreService:
         # 3. Calculate Technical Indicators
         df_ta = TechnicalAnalysis.calculate_indicators(df)
         print(f"      [DEBUG] {symbol} Indicators calculated. Tail Close: {df_ta['Close'].iloc[-1]}")
-
-        # 5. Optimized: Just ingest the last row for now (Production Refresh)
-        last_row_features = self.extract_institutional_features(df_ta, smc_data={}, timestamp=df_ta.index[-1])
-
-        await self.ingest_features(symbol, df_ta.index[-1], last_row_features)
-
-        # 2. Convert to DataFrame
-        df = pd.DataFrame([p.model_dump() for p in recent_prices])
-        df['date'] = pd.to_datetime(df['date'])
-        df.set_index('date', inplace=True)
-
-        # 3. Calculate Technical Indicators
-        df_ta = TechnicalAnalysis.calculate_indicators(df)
-
-        # 4. Extract Model Features (Time-Safe)
-        for ts, row in df_ta.iterrows():
-            # In production we usually only need to ingest the latest missing ones
-            # For quick ingest, we'll just do the last few
-            pass
 
         # 5. Optimized: Just ingest the last row for now (Production Refresh)
         last_row_features = self.extract_institutional_features(df_ta, smc_data={}, timestamp=df_ta.index[-1])

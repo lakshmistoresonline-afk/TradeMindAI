@@ -137,7 +137,7 @@ class IDataPlatformRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_champion_model(self, symbol: str) -> Optional[ModelMetadata]:
+    async def get_champion_model(self, symbol: str, horizon: str = "SWING") -> Optional[ModelMetadata]:
         pass
 
     @abstractmethod
@@ -153,7 +153,7 @@ class IDataPlatformRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
+    async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime, horizon: str = "SWING") -> List[FeatureVector]:
         pass
 
     @abstractmethod

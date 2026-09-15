@@ -133,6 +133,7 @@ class LiveSignal(BaseModel):
     realized_mfe: Optional[float] = None
 
     # Quality
+    quality_class: str = "EXPERIMENTAL" # PRIMARY, SELECTIVE, EXPERIMENTAL
     current_price_status: Optional[str] = None
     current_price_source: Optional[str] = None
     current_price_timestamp: Optional[datetime] = None

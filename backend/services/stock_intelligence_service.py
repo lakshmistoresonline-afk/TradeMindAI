@@ -34,11 +34,11 @@ class StockIntelligenceService:
             "volatility_score": round(features.get("ATR", 0.0) / price, 4) if price > 0 else 0.0,
             "rs_rating": features.get("rs_rating", 0.0),
             "technical_structure": json.dumps(structure),
-            "fundamental_score": 0.5, # Placeholder
-            "institutional_pressure": 0.0, # Placeholder
+            "fundamental_score": None, # DATA_UNAVAILABLE
+            "institutional_pressure": None,
             "market_regime": regime,
-            "sector_regime": "NEUTRAL", # Placeholder
-            "composite_intelligence_score": 0.5,
+            "sector_regime": None,
+            "composite_intelligence_score": None,
             "last_updated": datetime.datetime.utcnow()
         }
 

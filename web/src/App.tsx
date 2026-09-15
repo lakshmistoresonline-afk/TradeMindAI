@@ -1,18 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
+// V2.3.1_DEPLOY_SYNC_20260915
 import DashboardTerminal from './pages/DashboardTerminal'
-import EquityScanner from './pages/EquityScanner'
 import EquitySignals from './pages/EquitySignals'
-import SignalHistory from './pages/SignalHistory'
 import SignalDetail from './pages/SignalDetail'
-import MarketOverview from './pages/MarketOverview'
-import Accuracy from './pages/Accuracy'
-import Research from './pages/Research'
+import Performance from './pages/Performance'
 import SystemStatus from './pages/SystemStatus'
-import Methodology from './pages/Methodology'
 import Login from './pages/Login'
-import Settings from './pages/Settings'
 
 const darkTheme = createTheme({
   palette: {
@@ -77,25 +72,18 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<DashboardTerminal />} />
-                <Route path="/scanner" element={<EquityScanner />} />
 
-                <Route path="/signals" element={<Navigate to="/signals/active" replace />} />
-                <Route path="/signals/active" element={<EquitySignals />} />
-                <Route path="/signals/history" element={<SignalHistory />} />
+                <Route path="/signals" element={<EquitySignals />} />
                 <Route path="/signals/:id" element={<SignalDetail />} />
 
-                <Route path="/watchlist" element={<Navigate to="/scanner" replace />} />
-
-                <Route path="/market" element={<Navigate to="/market/overview" replace />} />
-                <Route path="/market/overview" element={<MarketOverview />} />
-
-                <Route path="/accuracy" element={<Accuracy />} />
-                <Route path="/research" element={<Research />} />
-
+                <Route path="/performance" element={<Performance />} />
                 <Route path="/status" element={<SystemStatus />} />
-                <Route path="/methodology" element={<Methodology />} />
 
-                <Route path="/settings" element={<Settings />} />
+                {/* Compatibility redirects */}
+                <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
+
+                {/* Fallback to Dashboard */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>
           } />

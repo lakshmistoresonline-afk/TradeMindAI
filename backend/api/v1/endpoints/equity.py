@@ -97,21 +97,33 @@ async def get_equity_research_runs():
 async def get_equity_accuracy():
     """
     GET /api/v1/equity/accuracy
-    Returns comprehensive accuracy forensics.
+    Returns comprehensive accuracy forensics including multi-horizon OOS metrics.
     """
-    perf = await get_equity_performance()
+    champions = await container.data_platform_repo.get_all_champion_models()
+
+    horizons_report = {}
+    for h in ["SHORT", "SWING", "LONG"]:
+        h_models = [m for m in champions if m.horizon == h]
+        if not h_models:
+            horizons_report[h] = {"sample_size": 0, "auc": 0, "win_rate": 0, "brier": 0}
+            continue
+
+        horizons_report[h] = {
+            "sample_size": len(h_models),
+            "auc": sum(m.roc_auc for m in h_models) / len(h_models),
+            "win_rate": sum(m.accuracy for m in h_models) * 100 / len(h_models),
+            "brier": sum(m.brier_score for m in h_models) / len(h_models),
+            "logloss": sum((m.calibration_metadata or {}).get("log_loss_calibrated", 0.69) for m in h_models) / len(h_models),
+            "ece": sum((m.calibration_metadata or {}).get("ece", 0.0) for m in h_models) / len(h_models)
+        }
+
     return {
+        "horizons": horizons_report,
         "verified_benchmark": {
             "n": 50,
             "win_rate": 58.0,
             "profit_factor": 2.72,
             "net_pnl": 126.75
-        },
-        "historical_replay": {
-            "n": perf.get("sample_size", 0),
-            "win_rate": perf.get("win_rate", 0),
-            "net_pnl": perf.get("net_pnl", 0),
-            "brier_score": perf.get("brier_score", 0)
         }
     }
 

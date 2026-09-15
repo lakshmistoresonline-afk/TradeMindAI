@@ -33,6 +33,7 @@ class DuckDBEngine:
             existing_df = existing_df.loc[:, ~existing_df.columns.duplicated()].copy()
 
             combined_df = pd.concat([existing_df, df]).drop_duplicates(subset=['date'], keep='last')
+            combined_df = combined_df.sort_values('date')
             combined_df.to_parquet(file_path, index=False)
         else:
             df.to_parquet(file_path, index=False)

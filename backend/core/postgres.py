@@ -298,6 +298,7 @@ class LiveSignalDB(Base):
     transaction_cost = Column(Float)
     slippage = Column(Float)
     net_pnl = Column(Float)
+    quality_class = Column(String) # PRIMARY, SELECTIVE, EXPERIMENTAL
     realized_mae = Column(Float)
     realized_mfe = Column(Float)
     holding_period_days = Column(Float)
@@ -398,6 +399,7 @@ class ShadowSignalDB(Base):
     pnl_percentage = Column(Float)
     fees = Column(Float)
     net_pnl = Column(Float)
+    quality_class = Column(String) # PRIMARY, SELECTIVE, EXPERIMENTAL
     prediction_id = Column(String, index=True)
     provenance_id = Column(String, index=True)
     run_id = Column(String, index=True)
@@ -616,6 +618,7 @@ class ModelMetadataDB(Base):
     name = Column(String, primary_key=True)
     symbol = Column(String, index=True)
     version = Column(String)
+    horizon = Column(String, index=True, default="SWING") # Phase 11 Extension
     type = Column(String)
     status = Column(String, default="CANDIDATE")
     accuracy = Column(Float)

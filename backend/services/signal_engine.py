@@ -7,6 +7,7 @@ from backend.domain.models.ios import LiveSignal, SignalEvent
 from backend.services.regime_engine import MarketRegimeEngine
 from backend.services.risk_engine import RiskEngine
 from backend.services.calibration_service import CalibrationService
+from backend.services.signal_quality_service import SignalQualityService
 from backend.core.container import container
 from backend.domain.models.data_platform import ModelMetadata
 
@@ -34,7 +35,8 @@ class SignalEngine:
         # 1. Fetch Fresh Data (if not provided)
         if stock is None:
             stock = await container.repository.get_stock_by_symbol(symbol)
-        if not stock: return None
+        if not stock:
+            return None
 
         # 2. Extract Features (Time-Safe) (if not provided)
         if features_list is None:
@@ -43,26 +45,27 @@ class SignalEngine:
                 eval_time - datetime.timedelta(days=7),
                 eval_time
             )
-        if not features_list: return None
+        if not features_list:
+            return None
         last_features = features_list[-1].features
 
-        # 3. Model Inference (Champion Model)
+        # 3. Model Inference (Champion Model specialized for timeframe/horizon)
         ml_res = await container.ml_service.predict_with_champion(
             symbol,
             last_features,
+            horizon=timeframe, # 'timeframe' param in V2.2 maps to 'horizon'
             champion=champion,
             save=save_prediction
         )
 
-        # 3.5 Extract Probabilities with Forensic Safety (Phase 11)
-        # Default to 0.5 only if model metadata is genuinely missing
+        # 3.5 Extract Probabilities with Forensic Safety
         ml_metadata = ml_res.get("metadata", {})
-        prob_up = ml_metadata.get("calibrated_probability_up", 0.5)
-        raw_prob_up = ml_metadata.get("raw_probability_up", 0.5)
+        if "calibrated_probability_up" not in ml_metadata or "raw_probability_up" not in ml_metadata:
+            print(f"   [FORENSIC_FAIL] {symbol} Aborting: Missing ML metadata (Probabilities).")
+            return None
 
-        if "raw_probability_up" not in ml_metadata:
-            # Audit log for default fallback
-            print(f"   [AUDIT] {symbol} Probability fallback to 0.5. Source: missing_metadata")
+        prob_up = ml_metadata["calibrated_probability_up"]
+        raw_prob_up = ml_metadata["raw_probability_up"]
 
         # 4. Map to Direction Probability
         direction = "LONG" if ml_res.get("prediction") == "UP" else "SHORT"
@@ -78,14 +81,16 @@ class SignalEngine:
             print(f"   [!] {symbol} Invalid price: {price}")
             return None
 
-        atr = last_features.get("ATR") or last_features.get("Atr") or (price * 0.02)
-        if not math.isfinite(atr) or atr <= 0:
-            atr = price * 0.02
+        atr = last_features.get("ATR") or last_features.get("Atr")
+        if not atr or not math.isfinite(atr) or atr <= 0:
+            print(f"   [FORENSIC_FAIL] {symbol} Aborting: Missing/Invalid ATR data.")
+            return None
 
         risk_params = RiskEngine.calculate_trade_parameters(
             symbol, price,
             direction,
-            atr
+            atr,
+            horizon=timeframe
         )
 
         if not risk_params: return None
@@ -106,8 +111,12 @@ class SignalEngine:
 
         # 7. REGIME ANALYSIS
         regime_obj = await container.ios_repo.get_latest_regime()
-        regime_label = regime_obj.regime if regime_obj else "SIDEWAYS"
-        regime_prob = regime_obj.sentiment_score if regime_obj else 0.5
+        if not regime_obj:
+            print(f"   [FORENSIC_FAIL] {symbol} Aborting: Missing Market Regime context.")
+            return None
+
+        regime_label = regime_obj.regime
+        regime_prob = regime_obj.sentiment_score
 
         # 8. PRODUCTION RISK GATES
         rejection_reason = None
@@ -117,9 +126,9 @@ class SignalEngine:
         if current_dd is None:
             current_dd = 0.0
 
-        # B. Data Freshness Gate (Max 24h)
+        # B. Data Freshness Gate (Max 120h to account for full weekends/holidays/delayed feeds)
         last_feature_date = features_list[-1].date
-        if (eval_time - last_feature_date).total_seconds() > 86400:
+        if (eval_time - last_feature_date).total_seconds() > 432000:
             rejection_reason = "STALE_MARKET_DATA"
 
         # C. Liquidity Gate (Min 10M Avg Volume)
@@ -150,6 +159,14 @@ class SignalEngine:
             print(f"   [NO_TRADE] {symbol} rejected: {rejection_reason} (Prob: {calibrated_prob:.4f}, EV: {expected_val:.4f})")
             return None
 
+        # 8.5 QUALITY GATE
+        champion_model = champion or await container.data_platform_repo.get_champion_model(symbol, horizon=timeframe)
+        if not SignalQualityService.should_publish(timeframe, champion_model, calibrated_prob):
+            print(f"   [QUALITY_GATE] {symbol} ({timeframe}) failed hard gate. (AUC={champion_model.roc_auc if champion_model else 'N/A'})")
+            return None
+
+        quality_class = SignalQualityService.get_quality_class(timeframe, champion_model)
+
         # 9. DATA QUALITY SCORE
         data_ts = features_list[-1].date
         staleness = (eval_time - data_ts).total_seconds() / 3600.0 # hours
@@ -167,7 +184,7 @@ class SignalEngine:
             eligibility = "DATA_BLOCKED"
 
         # 11. Construct Canonical Signal
-        sig_id = f"sig_{symbol}_{eval_time.strftime('%Y%m%d%H%M')}"
+        sig_id = f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}"
 
         # Identity Metadata
         instrument_id = stock.instrument_id if hasattr(stock, 'instrument_id') else f"NSE_{symbol}"
@@ -314,6 +331,7 @@ class SignalEngine:
             updated_at=datetime.datetime.utcnow(),
 
             # Quality
+            quality_class=quality_class,
             data_quality_status="FRESH" if staleness < 24 else "STALE",
             validation_status="CERTIFIED",
             audit_status="PENDING",

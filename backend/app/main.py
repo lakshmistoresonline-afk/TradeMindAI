@@ -45,9 +45,9 @@ def root():
     return {
         "message": "Welcome to TradeMind AI API",
         "status": "ONLINE",
-        "version": "2.0.0-PROD-RC5.8-FINAL-CERT-SYNC",
+        "version": "2.3.0-PROD-HARDENED",
         "deployed_at": datetime.datetime.utcnow().isoformat(),
-        "forensic_id": "CERT_SYNC_20260912_1315"
+        "forensic_id": "HARDENED_20260915_1140"
     }
 
 @app.get("/ready")

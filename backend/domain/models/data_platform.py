@@ -104,6 +104,7 @@ class ModelMetadata(BaseModel):
     name: str
     symbol: str
     version: str
+    horizon: str = "SWING" # Phase 11 Support
     type: str # RANDOM_FOREST, LSTM, XGBOOST
     accuracy: float = 0.5
     precision: float = 0.0

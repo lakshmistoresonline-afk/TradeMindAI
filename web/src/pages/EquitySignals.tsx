@@ -1,52 +1,42 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton } from '@mui/material';
-import { Clock, ShieldAlert, RefreshCw, Search, Activity, Info } from 'lucide-react';
-import { getStocks, getEquitySignals } from '../api/client';
+import { ShieldAlert, RefreshCw, Search, Activity, Info } from 'lucide-react';
+import { getEquitySignals } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 
 export default function EquitySignals() {
-  const [tfTab, setTfTab] = useState(2); // Default to SWING (index 2)
-  const [stocks, setStocks] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState(1); // Default to SWING PRIMARY (index 1)
+  const [signals, setSignals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { connectionStatus } = useTurboSync();
 
-  const timeframes = [
-    { label: 'INTRADAY', value: 'INTRADAY' },
-    { label: 'SHORT TERM', value: 'SHORT TERM' },
-    { label: 'SWING', value: 'SWING' },
-    { label: 'POSITION', value: 'POSITION' },
-    { label: 'LONG TERM', value: 'LONG TERM' }
-  ];
+  // Canonical Signal Universes (V2.3)
+  const universes = useMemo(() => [
+    { label: 'ALL ACTIVE', value: 'ALL', color: 'primary.main' },
+    { label: 'SWING PRIMARY', value: 'SWING_PRIMARY', color: '#10b981' },
+    { label: 'SHORT EXPERIMENTAL', value: 'SHORT_EXPERIMENTAL', color: 'slategray' },
+    { label: 'LONG SELECTIVE', value: 'LONG_SELECTIVE', color: '#00D1FF' }
+  ], []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [stocksData, signalsData] = await Promise.all([
-        getStocks(),
-        getEquitySignals({ limit: 200 })
-      ]);
-
-      const stockMap = new Map((stocksData || []).map((s: any) => [s.symbol, s]));
-
-      const combined = (signalsData || [])
-        .map((ls: any) => {
-          const stockInfo = stockMap.get(ls.symbol) || {};
-          return {
-            ...stockInfo,
-            ...ls,
-            decision: normalizeAITradeDecision({...stockInfo, ...ls})
-          };
-        }).sort((a: any, b: any) => {
-          const timeA = new Date(a.decision_timestamp || a.timestamp || 0).getTime();
-          const timeB = new Date(b.decision_timestamp || b.timestamp || 0).getTime();
+      const signalsData = await getEquitySignals({ limit: 100 });
+      const normalized = (Array.isArray(signalsData) ? signalsData : [])
+        .map((s: any) => ({
+          ...s,
+          decision: normalizeAITradeDecision(s)
+        })).sort((a: any, b: any) => {
+          const timeA = new Date(a.decision?.generatedAt || 0).getTime();
+          const timeB = new Date(b.decision?.generatedAt || 0).getTime();
           return timeB - timeA;
-      });
+        });
 
-      setStocks(combined);
+      setSignals(normalized);
     } catch (e) {
       console.error("Failed to sync equity signals:", e);
     } finally {
@@ -58,30 +48,44 @@ export default function EquitySignals() {
     fetchData();
   }, []);
 
+  const counts = useMemo(() => {
+    return {
+      all: signals.length,
+      swing: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').length,
+      short: signals.filter(s => s.decision.timeframe === 'SHORT').length,
+      long: signals.filter(s => s.decision.timeframe === 'LONG').length
+    };
+  }, [signals]);
+
   const filteredSignals = useMemo(() => {
-    const currentTf = timeframes[tfTab].value;
+    const universe = universes[activeTab].value;
 
-    return stocks.filter(s => {
-        const matchesTf = s.decision?.timeframe === currentTf;
-        const isTradeable = (s.decision?.rating?.includes('BUY') || s.decision?.rating?.includes('SELL'));
+    return signals.filter(s => {
         const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                             (s.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+                             (s.company_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        const isNotResolved = !['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'COMPLETED', 'CANCELLED'].includes(s.decision?.status);
+        if (!matchesSearch) return false;
 
-        return matchesTf && isTradeable && matchesSearch && isNotResolved;
+        if (universe === 'ALL') return true;
+        if (universe === 'SWING_PRIMARY') return s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY';
+        if (universe === 'SHORT_EXPERIMENTAL') return s.decision.timeframe === 'SHORT';
+        if (universe === 'LONG_SELECTIVE') return s.decision.timeframe === 'LONG';
+
+        return false;
     });
-  }, [stocks, tfTab, searchQuery]);
+  }, [signals, activeTab, searchQuery, universes]);
+
+  const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
   return (
     <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
-      {/* 1. Header */}
+      {/* 1. Terminal Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 5, flexWrap: 'wrap', gap: 3 }}>
          <Box>
             <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>EQUITY TERMINAL</Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
                <Typography variant="caption" sx={{ fontWeight: 900, color: '#10b981', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Activity size={14} /> CASH SEGMENT STREAM
+                  <Activity size={14} /> LIVE SHADOW SCAN
                </Typography>
                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
                <Typography variant="caption" sx={{ fontWeight: 800, color: connectionStatus === 'ONLINE' ? '#10b981' : '#ef4444' }}>
@@ -117,43 +121,52 @@ export default function EquitySignals() {
          </Stack>
       </Box>
 
-      {/* 2. Timeframe Navigation */}
-      <Paper sx={{ mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 0.5 }}>
-         <Tabs
-            value={tfTab}
-            onChange={(_, v) => setTfTab(v)}
-            variant="scrollable"
-            scrollButtons="auto"
+      {/* 2. Signal Summary Ribbon */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+         <Grid item xs={6} md={3}>
+            <SummaryStat label="TOTAL ACTIVE" value={counts.all} color="primary.main" />
+         </Grid>
+         <Grid item xs={6} md={3}>
+            <SummaryStat label="PRIMARY SWING" value={counts.swing} color="#10b981" />
+         </Grid>
+         <Grid item xs={6} md={3}>
+            <SummaryStat label="SELECTIVE LONG" value={counts.long} color="#00D1FF" />
+         </Grid>
+         <Grid item xs={6} md={3}>
+            <SummaryStat label="EXPERIMENTAL SHORT" value={counts.short} color="slategray" />
+         </Grid>
+      </Grid>
+
+      {/* 3. Universe Selectors */}
+      <Paper sx={{ mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 0.5, width: 'fit-content' }}>
+        <Tabs
+            value={activeTab}
+            onChange={(_, v) => setActiveTab(v)}
             sx={{
-               minHeight: 48,
-               '& .MuiTabs-indicator': { height: 2, bgcolor: '#10b981' },
-               '& .MuiTab-root': {
-                  color: 'slategray',
-                  fontWeight: 950,
-                  fontSize: '0.75rem',
-                  minWidth: 140,
-                  textTransform: 'none',
-                  '&.Mui-selected': { color: 'white' }
-               }
+                minHeight: 44,
+                '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
+                '& .MuiTab-root': {
+                    color: 'slategray',
+                    fontWeight: 950,
+                    fontSize: '0.7rem',
+                    minWidth: 160,
+                    textTransform: 'none',
+                    '&.Mui-selected': { color: 'white' }
+                }
             }}
-         >
-            {timeframes.map((tf) => (
-               <Tab
-                  key={tf.label}
-                  label={tf.label}
-                  icon={<Clock size={14} />}
-                  iconPosition="start"
-               />
+        >
+            {universes.map((u) => (
+                <Tab key={u.value} label={u.label} />
             ))}
-         </Tabs>
+        </Tabs>
       </Paper>
 
-      {/* 3. Main Data Grid */}
+      {/* 4. Data Grid */}
       {loading ? (
          <Grid container spacing={3}>
             {[1,2,3,4,5,6].map(i => (
                <Grid item xs={12} md={6} lg={4} key={i}>
-                  <Skeleton variant="rectangular" height={420} sx={{ borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }} />
+                  <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }} />
                </Grid>
             ))}
          </Grid>
@@ -162,7 +175,7 @@ export default function EquitySignals() {
             {filteredSignals.length > 0 ? (
                <Grid container spacing={3}>
                   {filteredSignals.map((s) => (
-                     <Grid item xs={12} md={6} lg={4} key={s.id || s.symbol}>
+                     <Grid item xs={12} md={6} lg={4} key={s.id}>
                         <LiveSignalCard stock={s} decision={s.decision} />
                      </Grid>
                   ))}
@@ -170,37 +183,50 @@ export default function EquitySignals() {
             ) : (
                <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
                   <ShieldAlert size={56} color="slategray" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>NO ACTIVE EQUITY SIGNALS</Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1, opacity: 0.5, fontWeight: 700 }}>Institutional scanners identifying {timeframes[tfTab].label} opportunities...</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>
+                     {universes[activeTab].label} — NO QUALIFIED SIGNALS
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1, opacity: 0.5, fontWeight: 700 }}>
+                     The quantitative engine has not identified any signals meeting the {universes[activeTab].label} evidence gates.
+                  </Typography>
                   <Button
                     variant="text"
                     size="small"
                     sx={{ mt: 4, fontWeight: 900, color: '#10b981', textTransform: 'none' }}
-                    onClick={() => {setSearchQuery(''); setTfTab(2);}}
+                    onClick={() => {setSearchQuery(''); setActiveTab(0);}}
                   >
-                    RESET ALL FILTERS
+                    VIEW ALL ACTIVE SIGNALS
                   </Button>
                </Paper>
             )}
          </Box>
       )}
 
-      {/* 4. Terminal Metadata */}
+      {/* 5. Footer Metadata */}
       <Box sx={{ mt: 10, p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
          <Stack direction="row" spacing={3} alignItems="flex-start">
             <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 1 }}>
                <Info size={20} color="#10b981" />
             </Box>
             <Box>
-               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>EQUITY DATA PROTOCOL</Typography>
+               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>FORENSIC SIGNAL PROTOCOL</Typography>
                <Typography variant="caption" sx={{ color: 'slategray', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
-                  Equity signals are derived from cash market order flow and institutional accumulation zones.
-                  Intraday setups focus on high-velocity momentum, while Swing and Position calls prioritize structural breakouts.
-                  Data is verified against NSE Spot nodes every 15 minutes.
+                  Authoritative signals are derived from institutional order flow and V2.2 structural breakout logic.
+                  PRIMARY SWING signals require OOS AUC &gt; 0.60. SELECTIVE LONG signals require AUC &gt; 0.70 with specialized symbol evidence.
+                  Latest sync confirmed at {latestUpdate} IST.
                </Typography>
             </Box>
          </Stack>
       </Box>
     </Box>
   );
+}
+
+function SummaryStat({ label, value, color }: any) {
+    return (
+        <Paper sx={{ p: 2, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.03)' }}>
+            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
+        </Paper>
+    );
 }

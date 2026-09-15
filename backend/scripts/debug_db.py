@@ -27,9 +27,14 @@ def check_models():
         res = conn.execute(text("SELECT count(*) FROM stocks;"))
         print(f"Total stocks: {res.scalar()}")
 
-        print("\n--- SIGNAL COUNT ---")
-        res = conn.execute(text("SELECT count(*) FROM live_signals;"))
-        print(f"Total signals in Neon: {res.scalar()}")
+        print("\n--- MODEL HORIZONS ---")
+        res = conn.execute(text("SELECT horizon, count(*) FROM model_registry GROUP BY horizon;"))
+        for r in res.fetchall():
+            print(r)
+
+        res = conn.execute(text("SELECT symbol, horizon, is_champion FROM model_registry WHERE is_champion=True LIMIT 20;"))
+        for r in res.fetchall():
+            print(r)
 
 if __name__ == "__main__":
     check_models()

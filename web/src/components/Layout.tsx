@@ -1,25 +1,17 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Button, Chip, Menu, MenuItem, IconButton, Avatar, alpha, Paper } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Chip, Menu, MenuItem, IconButton, Avatar, alpha } from '@mui/material';
 import {
   LayoutDashboard,
   Zap,
-  Search,
-  Bot,
   LogOut,
   Activity,
   Menu as MenuIcon,
   ChevronDown,
-  X,
   TrendingUp,
-  LineChart,
-  ArrowUpRight,
-  ArrowDownRight,
-  Fingerprint
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useMediaQuery, useTheme, Fab } from '@mui/material';
-import CommandPalette from './CommandPalette';
-import { API_BASE_URL, getMarketStats } from '../api/client';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { API_BASE_URL } from '../api/client';
 
 const drawerWidth = 260;
 
@@ -32,12 +24,9 @@ export const useNotification = () => useContext(NotificationContext);
 
 const menuItems = [
   { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/' },
-  { text: 'EQUITY SCANNER', icon: <Search size={20} />, path: '/scanner' },
-  { text: 'SIGNALS', icon: <Activity size={20} />, path: '/signals' },
-  { text: 'WATCHLIST', icon: <Zap size={20} />, path: '/watchlist' },
-  { text: 'MARKET', icon: <LineChart size={20} />, path: '/market' },
-  { text: 'ACCURACY', icon: <TrendingUp size={20} />, path: '/accuracy' },
-  { text: 'RESEARCH', icon: <Fingerprint size={20} />, path: '/research' },
+  { text: 'SIGNALS', icon: <Zap size={20} />, path: '/signals' },
+  { text: 'PERFORMANCE', icon: <TrendingUp size={20} />, path: '/performance' },
+  { text: 'SYSTEM STATUS', icon: <Activity size={20} />, path: '/status' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -47,16 +36,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [copilotOpen, setCopilotOpen] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
-  const [marketStats, setMarketStats] = useState<any>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  useEffect(() => {
-    getMarketStats().then(data => {
-       if (data) setMarketStats(data);
-    }).catch(() => {});
-  }, []);
 
   useEffect(() => {
     const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
@@ -95,12 +76,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#020617' }}>
-        <CommandPalette />
         <AppBar
           position="fixed"
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            backgroundColor: 'rgba(7, 10, 15, 0.8)',
+            backgroundColor: 'rgba(5, 8, 12, 0.9)', // Slightly darker for V2.3.1
             backdropFilter: 'blur(12px)',
             borderBottom: '1px solid rgba(255,255,255,0.08)',
             boxShadow: 'none'
@@ -130,13 +110,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Box sx={{ bgcolor: 'primary.main', color: '#000', px: 1, borderRadius: 0.5, fontSize: '0.8rem', fontWeight: 900 }}>TM</Box>
                 TRADEMIND AI
                 <Chip
-                  label="LIVE"
+                  label="CHALLENGER V2.3"
                   size="small"
                   sx={{
                     height: 18,
                     fontSize: '0.55rem',
                     fontWeight: 950,
-                    bgcolor: '#10b981',
+                    bgcolor: 'primary.main',
                     color: '#000',
                     borderRadius: 0.5,
                     ml: 1
@@ -144,11 +124,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 />
               </Typography>
 
-              {!isMobile && marketStats && (
-                <Stack direction="row" spacing={4} sx={{ ml: 6 }}>
-                   <MarketTickerCompact label="NIFTY" stats={marketStats['NIFTY 50']} />
-                   <MarketTickerCompact label="BNIFTY" stats={marketStats['BANK NIFTY']} />
-                   <MarketTickerCompact label="VIX" stats={marketStats['India VIX']} />
+              {!isMobile && (
+                <Stack direction="row" spacing={1} sx={{ ml: 4 }}>
+                   <HeaderStatus label="SCAN" value="TOP 50 HARDENED" color="#10b981" />
+                   <HeaderStatus label="MODE" value="SHADOW SIGNAL" color="#00D1FF" />
                 </Stack>
               )}
             </Stack>
@@ -156,8 +135,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Stack direction="row" spacing={2} alignItems="center">
               {!isMobile && (
                 <Stack direction="row" spacing={1} sx={{ mr: 4 }}>
-                   <HeaderStatus label="SYSTEM" value="OPTIMIZED" color="#10b981" />
-                   <HeaderStatus label="AUDIT" value="ACTIVE" color="#00D1FF" />
+                   <HeaderStatus label="MODE" value="SHADOW SIGNAL" color="#00D1FF" />
+                   <HeaderStatus label="REAL TRADING" value="DISABLED" color="#ef4444" />
+                   <HeaderStatus label="ROUTING" value="LOCKED" color="#ef4444" />
                 </Stack>
               )}
 
@@ -186,10 +166,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>Alpha Tier Node: 7421</Typography>
                 </Box>
                 <Divider sx={{ opacity: 0.05 }} />
-                <MenuItem onClick={() => { handleProfileClose(); navigate('/methodology'); }} sx={{ py: 1.5 }}>
-                  <ListItemIcon><Search size={18} color="slategray" /></ListItemIcon>
-                  <ListItemText primary="Methodology" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
-                </MenuItem>
                 <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.5 }}>
                   <ListItemIcon><Activity size={18} color="slategray" /></ListItemIcon>
                   <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
@@ -260,53 +236,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </List>
 
             <Box sx={{ mt: 'auto', p: 3, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-               <Paper sx={{ p: 2, bgcolor: alpha('#7C3AED', 0.05), border: '1px solid rgba(124, 58, 237, 0.1)', borderRadius: 1 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 900, color: 'secondary.main', display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                     <Bot size={14} /> AI CORE V2.2
-                  </Typography>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={() => setCopilotOpen(true)}
-                    sx={{
-                      borderRadius: 0.5,
-                      bgcolor: 'secondary.main',
-                      color: '#fff',
-                      fontWeight: 950,
-                      fontSize: '0.7rem',
-                      '&:hover': { bgcolor: alpha('#7C3AED', 0.8) }
-                    }}
-                  >
-                    INITIATE CONTEXT
-                  </Button>
-               </Paper>
+               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.6rem' }}>
+                  © 2026 TRADEMIND AI • V2.3
+               </Typography>
             </Box>
           </Box>
-        </Drawer>
-
-        <Drawer
-          anchor="right"
-          open={copilotOpen}
-          onClose={() => setCopilotOpen(false)}
-          sx={{ [`& .MuiDrawer-paper`]: { width: { xs: '100%', sm: 500 }, backgroundColor: '#020617', borderLeft: '1px solid rgba(255,255,255,0.1)', backgroundImage: 'none' } }}
-        >
-           <Box sx={{ p: 2.5, borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#070a0f' }}>
-              <Stack direction="row" spacing={2} alignItems="center">
-                 <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 0.5 }}>
-                    <Bot size={20} color="#10b981" />
-                 </Box>
-                 <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 950, letterSpacing: -0.5, color: '#fff' }}>SYSTEM ANALYST</Typography>
-                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>MULTI-AGENT CONSENSUS ACTIVE</Typography>
-                 </Box>
-              </Stack>
-              <IconButton onClick={() => setCopilotOpen(false)} sx={{ color: 'slategray' }}><X size={20} /></IconButton>
-           </Box>
-           <Box sx={{ height: 'calc(100% - 80px)' }}>
-              <Box sx={{ p: 4, textAlign: 'center' }}>
-                 <Typography color="textSecondary" variant="body2">AI Copilot context integration pending.</Typography>
-              </Box>
-           </Box>
         </Drawer>
 
         <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 4 }, width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
@@ -321,51 +255,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {notification.message}
           </Alert>
         </Snackbar>
-
-        {!isMobile && (
-           <Fab
-             color="primary"
-             onClick={() => setCopilotOpen(true)}
-             sx={{
-                position: 'fixed',
-                bottom: 40,
-                right: 40,
-                zIndex: 1000,
-                width: 60,
-                height: 60,
-                boxShadow: '0 0 30px rgba(0, 209, 255, 0.3)',
-                '&:hover': { transform: 'scale(1.05) rotate(5deg)' },
-                transition: '0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                borderRadius: 1.5,
-                bgcolor: '#00D1FF'
-             }}
-           >
-             <Bot size={28} color="#000" />
-           </Fab>
-        )}
       </Box>
     </NotificationContext.Provider>
   );
 }
 
-function MarketTickerCompact({ label, stats }: any) {
-  if (!stats) return null;
-  const isPositive = stats.change >= 0;
-  return (
-    <Box sx={{ borderLeft: '1px solid rgba(255,255,255,0.08)', pl: 2 }}>
-      <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', fontSize: '0.55rem', mb: 0.2 }}>{label}</Typography>
-      <Stack direction="row" spacing={1.5} alignItems="center">
-        <Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: '0.8rem', color: '#fff' }}>{stats.value.toLocaleString()}</Typography>
-        <Stack direction="row" alignItems="center" spacing={0.2}>
-          {isPositive ? <ArrowUpRight size={10} color="#10b981" /> : <ArrowDownRight size={10} color="#ef4444" />}
-          <Typography sx={{ color: isPositive ? '#10b981' : '#ef4444', fontWeight: 950, fontSize: '0.65rem' }}>
-            {stats.change}%
-          </Typography>
-        </Stack>
-      </Stack>
-    </Box>
-  );
-}
 
 function HeaderStatus({ label, value, color }: any) {
    return (

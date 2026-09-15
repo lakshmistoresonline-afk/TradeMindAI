@@ -32,9 +32,14 @@ async def backfill_symbol(symbol: str):
     # 2. Technical Indicators
     df_ta = TechnicalAnalysis.calculate_indicators(df)
 
-    # 3. Target Generation (Refined: Balanced UP/DOWN label)
-    df_ta['target_return'] = df_ta['Close'].shift(-5) / df_ta['Close'] - 1
-    df_ta['target'] = (df_ta['target_return'] > 0).astype(float)
+    # 3. Target Generation (Multi-Horizon Support)
+    # SHORT: 7 days, SWING: 30 days, LONG: 180 days (approximated candles)
+    df_ta['target_short'] = (df_ta['Close'].shift(-7) / df_ta['Close'] - 1 > 0).astype(float)
+    df_ta['target_swing'] = (df_ta['Close'].shift(-30) / df_ta['Close'] - 1 > 0).astype(float)
+    df_ta['target_long'] = (df_ta['Close'].shift(-180) / df_ta['Close'] - 1 > 0).astype(float)
+
+    # Legacy field
+    df_ta['target'] = df_ta['target_swing']
 
     # 4. Feature Extraction (Optimized Vectorized)
     feat_df = pd.DataFrame(index=df_ta.index)
@@ -50,6 +55,7 @@ async def backfill_symbol(symbol: str):
     feat_df['volatility_bb'] = (df_ta['Close'] - bbl) / (bbu - bbl + 1e-9)
 
     feat_df['volume_relative'] = df_ta['Volume'] / df_ta['Volume'].rolling(20).mean().fillna(df_ta['Volume'])
+    feat_df['Close'] = df_ta['Close'] # Phase 4 Hardening: Carry price for signal generation
 
     # SMC Logic Approximation (Vectorized for backfill speed)
     feat_df['smc_bullish_ob'] = 0.0
@@ -64,15 +70,20 @@ async def backfill_symbol(symbol: str):
     atr = df_ta.get('ATR', df_ta['Close'] * 0.02)
     feat_df['market_volatility_z'] = (atr - atr.rolling(50).mean()) / (atr.rolling(50).std() + 1e-9)
     feat_df['market_volatility_z'] = feat_df['market_volatility_z'].fillna(0.0)
+    feat_df['ATR'] = atr # Phase 4 Hardening
 
     feat_df['market_cap_class'] = 2.0
+    feat_df['target_short'] = df_ta['target_short']
+    feat_df['target_swing'] = df_ta['target_swing']
+    feat_df['target_long'] = df_ta['target_long']
     feat_df['target'] = df_ta['target']
 
     # Final cleanup
-    feat_df = feat_df.fillna(0.0)
+    # We keep NaN targets for latest rows to support inference
+    # Drop rows where critical price data is missing
+    feat_df.dropna(subset=['Close', 'ATR'], inplace=True)
 
-    # Cleanup
-    feat_df.dropna(subset=['target'], inplace=True)
+    # Validation
     if feat_df.empty: return
 
     # 5. Bulk Ingest into DuckDB

@@ -286,15 +286,27 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 if data.get(col): data[col] = json.dumps(data[col])
             db_columns = {c.name for c in ModelMetadataDB.__table__.columns}
             filtered_data = {k: v for k, v in data.items() if k in db_columns}
+
+            # If this is a new champion, demote old ones
+            if metadata.is_champion:
+                pg.query(ModelMetadataDB).filter(
+                    ModelMetadataDB.symbol == metadata.symbol,
+                    ModelMetadataDB.horizon == (metadata.horizon or "SWING")
+                ).update({"is_champion": False})
+
             if db_obj:
                 for k, v in filtered_data.items(): setattr(db_obj, k, v)
             else: pg.add(ModelMetadataDB(**filtered_data))
             pg.commit()
 
-    async def get_champion_model(self, symbol: str) -> Optional[ModelMetadata]:
+    async def get_champion_model(self, symbol: str, horizon: str = "SWING") -> Optional[ModelMetadata]:
         from backend.core.postgres import ModelMetadataDB
         with self.session_factory() as pg:
-            r = pg.query(ModelMetadataDB).filter(ModelMetadataDB.symbol == symbol, ModelMetadataDB.is_champion == True).first()
+            r = pg.query(ModelMetadataDB).filter(
+                ModelMetadataDB.symbol == symbol,
+                ModelMetadataDB.is_champion == True,
+                ModelMetadataDB.horizon == horizon
+            ).order_by(ModelMetadataDB.last_trained.desc()).first()
             return self._map_db_to_model_metadata(r) if r else None
 
     async def get_model_history(self, symbol: str, limit: int = 10) -> List[ModelMetadata]:
@@ -325,14 +337,35 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
             pg.add(MLDatasetDB(**data))
             pg.commit()
 
-    async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
+    async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime, horizon: str = "SWING") -> List[FeatureVector]:
         df = self.duck.create_ml_dataset(symbol, start_date.isoformat(), end_date.isoformat())
         results = []
+        target_col = f"target_{horizon.lower()}"
+
+        # Determine features to exclude (targets)
+        target_cols = [f"target_{h.lower()}" for h in ["SHORT", "SWING", "LONG"]]
+
         for _, row in df.iterrows():
             row_dict = row.to_dict()
-            target = row_dict.pop('target', None)
+            target = row_dict.get(target_col)
+
+            # Clean feature vector: Remove all target columns and non-feature columns
             date = row_dict.pop('date')
-            results.append(FeatureVector(symbol=symbol, date=date, version="v1.0.0", features={k: v for k, v in row_dict.items()}, target=target))
+            for col in target_cols:
+                row_dict.pop(col, None)
+            row_dict.pop('target', None) # Legacy
+
+            # OHLC might be in the dataset if prepare_horizon_datasets added them
+            # We usually want them for labeling but not necessarily as raw features for model
+            # unless normalized.
+
+            results.append(FeatureVector(
+                symbol=symbol,
+                date=date,
+                version="v1.0.0",
+                features={k: v for k, v in row_dict.items() if isinstance(v, (int, float, bool))},
+                target=target
+            ))
         return results
 
     async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: self.fs.collection("devices").document(device_info['device_id']).set({**device_info, "user_id": user_id})
