@@ -1,4 +1,5 @@
-import { Box, Typography, Paper, Grid, Stack, Chip, alpha, Divider, Button } from '@mui/material';
+import { Box, Typography, Paper, Grid, Stack, Chip, alpha, Divider, Button, Tooltip } from '@mui/material';
+import { HelpCircle } from 'lucide-react';
 // V2.3 Hardened Card
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
@@ -87,7 +88,12 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
               <Typography variant="caption" sx={{ fontWeight: 950, color: '#fff', letterSpacing: 0.5 }}>{decision.timeframe} · {decision.qualityClass}</Typography>
            </Box>
            <Box sx={{ borderLeft: '3px solid rgba(255,255,255,0.05)', pl: 1.5 }}>
-              <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', fontSize: '0.55rem' }}>MODEL PROBABILITY</Typography>
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', fontSize: '0.55rem' }}>MODEL PROBABILITY</Typography>
+                  <Tooltip title="Model-derived probability estimate based on the current model and evidence. It is not a guarantee of outcome.">
+                     <HelpCircle size={10} color="slategray" style={{ cursor: 'help' }} />
+                  </Tooltip>
+              </Stack>
               <Typography variant="caption" sx={{ fontWeight: 950, color: 'primary.main', fontSize: '0.8rem' }}>{decision.conviction}%</Typography>
            </Box>
         </Stack>

@@ -60,7 +60,8 @@ export default function DashboardTerminal() {
 
   const counts = useMemo(() => {
     return {
-      swingPrimary: signals.filter(s => s.decision.timeframe === 'SWING').length,
+      swingPrimary: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').length,
+      swingSelective: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'SELECTIVE').length,
       longSelective: signals.filter(s => s.decision.timeframe === 'LONG').length,
       shortExperimental: signals.filter(s => s.decision.timeframe === 'SHORT').length,
       total: signals.length
@@ -86,11 +87,11 @@ export default function DashboardTerminal() {
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
                  <Stack direction="row" spacing={4}>
                     <Box>
-                        <SmallStat label="PRIMARY (SWING)" value={counts.swingPrimary} color="#10b981" />
-                        <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>Validated Predictive Edge</Typography>
+                        <SmallStat label="SWING" value={counts.swingPrimary + counts.swingSelective} color="#10b981" />
+                        <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>{counts.swingPrimary} Primary / {counts.swingSelective} Selective</Typography>
                     </Box>
                     <Box>
-                        <SmallStat label="SELECTIVE (LONG)" value={counts.longSelective} color="#00D1FF" />
+                        <SmallStat label="LONG" value={counts.longSelective} color="#00D1FF" />
                         <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>Symbol-Qualified Only</Typography>
                     </Box>
                     <Box>
@@ -134,11 +135,11 @@ export default function DashboardTerminal() {
                   <Box>
                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1, color: '#10b981', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                           <ShieldCheck size={20} /> PRIMARY SWING OPPORTUNITIES
+                           <ShieldCheck size={20} /> SWING OPPORTUNITIES ({counts.swingPrimary} PRIMARY / {counts.swingSelective} SELECTIVE)
                         </Typography>
-                        <Button onClick={() => navigate('/signals')} size="small" sx={{ fontWeight: 800, color: 'slategray' }}>VIEW ALL {counts.swingPrimary}</Button>
+                        <Button onClick={() => navigate('/signals')} size="small" sx={{ fontWeight: 800, color: 'slategray' }}>VIEW ALL {counts.swingPrimary + counts.swingSelective}</Button>
                      </Box>
-                     {counts.swingPrimary > 0 ? (
+                     { (counts.swingPrimary + counts.swingSelective) > 0 ? (
                         <Grid container spacing={2}>
                            {signals.filter(s => s.decision.timeframe === 'SWING').map((s) => (
                               <Grid item xs={12} md={4} key={s.id}>

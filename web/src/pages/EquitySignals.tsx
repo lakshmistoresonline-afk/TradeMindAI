@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Tooltip } from '@mui/material';
-import { ShieldAlert, RefreshCw, Search, Activity, Info, HelpCircle } from 'lucide-react';
+import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton } from '@mui/material';
+import { ShieldAlert, RefreshCw, Search, Activity, Info } from 'lucide-react';
 import { getEquitySignals } from '../api/client';
 import { normalizeAITradeDecision } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
@@ -17,9 +17,9 @@ export default function EquitySignals() {
   // Canonical Signal Universes (V2.3)
   const universes = useMemo(() => [
     { label: 'ALL ACTIVE', value: 'ALL', color: 'primary.main' },
-    { label: 'SWING PRIMARY', value: 'SWING_PRIMARY', color: '#10b981' },
-    { label: 'SHORT EXPERIMENTAL', value: 'SHORT_EXPERIMENTAL', color: 'slategray' },
-    { label: 'LONG SELECTIVE', value: 'LONG_SELECTIVE', color: '#00D1FF' }
+    { label: 'SWING', value: 'SWING', color: '#10b981' },
+    { label: 'SHORT', value: 'SHORT', color: 'slategray' },
+    { label: 'LONG', value: 'LONG', color: '#00D1FF' }
   ], []);
 
   const fetchData = async () => {
@@ -67,9 +67,9 @@ export default function EquitySignals() {
         if (!matchesSearch) return false;
 
         if (universe === 'ALL') return true;
-        if (universe === 'SWING_PRIMARY') return s.decision.timeframe === 'SWING';
-        if (universe === 'SHORT_EXPERIMENTAL') return s.decision.timeframe === 'SHORT';
-        if (universe === 'LONG_SELECTIVE') return s.decision.timeframe === 'LONG';
+        if (universe === 'SWING') return s.decision.timeframe === 'SWING';
+        if (universe === 'SHORT') return s.decision.timeframe === 'SHORT';
+        if (universe === 'LONG') return s.decision.timeframe === 'LONG';
 
         return false;
     });
