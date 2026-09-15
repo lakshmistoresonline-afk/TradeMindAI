@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Tooltip, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle, TrendingUp, HelpCircle, Filter } from 'lucide-react';
+import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { getEquitySignals, getEquityHistory } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
