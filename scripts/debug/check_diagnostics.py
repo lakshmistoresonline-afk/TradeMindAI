@@ -42,8 +42,8 @@ with engine.connect() as conn:
         for row in res8: print(f"   {row[0]}: {row[1]} predictions")
     except Exception as e: print(f"Availability Error: {e}")
 
-    print("\n--- Provenance Table Count ---")
+    print("\n--- Regime Distribution (Shadow) ---")
     try:
-        res13 = conn.execute(text("SELECT COUNT(*) FROM shadow_provenance"))
-        print(f"Total: {res13.scalar()}")
-    except Exception as e: print(f"Prov Error: {e}")
+        res16 = conn.execute(text("SELECT regime, COUNT(*) FROM shadow_signals GROUP BY regime"))
+        for row in res16: print(f"   {row[0]}: {row[1]}")
+    except Exception as e: print(f"Regime Error: {e}")
