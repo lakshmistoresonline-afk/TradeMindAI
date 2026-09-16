@@ -38,6 +38,17 @@ async def startup():
             print("[+] Redis Cache Standby.")
         except: pass
 
+        # 2. Start Price Synchronization Loop
+        while True:
+            try:
+                from backend.services.market_data_service import MarketDataService
+                await MarketDataService.sync_active_signal_prices()
+            except Exception as e:
+                print(f"[!] Background Task Error (Price Sync): {e}")
+
+            # Run every 5 minutes in production
+            await asyncio.sleep(300)
+
     asyncio.create_task(background_inits())
 
 @app.get("/")

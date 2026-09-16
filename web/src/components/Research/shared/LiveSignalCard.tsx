@@ -20,7 +20,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
   const entry = decision.entry;
   const target = decision.target;
   const stop = decision.stopLoss;
-  const current = decision.normalizedCurrentPrice || stock.last_price || stock.current_price;
+  const current = decision.normalizedCurrentPrice;
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return 'UNAVAILABLE';

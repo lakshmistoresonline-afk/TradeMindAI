@@ -62,10 +62,10 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     return isNaN(num) ? undefined : num;
   };
 
-  const entry = parseNum(structured.entry) || parseNum(signal.entry_price) || signal.last_price || 0;
+  const entry = parseNum(structured.entry) || parseNum(signal.entry_price) || 0;
   const target = parseNum(structured.target) || parseNum(signal.target_price);
   const stopLoss = parseNum(structured.stop_loss) || parseNum(signal.stop_price);
-  const current = parseNum(signal.current_price) || parseNum(signal.last_price);
+  const current = parseNum(signal.current_price);
 
   // 7. Drivers
   let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];

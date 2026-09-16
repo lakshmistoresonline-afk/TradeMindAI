@@ -45,3 +45,37 @@ class MarketDataService:
     async def get_ohlc_history(symbol: str, days: int = 30) -> pd.DataFrame:
         start_date = datetime.datetime.utcnow() - datetime.timedelta(days=days)
         return await container.provider.get_history(symbol, start_date=start_date)
+
+    @staticmethod
+    async def sync_active_signal_prices():
+        """
+        Background Worker: Syncs current prices for all non-terminal signals.
+        Institutional 4.0 Hardening.
+        """
+        print("[*] MarketDataService: Syncing Active Signal Prices...")
+        from backend.services.price_resolver import PriceResolver
+        from backend.services.signal_ledger_service import SignalLedgerService
+
+        try:
+            # 1. Fetch all signals that need a price update
+            all_signals = await container.ios_repo.get_all_live_signals()
+            non_terminal = [s for s in all_signals if s.status in ["WAITING_FOR_ENTRY", "ENTRY_TRIGGERED", "ACTIVE"]]
+
+            if not non_terminal:
+                print("   [DEBUG] No active signals to sync.")
+                return
+
+            for signal in non_terminal:
+                res = await PriceResolver.resolve_current_price(signal)
+                if res["status"] == "FRESH":
+                    updates = {
+                        "current_price": res["current_price"],
+                        "current_price_timestamp": res["timestamp"],
+                        "current_price_source": res["source"],
+                        "current_price_status": "FRESH"
+                    }
+                    await SignalLedgerService.update_signal(signal.id, updates)
+
+            print(f"[+] MarketDataService: Successfully synced {len(non_terminal)} prices.")
+        except Exception as e:
+            print(f"[!] MarketDataService: Price sync failed: {e}")
