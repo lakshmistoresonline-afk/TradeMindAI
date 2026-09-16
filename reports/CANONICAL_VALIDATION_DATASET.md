@@ -13,7 +13,7 @@ This report documents the canonical dataset used for the quantitative validation
 - **Win Rate**: 59.18%
 - **Profit Factor**: 2.73
 - **Brier Score**: 0.2467
-- **Git SHA Authority**: 79d512a73124c946c72917a7416cdbe85472f365
+- **Git SHA Authority**: `db3f9d5ab8b0efa0c25d6b317a24c2634cb3105a`
 - **Real Trading Mode**: FALSE (Shadow Monitoring / Historical Replay only)
 
 ## 2. Active Signals (Neon Authority)

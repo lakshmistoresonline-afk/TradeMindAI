@@ -8,7 +8,7 @@ The following verified data points are established as the definitive truth for t
 
 - **Strategy Version**: Strategy V2.2 (**FROZEN**)
 - **Real Trading Mode**: `FALSE`
-- **Git SHA Authority**: `79d512a73124c946c72917a7416cdbe85472f365`
+- **Git SHA Authority**: `db3f9d5ab8b0efa0c25d6b317a24c2634cb3105a`
 - **Active Signals**: 33
 - **Historical Signals**: 50
 - **Wins (Target Hit)**: 29
