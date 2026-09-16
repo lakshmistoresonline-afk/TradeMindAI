@@ -9,12 +9,12 @@ This report documents the results of advanced research audits, including walk-fo
     - Window 1 (Historical): Win Rate 58%
     - Window 2 (Pre-Freeze): Win Rate 61%
     - Window 3 (Current Replay): Win Rate 59%
-- **Conclusion**: Performance is stable across time windows without significant degradation, validating Strategy V2.2's robustness against chronological drift.
+- **Conclusion**: Performance is stable across time windows in the observed sample, providing evidence of Strategy V2.2's consistency against chronological drift.
 
 ## 2. Cross-Regime Audit (Phase 29)
 - **Regime Stability**:
-    - **BULLISH**: Tested during Nifty-50 2026-08 rally. Strategy maintained 55% accuracy.
-    - **SIDEWAYS**: Current regime. Strategy shows 58% accuracy.
+    - **BULLISH**: Tested during Nifty-50 2026-08 rally. Strategy maintained 55% observed win rate.
+    - **SIDEWAYS**: Current regime. Strategy shows 58% observed win rate.
     - **VOLATILE**: Insufficient data in current validation set (n=0).
 - **Leakage Audit**: Verified that no features (e.g., future-dated indicator values) were used during historical replay. `OutcomeEngine` chronological evaluation confirmed valid.
 

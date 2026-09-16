@@ -1,23 +1,23 @@
 # TradeMind AI: Universe Survivorship Audit
 
-## 1. Constituents Status
-Verified the methodology for historical symbol selection:
+## 1. Constituent Identification
+Verified the symbol selection methodology for historical validation:
 
-| Dimension | Value |
+| Attribute | Value |
 | :--- | :--- |
 | **Universe Definition** | NIFTY-200 |
-| **Membership Source** | Current NSE Constituents (Static) |
-| **Historical Mapping** | Not implemented |
-| **Survivorship Bias Risk** | **TRUE** |
+| **Historical Constituent Data** | **NOT AVAILABLE** |
+| **Validation Universe** | Current Constituents (Static) |
+| **Survivorship Bias Risk** | **OBSERVED** |
 
-## 2. Audit Findings
-- **Static Universe**: The 7500 predictions and 50 historical outcomes are based on the current NIFTY-200 member list.
-- **Missing History**: There is no `historical_constituents` table in Neon. Consequently, symbols that were in the NIFTY-200 during the validation period but have since been removed are not included in the audit.
-- **Overstated Performance Risk**: Static universes typically introduce a "look-ahead" benefit as they exclude historical failures (delisted companies).
+## 2. Forensic Findings
+- **Static Assumption**: All historical signal reconstructions utilize the *current* member list of the NIFTY-200.
+- **Missing Failures**: Stocks that were part of the index during the validation period but have since been delisted or moved to lower tiers are not present in the Neon `stocks` or `shadow_signals` tables.
+- **Overstated Performance**: Using only "survivors" typically introduces a look-ahead benefit in backtests.
 
-## 3. Recommended Correction
-- Implement a `historical_constituents` table to track index inclusions/exclusions.
-- Re-run validation across the dynamically expanding/contracting universe list.
+## 3. Recommended Implementation
+- Populate a `historical_constituents` table with effective inclusion/exclusion dates.
+- Re-run validation across the dynamically adjusted historical universe to eliminate survivorship bias.
 
 ---
 **Verdict**: **DATA_LIMITED**

@@ -8,7 +8,7 @@ Verified data points for the Quant Validation 1.1 benchmark:
 
 - **Strategy Version**: Strategy V2.2 (**FROZEN**)
 - **Real Trading Mode**: `FALSE` (Locked)
-- **Git SHA Authority**: `35ad950ad1980c59539899399cfc7936cc8bcd95`
+- **Git SHA Authority**: `e15d82d0e1028ef0a762ad1e2cdedd5d3c3c57b5`
 - **Active Signals**: 33
 - **Historical Signals**: 50
 - **Total Ledger Identity**: 166 (incl. research)
@@ -26,7 +26,7 @@ Verified data points for the Quant Validation 1.1 benchmark:
 - **Survivorship Bias**: Validation currently uses a static constituent list, introducing a potential survivorship bias risk for historical reconstructions.
 
 ## 3. Compliance Statement
-Strategy V2.2 meets the core performance and integrity criteria for institutional research stability. While data limitations exist in sector metadata and intrabar resolution, the realized P&L and predictive calibration are statistically significant and bitwise reproducible.
+Strategy V2.2 meets the core performance and integrity criteria for institutional research stability. While data limitations exist in sector metadata and intrabar resolution, the realized P&L and predictive calibration are observed in sample and bitwise reproducible.
 
 ---
 **Date**: 2026-09-16

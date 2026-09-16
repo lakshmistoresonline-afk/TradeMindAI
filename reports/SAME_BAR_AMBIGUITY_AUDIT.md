@@ -1,26 +1,25 @@
 # TradeMind AI: Same-Bar Ambiguity Audit
 
-## 1. Ambiguity Detection
-Analyzed historical signals where both Target and Stop Loss levels were touched within the same daily candle:
+## 1. Ambiguity Detection (Population N=50)
+Analyzed terminal outcomes where both Target and Stop Loss levels were touched within the same daily candle:
 
-| Metric | Value |
-| :--- | :--- |
-| **Total Resolved Signals Checked** | 24 |
-| **Ambiguous Same-Bar Events** | 4 |
-| **Ambiguity Rate** | **16.7%** |
+| Metric | Value | Status |
+| :--- | :--- | :--- |
+| **Total Resolved Signals Audited** | 49 | Authoritative |
+| **Ambiguous Same-Bar Events** | 4 | **OBSERVED** |
+| **Ambiguity Rate** | **8.2%** | **SAMPLE_LIMITED** |
 
-## 2. Ambiguous Signals Ledger
-| Signal ID | Symbol | Date | Target | Stop | High | Low |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `sig_BRITANNIA_202608250436` | BRITANNIA | 2026-09-02 | 5138.1 | 5455.9 | 5256.0 | 5145.5 |
-| `sig_CUMMINSIND_202608241002` | CUMMINSIND | 2026-09-02 | 5009.6 | 5319.4 | 5115.0 | 5054.5 |
-| `recon_ASTRAL_20260629_0` | ASTRAL | 2026-07-13 | 1229.3 | 1420.5 | 1337.9 | 1312.9 |
-| `sig_ADANIGREEN_202608250435` | ADANIGREEN | 2026-08-26 | 1265.6 | 1343.8 | 1330.0 | 1294.8 |
+## 2. Identified Ambiguities
+The following signals are subject to resolution uncertainty:
+- `sig_BRITANNIA_202608250436` (2026-09-02)
+- `sig_CUMMINSIND_202608241002` (2026-09-02)
+- `recon_ASTRAL_20260629_0` (2026-07-13)
+- `sig_ADANIGREEN_202608250435` (2026-08-26)
 
 ## 3. Impact Statement
-- **Conservative Resolution**: In the current validation, these are recorded as wins/losses based on the final closing state, which introduces a 16.7% uncertainty in the outcome order.
-- **Recommendation**: For institutional-grade audit, same-bar touches should be resolved using 1-minute or 5-minute intrabar data. If intrabar data is unavailable, these must be treated as "Loss" or "Ambiguous" to avoid overstating performance.
+- **Accounting Uncertainty**: An 8.2% ambiguity rate implies that approximately 4 outcomes could be incorrectly classified (e.g., a "Win" that was actually hit *after* a "Stop" was touched).
+- **Conservatism**: Strategy V2.2 currently resolves these based on the closing state of the bar. For a "Hardened" verdict, these should be treated as losses to establish a worst-case performance floor.
 
 ---
-**Verdict**: **DATA_LIMITED**
-16.7% of terminal outcomes are subject to same-bar ambiguity. High-frequency forensic data is required to resolve definitively.
+**Verdict**: **SAMPLE_LIMITED**
+Resolution of same-bar collisions requires high-frequency intrabar data not currently present in the Neon database.

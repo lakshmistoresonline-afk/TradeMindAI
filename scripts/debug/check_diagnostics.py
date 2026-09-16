@@ -42,8 +42,8 @@ with engine.connect() as conn:
         for row in res8: print(f"   {row[0]}: {row[1]} predictions")
     except Exception as e: print(f"Availability Error: {e}")
 
-    print("\n--- Signal Crowding (By Date) ---")
+    print("\n--- Provenance Table Count ---")
     try:
-        res12 = conn.execute(text("SELECT timestamp::date, COUNT(*) FROM shadow_signals GROUP BY timestamp::date ORDER BY COUNT(*) DESC LIMIT 5"))
-        for row in res12: print(f"   {row[0]}: {row[1]} signals")
-    except Exception as e: print(f"Crowding Error: {e}")
+        res13 = conn.execute(text("SELECT COUNT(*) FROM shadow_provenance"))
+        print(f"Total: {res13.scalar()}")
+    except Exception as e: print(f"Prov Error: {e}")

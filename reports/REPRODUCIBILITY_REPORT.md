@@ -1,24 +1,23 @@
 # TradeMind AI: Reproducibility Report
 
-## 1. Deterministic Execution Audit
-Verified the ability to recreate Signal V2.2 decisions from historical feature vectors:
+## 1. Traceability Status
+Analyzed the availability of bitwise identity evidence for Strategy V2.2:
 
-| Component | Mechanism | Status |
+| Component | Status | Population Coverage |
 | :--- | :--- | :--- |
-| **Feature Extraction** | DuckDB-TA (Fixed logic) | **VERIFIED** |
-| **Model Inference** | Joblib/Scikit-Learn (Fixed state) | **VERIFIED** |
-| **Calibration** | Platt Scaling (Fixed coefficients) | **VERIFIED** |
-| **Signal Decision** | SignalEngine (Procedural) | **VERIFIED** |
+| **Input Hashing** | **DATA_LIMITED** | 0% of historical population |
+| **Decision Hashing** | **DATA_LIMITED** | 0% of historical population |
+| **Prediction Linkage** | **VERIFIED** | 100% of signals linked to IDs |
+| **Audit Status** | **UNVERIFIED** | (Missing Provenance Records) |
 
-## 2. Forensic Bitwise Matching
-- **Input Hash**: 100% of signals in `shadow_provenance` contain an `input_hash` of the feature vector.
-- **Decision Hash**: Verified that re-running `SignalEngine.generate_signal` on historical features produces a `decision_hash` identical to the stored record.
-- **Random Seed**: Confirmed that `ml_service.py` utilize fixed random seeds for any non-deterministic model components.
+## 2. Findings
+- **Legacy Artifacts**: The 50 historical signals were generated before the `shadow_provenance` identity system was implemented. While they have valid Signal and Prediction IDs, the underlying bitwise hashes (input/output) are missing.
+- **Procedural Consistency**: Re-running V2.2 logic on current active signals (N=33) demonstrates procedural consistency, but bitwise proof for historical outcomes is currently unavailable.
 
-## 3. Findings
-- **Bitwise Identity**: Tested `sig_ABB_SWING_202609150526`. The recreated probability (86.3%) and trade levels match the stored authoritative record exactly.
-- **Lineage**: Provenance chains allow full reconstruction of the decision environment at any point in history.
+## 3. Required Action
+- Implement "Forensic Reconstruction" to backfill hashes for the 50 historical records using the archived price data.
+- Ensure all *future* signals capture bitwise provenance at the moment of emission.
 
 ---
-**Verdict**: **PASS**
-Strategy V2.2 decisions are 100% reproducible and verifiable from stored feature vectors.
+**Verdict**: **DATA_LIMITED**
+Bitwise reproducibility is not established for the historical dataset due to missing provenance metadata.

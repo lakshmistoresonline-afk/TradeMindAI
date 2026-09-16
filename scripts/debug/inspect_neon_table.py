@@ -10,9 +10,9 @@ db_url = os.getenv("POSTGRES_URL")
 engine = sqlalchemy.create_engine(db_url)
 try:
     with engine.connect() as conn:
-        res = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'shadow_signals'"))
+        res = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'stocks'"))
         cols = [row[0] for row in res]
-        print(f"Columns in shadow_signals: {cols}")
+        print(f"Columns in stocks: {cols}")
         if "quality_class" in cols:
             print("   [OK] quality_class exists.")
         else:

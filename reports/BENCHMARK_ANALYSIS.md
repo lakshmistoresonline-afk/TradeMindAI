@@ -16,9 +16,9 @@ Analyzed Strategy V2.2 aggregate performance against the NIFTY-50 benchmark:
 - **Status**: **VERIFIED**
 
 ## 3. Findings
-- **Alpha Generation**: Strategy V2.2 significantly outperformed the broad market benchmark during the validation window. This is primarily attributed to high selectivity (2.2% emission rate) focusing on high-momentum breakouts.
+- **Observed Excess Return**: Strategy V2.2 outperformed the broad market benchmark during the validation window in the observed sample. This is primarily attributed to high selectivity (2.2% emission rate) focusing on high-momentum breakouts.
 - **Beta Sensitivity**: The strategy exhibits a beta of 1.15 relative to NIFTY-50, indicating moderate aggressive sensitivity to market direction.
 
 ---
 **Verdict**: **PASS**
-Strategy V2.2 demonstrates substantial excess return (Alpha) relative to the primary market benchmark.
+Strategy V2.2 demonstrates substantial excess return relative to the primary market benchmark in the current sample.

@@ -21,7 +21,7 @@ This audit provides a terminal recalculation of all key performance metrics for 
     - Net P&L (Full): +126.95%
     - Without Top 3 Trades: +97.55%
     - Without Bottom 3 Trades: +139.55%
-- **Expectancy Robustness**: The positive expectancy of 2.59% per trade indicates a significant statistical edge, exceeding the minimum threshold of 0.5% for production certification.
+- **Expectancy Robustness**: The positive expectancy of 2.59% per trade indicates an observed statistical edge in the current sample, exceeding the minimum threshold of 0.5% for production certification.
 
 ## 3. Segmented Performance
 ### 3.1 By Direction
