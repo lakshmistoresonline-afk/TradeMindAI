@@ -142,7 +142,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.55rem' }}>{stock.price_status || 'FRESH'} FEED</Typography>
          </Box>
 
-         <Stack spacing={1}>
+         <Stack spacing={1.5}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>CREATED AT</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(decision.generatedAt)}</Typography>
@@ -151,6 +151,14 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(stock.data_timestamp || stock.timestamp)}</Typography>
             </Box>
+            {decision.signalAgeHours !== undefined && (
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>SIGNAL AGE</Typography>
+                    <Typography variant="caption" sx={{ color: decision.signalAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem' }}>
+                        {decision.signalAgeHours.toFixed(1)} HOURS
+                    </Typography>
+                </Box>
+            )}
          </Stack>
       </Box>
 

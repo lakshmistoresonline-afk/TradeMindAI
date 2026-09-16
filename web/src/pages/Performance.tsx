@@ -88,7 +88,7 @@ function HorizonSection({ title, stats, description, color }: any) {
                 variant="text"
                 size="small"
                 onClick={() => navigate('/signals')}
-                sx={{ color: 'primary.main', fontWeight: 900, fontSize: '0.7rem' }}
+                sx={{ color: 'primary.main', fontWeight: 900, fontSize: '0.7rem', textTransform: 'none' }}
             >
                 VIEW UNDERLYING SIGNAL HISTORY →
             </Button>

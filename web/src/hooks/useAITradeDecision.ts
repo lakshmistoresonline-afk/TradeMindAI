@@ -121,7 +121,17 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     mae: parseNum(signal.realized_mae || signal.mae),
     mfe: parseNum(signal.realized_mfe || signal.mfe),
     outcome: signal.outcome,
-    closedAt: ensureUTC(signal.outcome_timestamp || signal.exit_at)
+    closedAt: ensureUTC(signal.outcome_timestamp || signal.exit_at),
+
+    // Signal Intelligence 3.0 Fields
+    predictionId: signal.prediction_id,
+    provenanceId: signal.provenance_id,
+    provenanceData: signal.provenance || signal.provenance_json,
+    marketContext: signal.market_context || signal.regime_metadata,
+    technicalEvidence: signal.technical_evidence || signal.indicators,
+    modelEvidence: signal.model_evidence,
+    lifecycleEvents: (signal.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) })),
+    signalAgeHours: signal.signal_age_hours || (signal.created_at ? (Date.now() - new Date(signal.created_at).getTime()) / (1000 * 60 * 60) : undefined)
   };
 };
 

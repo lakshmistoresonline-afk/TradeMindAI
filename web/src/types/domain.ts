@@ -72,6 +72,16 @@ export interface AITradeDecision {
   holdingPeriodDays?: number;
   outcome?: string;
   closedAt?: string;
+
+  // Signal Intelligence 3.0 Additions
+  predictionId?: string;
+  provenanceId?: string;
+  provenanceData?: any;
+  marketContext?: any;
+  technicalEvidence?: any;
+  modelEvidence?: any;
+  lifecycleEvents?: SignalEvent[];
+  signalAgeHours?: number;
 }
 
 export interface MarketSnapshot {

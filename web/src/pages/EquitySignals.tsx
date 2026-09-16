@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle, LayoutGrid, List as ListIcon, Columns } from 'lucide-react';
 import { getEquitySignals, getEquityHistory } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
@@ -16,6 +16,11 @@ export default function EquitySignals() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // UI State
+  const [viewLayout, setViewLayout] = useState<'GRID' | 'TABLE'>('GRID');
+  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+
   // History Pagination & Filters
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -29,8 +34,8 @@ export default function EquitySignals() {
 
   const { connectionStatus } = useTurboSync();
 
-  // Canonical Active Signal Universes (V2.3)
-  const activeUniverses = useMemo(() => [
+  // Canonical Signal Universes (V2.3)
+  const universes = useMemo(() => [
     { label: 'ALL ACTIVE', value: 'ALL', color: 'primary.main' },
     { label: 'SWING', value: 'SWING', color: '#10b981' },
     { label: 'SHORT', value: 'SHORT', color: 'slategray' },
@@ -87,7 +92,7 @@ export default function EquitySignals() {
   }, [signals]);
 
   const filteredActiveSignals = useMemo(() => {
-    const universe = activeUniverses[activeTab].value;
+    const universe = universes[activeTab].value;
 
     return signals.filter(s => {
         const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -102,7 +107,18 @@ export default function EquitySignals() {
 
         return false;
     });
-  }, [signals, activeTab, searchQuery, activeUniverses]);
+  }, [signals, activeTab, searchQuery, universes]);
+
+  const toggleCompare = (id: string) => {
+    setSelectedForCompare(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : (prev.length < 4 ? [...prev, id] : prev)
+    );
+  };
+
+  const comparedSignals = useMemo(() =>
+    signals.filter(s => selectedForCompare.includes(s.id)),
+    [signals, selectedForCompare]
+  );
 
   const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
@@ -111,7 +127,7 @@ export default function EquitySignals() {
       {/* 1. Terminal Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 5, flexWrap: 'wrap', gap: 3 }}>
          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>EQUITY TERMINAL</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>SIGNAL TERMINAL</Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
                <Typography variant="caption" sx={{ fontWeight: 900, color: '#10b981', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Activity size={14} /> LIVE SHADOW SCAN
@@ -151,12 +167,34 @@ export default function EquitySignals() {
          </Stack>
       </Box>
 
-      {/* 2. Mode Switch */}
-      <Box sx={{ mb: 4 }}>
+      {/* 2. Mode Switch & Controls */}
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
          <Stack direction="row" spacing={1}>
             <ModeButton active={mode === 'ACTIVE'} onClick={() => { setMode('ACTIVE'); setPage(0); setSearchQuery(''); }}>ACTIVE SIGNALS</ModeButton>
             <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setPage(0); setSearchQuery(''); }}>SIGNAL HISTORY</ModeButton>
          </Stack>
+
+         {mode === 'ACTIVE' && (
+            <Stack direction="row" spacing={1}>
+                <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? 'primary.main' : 'slategray' }}>
+                    <LayoutGrid size={20} />
+                </IconButton>
+                <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? 'primary.main' : 'slategray' }}>
+                    <ListIcon size={20} />
+                </IconButton>
+                <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
+                <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<Columns size={16} />}
+                    disabled={selectedForCompare.length < 2}
+                    onClick={() => setIsCompareOpen(true)}
+                    sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: 'primary.main', color: 'primary.main' }}
+                >
+                    COMPARE {selectedForCompare.length > 0 ? `(${selectedForCompare.length})` : ''}
+                </Button>
+            </Stack>
+         )}
       </Box>
 
       {mode === 'ACTIVE' ? (
@@ -184,7 +222,7 @@ export default function EquitySignals() {
                     onChange={(_, v) => setActiveTab(v)}
                     sx={{
                         minHeight: 44,
-                        '& .MuiTabs-indicator': { height: 3, bgcolor: activeUniverses[activeTab].color },
+                        '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
                         '& .MuiTab-root': {
                             color: 'slategray',
                             fontWeight: 950,
@@ -195,13 +233,13 @@ export default function EquitySignals() {
                         }
                     }}
                 >
-                    {activeUniverses.map((u) => (
+                    {universes.map((u) => (
                         <Tab key={u.value} label={u.label} />
                     ))}
                 </Tabs>
             </Paper>
 
-            {/* 5. Active Signal Grid */}
+            {/* 5. Active Signal Data Presentation */}
             {loading ? (
                 <Grid container spacing={3}>
                     {[1,2,3,4,5,6].map(i => (
@@ -213,18 +251,88 @@ export default function EquitySignals() {
             ) : (
                 <Box>
                     {filteredActiveSignals.length > 0 ? (
-                        <Grid container spacing={3}>
-                            {filteredActiveSignals.map((s) => (
-                                <Grid item xs={12} md={6} lg={4} key={s.id}>
-                                    <LiveSignalCard stock={s} decision={s.decision} />
-                                </Grid>
-                            ))}
-                        </Grid>
+                        viewLayout === 'GRID' ? (
+                            <Grid container spacing={3}>
+                                {filteredActiveSignals.map((s) => (
+                                    <Grid item xs={12} md={6} lg={4} key={s.id}>
+                                        <Box sx={{ position: 'relative', height: '100%' }}>
+                                            <LiveSignalCard stock={s} decision={s.decision} />
+                                            <MuiChip
+                                                label={selectedForCompare.includes(s.id) ? "SELECTED" : "COMPARE"}
+                                                onClick={() => toggleCompare(s.id)}
+                                                size="small"
+                                                sx={{
+                                                    position: 'absolute', top: 10, right: 80,
+                                                    zIndex: 10, height: 20, fontSize: '0.5rem',
+                                                    fontWeight: 950, cursor: 'pointer',
+                                                    bgcolor: selectedForCompare.includes(s.id) ? 'primary.main' : 'rgba(0,0,0,0.4)',
+                                                    color: selectedForCompare.includes(s.id) ? '#000' : 'white',
+                                                    '&:hover': { bgcolor: 'primary.main', color: '#000' }
+                                                }}
+                                            />
+                                        </Box>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        ) : (
+                            <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+                                <Table sx={{ minWidth: 1200 }}>
+                                    <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
+                                        <TableRow>
+                                            <TableCell padding="checkbox" />
+                                            <TableCell>SYMBOL</TableCell>
+                                            <TableCell>DIRECTION</TableCell>
+                                            <TableCell>HORIZON</TableCell>
+                                            <TableCell>ENTRY</TableCell>
+                                            <TableCell>CURRENT</TableCell>
+                                            <TableCell>TARGET</TableCell>
+                                            <TableCell>STOP</TableCell>
+                                            <TableCell>PROBABILITY</TableCell>
+                                            <TableCell>EV</TableCell>
+                                            <TableCell align="right">ACTION</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {filteredActiveSignals.map((s) => (
+                                            <TableRow key={s.id} hover onClick={() => navigate(`/signals/${s.id}`)} sx={{ cursor: 'pointer' }}>
+                                                <TableCell padding="checkbox">
+                                                    <MuiChip
+                                                        size="small"
+                                                        onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
+                                                        sx={{
+                                                            height: 18, width: 18, minWidth: 0, p: 0,
+                                                            bgcolor: selectedForCompare.includes(s.id) ? 'primary.main' : 'transparent',
+                                                            border: '1px solid rgba(255,255,255,0.1)'
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell sx={{ fontWeight: 950 }}>{s.symbol}</TableCell>
+                                                <TableCell>
+                                                    <Typography sx={{ fontWeight: 900, color: s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444', fontSize: '0.75rem' }}>
+                                                        {s.decision.rating}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>{s.decision.timeframe}</TableCell>
+                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.normalizedCurrentPrice?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#10b981' }}>₹{s.decision.target?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#ef4444' }}>₹{s.decision.stopLoss?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontWeight: 800 }}>{s.decision.conviction}%</TableCell>
+                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.expectedValue?.toFixed(1)}</TableCell>
+                                                <TableCell align="right">
+                                                    <Button size="small" sx={{ fontWeight: 900, fontSize: '0.65rem' }}>TERMINAL</Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        )
                     ) : (
                         <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
                             <ShieldAlert size={56} color="slategray" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
                             <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>
-                                {activeUniverses[activeTab].label} — NO QUALIFIED SIGNALS
+                                {universes[activeTab].label} — NO QUALIFIED SIGNALS
                             </Typography>
                         </Paper>
                     )}
@@ -234,40 +342,20 @@ export default function EquitySignals() {
       ) : (
         /* 6. Signal History View */
         <Box>
-            {/* 6.1 Historical Summary Summary stats */}
             <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={2.4}>
-                    <SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color="primary.main" />
-                </Grid>
-                <Grid item xs={6} md={2.4}>
-                    <SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color="#10b981" />
-                </Grid>
-                <Grid item xs={6} md={2.4}>
-                    <SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color="#ef4444" />
-                </Grid>
-                <Grid item xs={6} md={2.4}>
-                    <SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color="orange" />
-                </Grid>
-                <Grid item xs={6} md={2.4}>
-                    <SummaryStat label="OTHER" value={historySummary?.other || 0} color="slategray" />
-                </Grid>
+                <Grid item xs={12} md={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color="primary.main" /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color="#10b981" /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color="#ef4444" /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color="orange" /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color="slategray" /></Grid>
             </Grid>
 
-            {/* 6.2 Filter Bar */}
             <Paper sx={{ p: 2, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
                <Grid container spacing={3} alignItems="center">
-                  <Grid item xs={12} md={2.4}>
-                     <HistorySelect label="DIRECTION" value={hFilterDirection} onChange={setHFilterDirection} options={['ALL', 'LONG', 'SHORT']} />
-                  </Grid>
-                  <Grid item xs={12} md={2.4}>
-                     <HistorySelect label="HORIZON" value={hFilterHorizon} onChange={setHFilterHorizon} options={['ALL', 'SWING', 'SHORT', 'LONG']} />
-                  </Grid>
-                  <Grid item xs={12} md={2.4}>
-                     <HistorySelect label="QUALITY" value={hFilterQuality} onChange={setHFilterQuality} options={['ALL', 'PRIMARY', 'SELECTIVE', 'EXPERIMENTAL']} />
-                  </Grid>
-                  <Grid item xs={12} md={2.4}>
-                     <HistorySelect label="OUTCOME" value={hFilterStatus} onChange={setHFilterStatus} options={['ALL', 'TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'CANCELLED']} />
-                  </Grid>
+                  <Grid item xs={12} md={2.4}><HistorySelect label="DIRECTION" value={hFilterDirection} onChange={setHFilterDirection} options={['ALL', 'LONG', 'SHORT']} /></Grid>
+                  <Grid item xs={12} md={2.4}><HistorySelect label="HORIZON" value={hFilterHorizon} onChange={setHFilterHorizon} options={['ALL', 'SWING', 'SHORT', 'LONG']} /></Grid>
+                  <Grid item xs={12} md={2.4}><HistorySelect label="QUALITY" value={hFilterQuality} onChange={setHFilterQuality} options={['ALL', 'PRIMARY', 'SELECTIVE', 'EXPERIMENTAL']} /></Grid>
+                  <Grid item xs={12} md={2.4}><HistorySelect label="OUTCOME" value={hFilterStatus} onChange={setHFilterStatus} options={['ALL', 'TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'CANCELLED']} /></Grid>
                   <Grid item xs={12} md={2.4}>
                      <Button
                         fullWidth
@@ -282,7 +370,6 @@ export default function EquitySignals() {
                </Grid>
             </Paper>
 
-            {/* 6.3 Historical Ledger Table */}
             <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
                <Table sx={{ minWidth: 1400 }}>
                   <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
@@ -310,9 +397,7 @@ export default function EquitySignals() {
                         history.map((s) => (
                            <TableRow key={s.id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
                               <TableCell sx={{ fontWeight: 700, color: 'slategray', fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
-                              <TableCell>
-                                 <Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: '0.85rem' }}>{s.symbol}</Typography>
-                              </TableCell>
+                              <TableCell><Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
                               <TableCell sx={{ fontSize: '0.6rem', color: 'slategray', fontFamily: 'JetBrains Mono' }}>{s.id}</TableCell>
                               <TableCell>
                                  <MuiChip
@@ -340,9 +425,7 @@ export default function EquitySignals() {
                               </TableCell>
                               <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.8rem' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
                               <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.8rem' }}>{s.decision.exitPrice ? `₹${s.decision.exitPrice.toLocaleString()}` : '—'}</TableCell>
-                              <TableCell>
-                                 <OutcomeBadge outcome={s.decision.status} />
-                              </TableCell>
+                              <TableCell><OutcomeBadge outcome={s.decision.status} /></TableCell>
                               <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444', fontSize: '0.8rem' }}>
                                  {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(2)}%` : '—'}
                               </TableCell>
@@ -375,18 +458,46 @@ export default function EquitySignals() {
         </Box>
       )}
 
-      {/* 7. Footer Metadata */}
+      {/* 7. Comparison Dialog */}
+      <Dialog open={isCompareOpen} onClose={() => setIsCompareOpen(false)} maxWidth="lg" fullWidth PaperProps={{ sx: { bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' } }}>
+         <DialogTitle sx={{ color: 'white', fontWeight: 950 }}>SIGNAL COMPARISON</DialogTitle>
+         <DialogContent>
+            <TableContainer sx={{ mt: 2 }}>
+               <Table>
+                  <TableHead>
+                     <TableRow>
+                        <TableCell>METRIC</TableCell>
+                        {comparedSignals.map(s => <TableCell key={s.id} sx={{ fontWeight: 950, color: 'primary.main' }}>{s.symbol}</TableCell>)}
+                     </TableRow>
+                  </TableHead>
+                  <TableBody>
+                     <CompareRow label="PROBABILITY" values={comparedSignals.map(s => `${s.decision.conviction}%`)} />
+                     <CompareRow label="EXPECTED VALUE" values={comparedSignals.map(s => `₹${s.decision.expectedValue?.toFixed(2)}`)} />
+                     <CompareRow label="RISK / REWARD" values={comparedSignals.map(s => s.decision.riskReward)} />
+                     <CompareRow label="HORIZON" values={comparedSignals.map(s => s.decision.timeframe)} />
+                     <CompareRow label="QUALITY" values={comparedSignals.map(s => s.decision.qualityClass)} />
+                     <CompareRow label="ENTRY" values={comparedSignals.map(s => `₹${s.decision.entry?.toLocaleString()}`)} />
+                     <CompareRow label="TARGET" values={comparedSignals.map(s => `₹${s.decision.target?.toLocaleString()}`)} />
+                     <CompareRow label="STOP" values={comparedSignals.map(s => `₹${s.decision.stopLoss?.toLocaleString()}`)} />
+                  </TableBody>
+               </Table>
+            </TableContainer>
+         </DialogContent>
+         <DialogActions sx={{ p: 3 }}>
+            <Button onClick={() => setIsCompareOpen(false)} sx={{ fontWeight: 900, color: 'white' }}>CLOSE</Button>
+         </DialogActions>
+      </Dialog>
+
+      {/* 8. Footer Metadata */}
       <Box sx={{ mt: 10, p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
          <Stack direction="row" spacing={3} alignItems="flex-start">
-            <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 1 }}>
-               <Info size={20} color="#10b981" />
-            </Box>
+            <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 1 }}><Info size={20} color="#10b981" /></Box>
             <Box>
                <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>FORENSIC SIGNAL PROTOCOL</Typography>
                <Typography variant="caption" sx={{ color: 'slategray', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
                   Authoritative signals are derived from institutional order flow and Strategy V2.2 breakout logic.
                   All historical outcomes are verified against NSE Spot closing nodes.
-                  Last sync confirmed at {latestUpdate} IST.
+                  Latest sync confirmed at {latestUpdate} IST.
                </Typography>
             </Box>
          </Stack>
@@ -428,21 +539,9 @@ function HistorySelect({ label, value, onChange, options }: any) {
     return (
         <FormControl fullWidth size="small">
             <InputLabel sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.7rem' }}>{label}</InputLabel>
-            <Select
-                value={value}
-                label={label}
-                onChange={(e) => onChange(e.target.value)}
-                sx={{
-                    bgcolor: 'rgba(255,255,255,0.02)',
-                    color: 'white',
-                    fontWeight: 800,
-                    fontSize: '0.75rem',
-                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' }
-                }}
-            >
-                {options.map((o: string) => (
-                    <MenuItem key={o} value={o} sx={{ fontSize: '0.75rem', fontWeight: 700 }}>{o.replace(/_/g, ' ')}</MenuItem>
-                ))}
+            <Select value={value} label={label} onChange={(e) => onChange(e.target.value)}
+                sx={{ bgcolor: 'rgba(255,255,255,0.02)', color: 'white', fontWeight: 800, fontSize: '0.75rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' } }}>
+                {options.map((o: string) => (<MenuItem key={o} value={o} sx={{ fontSize: '0.75rem', fontWeight: 700 }}>{o.replace(/_/g, ' ')}</MenuItem>))}
             </Select>
         </FormControl>
     );
@@ -451,15 +550,22 @@ function HistorySelect({ label, value, onChange, options }: any) {
 function OutcomeBadge({ outcome }: { outcome: string }) {
     let color = 'slategray';
     let icon = <Clock size={12} />;
-
     if (outcome === 'TARGET_HIT') { color = '#10b981'; icon = <CheckCircle size={12} />; }
     if (outcome === 'STOP_LOSS' || outcome === 'STOP_HIT') { color = '#ef4444'; icon = <XCircle size={12} />; }
     if (outcome === 'EXPIRED') { color = 'orange'; icon = <AlertCircle size={12} />; }
-
     return (
         <Stack direction="row" spacing={1} alignItems="center" sx={{ color, fontWeight: 900, fontSize: '0.65rem' }}>
             {icon}
             <Typography variant="caption" sx={{ fontWeight: 950, fontSize: '0.65rem' }}>{outcome?.replace(/_/g, ' ')}</Typography>
         </Stack>
+    );
+}
+
+function CompareRow({ label, values }: any) {
+    return (
+        <TableRow>
+            <TableCell sx={{ fontWeight: 800, color: 'slategray', fontSize: '0.65rem' }}>{label}</TableCell>
+            {values.map((v: any, i: number) => <TableCell key={i} sx={{ fontWeight: 900, color: 'white', fontSize: '0.75rem' }}>{v || '—'}</TableCell>)}
+        </TableRow>
     );
 }

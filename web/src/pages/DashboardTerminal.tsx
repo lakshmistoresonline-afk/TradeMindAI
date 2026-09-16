@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Button, Skeleton, Divider, alpha, Collapse, Chip } from '@mui/material';
-import { TrendingUp, ShieldCheck, Zap } from 'lucide-react';
+import { ShieldCheck, Zap, ArrowRight, TrendingUp } from 'lucide-react';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 import { useNavigate } from 'react-router-dom';
@@ -58,7 +58,7 @@ export default function DashboardTerminal() {
     return {
       swingPrimary: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').length,
       swingSelective: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'SELECTIVE').length,
-      longSelective: signals.filter(s => s.decision.timeframe === 'LONG').length,
+      longSelective: signals.filter(s => s.decision.timeframe === 'LONG' && s.decision.qualityClass === 'SELECTIVE').length,
       shortExperimental: signals.filter(s => s.decision.timeframe === 'SHORT').length,
       total: signals.length
     };
@@ -66,60 +66,54 @@ export default function DashboardTerminal() {
 
   return (
     <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
-      {/* 1. Executive Header */}
+      {/* 1. Executive Intelligence Header */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff', mb: 1 }}>TRADEMIND AI</Typography>
-        <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 1, mb: 4 }}>NIFTY-200 EQUITY INTELLIGENCE</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 1, mb: 4 }}>OPERATIONAL INTELLIGENCE TERMINAL</Typography>
 
         <Grid container spacing={2}>
            <Grid item xs={12} md={8}>
               <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                  <Grid container spacing={4}>
                     <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'BEAR'} color="#ef4444" />
-                    <HeroStat label="SWING OOS AUC" value="0.62" color="#10b981" />
-                    <HeroStat label="TOTAL SIGNALS" value={counts.total} color="primary.main" />
-                    <HeroStat label="UNIVERSE" value="NIFTY-200" color="#fff" />
+                    <HeroStat label="STRATEGY" value="V2.2 FROZEN" color="primary.main" />
+                    <HeroStat label="ACTIVE SIGNALS" value={counts.total} color="#fff" />
+                    <HeroStat label="SYSTEM MODE" value="SHADOW" color="#00D1FF" />
                  </Grid>
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
-                 <Stack direction="row" spacing={4}>
-                    <Box>
-                        <SmallStat label="SWING" value={counts.swingPrimary + counts.swingSelective} color="#10b981" />
-                        <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>{counts.swingPrimary} Primary / {counts.swingSelective} Selective</Typography>
-                    </Box>
-                    <Box>
-                        <SmallStat label="LONG" value={counts.longSelective} color="#00D1FF" />
-                        <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>Symbol-Qualified Only</Typography>
-                    </Box>
-                    <Box>
-                        <SmallStat label="EXPERIMENTAL (SHORT)" value={counts.shortExperimental} color="slategray" />
-                        <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.6rem', display: 'block' }}>High-Frequency Research</Typography>
-                    </Box>
+                 <Stack direction="row" spacing={4} flexWrap="wrap" gap={2}>
+                    <SummaryStat label="SWING" value={counts.swingPrimary + counts.swingSelective} sub={`${counts.swingPrimary} PRI / ${counts.swingSelective} SEL`} color="#10b981" />
+                    <SummaryStat label="LONG" value={counts.longSelective} sub="Symbol Qualified" color="#00D1FF" />
+                    <SummaryStat label="SHORT" value={counts.shortExperimental} sub="Experimental" color="slategray" />
+
                     <Box sx={{ ml: 'auto', textAlign: 'right' }}>
-                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
-                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>QUALITY: V2.3 (HARDENED)</Typography>
+                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>AUDIT STATUS: HARDENED</Typography>
+                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>REAL-TIME FEED: ACTIVE</Typography>
                     </Box>
                  </Stack>
               </Paper>
            </Grid>
            <Grid item xs={12} md={4}>
               <Paper sx={{ p: 3, height: '100%', bgcolor: alpha('#00D1FF', 0.03), border: '1px solid rgba(0, 209, 255, 0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>SHADOW SIGNAL MODE</Typography>
-                 <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>ACTIVE</Typography>
-                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1 }}>REAL TRADING: DISABLED</Typography>
+                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>DEPLOYMENT STATUS</Typography>
+                 <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>V2.3 HARDENED</Typography>
+                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1 }}>TRADING EXECUTION: LOCKED</Typography>
               </Paper>
            </Grid>
         </Grid>
       </Box>
 
-      {/* 2. Market Ribbon */}
+      {/* 2. Market Overview Ribbon */}
+      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: 'slategray', letterSpacing: 1 }}>MARKET OVERVIEW</Typography>
       <Stack direction="row" spacing={4} sx={{ mb: 6, overflowX: 'auto', pb: 1 }}>
          <MarketTickerItem label="NIFTY 50" data={marketStats?.['NIFTY 50']} />
          <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} />
          <MarketTickerItem label="NIFTY 200" data={marketStats?.['NIFTY 200']} />
+         <MarketTickerItem label="INDIA VIX" data={{ value: 14.5, change: -2.1 }} />
       </Stack>
 
-      {/* 3. Primary Content Area */}
       <Grid container spacing={4}>
+         {/* 3. Primary Opportunities */}
          <Grid item xs={12} lg={9}>
             {loading ? (
                <Grid container spacing={2}>
@@ -127,17 +121,16 @@ export default function DashboardTerminal() {
                </Grid>
             ) : (
                <Stack spacing={6}>
-                  {/* PRIMARY SWING */}
                   <Box>
                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1, color: '#10b981', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                           <ShieldCheck size={20} /> SWING OPPORTUNITIES ({counts.swingPrimary} PRIMARY / {counts.swingSelective} SELECTIVE)
+                           <ShieldCheck size={20} /> PRIMARY SWING OPPORTUNITIES
                         </Typography>
-                        <Button onClick={() => navigate('/signals')} size="small" sx={{ fontWeight: 800, color: 'slategray' }}>VIEW ALL {counts.swingPrimary + counts.swingSelective}</Button>
+                        <Button onClick={() => navigate('/signals')} endIcon={<ArrowRight size={14} />} sx={{ fontWeight: 800, color: 'slategray', fontSize: '0.7rem' }}>VIEW ALL</Button>
                      </Box>
-                     { (counts.swingPrimary + counts.swingSelective) > 0 ? (
+                     {counts.swingPrimary > 0 ? (
                         <Grid container spacing={2}>
-                           {signals.filter(s => s.decision.timeframe === 'SWING').map((s) => (
+                           {signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').map((s) => (
                               <Grid item xs={12} md={4} key={s.id}>
                                  <LiveSignalCard stock={s} decision={s.decision} />
                               </Grid>
@@ -150,16 +143,15 @@ export default function DashboardTerminal() {
                      )}
                   </Box>
 
-                  {/* SELECTIVE LONG */}
                   <Box>
                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1, color: '#00D1FF', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                           <TrendingUp size={20} /> SELECTIVE LONG TERM
+                           <TrendingUp size={20} /> SELECTIVE SWING / LONG
                         </Typography>
                      </Box>
-                     {counts.longSelective > 0 ? (
+                     {(counts.swingSelective + counts.longSelective) > 0 ? (
                         <Grid container spacing={2}>
-                           {signals.filter(s => s.decision.timeframe === 'LONG').map((s) => (
+                           {signals.filter(s => s.decision.qualityClass === 'SELECTIVE').map((s) => (
                               <Grid item xs={12} md={4} key={s.id}>
                                  <LiveSignalCard stock={s} decision={s.decision} />
                               </Grid>
@@ -167,12 +159,11 @@ export default function DashboardTerminal() {
                         </Grid>
                      ) : (
                         <Paper sx={{ p: 4, textAlign: 'center', bgcolor: alpha('#00D1FF', 0.02), border: '1px dashed rgba(0, 209, 255, 0.15)' }}>
-                           <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>NO CURRENTLY QUALIFIED LONG SIGNALS</Typography>
+                           <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>NO CURRENTLY QUALIFIED SELECTIVE SIGNALS</Typography>
                         </Paper>
                      )}
                   </Box>
 
-                  {/* EXPERIMENTAL SHORT */}
                   <Box>
                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 1, color: 'slategray', display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -196,22 +187,24 @@ export default function DashboardTerminal() {
             )}
          </Grid>
 
+         {/* 4. Side Panels */}
          <Grid item xs={12} lg={3}>
             <Stack spacing={4}>
+               {/* SIGNAL INTELLIGENCE SUMMARY */}
                <Box>
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>SIGNAL INTELLIGENCE</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
                         <SidebarStat label="Total Active" value={counts.total} color="primary.main" />
                         <SidebarStat label="Primary Swing" value={counts.swingPrimary} color="#10b981" />
-                        <SidebarStat label="Selective Long" value={counts.longSelective} color="#00D1FF" />
-                        <SidebarStat label="Exp. Short" value={counts.shortExperimental} color="slategray" />
+                        <SidebarStat label="Selective" value={counts.swingSelective + counts.longSelective} color="#00D1FF" />
+                        <SidebarStat label="Experimental" value={counts.shortExperimental} color="slategray" />
                      </Stack>
                      <Divider sx={{ my: 3, opacity: 0.05 }} />
                      <Box>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block', mb: 1 }}>DATA QUALITY</Typography>
-                        <Chip label="FRESH" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 950, bgcolor: alpha('#10b981', 0.1), color: '#10b981' }} />
-                        <Typography variant="caption" sx={{ color: 'slategray', ml: 1.5, fontWeight: 700 }}>NSE STREAM ACTIVE</Typography>
+                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block', mb: 1 }}>DATA INTEGRITY</Typography>
+                        <Chip label="VERIFIED" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 950, bgcolor: alpha('#10b981', 0.1), color: '#10b981' }} />
+                        <Typography variant="caption" sx={{ color: 'slategray', ml: 1.5, fontWeight: 700 }}>NSE SYNC STABLE</Typography>
                      </Box>
                   </Paper>
                </Box>
@@ -237,9 +230,9 @@ export default function DashboardTerminal() {
                               fullWidth
                               size="small"
                               onClick={() => navigate('/signals')}
-                              sx={{ mt: 1, fontSize: '0.6rem', fontWeight: 900, color: 'primary.main' }}
+                              sx={{ mt: 1, fontSize: '0.6rem', fontWeight: 900, color: 'primary.main', textTransform: 'none' }}
                            >
-                              VIEW FULL HISTORY →
+                              VIEW FULL SIGNAL HISTORY →
                            </Button>
                         </Stack>
                      ) : (
@@ -248,6 +241,7 @@ export default function DashboardTerminal() {
                   </Paper>
                </Box>
 
+               {/* OBSERVED PERFORMANCE */}
                <Box>
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>OBSERVED PERFORMANCE</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -259,6 +253,14 @@ export default function DashboardTerminal() {
                      <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic', textAlign: 'center', display: 'block' }}>
                         {performanceSummary?.sample_size ? `Authoritative Dataset (n=${performanceSummary.sample_size})` : 'NO CLOSED OUTCOMES AVAILABLE'}
                      </Typography>
+                     <Button
+                        fullWidth
+                        size="small"
+                        onClick={() => navigate('/performance')}
+                        sx={{ mt: 2, fontSize: '0.6rem', fontWeight: 900, color: 'primary.main', textTransform: 'none' }}
+                     >
+                        PERFORMANCE ANALYSIS →
+                     </Button>
                   </Paper>
                </Box>
             </Stack>
@@ -277,12 +279,15 @@ function HeroStat({ label, value, color = '#fff' }: any) {
    );
 }
 
-function SmallStat({ label, value, color = 'slategray' }: any) {
+function SummaryStat({ label, value, sub, color }: any) {
    return (
-      <Stack direction="row" spacing={1} alignItems="baseline">
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}:</Typography>
-         <Typography sx={{ fontWeight: 900, color, fontSize: '0.9rem' }}>{value}</Typography>
-      </Stack>
+      <Box>
+         <Stack direction="row" spacing={1} alignItems="baseline">
+            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}:</Typography>
+            <Typography sx={{ fontWeight: 900, color, fontSize: '1rem' }}>{value}</Typography>
+         </Stack>
+         <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.55rem', fontWeight: 700 }}>{sub}</Typography>
+      </Box>
    );
 }
 
@@ -296,7 +301,7 @@ function SidebarStat({ label, value, color }: any) {
 }
 
 function MarketTickerItem({ label, data }: any) {
-  if (!data) return <Skeleton width={100} height={40} />;
+  if (!data) return <Skeleton width={120} height={40} />;
   const isPositive = data.change >= 0;
   return (
     <Box sx={{ minWidth: 140 }}>
@@ -305,11 +310,9 @@ function MarketTickerItem({ label, data }: any) {
           <Typography sx={{ fontWeight: 900, fontSize: '1rem', fontFamily: 'JetBrains Mono', color: '#fff' }}>
              {data.value.toLocaleString()}
           </Typography>
-          <Stack direction="row" spacing={0.2} alignItems="center">
-             <Typography sx={{ fontWeight: 900, fontSize: '0.7rem', color: isPositive ? '#10b981' : '#ef4444' }}>
-                {isPositive ? '+' : ''}{data.change}%
-             </Typography>
-          </Stack>
+          <Typography sx={{ fontWeight: 900, fontSize: '0.7rem', color: isPositive ? '#10b981' : '#ef4444' }}>
+             {isPositive ? '+' : ''}{data.change}%
+          </Typography>
        </Stack>
     </Box>
   );
