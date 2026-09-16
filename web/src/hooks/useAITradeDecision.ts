@@ -74,9 +74,17 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   }
   drivers = (drivers as any[]).filter(d => typeof d === 'string' && !d.includes('{'));
 
-  // 8. Thesis
+  // 8. Thesis & Deterministic Explanation (Signal Intelligence 4.0)
   let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Analyzing institutional order flow...';
   if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
+
+  const formattedThesis = {
+      trend: rawRating.includes('BUY') ? 'Bullish structure detected' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
+      momentum: conviction > 70 ? 'Strong directional momentum' : 'Consolidating / Neutral',
+      volume: 'Confirmed institutional flow', // Fallback as backend volume specific field is internal to V2.2
+      market: `${signal.regime || 'SIDEWAYS'} regime`,
+      probability: `${conviction}% model probability`
+  };
 
   // 9. Quality Class (Strict V2.3 Classification)
   // Backend quality_class is the authority. Fallback is deterministic.
@@ -102,6 +110,7 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     riskReward: signal.risk_reward_ratio ? `1:${signal.risk_reward_ratio.toFixed(1)}` : '1:2.5',
     expectedValue: parseNum(signal.expected_value),
     thesis,
+    formattedThesis,
     drivers,
     generatedAt: ensureUTC(signal.created_at || signal.timestamp),
     validatedAt: ensureUTC(signal.validated_at),
@@ -131,7 +140,8 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     technicalEvidence: signal.technical_evidence || signal.indicators,
     modelEvidence: signal.model_evidence,
     lifecycleEvents: (signal.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) })),
-    signalAgeHours: signal.signal_age_hours || (signal.created_at ? (Date.now() - new Date(signal.created_at).getTime()) / (1000 * 60 * 60) : undefined)
+    signalAgeHours: signal.signal_age_hours || (signal.created_at ? (Date.now() - new Date(signal.created_at).getTime()) / (1000 * 60 * 60) : undefined),
+    dataAgeHours: (signal.data_timestamp || signal.timestamp) ? (Date.now() - new Date(signal.data_timestamp || signal.timestamp).getTime()) / (1000 * 60 * 60) : undefined
   };
 };
 

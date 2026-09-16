@@ -1,4 +1,4 @@
-import { Box, Typography, Stepper, Step, StepLabel, StepContent, Chip } from '@mui/material';
+import { Box, Typography, Stepper, Step, StepLabel, StepContent, Chip, alpha } from '@mui/material';
 import { SignalEvent } from '../../../types/domain';
 import { CheckCircle2, Clock, Zap, Target, ShieldAlert, XCircle } from 'lucide-react';
 
@@ -38,17 +38,17 @@ export default function SignalLifecycleTimeline({ events, currentStatus }: Signa
           <Step key={event.id} active={true} expanded={true}>
             <StepLabel
               icon={getStepIcon(event.type)}
-              sx={{ '& .MuiStepLabel-label': { fontWeight: 900, color: 'white' } }}
+              sx={{ '& .MuiStepLabel-label': { fontWeight: 950, color: 'white', fontSize: '0.85rem' } }}
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <Typography variant="body2" fontWeight={800}>{event.type.replace('_', ' ')}</Typography>
-                <Typography variant="caption" color="textSecondary" sx={{ fontFamily: 'JetBrains Mono' }}>
-                  {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <Typography variant="body2" sx={{ fontWeight: 950, letterSpacing: 0.5 }}>{event.type.replace(/_/g, ' ')}</Typography>
+                <Typography variant="caption" sx={{ color: 'primary.main', fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
+                  {new Date(event.timestamp).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </Typography>
               </Box>
             </StepLabel>
-            <StepContent>
-              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1, fontWeight: 500 }}>
+            <StepContent sx={{ borderLeft: '2px dashed rgba(255,255,255,0.1)', ml: '12px' }}>
+              <Typography variant="caption" sx={{ color: 'slategray', display: 'block', mb: 1, fontWeight: 700, fontSize: '0.7rem' }}>
                 {event.message || `Signal state transitioned to ${event.type}.`}
               </Typography>
               {event.price && (
@@ -63,11 +63,22 @@ export default function SignalLifecycleTimeline({ events, currentStatus }: Signa
         ))}
       </Stepper>
 
-      <Box sx={{ mt: 2, p: 2, bgcolor: 'rgba(16, 185, 129, 0.05)', borderRadius: 1, border: '1px dashed #10b981' }}>
-         <Typography variant="caption" sx={{ fontWeight: 800, color: 'primary.main', display: 'block', textAlign: 'center' }}>
-           CURRENT STATE: {currentStatus.replace('_', ' ')}
+      <Box sx={{ mt: 3, p: 2, bgcolor: alpha(getStatusColor(currentStatus), 0.05), borderRadius: 1, border: `1px dashed ${getStatusColor(currentStatus)}` }}>
+         <Typography variant="caption" sx={{ fontWeight: 800, color: getStatusColor(currentStatus), display: 'block', textAlign: 'center', letterSpacing: 1 }}>
+           LIFECYCLE STATUS: {currentStatus.replace(/_/g, ' ')}
          </Typography>
       </Box>
     </Box>
   );
+}
+
+function getStatusColor(status: string) {
+    switch (status) {
+      case 'ACTIVE': return '#3b82f6';
+      case 'ENTRY_TRIGGERED': return '#00D1FF';
+      case 'WAITING_FOR_ENTRY': return '#f59e0b';
+      case 'TARGET_HIT': return '#10b981';
+      case 'STOP_LOSS': return '#ef4444';
+      default: return 'slategray';
+    }
 }

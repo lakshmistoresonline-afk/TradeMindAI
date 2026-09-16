@@ -32,6 +32,13 @@ export interface AITradeDecision {
 
   primaryCatalyst?: string;
   thesis?: string;
+  formattedThesis?: {
+      trend: string;
+      momentum: string;
+      volume: string;
+      market: string;
+      probability: string;
+  };
   keyRisks?: string[];
   invalidation?: string;
 
@@ -82,6 +89,7 @@ export interface AITradeDecision {
   modelEvidence?: any;
   lifecycleEvents?: SignalEvent[];
   signalAgeHours?: number;
+  dataAgeHours?: number;
 }
 
 export interface MarketSnapshot {

@@ -151,14 +151,24 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(stock.data_timestamp || stock.timestamp)}</Typography>
             </Box>
-            {decision.signalAgeHours !== undefined && (
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>SIGNAL AGE</Typography>
-                    <Typography variant="caption" sx={{ color: decision.signalAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem' }}>
-                        {decision.signalAgeHours.toFixed(1)} HOURS
-                    </Typography>
-                </Box>
-            )}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                {decision.signalAgeHours !== undefined && (
+                    <Box sx={{ flex: 1 }}>
+                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>SIGNAL AGE</Typography>
+                        <Typography variant="caption" sx={{ color: decision.signalAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem', display: 'block' }}>
+                            {decision.signalAgeHours.toFixed(1)} HOURS
+                        </Typography>
+                    </Box>
+                )}
+                {decision.dataAgeHours !== undefined && (
+                    <Box sx={{ flex: 1, textAlign: 'right' }}>
+                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>DATA AGE</Typography>
+                        <Typography variant="caption" sx={{ color: decision.dataAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem', display: 'block' }}>
+                            {decision.dataAgeHours.toFixed(1)} HOURS
+                        </Typography>
+                    </Box>
+                )}
+            </Box>
          </Stack>
       </Box>
 

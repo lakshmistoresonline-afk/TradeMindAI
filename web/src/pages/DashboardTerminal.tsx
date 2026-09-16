@@ -81,16 +81,28 @@ export default function DashboardTerminal() {
                     <HeroStat label="SYSTEM MODE" value="SHADOW" color="#00D1FF" />
                  </Grid>
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
-                 <Stack direction="row" spacing={4} flexWrap="wrap" gap={2}>
-                    <SummaryStat label="SWING" value={counts.swingPrimary + counts.swingSelective} sub={`${counts.swingPrimary} PRI / ${counts.swingSelective} SEL`} color="#10b981" />
-                    <SummaryStat label="LONG" value={counts.longSelective} sub="Symbol Qualified" color="#00D1FF" />
-                    <SummaryStat label="SHORT" value={counts.shortExperimental} sub="Experimental" color="slategray" />
-
-                    <Box sx={{ ml: 'auto', textAlign: 'right' }}>
+                 <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}>
+                        <SummaryStat label="SWING" value={counts.swingPrimary + counts.swingSelective} sub={`${counts.swingPrimary} PRI / ${counts.swingSelective} SEL`} color="#10b981" />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                        <SummaryStat label="LONG" value={counts.longSelective} sub="Symbol Qualified" color="#00D1FF" />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                        <SummaryStat label="SHORT" value={counts.shortExperimental} sub="Experimental" color="slategray" />
+                    </Grid>
+                 </Grid>
+                 <Divider sx={{ my: 3, opacity: 0.05 }} />
+                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box>
+                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
+                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>QUALITY: V2.3 (HARDENED)</Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'right' }}>
                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>AUDIT STATUS: HARDENED</Typography>
                        <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>REAL-TIME FEED: ACTIVE</Typography>
                     </Box>
-                 </Stack>
+                 </Box>
               </Paper>
            </Grid>
            <Grid item xs={12} md={4}>
@@ -218,12 +230,19 @@ export default function DashboardTerminal() {
                            {recentHistory.map((s) => (
                               <Box key={s.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                  <Box>
-                                    <Typography variant="caption" sx={{ fontWeight: 900, color: '#fff' }}>{s.symbol}</Typography>
-                                    <Typography variant="caption" sx={{ color: 'slategray', display: 'block', fontSize: '0.5rem' }}>{s.decision.status}</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 950, color: '#fff' }}>{s.symbol}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'slategray', display: 'block', fontSize: '0.5rem', fontWeight: 800 }}>
+                                        {s.decision.status} · {s.decision.timeframe}
+                                    </Typography>
                                  </Box>
-                                 <Typography variant="caption" sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444' }}>
-                                    {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(1)}%` : '—'}
-                                 </Typography>
+                                 <Box sx={{ textAlign: 'right' }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 950, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444' }}>
+                                        {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(1)}%` : '—'}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: 'slategray', display: 'block', fontSize: '0.45rem', fontWeight: 700 }}>
+                                        {s.decision.closedAt ? new Date(s.decision.closedAt).toLocaleDateString() : '—'}
+                                    </Typography>
+                                 </Box>
                               </Box>
                            ))}
                            <Button
@@ -281,12 +300,12 @@ function HeroStat({ label, value, color = '#fff' }: any) {
 
 function SummaryStat({ label, value, sub, color }: any) {
    return (
-      <Box>
+      <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)', height: '100%' }}>
          <Stack direction="row" spacing={1} alignItems="baseline">
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}:</Typography>
-            <Typography sx={{ fontWeight: 900, color, fontSize: '1rem' }}>{value}</Typography>
+            <Typography sx={{ fontWeight: 900, color, fontSize: '1.2rem', fontFamily: 'JetBrains Mono' }}>{value}</Typography>
          </Stack>
-         <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.55rem', fontWeight: 700 }}>{sub}</Typography>
+         <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.65rem', fontWeight: 700, mt: 0.5, display: 'block' }}>{sub}</Typography>
       </Box>
    );
 }

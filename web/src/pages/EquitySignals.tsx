@@ -15,6 +15,7 @@ export default function EquitySignals() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('NEWEST');
 
   // UI State
   const [viewLayout, setViewLayout] = useState<'GRID' | 'TABLE'>('GRID');
@@ -57,8 +58,8 @@ export default function EquitySignals() {
         setSignals(normalized);
       } else {
         const params: any = {
-            page: page + 1,
-            limit: rowsPerPage,
+            page: mode === 'HISTORY' ? page + 1 : 1,
+            limit: mode === 'HISTORY' ? rowsPerPage : 100,
             symbol: searchQuery || undefined,
             horizon: hFilterHorizon !== 'ALL' ? hFilterHorizon : undefined,
             quality: hFilterQuality !== 'ALL' ? hFilterQuality : undefined,
@@ -115,10 +116,18 @@ export default function EquitySignals() {
     );
   };
 
-  const comparedSignals = useMemo(() =>
-    signals.filter(s => selectedForCompare.includes(s.id)),
-    [signals, selectedForCompare]
-  );
+  const comparedSignals = useMemo(() => {
+    const source = mode === 'ACTIVE' ? signals : history;
+    return source.filter(s => selectedForCompare.includes(s.id));
+  }, [signals, history, mode, activeTab, searchQuery, universes]);
+
+  const finalDisplaySignals = useMemo(() => {
+    let source = mode === 'ACTIVE' ? [...filteredActiveSignals] : [...history];
+    if (sortBy === 'PROBABILITY') source.sort((a, b) => (b.decision?.conviction || 0) - (a.decision?.conviction || 0));
+    if (sortBy === 'EV') source.sort((a, b) => (b.decision?.expectedValue || 0) - (a.decision?.expectedValue || 0));
+    if (sortBy === 'NEWEST') source.sort((a, b) => new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime());
+    return source;
+  }, [filteredActiveSignals, history, mode, sortBy]);
 
   const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
@@ -174,27 +183,43 @@ export default function EquitySignals() {
             <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setPage(0); setSearchQuery(''); }}>SIGNAL HISTORY</ModeButton>
          </Stack>
 
-         {mode === 'ACTIVE' && (
-            <Stack direction="row" spacing={1}>
-                <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? 'primary.main' : 'slategray' }}>
-                    <LayoutGrid size={20} />
-                </IconButton>
-                <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? 'primary.main' : 'slategray' }}>
-                    <ListIcon size={20} />
-                </IconButton>
-                <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
-                <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<Columns size={16} />}
-                    disabled={selectedForCompare.length < 2}
-                    onClick={() => setIsCompareOpen(true)}
-                    sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: 'primary.main', color: 'primary.main' }}
+         <Stack direction="row" spacing={1}>
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel sx={{ color: 'slategray', fontSize: '0.6rem', fontWeight: 900 }}>DISPLAY RANKING</InputLabel>
+                <Select
+                    value={sortBy}
+                    label="DISPLAY RANKING"
+                    onChange={(e) => setSortBy(e.target.value)}
+                    sx={{ height: 40, bgcolor: '#0f172a', color: 'white', fontWeight: 800, fontSize: '0.7rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.08)' } }}
                 >
-                    COMPARE {selectedForCompare.length > 0 ? `(${selectedForCompare.length})` : ''}
-                </Button>
-            </Stack>
-         )}
+                    <MenuItem value="NEWEST" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>NEWEST</MenuItem>
+                    <MenuItem value="PROBABILITY" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>PROBABILITY</MenuItem>
+                    <MenuItem value="EV" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>EXPECTED VALUE</MenuItem>
+                </Select>
+            </FormControl>
+            <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
+            {mode === 'ACTIVE' && (
+                <>
+                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? 'primary.main' : 'slategray' }}>
+                        <LayoutGrid size={20} />
+                    </IconButton>
+                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? 'primary.main' : 'slategray' }}>
+                        <ListIcon size={20} />
+                    </IconButton>
+                </>
+            )}
+            <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
+            <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Columns size={16} />}
+                disabled={selectedForCompare.length < 2}
+                onClick={() => setIsCompareOpen(true)}
+                sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: 'primary.main', color: 'primary.main' }}
+            >
+                COMPARE {selectedForCompare.length > 0 ? `(${selectedForCompare.length})` : ''}
+            </Button>
+         </Stack>
       </Box>
 
       {mode === 'ACTIVE' ? (
@@ -239,7 +264,7 @@ export default function EquitySignals() {
                 </Tabs>
             </Paper>
 
-            {/* 5. Active Signal Data Presentation */}
+            {/* 5. Signal Data Presentation */}
             {loading ? (
                 <Grid container spacing={3}>
                     {[1,2,3,4,5,6].map(i => (
@@ -250,10 +275,10 @@ export default function EquitySignals() {
                 </Grid>
             ) : (
                 <Box>
-                    {filteredActiveSignals.length > 0 ? (
-                        viewLayout === 'GRID' ? (
+                    {finalDisplaySignals.length > 0 ? (
+                        viewLayout === 'GRID' && mode === 'ACTIVE' ? (
                             <Grid container spacing={3}>
-                                {filteredActiveSignals.map((s) => (
+                                {finalDisplaySignals.map((s) => (
                                     <Grid item xs={12} md={6} lg={4} key={s.id}>
                                         <Box sx={{ position: 'relative', height: '100%' }}>
                                             <LiveSignalCard stock={s} decision={s.decision} />
@@ -284,7 +309,7 @@ export default function EquitySignals() {
                                             <TableCell>DIRECTION</TableCell>
                                             <TableCell>HORIZON</TableCell>
                                             <TableCell>ENTRY</TableCell>
-                                            <TableCell>CURRENT</TableCell>
+                                            <TableCell>CURRENT/EXIT</TableCell>
                                             <TableCell>TARGET</TableCell>
                                             <TableCell>STOP</TableCell>
                                             <TableCell>PROBABILITY</TableCell>
@@ -293,7 +318,7 @@ export default function EquitySignals() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredActiveSignals.map((s) => (
+                                        {finalDisplaySignals.map((s) => (
                                             <TableRow key={s.id} hover onClick={() => navigate(`/signals/${s.id}`)} sx={{ cursor: 'pointer' }}>
                                                 <TableCell padding="checkbox">
                                                     <MuiChip
@@ -314,7 +339,7 @@ export default function EquitySignals() {
                                                 </TableCell>
                                                 <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>{s.decision.timeframe}</TableCell>
                                                 <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.normalizedCurrentPrice?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{(s.decision.normalizedCurrentPrice || s.decision.exitPrice)?.toLocaleString()}</TableCell>
                                                 <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#10b981' }}>₹{s.decision.target?.toLocaleString()}</TableCell>
                                                 <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#ef4444' }}>₹{s.decision.stopLoss?.toLocaleString()}</TableCell>
                                                 <TableCell sx={{ fontWeight: 800 }}>{s.decision.conviction}%</TableCell>
@@ -374,6 +399,7 @@ export default function EquitySignals() {
                <Table sx={{ minWidth: 1400 }}>
                   <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
                      <TableRow>
+                        <TableCell padding="checkbox" />
                         <TableCell>DATE</TableCell>
                         <TableCell>SYMBOL</TableCell>
                         <TableCell>SIGNAL ID</TableCell>
@@ -396,6 +422,17 @@ export default function EquitySignals() {
                      ) : history.length > 0 ? (
                         history.map((s) => (
                            <TableRow key={s.id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
+                              <TableCell padding="checkbox">
+                                  <MuiChip
+                                      size="small"
+                                      onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
+                                      sx={{
+                                          height: 18, width: 18, minWidth: 0, p: 0,
+                                          bgcolor: selectedForCompare.includes(s.id) ? 'primary.main' : 'transparent',
+                                          border: '1px solid rgba(255,255,255,0.1)'
+                                      }}
+                                  />
+                              </TableCell>
                               <TableCell sx={{ fontWeight: 700, color: 'slategray', fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
                               <TableCell><Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
                               <TableCell sx={{ fontSize: '0.6rem', color: 'slategray', fontFamily: 'JetBrains Mono' }}>{s.id}</TableCell>
@@ -431,7 +468,22 @@ export default function EquitySignals() {
                               </TableCell>
                               <TableCell sx={{ fontWeight: 800, color: 'primary.main', fontSize: '0.8rem' }}>{s.decision.conviction}%</TableCell>
                               <TableCell align="right">
-                                 <Button size="small" onClick={() => navigate(`/signals/${s.id}`)} sx={{ fontWeight: 900, fontSize: '0.65rem' }}>DETAILS</Button>
+                                 <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                     <Button
+                                        size="small"
+                                        onClick={() => navigate(`/signals/${s.id}`, { state: { scrollReplay: true } })}
+                                        sx={{ fontWeight: 900, fontSize: '0.65rem', color: '#10b981' }}
+                                     >
+                                         REPLAY
+                                     </Button>
+                                     <Button
+                                        size="small"
+                                        onClick={() => navigate(`/signals/${s.id}`)}
+                                        sx={{ fontWeight: 900, fontSize: '0.65rem' }}
+                                     >
+                                         DETAILS
+                                     </Button>
+                                 </Stack>
                               </TableCell>
                            </TableRow>
                         ))
@@ -479,6 +531,13 @@ export default function EquitySignals() {
                      <CompareRow label="ENTRY" values={comparedSignals.map(s => `₹${s.decision.entry?.toLocaleString()}`)} />
                      <CompareRow label="TARGET" values={comparedSignals.map(s => `₹${s.decision.target?.toLocaleString()}`)} />
                      <CompareRow label="STOP" values={comparedSignals.map(s => `₹${s.decision.stopLoss?.toLocaleString()}`)} />
+                     {mode === 'HISTORY' && (
+                         <>
+                            <CompareRow label="OUTCOME" values={comparedSignals.map(s => s.decision.status)} />
+                            <CompareRow label="RETURN %" values={comparedSignals.map(s => `${s.decision.realizedReturn?.toFixed(2)}%`)} />
+                            <CompareRow label="HOLDING" values={comparedSignals.map(s => `${s.decision.holdingPeriodDays} days`)} />
+                         </>
+                     )}
                   </TableBody>
                </Table>
             </TableContainer>
