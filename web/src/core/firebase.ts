@@ -5,7 +5,7 @@ import { getFirestore } from "firebase/firestore";
 const meta = import.meta as any;
 
 const firebaseConfig = {
-  apiKey: meta.env?.VITE_FIREBASE_API_KEY,
+  apiKey: meta.env?.VITE_FIREBASE_API_KEY || "AIzaSyAV2mVlSuVSvM-FXVZtTsn06VsSP_mTr4k",
   authDomain: `${meta.env?.VITE_FIREBASE_PROJECT_ID || "com-webcraft-trademindai-c8f75"}.firebaseapp.com`,
   projectId: meta.env?.VITE_FIREBASE_PROJECT_ID || "com-webcraft-trademindai-c8f75",
   storageBucket: `${meta.env?.VITE_FIREBASE_PROJECT_ID || "com-webcraft-trademindai-c8f75"}.appspot.com`,

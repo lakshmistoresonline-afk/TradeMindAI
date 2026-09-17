@@ -95,7 +95,7 @@ export default function Checkout() {
                   <Divider sx={{ opacity: 0.05 }} />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                      <Typography variant="h6" sx={{ fontWeight: 950 }}>TOTAL</Typography>
-                     <Typography variant="h6" sx={{ fontWeight: 950, color: 'primary.main' }}>₹{price}</Typography>
+                     <Typography variant="h6" sx={{ fontWeight: 950, color: '#00D1FF' }}>₹{price}</Typography>
                   </Box>
                </Stack>
 
