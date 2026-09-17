@@ -8,8 +8,8 @@ Verification of current deployment artifacts across the stack:
 
 | Dimension | Value | Verification |
 | :--- | :--- | :--- |
-| **Git SHA** | `9ccf0dca47d106001a178c914a3bdb55d87618b3` | Authoritative |
-| **Frontend Build** | `index-BrEbCAcS.js` | Verified (Firebase) |
+| **Git SHA** | `3227f45a6fdc70cb7c4c6debd8561a2c1bdfd577` | Authoritative |
+| **Frontend Build** | `index-DMVI8pMT.js` | Verified (Firebase) |
 | **Backend Version** | `2.3.2-PROD-HISTORY-SYNC` | Verified (Render) |
 | **Strategy Version**| **V2.2 (FROZEN)** | **LOCKED** |
 | **Model Version** | `TradeMind Core v2.2` | Authoritative |

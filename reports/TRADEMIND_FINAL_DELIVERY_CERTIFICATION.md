@@ -1,8 +1,8 @@
 # TradeMind AI: Final Delivery Certification (Audit v1.3)
 
 **Date:** 2026-09-17
-**Frozen Git SHA:** `7228196e872d80d22079089025e1779942a6c8e3` (Baseline Frozen)
-**Live Build Hash**: `index-C0mslemn.js` (Verified Live)
+**Frozen Git SHA:** `3227f45a6fdc70cb7c4c6debd8561a2c1bdfd577` (Immutable Release)
+**Live Build Hash**: `index-DMVI8pMT.js` (Verified Live)
 **Deployment Status:** **DELIVERY READY WITH DOCUMENTED LIMITATIONS**
 
 ## 1. Quantitative Baseline (Strategy V2.2 Frozen)
