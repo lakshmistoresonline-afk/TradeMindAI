@@ -44,7 +44,7 @@ export default function Evidence() {
             <AuditItem title="Temporal Integrity" status="PASS" text="100% adherence to data <= decision < outcome invariant. Zero look-ahead leakage." />
             <AuditItem title="Outcome Forensic" status="VERIFIED" text="Target/Stop hits verified against NSE Spot closing prices." />
             <AuditItem title="Selection Bias" status="VERIFIED" text="2.2% emission rate focus on high-probability edges." />
-            <AuditItem title="Timestamp Forensics" status="PASS" text="Strict UTC-based temporal alignment across all 166 records." />
+            <AuditItem title="Survivorship Risk" status="OBSERVED" text="Historical validation uses static current NIFTY-200 list. Survivorship bias is a known limitation." />
          </Grid>
       </Box>
 

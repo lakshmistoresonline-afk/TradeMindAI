@@ -43,7 +43,7 @@ export default function Pricing() {
                "120h Freshness Priority"
              ]}
              cta="Go Pro"
-             onClick={() => navigate('/login')}
+             onClick={() => navigate('/checkout/pro')}
            />
         </Grid>
         <Grid item xs={12} md={4}>
@@ -60,7 +60,7 @@ export default function Pricing() {
                "Dedicated Analyst Support"
              ]}
              cta="Contact Sales"
-             onClick={() => navigate('/contact')}
+             onClick={() => navigate('/checkout/alpha')}
            />
         </Grid>
       </Grid>

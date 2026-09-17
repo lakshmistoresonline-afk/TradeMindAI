@@ -16,6 +16,8 @@ import Pricing from './pages/Pricing'
 import RiskDisclosure from './pages/RiskDisclosure'
 import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
+import Checkout from './pages/Checkout'
+import Account from './pages/Account'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -110,6 +112,8 @@ function App() {
                     <Route path="/signals/:id" element={<SignalDetail />} />
                     <Route path="/performance" element={<Performance />} />
                     <Route path="/status" element={<SystemStatus />} />
+                    <Route path="/account" element={<Account />} />
+                    <Route path="/checkout/:planId" element={<Checkout />} />
 
                     {/* Compatibility redirects */}
                     <Route path="/accuracy" element={<Navigate to="/performance" replace />} />

@@ -8,6 +8,7 @@ import {
   Menu as MenuIcon,
   ChevronDown,
   TrendingUp,
+  User,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -24,10 +25,11 @@ export const NotificationContext = createContext({
 export const useNotification = () => useContext(NotificationContext);
 
 const menuItems = [
-  { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/' },
+  { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
   { text: 'SIGNALS', icon: <Zap size={20} />, path: '/signals' },
   { text: 'PERFORMANCE', icon: <TrendingUp size={20} />, path: '/performance' },
   { text: 'SYSTEM STATUS', icon: <Activity size={20} />, path: '/status' },
+  { text: 'ACCOUNT', icon: <User size={20} />, path: '/account' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {

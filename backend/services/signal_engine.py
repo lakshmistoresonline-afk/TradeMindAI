@@ -186,6 +186,12 @@ class SignalEngine:
         # 11. Construct Canonical Signal
         sig_id = f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}"
 
+        # 11.2 Expiry Logic (Phase 12 Hardening)
+        # SWING: 30 days. SHORT_TERM: 7 days. INTRADAY: 1 day.
+        horizon_days = {"SWING": 30, "SHORT": 7, "INTRADAY": 1, "LONG": 365}
+        valid_days = horizon_days.get(timeframe, 30)
+        valid_until = eval_time + datetime.timedelta(days=valid_days)
+
         # Identity Metadata
         instrument_id = stock.instrument_id if hasattr(stock, 'instrument_id') else f"NSE_{symbol}"
         company_name = stock.name if hasattr(stock, 'name') else f"{symbol} Limited"
@@ -272,6 +278,7 @@ class SignalEngine:
             strategy_version="v2.2",
             signal_version="1.0",
             timestamp=eval_time,
+            valid_until=valid_until,
 
             # Price
             entry_price=price,

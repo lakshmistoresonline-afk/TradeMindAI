@@ -65,6 +65,18 @@ export default function SystemStatus() {
                      {health?.universe?.coverage || 50}/{health?.universe?.total || 200} CONSTITUENTS (HARDENED SCAN)
                   </Typography>
                </Box>
+               <Box sx={{ mb: 4 }}>
+                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, mb: 1, display: 'block' }}>SECTOR METADATA</Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={health?.sector?.coverage_pct || 0}
+                    color="primary"
+                    sx={{ height: 6, borderRadius: 2 }}
+                  />
+                  <Typography variant="caption" sx={{ color: '#fff', fontWeight: 900, mt: 1, display: 'block' }}>
+                     {health?.sector?.mapped || 0}/{health?.sector?.total || 200} MAPPED ({health?.sector?.coverage_pct || 0}%)
+                  </Typography>
+               </Box>
                <Box>
                   <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, mb: 1, display: 'block' }}>DATA FRESHNESS</Typography>
                   <LinearProgress

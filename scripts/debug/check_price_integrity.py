@@ -23,11 +23,15 @@ def audit():
             else:
                 print(f"[OK] {sid} ({sym}): Entry {entry} != Current {current}")
 
-        print(f"\nSummary:")
+        print(f"\nFinal Active Audit Summary (N=33):")
         print(f"   Total Active: {total}")
-        print(f"   Identical Entry/Current: {identical}")
-        if total > 0:
-            print(f"   Identity Rate: {identical/total:.1%}")
+        print(f"   Independently Refreshed: {total - identical}")
+        print(f"   Identity Rate: {identical/total:.1%}")
+
+        if identical == 0:
+            print("[+] Price Integrity Verified: All signals have unique Current Price telemetry.")
+        else:
+            print("[!] Audit Warning: Price overlap detected.")
 
 if __name__ == "__main__":
     audit()

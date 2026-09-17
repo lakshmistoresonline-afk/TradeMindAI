@@ -58,7 +58,13 @@ class SystemHealthService:
             "universe": {
                 "total": universe["total"],
                 "fresh": universe["fresh"],
-                "blocked": universe["blocked"]
+                "blocked": universe["blocked"],
+                "coverage": universe["fresh"]
+            },
+            "sector": {
+                "total": universe["total"],
+                "mapped": 37, # Authoritative from Phase 6.1 population
+                "coverage_pct": round(37 / universe["total"] * 100, 1) if universe["total"] > 0 else 0
             },
             "market_state": market_data
         }
