@@ -5,22 +5,22 @@ export default function Methodology() {
     <Box sx={{ pb: 10, maxWidth: 900, mx: 'auto', p: 4 }}>
       <Box sx={{ mb: 6, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: 'white' }}>SIGNAL METHODOLOGY</Typography>
-        <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800, mt: 1 }}>STRATEGY V2.2 CORE PROTOCOL</Typography>
+        <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800, mt: 1 }}>STRATEGY V2.2 CORE PROTOCOL</Typography>
       </Box>
 
       {/* CANONICAL DATA FLOW */}
       <Box sx={{ mb: 8, p: 4, bgcolor: '#0f172a', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, letterSpacing: 2, display: 'block', mb: 4, textAlign: 'center' }}>DATA ARCHITECTURE</Typography>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center" justifyContent="center" sx={{ color: 'white' }}>
-            <FlowBox label="MARKET DATA" color="primary.main" />
+            <FlowBox label="MARKET DATA" color="#00D1FF" />
             <Box sx={{ opacity: 0.2 }}>→</Box>
-            <FlowBox label="FEATURES" color="primary.main" />
+            <FlowBox label="FEATURES" color="#00D1FF" />
             <Box sx={{ opacity: 0.2 }}>→</Box>
-            <FlowBox label="MODEL" color="primary.main" />
+            <FlowBox label="MODEL" color="#00D1FF" />
             <Box sx={{ opacity: 0.2 }}>→</Box>
-            <FlowBox label="V2.2 DECISION" color="primary.main" />
+            <FlowBox label="V2.2 DECISION" color="#00D1FF" />
             <Box sx={{ opacity: 0.2 }}>→</Box>
-            <FlowBox label="SIGNAL" color="success.main" />
+            <FlowBox label="SIGNAL" color="#10b981" />
         </Stack>
       </Box>
 
@@ -74,7 +74,7 @@ export default function Methodology() {
   );
 }
 
-function FlowBox({ label, color }: any) {
+function FlowBox({ label, color }: { label: string; color: string }) {
     return (
         <Box sx={{
             px: 2, py: 1,
@@ -84,7 +84,10 @@ function FlowBox({ label, color }: any) {
             width: { xs: '100%', md: 'auto' },
             textAlign: 'center'
         }}>
-            <Typography variant="caption" sx={{ fontWeight: 950, color }}>{label}</Typography>
+            <Typography variant="caption" sx={{
+                fontWeight: 950,
+                color: color
+            }}>{label}</Typography>
         </Box>
     );
 }

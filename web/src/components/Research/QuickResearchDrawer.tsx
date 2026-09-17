@@ -43,7 +43,7 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
 
            <Stack direction="row" spacing={2} sx={{ mt: 2 }} alignItems="center">
               <Typography variant="h5" fontWeight={800} sx={{ fontFamily: 'JetBrains Mono' }}>₹{stock.last_price?.toLocaleString()}</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: stock.change_pct >= 0 ? 'primary.main' : 'error.main' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: stock.change_pct >= 0 ? '#00D1FF' : '#ef4444' }}>
                  {stock.change_pct >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                  <Typography variant="body2" fontWeight="bold">{stock.change_pct?.toFixed(2)}%</Typography>
               </Box>
@@ -53,9 +53,9 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
         <Paper sx={{ p: 3, mb: 4, bgcolor: isBullish ? 'rgba(16, 185, 129, 0.05)' : isBearish ? 'rgba(244, 63, 94, 0.05)' : 'rgba(255,255,255,0.02)', border: '1px solid #334155' }}>
            <Stack direction="row" justifyContent="space-between" mb={1}>
               <Typography variant="caption" color="textSecondary" fontWeight={800}>AI RATING</Typography>
-              <Typography variant="caption" color="primary.main" fontWeight={900}>{decision.timeframe}</Typography>
+              <Typography variant="caption" color="#00D1FF" fontWeight={900}>{decision.timeframe}</Typography>
            </Stack>
-           <Typography variant="h3" fontWeight={900} color={isBullish ? 'primary.main' : isBearish ? 'error.main' : 'warning.main'} sx={{ mb: 1 }}>
+           <Typography variant="h3" fontWeight={900} color={isBullish ? '#00D1FF' : isBearish ? '#ef4444' : '#f59e0b'} sx={{ mb: 1 }}>
               {decision.rating}
            </Typography>
            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -73,10 +73,10 @@ export default function QuickResearchDrawer({ open, onClose, stock }: QuickResea
         <Stack spacing={3} sx={{ flexGrow: 1 }}>
            <Grid container spacing={2}>
               <Grid item xs={6}>
-                 <QuickStat icon={<Target size={14} />} label="TARGET" value={decision.target ? `₹${decision.target.toLocaleString()}` : '---'} color="primary.main" />
+                 <QuickStat icon={<Target size={14} />} label="TARGET" value={decision.target ? `₹${decision.target.toLocaleString()}` : '---'} color="#00D1FF" />
               </Grid>
               <Grid item xs={6}>
-                 <QuickStat icon={<ShieldCheck size={14} />} label="STOP LOSS" value={decision.stopLoss ? `₹${decision.stopLoss.toLocaleString()}` : '---'} color="error.main" />
+                 <QuickStat icon={<ShieldCheck size={14} />} label="STOP LOSS" value={decision.stopLoss ? `₹${decision.stopLoss.toLocaleString()}` : '---'} color="#ef4444" />
               </Grid>
            </Grid>
 

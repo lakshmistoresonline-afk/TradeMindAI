@@ -100,7 +100,7 @@ export default function FundamentalAnalysis({ stock }: { stock: any }) {
                       <TableCell sx={{ fontWeight: 600 }}>Operating Margin</TableCell>
                       <TableCell align="right">18.2%</TableCell>
                       <TableCell align="right">21.4%</TableCell>
-                      <TableCell align="right" sx={{ color: 'primary.main', fontWeight: 800 }}>22.5%</TableCell>
+                      <TableCell align="right" sx={{ color: '#00D1FF', fontWeight: 800 }}>22.5%</TableCell>
                    </TableRow>
                    <TableRow>
                       <TableCell sx={{ fontWeight: 600 }}>EBITDA Margin</TableCell>

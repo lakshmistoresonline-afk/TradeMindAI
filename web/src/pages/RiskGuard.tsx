@@ -43,7 +43,7 @@ export default function RiskGuard({ isConsolidated = false }: { isConsolidated?:
             <Paper sx={{ p: 4, height: '100%', border: '1px solid #1e293b' }}>
                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 3, fontWeight: 900 }}>AGGREGATE RISK SCORE (BENCHMARK)</Typography>
                <Box sx={{ textAlign: 'center', mb: 4 }}>
-                  <Typography variant="h1" sx={{ fontWeight: 900, color: 'primary.main', mb: 1 }}>{Math.round(portfolioRiskScore)}</Typography>
+                  <Typography variant="h1" sx={{ fontWeight: 900, color: '#00D1FF', mb: 1 }}>{Math.round(portfolioRiskScore)}</Typography>
                   <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>{health?.risk_level === 'HIGH' ? 'HIGH' : 'OPTIMAL'} VOLATILITY SENSITIVITY</Typography>
                </Box>
                <LinearProgress variant="determinate" value={portfolioRiskScore} color="primary" sx={{ height: 8, borderRadius: 4, mb: 3 }} />
@@ -148,7 +148,7 @@ function RiskFactor({ label, value, status }: any) {
          <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>{label}</Typography>
          <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="body1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
-            <Typography variant="caption" sx={{ fontWeight: 900, color: status === 'NORMAL' ? 'primary.main' : 'error.main', fontSize: '0.6rem' }}>{status}</Typography>
+            <Typography variant="caption" sx={{ fontWeight: 900, color: status === 'NORMAL' ? '#00D1FF' : '#ef4444', fontSize: '0.6rem' }}>{status}</Typography>
          </Stack>
       </Box>
    );
@@ -159,7 +159,7 @@ function RiskAlert({ title, desc }: any) {
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, p: 2, bgcolor: 'rgba(255,255,255,0.01)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
          <Box sx={{ mt: 0.5 }}><Info size={16} className="text-slategray" /></Box>
          <Box>
-            <Typography variant="body2" fontWeight={800} color="primary.main">{title}</Typography>
+            <Typography variant="body2" fontWeight={800} color="#00D1FF">{title}</Typography>
             <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', lineHeight: 1.5 }}>{desc}</Typography>
          </Box>
       </Box>

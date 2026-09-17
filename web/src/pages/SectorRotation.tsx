@@ -75,7 +75,7 @@ export default function SectorRotation() {
 
           return (
             <Grid item xs={12} md={4} key={sector}>
-              <Paper sx={{ p: 3, border: '1px solid #1e293b', transition: '0.2s', '&:hover': { borderColor: 'primary.main', bgcolor: 'rgba(16, 185, 129, 0.02)' } }}>
+              <Paper sx={{ p: 3, border: '1px solid #1e293b', transition: '0.2s', '&:hover': { borderColor: '#00D1FF', bgcolor: 'rgba(16, 185, 129, 0.02)' } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Box>
                      <Typography variant="h6" fontWeight={900}>{sector}</Typography>
@@ -111,7 +111,7 @@ export default function SectorRotation() {
                          {avgReturn >= 0 ? <TrendingUp size={14} className="text-emerald-500" /> : <TrendingDown size={14} className="text-rose-500" />}
                          <Typography variant="caption" color="textSecondary">RELATIVE RETURN</Typography>
                       </Box>
-                      <Typography variant="body2" fontWeight="bold" color={avgReturn >= 0 ? 'primary.main' : 'error.main'}>
+                      <Typography variant="body2" fontWeight="bold" color={avgReturn >= 0 ? '#00D1FF' : '#ef4444'}>
                          {avgReturn >= 0 ? '+' : ''}{avgReturn.toFixed(2)}%
                       </Typography>
                    </Box>

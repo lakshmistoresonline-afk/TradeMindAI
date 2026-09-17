@@ -40,7 +40,7 @@ export default function ManagementMoat({ analysis }: { analysis: any }) {
                 {factors.map((f) => (
                   <Box key={f.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ color: 'primary.main' }}>{f.icon}</Box>
+                        <Box sx={{ color: '#00D1FF' }}>{f.icon}</Box>
                         <Typography variant="body2" fontWeight="bold">{f.label}</Typography>
                      </Box>
                      <Rating value={f.score} precision={0.1} readOnly size="small" />

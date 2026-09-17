@@ -45,7 +45,7 @@ export default function AINewsCenter({ symbol }: { symbol: string }) {
                 {item.content || item.summary}
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'primary.main' }}>
+                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#00D1FF' }}>
                     <Zap size={14} />
                     <Typography variant="caption" fontWeight="bold">AI IMPACT ANALYSIS ACTIVE</Typography>
                  </Box>

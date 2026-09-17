@@ -25,8 +25,8 @@ export default function Performance() {
       {/* 0. Executive Production Benchmark */}
       <Box sx={{ mb: 8 }}>
           <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 950, color: 'primary.main' }}>PRODUCTION SIGNAL BENCHMARK</Typography>
-            <Divider sx={{ flexGrow: 1, opacity: 0.1, bgcolor: 'primary.main' }} />
+            <Typography variant="h6" sx={{ fontWeight: 950, color: '#00D1FF' }}>PRODUCTION SIGNAL BENCHMARK</Typography>
+            <Divider sx={{ flexGrow: 1, opacity: 0.1, bgcolor: '#00D1FF' }} />
          </Stack>
          <Grid container spacing={3}>
             <MetricBox label="RESOLVED OUTCOMES" value={summary?.verified_benchmark?.n || '—'} />
@@ -109,7 +109,7 @@ function HorizonSection({ title, stats, description, color }: any) {
                 variant="text"
                 size="small"
                 onClick={() => navigate('/signals')}
-                sx={{ color: 'primary.main', fontWeight: 900, fontSize: '0.7rem', textTransform: 'none' }}
+                sx={{ color: '#00D1FF', fontWeight: 900, fontSize: '0.7rem', textTransform: 'none' }}
             >
                 VIEW UNDERLYING SIGNAL HISTORY →
             </Button>

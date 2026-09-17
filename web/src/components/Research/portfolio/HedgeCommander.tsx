@@ -71,7 +71,7 @@ export default function HedgeCommander() {
                   fullWidth
                   variant="contained"
                   startIcon={<Zap size={16} />}
-                  sx={{ mt: 2, fontWeight: 900, bgcolor: 'primary.main', color: 'black' }}
+                  sx={{ mt: 2, fontWeight: 900, bgcolor: '#00D1FF', color: 'black' }}
                >
                   ONE-CLICK HEDGE EXECUTION
                </Button>

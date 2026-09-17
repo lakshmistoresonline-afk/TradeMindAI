@@ -55,7 +55,7 @@ export default function StrategyBuilder() {
               <List>
                 {blocks.map((block, index) => (
                   <ListItem key={block.id} sx={{ bgcolor: 'rgba(255,255,255,0.03)', mb: 1, borderRadius: 2 }}>
-                    <Typography sx={{ mr: 2, color: 'primary.main', fontWeight: 'bold' }}>{index === 0 ? 'IF' : 'AND'}</Typography>
+                    <Typography sx={{ mr: 2, color: '#00D1FF', fontWeight: 'bold' }}>{index === 0 ? 'IF' : 'AND'}</Typography>
                     <FormControl size="small" sx={{ minWidth: 200, mr: 2 }}>
                       <Select value={block.feature} onChange={(e) => updateBlock(block.id, 'feature', e.target.value)}>
                         <MenuItem value="momentum_rsi">RSI (14)</MenuItem>

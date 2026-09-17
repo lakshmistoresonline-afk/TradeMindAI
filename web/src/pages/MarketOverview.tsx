@@ -24,7 +24,7 @@ export default function MarketOverview() {
          <Grid item xs={12} md={4}>
             <Paper sx={{ p: 4, height: '100%', bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 4 }}>
-                  <Globe size={20} color="primary.main" />
+                  <Globe size={20} color="#00D1FF" />
                   <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>MARKET REGIME</Typography>
                </Stack>
                <Box sx={{ textAlign: 'center', py: 4 }}>

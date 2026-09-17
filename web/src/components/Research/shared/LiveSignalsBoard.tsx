@@ -91,7 +91,7 @@ export default function LiveSignalsBoard({ stocks }: LiveSignalsBoardProps) {
                           color={s.decision.rating.includes('BUY') ? 'primary' : s.decision.rating.includes('SELL') ? 'error' : 'warning'}
                           sx={{ fontWeight: 900, height: 18, fontSize: '0.6rem' }}
                         />
-                        <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontWeight: 900, color: s.decision.rating.includes('BUY') ? 'primary.main' : 'error.main', fontSize: '0.5rem' }}>
+                        <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontWeight: 900, color: s.decision.rating.includes('BUY') ? '#00D1FF' : '#ef4444', fontSize: '0.5rem' }}>
                            {s.decision.rating.includes('BUY') ? 'LONG' : s.decision.rating.includes('SELL') ? 'SHORT' : 'NEUTRAL'}
                         </Typography>
                      </TableCell>
@@ -99,14 +99,14 @@ export default function LiveSignalsBoard({ stocks }: LiveSignalsBoardProps) {
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
                            <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'JetBrains Mono' }}>{s.decision.conviction}%</Typography>
                            <Box sx={{ width: 30, height: 3, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 1 }}>
-                              <Box sx={{ width: `${s.decision.conviction}%`, height: '100%', bgcolor: 'primary.main' }} />
+                              <Box sx={{ width: `${s.decision.conviction}%`, height: '100%', bgcolor: '#00D1FF' }} />
                            </Box>
                         </Box>
                      </TableCell>
                      <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>
                         {s.decision.entry ? `₹${Math.round(s.decision.entry).toLocaleString()}` : '---'}
                      </TableCell>
-                     <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'primary.main' }}>
+                     <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: '#00D1FF' }}>
                         {s.decision.target ? `₹${Math.round(s.decision.target).toLocaleString()}` : '---'}
                      </TableCell>
                      <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800, color: 'error.main' }}>
@@ -121,7 +121,7 @@ export default function LiveSignalsBoard({ stocks }: LiveSignalsBoardProps) {
                            sx={{ height: 16, fontSize: '0.5rem', fontWeight: 900 }}
                         />
                         {s.decision.status === 'ACTIVE' && (
-                           <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontWeight: 900, color: 'primary.main', fontSize: '0.5rem' }}>
+                           <Typography variant="caption" sx={{ display: 'block', mt: 0.5, fontWeight: 900, color: '#00D1FF', fontSize: '0.5rem' }}>
                               {s.decision.profitPct !== undefined ? `${s.decision.profitPct >= 0 ? '+' : ''}${s.decision.profitPct.toFixed(2)}%` : 'TRACKING'}
                            </Typography>
                         )}

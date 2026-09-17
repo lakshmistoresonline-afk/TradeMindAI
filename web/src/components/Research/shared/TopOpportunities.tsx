@@ -43,7 +43,7 @@ export default function TopOpportunities() {
            <Grid item xs={12} md={4} key={opp.id}>
               <Paper sx={{ p: 3, height: '100%', border: '1px solid #334155', '&:hover': { borderColor: '#10b981' }, cursor: 'pointer', transition: 'all 0.2s', position: 'relative' }}>
                  {opp.indicators?.includes('AI SCANNING...') && (
-                   <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, bgcolor: 'primary.main', opacity: 0.5 }} />
+                   <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, bgcolor: '#00D1FF', opacity: 0.5 }} />
                  )}
                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" fontWeight="bold">{opp.symbol}</Typography>

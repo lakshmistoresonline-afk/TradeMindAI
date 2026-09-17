@@ -76,7 +76,7 @@ export default function AIInvestmentThesis({ stock }: { stock: any }) {
             {decision.invalidation && (
               <Box sx={{ mt: 4, p: 2, border: '1px dashed #f43f5e', borderRadius: 1, bgcolor: 'rgba(244, 63, 94, 0.03)' }}>
                  <Typography variant="caption" color="error" display="block" sx={{ fontWeight: 900, mb: 0.5 }}>INVALIDATION POINT</Typography>
-                 <Typography variant="body2" fontWeight={800} color="error.main">{decision.invalidation}</Typography>
+                 <Typography variant="body2" fontWeight={800} color="#ef4444">{decision.invalidation}</Typography>
               </Box>
             )}
 
@@ -111,7 +111,7 @@ function SuitabilityCard({ label, value }: any) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
        <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 800 }}>{label}</Typography>
-       <Typography variant="body2" fontWeight={900} color="primary.main">{value}</Typography>
+       <Typography variant="body2" fontWeight={900} color="#00D1FF">{value}</Typography>
     </Box>
   );
 }

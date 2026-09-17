@@ -42,7 +42,7 @@ export default function SignalLifecycleTimeline({ events, currentStatus }: Signa
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <Typography variant="body2" sx={{ fontWeight: 950, letterSpacing: 0.5 }}>{event.type.replace(/_/g, ' ')}</Typography>
-                <Typography variant="caption" sx={{ color: 'primary.main', fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
+                <Typography variant="caption" sx={{ color: '#00D1FF', fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
                   {new Date(event.timestamp).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </Typography>
               </Box>

@@ -5,7 +5,7 @@ export default function Terms() {
     <Box sx={{ pb: 10, maxWidth: 900, mx: 'auto', p: 4, color: 'white' }}>
       <Box sx={{ mb: 8, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, mb: 2 }}>TERMS OF SERVICE</Typography>
-        <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800 }}>LEGAL OPERATING FRAMEWORK</Typography>
+        <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800 }}>LEGAL OPERATING FRAMEWORK</Typography>
       </Box>
 
       <Stack spacing={4}>

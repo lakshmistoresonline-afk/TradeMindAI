@@ -6,7 +6,7 @@ export default function Evidence() {
     <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
       <Box sx={{ mb: 8, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, mb: 2 }}>EVIDENCE BASELINE</Typography>
-        <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800 }}>HARDENED QUANTITATIVE AUDIT • SEPTEMBER 2026</Typography>
+        <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800 }}>HARDENED QUANTITATIVE AUDIT • SEPTEMBER 2026</Typography>
       </Box>
 
       {/* 1. CANONICAL POPULATION */}
@@ -90,7 +90,7 @@ function EvidenceRow({ label, count, status }: any) {
         <TableRow>
             <TableCell sx={{ fontWeight: 800, color: 'slategray' }}>{label}</TableCell>
             <TableCell sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', color: 'white' }}>{count}</TableCell>
-            <TableCell sx={{ fontWeight: 900, color: 'primary.main', fontSize: '0.65rem' }}>{status}</TableCell>
+            <TableCell sx={{ fontWeight: 900, color: '#00D1FF', fontSize: '0.65rem' }}>{status}</TableCell>
         </TableRow>
     );
 }
@@ -115,7 +115,7 @@ function LimitItem({ label, val, text }: any) {
     return (
         <Box>
             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-                <Typography variant="caption" sx={{ fontWeight: 950, color: 'primary.main' }}>{label}:</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 950, color: '#00D1FF' }}>{label}:</Typography>
                 <Typography variant="caption" sx={{ fontWeight: 900, color: '#ef4444' }}>{val}</Typography>
             </Stack>
             <Typography variant="body2" sx={{ color: 'slategray' }}>{text}</Typography>

@@ -163,7 +163,7 @@ export default function EquityScanner() {
                    />
                 </TableCell>
                 <TableCell align="right">
-                   <Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: 'primary.main' }}>
+                   <Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#00D1FF' }}>
                       {(s.calibrated_probability * 100).toFixed(1)}%
                    </Typography>
                 </TableCell>
@@ -176,7 +176,7 @@ export default function EquityScanner() {
                    <Typography sx={{ fontWeight: 800 }}>1:{s.risk_reward_ratio?.toFixed(1) || '1.0'}</Typography>
                 </TableCell>
                 <TableCell align="center">
-                   <Typography variant="caption" sx={{ fontWeight: 900, color: s.status === 'ACTIVE' ? 'primary.main' : 'slategray' }}>
+                   <Typography variant="caption" sx={{ fontWeight: 900, color: s.status === 'ACTIVE' ? '#00D1FF' : 'slategray' }}>
                       {s.status}
                    </Typography>
                 </TableCell>
@@ -185,7 +185,7 @@ export default function EquityScanner() {
                     size="small"
                     endIcon={<ArrowRight size={14} />}
                     onClick={() => navigate(`/signals/${s.id}`, { state: { signal: s } })}
-                    sx={{ color: 'primary.main', fontWeight: 800 }}
+                    sx={{ color: '#00D1FF', fontWeight: 800 }}
                    >
                      ANALYZE
                    </Button>

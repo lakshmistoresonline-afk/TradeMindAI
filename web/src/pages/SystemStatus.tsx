@@ -23,7 +23,7 @@ export default function SystemStatus() {
         </Box>
         <Box sx={{ textAlign: 'right' }}>
            <Chip label="PRODUCTION HARDENED" color="success" sx={{ fontWeight: 950, borderRadius: 0.5, mb: 1 }} />
-           <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, display: 'block' }}>SHADOW SIGNAL MODE</Typography>
+           <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, display: 'block' }}>SHADOW SIGNAL MODE</Typography>
         </Box>
       </Box>
 

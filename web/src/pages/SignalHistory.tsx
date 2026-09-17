@@ -79,7 +79,7 @@ export default function SignalHistory() {
                      <TableCell sx={{ color: 'slategray', fontSize: '0.75rem', fontWeight: 700 }}>
                         {new Date(s.timestamp).toLocaleDateString()}
                      </TableCell>
-                     <TableCell sx={{ fontWeight: 900, color: 'primary.main' }}>{s.symbol}</TableCell>
+                     <TableCell sx={{ fontWeight: 900, color: '#00D1FF' }}>{s.symbol}</TableCell>
                      <TableCell align="center">
                         <Typography variant="caption" sx={{ fontWeight: 900, color: s.direction === 'LONG' ? '#10b981' : '#ef4444' }}>{s.direction}</Typography>
                      </TableCell>

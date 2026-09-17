@@ -67,7 +67,7 @@ export default function ConfluenceMatrix({ stock }: ConfluenceMatrixProps) {
       </Stack>
 
       <Box sx={{ mt: 3, p: 2, bgcolor: alpha('#00D1FF', 0.05), borderRadius: 1, border: '1px dashed rgba(0, 209, 255, 0.2)' }}>
-        <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 800, textAlign: 'center', display: 'block' }}>
+        <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 800, textAlign: 'center', display: 'block' }}>
           MULTI-FACTOR ALIGNMENT: {(factors.filter(f => f.status === 'BULLISH' || f.status === 'POSITIVE' || f.status === 'CONFIRMED').length / factors.length * 100).toFixed(0)}%
         </Typography>
       </Box>

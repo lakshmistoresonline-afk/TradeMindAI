@@ -50,7 +50,7 @@ export default function DecisionPanel({ stock }: { stock: any }) {
              </Box>
              <Box>
                 <Typography variant="caption" color="textSecondary" display="block">TIME HORIZON</Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'primary.main' }}>{decision.timeframe}</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#00D1FF' }}>{decision.timeframe}</Typography>
              </Box>
           </Stack>
 

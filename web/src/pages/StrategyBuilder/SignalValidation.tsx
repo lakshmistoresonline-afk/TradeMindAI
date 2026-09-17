@@ -252,7 +252,7 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                                  <TableRow key={tf}>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>{tf}</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 700 }}>{stats.total}</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 900, color: 'primary.main' }}>{stats.win_rate}%</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 900, color: '#00D1FF' }}>{stats.win_rate}%</TableCell>
                                  </TableRow>
                               ))}
                            </TableBody>
@@ -277,7 +277,7 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                                  <TableRow key={sec}>
                                     <TableCell sx={{ fontWeight: 800, fontSize: '0.75rem' }}>{sec}</TableCell>
                                     <TableCell align="center" sx={{ fontWeight: 700 }}>{stats.total}</TableCell>
-                                    <TableCell align="right" sx={{ fontWeight: 900, color: stats.win_rate > 50 ? 'primary.main' : 'warning.main' }}>{stats.win_rate}%</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 900, color: stats.win_rate > 50 ? '#00D1FF' : '#f59e0b' }}>{stats.win_rate}%</TableCell>
                                  </TableRow>
                               )) : (
                                  <TableRow><TableCell colSpan={3} align="center"><Typography variant="caption">Sector attribution pending...</Typography></TableCell></TableRow>
@@ -343,7 +343,7 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                                        <TableCell align="center">
                                           <Chip label={sig.status.replace('_', ' ')} size="small" variant="outlined" color="primary" sx={{ height: 18, fontSize: '0.55rem', fontWeight: 900 }} />
                                        </TableCell>
-                                       <TableCell align="right" sx={{ fontWeight: 900, color: (sig.profit_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
+                                       <TableCell align="right" sx={{ fontWeight: 900, color: (sig.profit_pct || 0) >= 0 ? '#00D1FF' : '#ef4444' }}>
                                           {sig.status === 'ACTIVE' ? `${(sig.profit_pct || 0) >= 0 ? '+' : ''}${sig.profit_pct?.toFixed(2)}%` : '---'}
                                        </TableCell>
                                     </TableRow>
@@ -396,13 +396,13 @@ export default function SignalValidation({ isConsolidated = false, initialTab = 
                                           <Typography variant="caption" color="textSecondary" sx={{ display: 'block', fontSize: '0.6rem' }}>{sig.timeframe}</Typography>
                                        </TableCell>
                                        <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{Math.round(entry).toLocaleString()}</TableCell>
-                                       <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', color: 'primary.main', opacity: 0.8 }}>₹{Math.round(target).toLocaleString()}</TableCell>
+                                       <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', color: '#00D1FF', opacity: 0.8 }}>₹{Math.round(target).toLocaleString()}</TableCell>
                                        <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', color: 'error.main', opacity: 0.8 }}>₹{Math.round(stop).toLocaleString()}</TableCell>
                                        <TableCell align="right" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700 }}>₹{Math.round(outcomePrice).toLocaleString()}</TableCell>
-                                       <TableCell align="right" sx={{ fontWeight: 800, color: profitPerShare >= 0 ? 'primary.main' : 'error.main' }}>
+                                       <TableCell align="right" sx={{ fontWeight: 800, color: profitPerShare >= 0 ? '#00D1FF' : '#ef4444' }}>
                                           {profitPerShare >= 0 ? '+' : '-'}₹{Math.abs(Math.round(profitPerShare)).toLocaleString()}
                                        </TableCell>
-                                       <TableCell align="right" sx={{ fontWeight: 800, color: profitPct >= 0 ? 'primary.main' : 'error.main' }}>
+                                       <TableCell align="right" sx={{ fontWeight: 800, color: profitPct >= 0 ? '#00D1FF' : '#ef4444' }}>
                                           {profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%
                                        </TableCell>
                                        <TableCell align="center">

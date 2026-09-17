@@ -45,7 +45,7 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
             <SectionHeader icon={<Shield size={18} />} title="1. SIGNAL IDENTITY" />
             <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
               <DataRow label="SIGNAL ID" value={signal.id} />
-              <DataRow label="SYMBOL" value={signal.symbol} bold color="primary.main" />
+              <DataRow label="SYMBOL" value={signal.symbol} bold color="#00D1FF" />
               <DataRow label="DIRECTION" value={signal.direction}
                  color={signal.direction === 'LONG' ? '#10b981' : '#ef4444'} bold />
               <DataRow label="ASSET TYPE" value={signal.asset_type || signal.asset_class || "EQUITY"} />
@@ -233,7 +233,7 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
                {signal.audit_trail && signal.audit_trail.length > 0 ? (
                   <Stack spacing={2}>
                      {signal.audit_trail.map((evt: any, idx: number) => (
-                        <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', borderLeft: '2px solid', borderColor: 'primary.main', pl: 2 }}>
+                        <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', borderLeft: '2px solid', borderColor: '#00D1FF', pl: 2 }}>
                            <Box>
                               <Typography variant="body2" sx={{ fontWeight: 800 }}>{evt.type}</Typography>
                               <Typography variant="caption" color="text.secondary">{evt.reason || 'Transition Verified'}</Typography>
@@ -252,7 +252,7 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
           <Grid item xs={12} md={4}>
              <SectionHeader icon={<AlertCircle size={18} />} title="20. LIMITATIONS" />
              <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#ef4444', 0.02), borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: 'error.main', mb: 1, display: 'block' }}>AUDIT CONSTRAINTS</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: '#ef4444', mb: 1, display: 'block' }}>AUDIT CONSTRAINTS</Typography>
                 <Stack spacing={1.5}>
                    <Typography variant="caption" color="textSecondary" sx={{ display: 'flex', gap: 1 }}>
                       • Legacy signals (pre-V2.2) lack prediction ID linkage.
@@ -275,7 +275,7 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
 function SectionHeader({ icon, title }: any) {
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
-      <Box sx={{ color: 'primary.main' }}>{icon}</Box>
+      <Box sx={{ color: '#00D1FF' }}>{icon}</Box>
       <Typography variant="caption" sx={{ fontWeight: 950, letterSpacing: 1.5, color: 'slategray' }}>{title}</Typography>
     </Stack>
   );

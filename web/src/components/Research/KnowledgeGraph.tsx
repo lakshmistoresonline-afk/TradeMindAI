@@ -26,14 +26,14 @@ export default function KnowledgeGraph({ symbol }: { symbol: string }) {
 
       <Paper sx={{ p: 4, bgcolor: 'rgba(15, 23, 42, 0.3)', border: '1px solid #334155' }}>
          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-            <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', color: 'black', fontWeight: 'bold', fontSize: '1.5rem' }}>{symbol}</Avatar>
+            <Avatar sx={{ width: 80, height: 80, bgcolor: '#00D1FF', color: 'black', fontWeight: 'bold', fontSize: '1.5rem' }}>{symbol}</Avatar>
          </Box>
 
          <Grid container spacing={4}>
             {data.nodes.filter((n: any) => n.id !== symbol).map((node: any, i: number) => (
               <Grid item xs={6} md={2.4} key={i}>
-                 <Box sx={{ textAlign: 'center', p: 2, border: '1px solid #334155', borderRadius: 2, '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.05)', borderColor: 'primary.main' }, transition: '0.2s' }}>
-                    <Box sx={{ display: 'inline-flex', p: 1, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: '50%', mb: 1, color: 'primary.main' }}>
+                 <Box sx={{ textAlign: 'center', p: 2, border: '1px solid #334155', borderRadius: 2, '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.05)', borderColor: '#00D1FF' }, transition: '0.2s' }}>
+                    <Box sx={{ display: 'inline-flex', p: 1, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: '50%', mb: 1, color: '#00D1FF' }}>
                        {node.type === 'SECTOR' ? <Globe size={14} /> : node.type === 'COMPETITOR' ? <Building size={14} /> : <Users size={14} />}
                     </Box>
                     <Typography variant="caption" color="textSecondary" display="block">{node.type}</Typography>

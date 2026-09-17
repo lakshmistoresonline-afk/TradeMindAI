@@ -69,14 +69,14 @@ export default function DashboardTerminal() {
       {/* 1. Executive Intelligence Header */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff', mb: 1 }}>TRADEMIND AI</Typography>
-        <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 1, mb: 4 }}>OPERATIONAL INTELLIGENCE TERMINAL</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: '#00D1FF', letterSpacing: 1, mb: 4 }}>OPERATIONAL INTELLIGENCE TERMINAL</Typography>
 
         <Grid container spacing={2}>
            <Grid item xs={12} md={8}>
               <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                  <Grid container spacing={4}>
                     <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'BEAR'} color="#ef4444" />
-                    <HeroStat label="STRATEGY" value="V2.2 FROZEN" color="primary.main" />
+                    <HeroStat label="STRATEGY" value="V2.2 FROZEN" color="#00D1FF" />
                     <HeroStat label="ACTIVE SIGNALS" value={counts.total} color="#fff" />
                     <HeroStat label="SYSTEM MODE" value="SHADOW" color="#00D1FF" />
                  </Grid>
@@ -96,18 +96,18 @@ export default function DashboardTerminal() {
                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
-                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>RELIABILITY: AUDITED</Typography>
+                       <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900 }}>RELIABILITY: AUDITED</Typography>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>AUDIT STATUS: HARDENED</Typography>
-                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>REAL-TIME FEED: ACTIVE</Typography>
+                       <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900 }}>REAL-TIME FEED: ACTIVE</Typography>
                     </Box>
                  </Box>
               </Paper>
            </Grid>
            <Grid item xs={12} md={4}>
               <Paper sx={{ p: 3, height: '100%', bgcolor: alpha('#00D1FF', 0.03), border: '1px solid rgba(0, 209, 255, 0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>BASELINE IDENTITY</Typography>
+                 <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, letterSpacing: 2, mb: 1 }}>BASELINE IDENTITY</Typography>
                  <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>V2.2 FROZEN</Typography>
                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                     TRADING EXECUTION: LOCKED <ShieldCheck size={12} color="#ef4444" />
@@ -116,7 +116,7 @@ export default function DashboardTerminal() {
                     variant="text"
                     size="small"
                     onClick={() => navigate('/evidence')}
-                    sx={{ mt: 2, p: 0, justifyContent: 'flex-start', color: 'primary.main', fontWeight: 800, fontSize: '0.65rem' }}
+                    sx={{ mt: 2, p: 0, justifyContent: 'flex-start', color: '#00D1FF', fontWeight: 800, fontSize: '0.65rem' }}
                  >
                     VIEW EVIDENCE & LIMITATIONS →
                  </Button>
@@ -216,7 +216,7 @@ export default function DashboardTerminal() {
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>SIGNAL INTELLIGENCE</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
-                        <SidebarStat label="Total Active" value={counts.total} color="primary.main" />
+                        <SidebarStat label="Total Active" value={counts.total} color="#00D1FF" />
                         <SidebarStat label="Primary Swing" value={counts.swingPrimary} color="#10b981" />
                         <SidebarStat label="Selective" value={counts.swingSelective + counts.longSelective} color="#00D1FF" />
                         <SidebarStat label="Experimental" value={counts.shortExperimental} color="slategray" />
@@ -258,7 +258,7 @@ export default function DashboardTerminal() {
                               fullWidth
                               size="small"
                               onClick={() => navigate('/signals')}
-                              sx={{ mt: 1, fontSize: '0.6rem', fontWeight: 900, color: 'primary.main', textTransform: 'none' }}
+                              sx={{ mt: 1, fontSize: '0.6rem', fontWeight: 900, color: '#00D1FF', textTransform: 'none' }}
                            >
                               VIEW FULL SIGNAL HISTORY →
                            </Button>
@@ -285,7 +285,7 @@ export default function DashboardTerminal() {
                         fullWidth
                         size="small"
                         onClick={() => navigate('/performance')}
-                        sx={{ mt: 2, fontSize: '0.6rem', fontWeight: 900, color: 'primary.main', textTransform: 'none' }}
+                        sx={{ mt: 2, fontSize: '0.6rem', fontWeight: 900, color: '#00D1FF', textTransform: 'none' }}
                      >
                         PERFORMANCE ANALYSIS →
                      </Button>

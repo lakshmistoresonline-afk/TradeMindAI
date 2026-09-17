@@ -109,7 +109,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   fontSize: '1.25rem'
                 }}
               >
-                <Box sx={{ bgcolor: 'primary.main', color: '#000', px: 1, borderRadius: 0.5, fontSize: '0.8rem', fontWeight: 900 }}>TM</Box>
+                <Box sx={{ bgcolor: '#00D1FF', color: '#000', px: 1, borderRadius: 0.5, fontSize: '0.8rem', fontWeight: 900 }}>TM</Box>
                 TRADEMIND AI
                 <Chip
                   label="V2.2 FROZEN"
@@ -118,7 +118,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     height: 18,
                     fontSize: '0.55rem',
                     fontWeight: 950,
-                    bgcolor: 'success.main',
+                    bgcolor: '#10b981',
                     color: '#000',
                     borderRadius: 0.5,
                     ml: 1
@@ -144,7 +144,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               )}
 
               <IconButton onClick={handleProfileClick} sx={{ p: 0.5, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1 }}>
-                <Avatar sx={{ width: 28, height: 28, bgcolor: 'secondary.main', fontSize: '0.7rem', fontWeight: 900, borderRadius: 0.5 }}>
+                <Avatar sx={{ width: 28, height: 28, bgcolor: '#7C3AED', fontSize: '0.7rem', fontWeight: 900, borderRadius: 0.5 }}>
                   {user?.email?.substring(0, 2).toUpperCase() || 'TR'}
                 </Avatar>
                 <ChevronDown size={14} style={{ marginLeft: 6, opacity: 0.5 }} color="white" />
@@ -175,7 +175,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
                 </MenuItem>
                 <Divider sx={{ opacity: 0.05 }} />
-                <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: 'error.main', py: 1.5 }}>
+                <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: '#ef4444', py: 1.5 }}>
                   <ListItemIcon><LogOut size={18} color="currentColor" /></ListItemIcon>
                   <ListItemText primary="Disconnect Terminal" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
                 </MenuItem>
@@ -215,8 +215,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         py: 1.4,
                         '&.Mui-selected': {
                           backgroundColor: alpha('#00D1FF', 0.08),
-                          color: 'primary.main',
-                          '& .MuiListItemIcon-root': { color: 'primary.main' },
+                          color: '#00D1FF',
+                          '& .MuiListItemIcon-root': { color: '#00D1FF' },
                           '& .MuiTypography-root': { fontWeight: 950 }
                         },
                         '&:hover': { backgroundColor: alpha('#fff', 0.03) }

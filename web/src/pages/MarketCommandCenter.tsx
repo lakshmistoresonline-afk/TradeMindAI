@@ -123,7 +123,7 @@ export default function MarketCommandCenter() {
                     <TableBody>
                        {radar.slice(0, 5).map((opp: any) => (
                           <TableRow key={opp.id} hover>
-                             <TableCell sx={{ fontWeight: 900, color: 'primary.main' }}>{opp.symbol}</TableCell>
+                             <TableCell sx={{ fontWeight: 900, color: '#00D1FF' }}>{opp.symbol}</TableCell>
                              <TableCell><Chip label={opp.type} size="small" sx={{ fontWeight: 800, fontSize: '0.6rem' }} /></TableCell>
                              <TableCell>
                                 <Stack direction="row" spacing={2} alignItems="center">

@@ -62,7 +62,7 @@ export default function Research() {
       ) : (
          <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
-               <Paper sx={{ p: 4, mb: 4, borderLeft: '4px solid', borderColor: 'primary.main', bgcolor: '#0f172a' }}>
+               <Paper sx={{ p: 4, mb: 4, borderLeft: '4px solid', borderColor: '#00D1FF', bgcolor: '#0f172a' }}>
                   <Typography variant="h3" sx={{ fontWeight: 950 }}>{selectedSymbol}</Typography>
                   <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 800, mt: 1 }}>
                      {research?.technical_context?.sector || 'NIFTY-200 CONSTITUENT'}

@@ -56,7 +56,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
         overflow: 'hidden',
         bgcolor: '#0f172a',
         transition: '0.2s',
-        '&:hover': { borderColor: 'primary.main', bgcolor: '#111827', transform: 'translateY(-2px)' }
+        '&:hover': { borderColor: '#00D1FF', bgcolor: '#111827', transform: 'translateY(-2px)' }
       }}
     >
       {/* 1. Primary Identity Area */}
@@ -94,7 +94,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
                      <HelpCircle size={10} color="slategray" style={{ cursor: 'help' }} />
                   </Tooltip>
               </Stack>
-              <Typography variant="caption" sx={{ fontWeight: 950, color: 'primary.main', fontSize: '0.8rem' }}>{decision.conviction}%</Typography>
+              <Typography variant="caption" sx={{ fontWeight: 950, color: '#00D1FF', fontSize: '0.8rem' }}>{decision.conviction}%</Typography>
            </Box>
         </Stack>
       </Box>
@@ -119,7 +119,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'right' }}>
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>RISK / REWARD</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 950, color: 'primary.main', fontFamily: 'JetBrains Mono' }}>{decision.riskReward}</Typography>
+               <Typography variant="body2" sx={{ fontWeight: 950, color: '#00D1FF', fontFamily: 'JetBrains Mono' }}>{decision.riskReward}</Typography>
             </Grid>
          </Grid>
       </Box>
@@ -179,7 +179,7 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
         sx={{
            py: 1.5,
            borderRadius: 0,
-           color: 'primary.main',
+           color: '#00D1FF',
            fontWeight: 950,
            fontSize: '0.65rem',
            letterSpacing: 1,

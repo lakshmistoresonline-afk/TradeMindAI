@@ -6,7 +6,7 @@ export default function Trust() {
     <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
       <Box sx={{ mb: 8, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, mb: 2 }}>TRUST CENTER</Typography>
-        <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800 }}>TRANSPARENCY • TRACEABILITY • ACCOUNTABILITY</Typography>
+        <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800 }}>TRANSPARENCY • TRACEABILITY • ACCOUNTABILITY</Typography>
       </Box>
 
       <Grid container spacing={4}>
@@ -76,7 +76,7 @@ function ReliabilityItem({ label, status, text }: any) {
     return (
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
             <Box sx={{ minWidth: 120 }}>
-                <Typography variant="caption" sx={{ fontWeight: 950, color: 'primary.main', display: 'block' }}>{label}</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 950, color: '#00D1FF', display: 'block' }}>{label}</Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                     <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#10b981' }} />
                     <Typography variant="caption" sx={{ fontWeight: 900, fontSize: '0.6rem', color: '#10b981' }}>{status}</Typography>

@@ -116,7 +116,7 @@ export default function OpportunityScanner() {
                      sx={{ cursor: 'pointer' }}
                    >
                       <TableCell align="center">
-                         <Typography variant="body2" sx={{ fontWeight: 800, color: i < 3 ? 'primary.main' : 'text.secondary' }}>
+                         <Typography variant="body2" sx={{ fontWeight: 800, color: i < 3 ? '#00D1FF' : 'text.secondary' }}>
                             #{i+1}
                          </Typography>
                       </TableCell>
@@ -128,14 +128,14 @@ export default function OpportunityScanner() {
                          <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
                             <Typography color="primary" fontWeight={900}>{s.decision?.conviction || 0}%</Typography>
                             <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
-                               <Box sx={{ width: `${s.decision?.conviction || 0}%`, height: '100%', bgcolor: 'primary.main', borderRadius: 2 }} />
+                               <Box sx={{ width: `${s.decision?.conviction || 0}%`, height: '100%', bgcolor: '#00D1FF', borderRadius: 2 }} />
                             </Box>
                          </Stack>
                       </TableCell>
                       <TableCell align="center">
                          <Typography variant="body2" sx={{ fontWeight: 800, fontFamily: 'JetBrains Mono' }}>{s.decision?.riskReward || '1:2.0'}</Typography>
                       </TableCell>
-                      <TableCell align="right" sx={{ color: (s.change_pct || 0) >= 0 ? 'primary.main' : 'error.main', fontWeight: 800 }}>
+                      <TableCell align="right" sx={{ color: (s.change_pct || 0) >= 0 ? '#00D1FF' : '#ef4444', fontWeight: 800 }}>
                          {(s.change_pct || 0) >= 0 ? '+' : ''}{s.change_pct?.toFixed(2) || '0.00'}%
                       </TableCell>
                       <TableCell align="center">
@@ -147,7 +147,7 @@ export default function OpportunityScanner() {
                          <Button
                            size="small"
                            endIcon={<ArrowRight size={14} />}
-                           sx={{ fontWeight: 900, fontSize: '0.65rem', color: 'primary.main' }}
+                           sx={{ fontWeight: 900, fontSize: '0.65rem', color: '#00D1FF' }}
                          >
                            FORENSIC LAB
                          </Button>

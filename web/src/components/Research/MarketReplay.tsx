@@ -35,7 +35,7 @@ export default function MarketReplay() {
             <Slider value={frame} onChange={(_, v) => setFrame(v as number)} min={0} max={100} />
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, alignItems: 'center' }}>
                <IconButton><Rewind size={24} /></IconButton>
-               <IconButton onClick={() => setIsPlaying(!isPlaying)} sx={{ bgcolor: 'primary.main', color: 'black', '&:hover': { bgcolor: 'primary.dark' } }}>
+               <IconButton onClick={() => setIsPlaying(!isPlaying)} sx={{ bgcolor: '#00D1FF', color: 'black', '&:hover': { bgcolor: 'primary.dark' } }}>
                   {isPlaying ? <Pause size={24} /> : <Play size={24} />}
                </IconButton>
                <IconButton><FastForward size={24} /></IconButton>

@@ -88,7 +88,7 @@ export default function SignalDetail() {
                />
             </Stack>
             <Typography variant="h6" sx={{ color: 'slategray', fontWeight: 700, mt: 0.5 }}>{signal.company_name || signal.name || 'INSTRUMENT'}</Typography>
-            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, display: 'block', mt: 1 }}>
+            <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, letterSpacing: 2, display: 'block', mt: 1 }}>
                {decision.rating} · {decision.timeframe} HORIZON · STRATEGY V2.2
             </Typography>
             {decision.status !== 'ACTIVE' && decision.status !== 'WAITING_FOR_ENTRY' && (
@@ -124,14 +124,14 @@ export default function SignalDetail() {
                   <PlanItem label="ENTRY PRICE" value={`₹${decision.entry?.toLocaleString()}`} />
                   <PlanItem label="TARGET PRICE" value={`₹${decision.target?.toLocaleString()}`} color="#10b981" />
                   <PlanItem label="STOP LOSS" value={`₹${decision.stopLoss?.toLocaleString()}`} color="#ef4444" />
-                  <PlanItem label="RISK / REWARD" value={decision.riskReward} color="primary.main" />
+                  <PlanItem label="RISK / REWARD" value={decision.riskReward} color="#00D1FF" />
                </Grid>
                <Divider sx={{ my: 4, opacity: 0.05 }} />
                <Grid container spacing={4}>
                   <PlanItem
                     label="MODEL PROBABILITY"
                     value={`${decision.conviction}%`}
-                    color="primary.main"
+                    color="#00D1FF"
                     tooltip="Model-derived probability estimate based on the current model and evidence. It is not a guarantee of outcome."
                   />
                   <PlanItem label="EXPECTED VALUE" value={`₹${(decision.expectedValue || 0).toFixed(2)}`} color="#10b981" />
@@ -212,7 +212,7 @@ export default function SignalDetail() {
                     <Divider sx={{ my: 3, opacity: 0.05 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>REPLAY FIDELITY: HIGH</Typography>
-                        <MuiChip label="VERIFIED RECONSTRUCTION" size="small" variant="outlined" sx={{ height: 18, fontSize: '0.5rem', fontWeight: 950, color: 'primary.main', borderColor: alpha('#00D1FF', 0.3) }} />
+                        <MuiChip label="VERIFIED RECONSTRUCTION" size="small" variant="outlined" sx={{ height: 18, fontSize: '0.5rem', fontWeight: 950, color: '#00D1FF', borderColor: alpha('#00D1FF', 0.3) }} />
                     </Box>
                 </Paper>
             </Box>
@@ -237,7 +237,7 @@ export default function SignalDetail() {
                </Stack>
                <Divider sx={{ my: 3, opacity: 0.05 }} />
                <Box sx={{ p: 1.5, bgcolor: alpha('#00D1FF', 0.03), borderRadius: 1, border: '1px solid rgba(0, 209, 255, 0.1)' }}>
-                   <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
+                   <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
                        <ShieldCheck size={12} /> SHADOW SIGNAL MODE ACTIVE
                    </Typography>
                </Box>
@@ -274,7 +274,7 @@ export default function SignalDetail() {
 function SectionHeader({ icon, title }: any) {
     return (
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2, opacity: 0.8 }}>
-            <Box sx={{ color: 'primary.main' }}>{icon}</Box>
+            <Box sx={{ color: '#00D1FF' }}>{icon}</Box>
             <Typography variant="subtitle2" sx={{ fontWeight: 950, letterSpacing: 1, color: '#fff' }}>{title}</Typography>
         </Stack>
     );

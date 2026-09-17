@@ -48,7 +48,7 @@ export default function MarketOutlook() {
         <Grid container spacing={3}>
            <Grid item xs={12} md={7}>
               <Box sx={{ p: 2.5, bgcolor: 'rgba(15, 23, 42, 0.5)', borderRadius: 2, height: '100%', border: '1px solid rgba(255,255,255,0.05)' }}>
-                 <Typography variant="subtitle1" fontWeight={800} gutterBottom color="primary.main">
+                 <Typography variant="subtitle1" fontWeight={800} gutterBottom color="#00D1FF">
                     {intel?.summary || "AI Analysis pending for latest session..."}
                  </Typography>
                  <Typography variant="body2" color="textSecondary" sx={{ lineHeight: 1.7, fontWeight: 500 }}>

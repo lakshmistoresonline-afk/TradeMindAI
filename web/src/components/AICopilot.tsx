@@ -110,7 +110,7 @@ Question: ${message}`;
                   color="primary"
                   disabled={!message.trim() || loading}
                   onClick={handleSend}
-                  sx={{ width: 40, height: 40, bgcolor: 'primary.main', color: 'black', '&:hover': { bgcolor: 'primary.dark' }, borderRadius: 1 }}
+                  sx={{ width: 40, height: 40, bgcolor: '#00D1FF', color: 'black', '&:hover': { bgcolor: 'primary.dark' }, borderRadius: 1 }}
                 >
                   <Send size={18} />
                 </IconButton>

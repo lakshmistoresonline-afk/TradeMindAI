@@ -15,7 +15,7 @@ export default function RiskAndModelProfile() {
             <Stack spacing={2.5} sx={{ mt: 2 }}>
                <ProfileMetric label="Volatility Regime" value="MEDIUM" />
                <ProfileMetric label="Systematic Beta" value="1.14" />
-               <ProfileMetric label="Historical Drawdown" value="-12.4%" color="error.main" />
+               <ProfileMetric label="Historical Drawdown" value="-12.4%" color="#ef4444" />
                <ProfileMetric label="Institutional Correlation" value="0.82" />
             </Stack>
           </Paper>

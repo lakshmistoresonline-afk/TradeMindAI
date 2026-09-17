@@ -53,7 +53,7 @@ export default function TradeJournal() {
                       <TableCell>{new Date(t.entry_date).toLocaleDateString()}</TableCell>
                       <TableCell sx={{ fontWeight: 900 }}>{t.symbol}</TableCell>
                       <TableCell><Chip label="LONG" size="small" variant="outlined" sx={{ height: 18, fontSize: '0.6rem' }} /></TableCell>
-                      <TableCell align="right" sx={{ color: t.pnl >= 0 ? 'primary.main' : 'error.main', fontWeight: 800 }}>
+                      <TableCell align="right" sx={{ color: t.pnl >= 0 ? '#00D1FF' : '#ef4444', fontWeight: 800 }}>
                         {t.pnl >= 0 ? '+' : ''}₹{t.pnl.toLocaleString()}
                       </TableCell>
                       <TableCell align="center"><Chip label="CLOSED" size="small" sx={{ fontWeight: 900, height: 20 }} /></TableCell>

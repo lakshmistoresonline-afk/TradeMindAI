@@ -178,14 +178,14 @@ export default function MarketPulse() {
                    {stock.last_price ? `₹${stock.last_price.toLocaleString()}` : '---'}
                 </TableCell>
                 <TableCell align="right">
-                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, color: (stock.change_pct || 0) >= 0 ? 'primary.main' : 'error.main' }}>
+                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, color: (stock.change_pct || 0) >= 0 ? '#00D1FF' : '#ef4444' }}>
                       <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 800 }}>
                         {(stock.change_pct || 0) >= 0 ? '+' : ''}{stock.change_pct?.toFixed(2)}%
                       </Typography>
                    </Box>
                 </TableCell>
                 <TableCell align="right">
-                   <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700, color: (stock.avg_volume > 0 && (stock.volume / stock.avg_volume) > 1.5) ? 'primary.main' : 'text.secondary' }}>
+                   <Typography variant="body2" sx={{ fontFamily: 'JetBrains Mono', fontWeight: 700, color: (stock.avg_volume > 0 && (stock.volume / stock.avg_volume) > 1.5) ? '#00D1FF' : 'text.secondary' }}>
                       {stock.avg_volume > 0 ? (stock.volume / stock.avg_volume).toFixed(1) : '1.0'}x
                    </Typography>
                 </TableCell>

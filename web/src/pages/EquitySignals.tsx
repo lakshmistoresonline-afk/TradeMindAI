@@ -37,7 +37,7 @@ export default function EquitySignals() {
 
   // Canonical Signal Universes (V2.3)
   const universes = useMemo(() => [
-    { label: 'ALL ACTIVE', value: 'ALL', color: 'primary.main' },
+    { label: 'ALL ACTIVE', value: 'ALL', color: '#00D1FF' },
     { label: 'SWING', value: 'SWING', color: '#10b981' },
     { label: 'SHORT', value: 'SHORT', color: 'slategray' },
     { label: 'LONG', value: 'LONG', color: '#00D1FF' }
@@ -200,10 +200,10 @@ export default function EquitySignals() {
             <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
             {mode === 'ACTIVE' && (
                 <>
-                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? 'primary.main' : 'slategray' }}>
+                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? '#00D1FF' : 'slategray' }}>
                         <LayoutGrid size={20} />
                     </IconButton>
-                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? 'primary.main' : 'slategray' }}>
+                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? '#00D1FF' : 'slategray' }}>
                         <ListIcon size={20} />
                     </IconButton>
                 </>
@@ -215,7 +215,7 @@ export default function EquitySignals() {
                 startIcon={<Columns size={16} />}
                 disabled={selectedForCompare.length < 2}
                 onClick={() => setIsCompareOpen(true)}
-                sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: 'primary.main', color: 'primary.main' }}
+                sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: '#00D1FF', color: '#00D1FF' }}
             >
                 COMPARE {selectedForCompare.length > 0 ? `(${selectedForCompare.length})` : ''}
             </Button>
@@ -227,7 +227,7 @@ export default function EquitySignals() {
             {/* 3. Active Signal Summary */}
             <Grid container spacing={2} sx={{ mb: 4 }}>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="TOTAL ACTIVE" value={counts.all} color="primary.main" />
+                    <SummaryStat label="TOTAL ACTIVE" value={counts.all} color="#00D1FF" />
                 </Grid>
                 <Grid item xs={6} md={3}>
                     <SummaryStat label="SWING" value={counts.swing} color="#10b981" />
@@ -290,9 +290,9 @@ export default function EquitySignals() {
                                                     position: 'absolute', top: 10, right: 80,
                                                     zIndex: 10, height: 20, fontSize: '0.5rem',
                                                     fontWeight: 950, cursor: 'pointer',
-                                                    bgcolor: selectedForCompare.includes(s.id) ? 'primary.main' : 'rgba(0,0,0,0.4)',
+                                                    bgcolor: selectedForCompare.includes(s.id) ? '#00D1FF' : 'rgba(0,0,0,0.4)',
                                                     color: selectedForCompare.includes(s.id) ? '#000' : 'white',
-                                                    '&:hover': { bgcolor: 'primary.main', color: '#000' }
+                                                    '&:hover': { bgcolor: '#00D1FF', color: '#000' }
                                                 }}
                                             />
                                         </Box>
@@ -326,7 +326,7 @@ export default function EquitySignals() {
                                                         onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
                                                         sx={{
                                                             height: 18, width: 18, minWidth: 0, p: 0,
-                                                            bgcolor: selectedForCompare.includes(s.id) ? 'primary.main' : 'transparent',
+                                                            bgcolor: selectedForCompare.includes(s.id) ? '#00D1FF' : 'transparent',
                                                             border: '1px solid rgba(255,255,255,0.1)'
                                                         }}
                                                     />
@@ -368,7 +368,7 @@ export default function EquitySignals() {
         /* 6. Signal History View */
         <Box>
             <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color="primary.main" /></Grid>
+                <Grid item xs={12} md={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color="#00D1FF" /></Grid>
                 <Grid item xs={6} md={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color="#10b981" /></Grid>
                 <Grid item xs={6} md={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color="#ef4444" /></Grid>
                 <Grid item xs={6} md={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color="orange" /></Grid>
@@ -428,7 +428,7 @@ export default function EquitySignals() {
                                       onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
                                       sx={{
                                           height: 18, width: 18, minWidth: 0, p: 0,
-                                          bgcolor: selectedForCompare.includes(s.id) ? 'primary.main' : 'transparent',
+                                          bgcolor: selectedForCompare.includes(s.id) ? '#00D1FF' : 'transparent',
                                           border: '1px solid rgba(255,255,255,0.1)'
                                       }}
                                   />
@@ -466,7 +466,7 @@ export default function EquitySignals() {
                               <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444', fontSize: '0.8rem' }}>
                                  {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(2)}%` : '—'}
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 800, color: 'primary.main', fontSize: '0.8rem' }}>{s.decision.conviction}%</TableCell>
+                              <TableCell sx={{ fontWeight: 800, color: '#00D1FF', fontSize: '0.8rem' }}>{s.decision?.conviction}%</TableCell>
                               <TableCell align="right">
                                  <Stack direction="row" spacing={1} justifyContent="flex-end">
                                      <Button
@@ -519,7 +519,7 @@ export default function EquitySignals() {
                   <TableHead>
                      <TableRow>
                         <TableCell>METRIC</TableCell>
-                        {comparedSignals.map(s => <TableCell key={s.id} sx={{ fontWeight: 950, color: 'primary.main' }}>{s.symbol}</TableCell>)}
+                        {comparedSignals.map(s => <TableCell key={s.id} sx={{ fontWeight: 950, color: '#00D1FF' }}>{s.symbol}</TableCell>)}
                      </TableRow>
                   </TableHead>
                   <TableBody>
@@ -572,12 +572,12 @@ function ModeButton({ active, children, onClick }: any) {
             sx={{
                 px: 3, py: 1,
                 borderRadius: 0.5,
-                bgcolor: active ? 'primary.main' : 'transparent',
+                bgcolor: active ? '#00D1FF' : 'transparent',
                 color: active ? '#000' : 'slategray',
                 fontWeight: 950,
                 fontSize: '0.75rem',
                 border: active ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                '&:hover': { bgcolor: active ? 'primary.main' : 'rgba(255,255,255,0.03)' }
+                '&:hover': { bgcolor: active ? '#00D1FF' : 'rgba(255,255,255,0.03)' }
             }}
         >
             {children}

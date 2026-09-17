@@ -28,7 +28,7 @@ export default function AIResearchTimeline({ symbol }: { symbol: string }) {
             {timeline.map((item, index) => (
               <Step key={index} active={true}>
                 <StepLabel
-                  StepIconComponent={() => <Box sx={{ width: 10, height: 10, bgcolor: item.type === 'RATING' ? 'primary.main' : 'text.secondary', borderRadius: '50%' }} />}
+                  StepIconComponent={() => <Box sx={{ width: 10, height: 10, bgcolor: item.type === 'RATING' ? '#00D1FF' : 'text.secondary', borderRadius: '50%' }} />}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography variant="subtitle2" fontWeight="bold">{item.title}</Typography>

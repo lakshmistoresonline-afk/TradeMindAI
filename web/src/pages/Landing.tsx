@@ -27,7 +27,7 @@ export default function Landing() {
           <Typography variant="h4" sx={{
             fontSize: { xs: '1.25rem', md: '2rem' },
             fontWeight: 700,
-            color: 'primary.main',
+            color: '#00D1FF',
             letterSpacing: 2,
             mb: 4
           }}>
@@ -112,12 +112,12 @@ export default function Landing() {
           <Divider sx={{ mb: 8, opacity: 0.1 }} />
           <Grid container spacing={4} justifyContent="center">
             <Grid item xs={12} md={4}>
-              <Typography variant="h5" sx={{ fontWeight: 950, color: 'primary.main', mb: 2 }}>59.18%</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>59.18%</Typography>
               <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>OBSERVED WIN RATE</Typography>
               <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>N=49 Resolved Signals</Typography>
             </Grid>
             <Grid item xs={12} md={4}>
-               <Typography variant="h5" sx={{ fontWeight: 950, color: 'primary.main', mb: 2 }}>2.73</Typography>
+               <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>2.73</Typography>
                <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>PROFIT FACTOR</Typography>
                <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>Observed Performance</Typography>
             </Grid>
