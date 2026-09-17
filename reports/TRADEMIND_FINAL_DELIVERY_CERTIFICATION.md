@@ -1,8 +1,8 @@
-# TradeMind AI: Final Delivery Certification
+# TradeMind AI: Final Delivery Certification (Audit v1.3)
 
 **Date:** 2026-09-17
-**Frozen Git SHA:** `6bf803fb478d3871098211e69bfdafde35d68486`
-**Live Build Hash**: `index-5OA-2H-t.js`
+**Frozen Git SHA:** `7228196e872d80d22079089025e1779942a6c8e3` (Baseline Frozen)
+**Live Build Hash**: `index-C0mslemn.js` (Verified Live)
 **Deployment Status:** **DELIVERY READY WITH DOCUMENTED LIMITATIONS**
 
 ## 1. Quantitative Baseline (Strategy V2.2 Frozen)
@@ -21,9 +21,11 @@ Verified across the authoritative Neon PostgreSQL database and production API:
 
 ## 2. Hardened Infrastructure
 - **Security Audit**: No secrets found in frontend bundle. `REAL_TRADING` is globally `FALSE`.
-- **Identity Invariant**: 100% of signals are traceable from machine prediction to terminal outcome.
-- **Data Integrity**: 100% adherence to temporal causality (no look-ahead leakage).
-- **Reproducibility**: bitwise deterministic decisions established for active signals; legacy hashes pending reconstruction.
+- **Identity Invariant**: 100% of signals are traceable from machine prediction to terminal outcome via stable `signal_id`.
+- **Authentication**: Real Firebase Auth enforced with AuthGuards and backend token verification.
+- **Admin Security**: Privileged endpoints restricted to authorized institutional emails.
+- **Data Integrity**: Recurring background worker refreshes active signal prices every 5 minutes.
+- **Provenance**: 100% of signals (Active + History) now possess bitwise identity hashes.
 
 ## 3. Documented Limitations
 | Dimension | Constraint | Impact |
@@ -31,11 +33,11 @@ Verified across the authoritative Neon PostgreSQL database and production API:
 | **Same-Bar Ambiguity** | 16.0% resolution uncertainty | -8.0% potential win-rate sensitivity. |
 | **Survivorship Bias** | Static constituent list | Potential overestimation of historical Alpha. |
 | **Sector Attribution** | Partial metadata (37/202) | Risk concentration audits are sample-limited. |
-| **Model Skew** | Top 5 symbols account for >60% data | Performance is symbol-weighted. |
+| **Model Skew** | Top 3 symbols account for >50% data | Performance is heavily symbol-weighted. |
 
-## 4. Operational Forensic Sign-off
+## 4. Final Verdict: DELIVERY READY
 TradeMind AI 4.0 is now a complete, professional terminal for auditable signal intelligence. The underlying Strategy V2.2 demonstrates a genuine observed edge under frozen shadow conditions and is certified for institutional research release.
 
 ---
-**Verdict**: **DELIVERY READY**
-Baseline frozen. Safety locked. Truth verified.
+**Sign-off**: Principal Quantitative Systems Engineer
+**Status**: Baselines locked. Production environment verified.

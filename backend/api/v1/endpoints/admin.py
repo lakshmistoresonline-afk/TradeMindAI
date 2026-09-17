@@ -6,7 +6,7 @@ import datetime
 router = APIRouter()
 
 @router.get("/stats")
-async def get_system_stats(current_user: dict = Depends(get_current_user)):
+async def get_system_stats(current_user: dict = Depends(get_current_admin)):
     # Check if user is admin (Vision 2.0: Restricted access)
     return {
         "total_users": 1240,

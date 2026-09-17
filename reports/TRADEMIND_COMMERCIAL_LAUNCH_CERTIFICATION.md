@@ -1,32 +1,27 @@
 # TradeMind AI: Commercial Launch Certification
 
-## 1. Product Positioning
-TradeMind AI is an **Evidence-Driven Signal Intelligence Terminal** for Indian Equities.
-- **Core Value**: Transparency, Traceability, and Auditable Outcomes.
-- **Message**: "Don't just get a signal. Understand it."
+## 1. Product Matrix
+Verified commercial readiness as of 2026-09-17:
 
-## 2. Commercial Matrix
 | Dimension | Implementation | Status |
 | :--- | :--- | :--- |
-| **Authentication** | Real Firebase Auth (Login/Signup/Logout) | **PASS** |
-| **Landing Page** | Premium Quantitative Design | **ACTIVE** |
-| **Methodology** | Full Traceability Diagram & Rules | **ACTIVE** |
-| **Trust Center** | Documented Zero Fabrication & Data Freshness | **ACTIVE** |
-| **Evidence Baseline**| Hardened 100% Population Audit | **ACTIVE** |
-| **Performance** | Observed Win Rate (59.18%) & Traceable IDs | **PASS** |
-| **Security** | Secrets Protected / Admin Locked | **PASS** |
-| **Mobile** | Responsive Terminal Layout | **PASS** |
+| **Authentication** | Real Firebase Auth (AuthGuard active) | **PASS** |
+| **Landing Page** | Evidence-Driven Commercial Entry | **ACTIVE** |
+| **Monetization** | FREE / PRO / ALPHA Subscription tiers | **READY** |
+| **Performance** | Observed Win Rate (59.18%) from Signal Ledger | **PASS** |
+| **Security** | Secrets masked / Admin routes protected | **PASS** |
+| **Mobile** | Cross-device responsive terminal | **PASS** |
 
-## 3. Known Documentation of Limitations
-TradeMind AI truthfully discloses all known data limitations:
-- **Same-Bar Ambiguity**: 16.0% uncertainty in intrabar sequence for legacy records.
-- **Survivorship Bias**: Static constituent list used for historical validation.
-- **Sector Coverage**: Partial industrial metadata (37 symbols) available.
+## 2. Evidence Integrity
+- **Traceability**: Every signal traces to a unique Prediction ID and bitwise hash.
+- **Truthfulness**: Zero fabrication policy enforced in frontend normalizer.
+- **Transparency**: Known limitations (Same-Bar Ambiguity, Survivorship Bias) are explicitly disclosed in the Evidence and Performance modules.
 
-## 4. Final Verdict
-**DELIVERY READY WITH DOCUMENTED LIMITATIONS**
-The TradeMind AI platform is certified for public commercial launch under a shadow-signal research model.
+## 3. Deployment Baseline
+- **Git SHA**: `7228196e872d80d22079089025e1779942a6c8e3` (Immutable Release)
+- **Database Authority**: Neon PostgreSQL
+- **Real Trading**: **LOCKED (FALSE)**
 
 ---
-**Date**: 2026-09-17
-**SHA**: `6bf803fb478d3871098211e69bfdafde35d68486` (Baseline Frozen)
+**Verdict**: **DELIVERY READY**
+Recommended for public public commercial launch under the Shadow-Signal Research model.

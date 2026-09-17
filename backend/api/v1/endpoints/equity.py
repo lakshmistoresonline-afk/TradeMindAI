@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
+from backend.core.auth import get_current_user
 from typing import List, Dict, Any, Optional
 from sqlalchemy import func, or_
 from backend.core.container import container
@@ -167,12 +168,17 @@ async def get_equity_history(
     status: Optional[str] = None,
     direction: Optional[str] = None,
     page: int = 1,
-    limit: int = 50
+    limit: int = 50,
+    user: dict = Depends(get_current_user)
 ):
     """
     GET /api/v1/equity/history
     Returns historical signal records from the shadow_signals ledger.
     """
+    # 1. Entitlement Enforcement (Phase 58)
+    from backend.services.billing_service import BillingService
+    # For now, allow FREE users to see history but enforce authentication.
+    # In a real launch, we would check BillingService.verify_entitlement(user["uid"], "history")
     from backend.core.postgres import SessionLocal, ShadowSignalDB
     with SessionLocal() as session:
         query = session.query(ShadowSignalDB)

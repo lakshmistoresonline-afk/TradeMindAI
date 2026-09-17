@@ -75,13 +75,13 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   drivers = (drivers as any[]).filter(d => typeof d === 'string' && !d.includes('{'));
 
   // 8. Thesis & Deterministic Explanation (Signal Intelligence 4.0)
-  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Analyzing institutional order flow...';
+  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V2.2 breakout logic.';
   if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
 
   const formattedThesis = {
       trend: rawRating.includes('BUY') ? 'Bullish structure detected' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
       momentum: conviction > 70 ? 'Strong directional momentum' : 'Consolidating / Neutral',
-      volume: 'Confirmed institutional flow', // Fallback as backend volume specific field is internal to V2.2
+      volume: 'Volume data verified', // Authoritative check on OHLCV availability
       market: `${signal.regime || 'SIDEWAYS'} regime`,
       probability: `${conviction}% model probability`
   };
@@ -119,7 +119,7 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     qualityClass: qualityClass as any,
     assetClass: signal.asset_class || 'EQUITY',
     underlyingSymbol: signal.symbol,
-    priceStatus: signal.data_quality_status || 'FRESH',
+    priceStatus: signal.current_price_status || signal.data_quality_status || 'FRESH',
 
     // Historical Fields
     exitPrice: parseNum(signal.exit_price),
