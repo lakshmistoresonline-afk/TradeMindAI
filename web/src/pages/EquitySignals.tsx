@@ -50,6 +50,7 @@ export default function EquitySignals() {
     try {
       if (mode === 'ACTIVE') {
         const signalsData = await getEquitySignals({ limit: 100 });
+        console.log(`[Forensic] Received Active Signals: ${signalsData?.length || 0}`);
         if (!signalsData || !Array.isArray(signalsData)) {
             throw new Error("Invalid response format from signal service.");
         }

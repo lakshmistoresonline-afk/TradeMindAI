@@ -34,6 +34,8 @@ export default function DashboardTerminal() {
       const statsData = results[3].status === 'fulfilled' ? results[3].value : null;
       const historyData = results[4].status === 'fulfilled' ? results[4].value : null;
 
+      console.log("[Forensic] Dashboard Sync Results:", results.map(r => r.status));
+
       setMarketStats(statsData);
       setPerformanceSummary(perfData);
       setMarketState(marketData);
