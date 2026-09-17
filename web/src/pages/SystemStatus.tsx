@@ -32,12 +32,12 @@ export default function SystemStatus() {
             <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4 }}>CORE INFRASTRUCTURE</Typography>
                <Stack spacing={3}>
-                  <StatusRow label="Backend API" status="HEALTHY" icon={<Activity size={18} />} color="#10b981" />
-                  <StatusRow label="Neon Database" status={components['Neon Database'] || 'HEALTHY'} icon={<Database size={18} />} color="#10b981" />
-                  <StatusRow label="Market Data" status={components['Market Data Provider'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
-                  <StatusRow label="Signal Engine" status="HEALTHY" icon={<Activity size={18} />} color="#10b981" />
-                  <StatusRow label="Model Service" status="HEALTHY" icon={<Activity size={18} />} color="#10b981" />
-                  <StatusRow label="Firebase" status="HEALTHY" icon={<Activity size={18} />} color="#10b981" />
+                  <StatusRow label="Backend API" status={components['API'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
+                  <StatusRow label="Neon Database" status={components['Database'] || 'HEALTHY'} icon={<Database size={18} />} color="#10b981" />
+                  <StatusRow label="Market Data" status={components['Market Data'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
+                  <StatusRow label="Signal Engine" status={components['Signal Engine'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
+                  <StatusRow label="Model Service" status={components['Model Registry'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
+                  <StatusRow label="Firebase Mirror" status={components['Firestore Mirror'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
                </Stack>
             </Paper>
 

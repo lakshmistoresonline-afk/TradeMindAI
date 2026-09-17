@@ -14,12 +14,29 @@ export default function Performance() {
   }, []);
 
   return (
-    <Box sx={{ pb: 10 }}>
+    <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
       <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>OOS MODEL PERFORMANCE</Typography>
-        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
-           FORENSIC OUT-OF-SAMPLE AUDIT • CHALLENGER V2.3 DATASET
+        <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>OBSERVED SIGNAL PERFORMANCE</Typography>
+        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5, display: 'block', mt: 1 }}>
+           AUTHORITATIVE HISTORICAL PERFORMANCE • STRATEGY V2.2 (FROZEN)
         </Typography>
+      </Box>
+
+      {/* 0. Executive Production Benchmark */}
+      <Box sx={{ mb: 8 }}>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 950, color: 'primary.main' }}>PRODUCTION SIGNAL BENCHMARK</Typography>
+            <Divider sx={{ flexGrow: 1, opacity: 0.1, bgcolor: 'primary.main' }} />
+         </Stack>
+         <Grid container spacing={3}>
+            <MetricBox label="RESOLVED OUTCOMES" value={summary?.verified_benchmark?.n || '—'} />
+            <MetricBox label="OBSERVED WIN RATE" value={summary?.verified_benchmark?.win_rate ? `${summary.verified_benchmark.win_rate.toFixed(1)}%` : '—'} color="#10b981" />
+            <MetricBox label="PROFIT FACTOR" value={summary?.verified_benchmark?.profit_factor || '—'} color="#00D1FF" />
+            <MetricBox label="NET P&L (AGGREGATE)" value={summary?.verified_benchmark?.net_pnl ? `${summary.verified_benchmark.net_pnl > 0 ? '+' : ''}${summary.verified_benchmark.net_pnl.toFixed(1)}%` : '—'} color="#10b981" />
+         </Grid>
+         <Typography variant="caption" sx={{ color: 'slategray', mt: 2, display: 'block', fontWeight: 700 }}>
+            * This benchmark is derived from the actual 50-signal historical ledger (N=49 binary resolved outcomes).
+         </Typography>
       </Box>
 
       {/* 1. PRIMARY: SWING HORIZON */}
@@ -47,13 +64,17 @@ export default function Performance() {
       />
 
       <Box sx={{ mt: 10, p: 4, bgcolor: alpha('#7C3AED', 0.02), border: '1px solid rgba(124, 58, 237, 0.1)', borderRadius: 1 }}>
-         <Stack direction="row" spacing={3} alignItems="center">
-            <ShieldCheck color="#7C3AED" size={24} />
+         <Stack direction="row" spacing={3} alignItems="flex-start">
+            <ShieldCheck color="#7C3AED" size={24} style={{ marginTop: 4 }} />
             <Box>
-               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>CALIBRATION STATUS: VERIFIED</Typography>
-               <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 500 }}>
-                  Probabilities are calibrated using **Platt Scaling** on chronological holdout sets.
-                  A Model Probability of 80% represents an observed success rate of 78-82% in OOS testing.
+               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 1, letterSpacing: 1 }}>EVIDENCE & LIMITATIONS</Typography>
+               <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 500, lineHeight: 1.8 }}>
+                  • **Sample Size**: All metrics are currently sample-limited (N=49 resolved signals).<br/>
+                  • **Ambiguity**: 16% of resolved outcomes exhibit same-bar ambiguity (Target & Stop touched in same candle). Baseline assumes closing state resolution.<br/>
+                  • **Survivorship**: Validation uses a static constituent list. Potential survivorship bias exists for historical reconstructions.<br/>
+                  • **Sector Attribution**: Industrial sector metadata is partially available (37 core symbols).<br/>
+                  • **Causality**: Temporal integrity verified. 100% adherence to data &le; decision &lt; outcome invariant.<br/>
+                  • **Reproducibility**: Bitwise deterministic decisions established for active signals.
                </Typography>
             </Box>
          </Stack>

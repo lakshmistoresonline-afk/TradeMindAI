@@ -1,7 +1,7 @@
 import os
 import json
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, auth
 from backend.core.config import settings
 from google.cloud import firestore as google_firestore
 from google.oauth2 import service_account
@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 # Global client cache
 _db_client = None
+_firebase_app = None
 
 class PydanticJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -21,17 +22,16 @@ class PydanticJSONEncoder(json.JSONEncoder):
         return super().default(obj)
 
 def get_db():
-    global _db_client
+    global _db_client, _firebase_app
     if _db_client is not None:
         return _db_client
 
     firebase_creds_json = os.getenv("FIREBASE_SERVICE_ACCOUNT")
+    creds_dict = None
 
     if firebase_creds_json:
         try:
             creds_input = firebase_creds_json.strip().strip("'").strip('"')
-            creds_dict = None
-
             # 1. Try Raw JSON
             if creds_input.startswith('{'):
                 try:
@@ -46,7 +46,6 @@ def get_db():
                 try:
                     if len(clean_b64) % 4 != 0:
                         clean_b64 += '=' * (4 - len(clean_b64) % 4)
-
                     decoded_bytes = base64.b64decode(clean_b64)
                     decoded = decoded_bytes.decode('utf-8')
                     if decoded.strip().startswith('{'):
@@ -60,12 +59,17 @@ def get_db():
                     creds_dict['private_key'] = pk
 
                 try:
+                    if not _firebase_app:
+                        cred = credentials.Certificate(creds_dict)
+                        _firebase_app = firebase_admin.initialize_app(cred)
+                        print("[+] Firebase Admin initialized.")
+
                     g_creds = service_account.Credentials.from_service_account_info(creds_dict)
                     _db_client = google_firestore.Client(project=creds_dict.get('project_id'), credentials=g_creds)
                     print("[+] Firestore client created.")
                     return _db_client
                 except Exception as e:
-                    print(f"[!!] Firestore client creation failed: {e}")
+                    print(f"[!!] Firebase initialization failed: {e}")
         except Exception as e:
             print(f"[!!] Firebase credential parsing failed: {e}")
 
@@ -73,8 +77,13 @@ def get_db():
     for path in ["service-account.json", "backend/service-account.json"]:
         if os.path.exists(path):
             try:
+                if not _firebase_app:
+                    cred = credentials.Certificate(path)
+                    _firebase_app = firebase_admin.initialize_app(cred)
+                    print(f"[+] Firebase Admin initialized from file: {path}")
+
                 _db_client = google_firestore.Client.from_service_account_json(path)
-                print(f"[+] Firestore initialized from local file: {path}")
+                print(f"[+] Firestore client created from file: {path}")
                 return _db_client
             except: pass
 

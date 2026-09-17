@@ -96,7 +96,7 @@ export default function DashboardTerminal() {
                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
-                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>QUALITY: V2.3 (HARDENED)</Typography>
+                       <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900 }}>RELIABILITY: AUDITED</Typography>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>AUDIT STATUS: HARDENED</Typography>
@@ -107,21 +107,30 @@ export default function DashboardTerminal() {
            </Grid>
            <Grid item xs={12} md={4}>
               <Paper sx={{ p: 3, height: '100%', bgcolor: alpha('#00D1FF', 0.03), border: '1px solid rgba(0, 209, 255, 0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>DEPLOYMENT STATUS</Typography>
-                 <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>V2.3 HARDENED</Typography>
-                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1 }}>TRADING EXECUTION: LOCKED</Typography>
+                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 2, mb: 1 }}>BASELINE IDENTITY</Typography>
+                 <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>V2.2 FROZEN</Typography>
+                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    TRADING EXECUTION: LOCKED <ShieldCheck size={12} color="#ef4444" />
+                 </Typography>
+                 <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => navigate('/evidence')}
+                    sx={{ mt: 2, p: 0, justifyContent: 'flex-start', color: 'primary.main', fontWeight: 800, fontSize: '0.65rem' }}
+                 >
+                    VIEW EVIDENCE & LIMITATIONS →
+                 </Button>
               </Paper>
            </Grid>
         </Grid>
       </Box>
 
-      {/* 2. Market Overview Ribbon */}
       <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: 'slategray', letterSpacing: 1 }}>MARKET OVERVIEW</Typography>
       <Stack direction="row" spacing={4} sx={{ mb: 6, overflowX: 'auto', pb: 1 }}>
          <MarketTickerItem label="NIFTY 50" data={marketStats?.['NIFTY 50']} />
          <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} />
          <MarketTickerItem label="NIFTY 200" data={marketStats?.['NIFTY 200']} />
-         <MarketTickerItem label="INDIA VIX" data={{ value: 14.5, change: -2.1 }} />
+         <MarketTickerItem label="INDIA VIX" data={marketState?.vix ? { value: marketState.vix, change: 0 } : null} />
       </Stack>
 
       <Grid container spacing={4}>

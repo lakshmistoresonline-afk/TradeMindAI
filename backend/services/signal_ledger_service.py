@@ -40,6 +40,27 @@ class SignalLedgerService:
 
             db_obj = LiveSignalDB(**{k: v for k, v in signal_data.items() if hasattr(LiveSignalDB, k)})
             db.add(db_obj)
+
+            # 1.5 Provenance Enforcement (Audit Phase 1.3)
+            if signal.provenance:
+                from backend.core.postgres import ShadowProvenanceDB
+                prov = signal.provenance
+                prov_obj = ShadowProvenanceDB(
+                    id=prov.get("provenance_id", str(uuid.uuid4())),
+                    signal_id=signal.id,
+                    prediction_id=signal.prediction_id,
+                    data_snapshot_timestamp=prov.get("data_snapshot_timestamp"),
+                    model_version=prov.get("model_version"),
+                    strategy_version=prov.get("strategy_version", "v2.2"),
+                    feature_version=prov.get("feature_version"),
+                    data_sources=json.dumps(prov.get("data_sources")),
+                    source_timestamps=json.dumps(prov.get("source_timestamps")),
+                    input_hash=prov.get("input_hash"),
+                    output_hash=prov.get("output_hash"),
+                    decision_hash=prov.get("decision_hash")
+                )
+                db.add(prov_obj)
+
             db.commit()
             db.refresh(db_obj)
 

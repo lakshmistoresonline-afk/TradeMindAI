@@ -113,4 +113,27 @@ class TechnicalAnalysis:
 
     @staticmethod
     def calculate_volume_profile(df: Any, bins=20):
-        return {}
+        if df is None or df.empty or "Close" not in df.columns or "Volume" not in df.columns:
+            return {}
+
+        import numpy as np
+        try:
+            min_p = float(df["Close"].min())
+            max_p = float(df["Close"].max())
+            if min_p == max_p: return {"min": min_p, "max": max_p, "profile": []}
+
+            counts, edges = np.histogram(df["Close"], bins=bins, weights=df["Volume"])
+            profile = []
+            for i in range(len(counts)):
+                profile.append({
+                    "price": float((edges[i] + edges[i+1]) / 2),
+                    "volume": float(counts[i])
+                })
+
+            return {
+                "min": min_p,
+                "max": max_p,
+                "profile": profile
+            }
+        except:
+            return {}

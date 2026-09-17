@@ -1,11 +1,27 @@
-import { Box, Typography, Paper, Stack, Divider } from '@mui/material';
+import { Box, Typography, Paper, Stack, Divider, alpha } from '@mui/material';
 
 export default function Methodology() {
   return (
-    <Box sx={{ pb: 10, maxWidth: 900, mx: 'auto' }}>
+    <Box sx={{ pb: 10, maxWidth: 900, mx: 'auto', p: 4 }}>
       <Box sx={{ mb: 6, textAlign: 'center' }}>
-        <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2 }}>SIGNAL METHODOLOGY</Typography>
+        <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: 'white' }}>SIGNAL METHODOLOGY</Typography>
         <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 800, mt: 1 }}>STRATEGY V2.2 CORE PROTOCOL</Typography>
+      </Box>
+
+      {/* CANONICAL DATA FLOW */}
+      <Box sx={{ mb: 8, p: 4, bgcolor: '#0f172a', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, letterSpacing: 2, display: 'block', mb: 4, textAlign: 'center' }}>DATA ARCHITECTURE</Typography>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center" justifyContent="center" sx={{ color: 'white' }}>
+            <FlowBox label="MARKET DATA" color="primary.main" />
+            <Box sx={{ opacity: 0.2 }}>→</Box>
+            <FlowBox label="FEATURES" color="primary.main" />
+            <Box sx={{ opacity: 0.2 }}>→</Box>
+            <FlowBox label="MODEL" color="primary.main" />
+            <Box sx={{ opacity: 0.2 }}>→</Box>
+            <FlowBox label="V2.2 DECISION" color="primary.main" />
+            <Box sx={{ opacity: 0.2 }}>→</Box>
+            <FlowBox label="SIGNAL" color="success.main" />
+        </Stack>
       </Box>
 
       <Stack spacing={6}>
@@ -56,4 +72,19 @@ export default function Methodology() {
       </Stack>
     </Box>
   );
+}
+
+function FlowBox({ label, color }: any) {
+    return (
+        <Box sx={{
+            px: 2, py: 1,
+            bgcolor: alpha(color, 0.05),
+            border: `1px solid ${alpha(color, 0.2)}`,
+            borderRadius: 0.5,
+            width: { xs: '100%', md: 'auto' },
+            textAlign: 'center'
+        }}>
+            <Typography variant="caption" sx={{ fontWeight: 950, color }}>{label}</Typography>
+        </Box>
+    );
 }

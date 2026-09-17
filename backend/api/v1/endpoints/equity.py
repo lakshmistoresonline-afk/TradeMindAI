@@ -119,35 +119,45 @@ async def get_equity_accuracy():
             "ece": sum((m.calibration_metadata or {}).get("ece", 0.0) for m in h_models) / len(h_models)
         }
 
+    # Authoritative Performance from Signal Ledger
+    from backend.core.postgres import SessionLocal, ShadowSignalDB
+    with SessionLocal() as session:
+        resolved = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"])).all()
+        signals_data = []
+        for s in resolved:
+            data = {c.name: getattr(s, c.name) for c in s.__table__.columns}
+            signals_data.append(data)
+
+        perf = ResearchMetricsService.calculate_performance_metrics(signals_data)
+
     return {
         "horizons": horizons_report,
         "verified_benchmark": {
-            "n": 50,
-            "win_rate": 58.0,
-            "profit_factor": 2.72,
-            "net_pnl": 126.75
+            "n": perf["sample_size"],
+            "win_rate": perf["win_rate"],
+            "profit_factor": perf["profit_factor"],
+            "net_pnl": perf["net_pnl"]
         }
     }
 
 @router.get("/performance")
 async def get_equity_performance():
     """
-    Returns canonical metrics for V2.2.
+    Returns canonical metrics for V2.2 directly from the Shadow Signal Ledger.
     """
-    from backend.core.postgres import SessionLocal, LiveSignalDB
+    from backend.core.postgres import SessionLocal, ShadowSignalDB
     with SessionLocal() as session:
-        resolved = session.query(LiveSignalDB).filter(LiveSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"])).all()
-        signals_data = [s.__dict__ for s in resolved]
+        resolved = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"])).all()
+        signals_data = []
+        for s in resolved:
+            data = {c.name: getattr(s, c.name) for c in s.__table__.columns}
+            signals_data.append(data)
         return ResearchMetricsService.calculate_performance_metrics(signals_data)
 
 @router.get("/market")
 async def get_market_state():
-    regime = await container.ios_repo.get_latest_regime()
-    return {
-        "regime": regime.regime if regime else "SIDEWAYS",
-        "timestamp": datetime.datetime.utcnow().isoformat(),
-        "universe": "NIFTY-200"
-    }
+    from backend.services.market_data_service import MarketDataService
+    return await MarketDataService.get_market_state()
 
 @router.get("/history")
 async def get_equity_history(

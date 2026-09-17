@@ -47,6 +47,43 @@ class MarketDataService:
         return await container.provider.get_history(symbol, start_date=start_date)
 
     @staticmethod
+    async def get_market_state() -> Dict[str, Any]:
+        """
+        Final Hardening: Single source of truth for Market Regime and VIX.
+        """
+        try:
+            # 1. Fetch VIX
+            vix = await container.provider.get_ltp("INDIAVIX")
+
+            # 2. Fetch Index for Regime
+            index_df = await container.provider.fetch_history("NIFTY", period="1y")
+
+            # 3. Detect Regime
+            from backend.services.ios.regime_engine import MarketRegimeEngine
+            # Create a mock VIX df for engine
+            vix_df = pd.DataFrame([{"Close": vix}]) if vix else pd.DataFrame()
+            regime_obj = MarketRegimeEngine.detect_regime(index_df, vix_df)
+
+            return {
+                "regime": regime_obj.regime,
+                "risk_mode": regime_obj.risk_mode,
+                "vix": vix or 14.5,
+                "sentiment_score": regime_obj.sentiment_score,
+                "description": regime_obj.description,
+                "timestamp": datetime.datetime.utcnow().isoformat(),
+                "status": "HEALTHY" if vix else "DEGRADED"
+            }
+        except Exception as e:
+            print(f"[MarketData] Regime detection failed: {e}")
+            return {
+                "regime": "SIDEWAYS",
+                "risk_mode": "NEUTRAL",
+                "vix": 14.5,
+                "status": "ERROR",
+                "error": str(e)
+            }
+
+    @staticmethod
     async def sync_active_signal_prices():
         """
         Background Worker: Syncs current prices for all non-terminal signals.

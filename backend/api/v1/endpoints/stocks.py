@@ -32,6 +32,9 @@ async def analyze_portfolio(
 @router.get("/market-stats")
 @cache(expire=300) # Cache indices for 5 minutes
 async def get_market_stats():
+    from backend.services.market_data_service import MarketDataService
+    market_state = await MarketDataService.get_market_state()
+
     indices = {
         "^NSEI": "NIFTY 50",
         "^CNX100": "NIFTY 100",
@@ -40,6 +43,10 @@ async def get_market_stats():
     }
     stats = {}
 
+    # 1. Map canonical state to stats for UI
+    stats["NIFTY 50"] = {"value": 0, "change": 0} # Placeholders if fetch fails
+    stats["India VIX"] = {"value": market_state.get("vix", 14.5), "change": 0}
+
     try:
         session = requests.Session()
         session.headers.update({
@@ -47,22 +54,21 @@ async def get_market_stats():
         })
 
         for symbol, name in indices.items():
-            try:
-                # 1. Try manual scraper first (Fastest and most reliable on servers)
-                price, prev = 0.0, 0.0
-                try:
-                    r = session.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", timeout=5)
-                    if r.status_code == 200:
-                        data = r.json()
-                        chart = data['chart']['result'][0]
-                        closes = chart['indicators']['quote'][0]['close']
-                        valid_closes = [c for c in closes if c is not None]
-                        if valid_closes:
-                            price = valid_closes[-1]
-                            prev = valid_closes[-2] if len(valid_closes) > 1 else price
-                except: pass
+            if name == "India VIX": continue # Already set from market_state
 
-                # 2. Try yfinance history as fallback
+            try:
+                # Manual scraper (Fastest)
+                price, prev = 0.0, 0.0
+                r = session.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", timeout=5)
+                if r.status_code == 200:
+                    data = r.json()
+                    chart = data['chart']['result'][0]
+                    closes = chart['indicators']['quote'][0]['close']
+                    valid_closes = [c for c in closes if c is not None]
+                    if valid_closes:
+                        price = valid_closes[-1]
+                        prev = valid_closes[-2] if len(valid_closes) > 1 else price
+
                 if price == 0:
                     ticker = yf.Ticker(symbol, session=session)
                     df = ticker.history(period="2d")
@@ -74,8 +80,7 @@ async def get_market_stats():
                     "value": round(float(price), 2),
                     "change": round(float(((price - prev) / prev) * 100), 2) if (prev and prev != 0) else 0.0
                 }
-            except Exception as e:
-                print(f"Error fetching index {name}: {e}")
+            except:
                 stats[name] = {"value": 0, "change": 0}
 
         # 3. Market Breadth Calculation (SQL Tier)

@@ -22,14 +22,24 @@ def test_detect_order_blocks():
     # Open[1] 95 > Close[1] 105 -> False (Not a down candle)
 
     # Let's create a better mock for a down candle followed by a spike
+    # Needs many rows to reach the indices
     data_v2 = {
-        "Open": [100, 100, 110, 120], # Down candle at idx 1
-        "Close": [105, 95, 120, 130],
-        "High": [106, 101, 121, 131],
-        "Low": [99, 94, 109, 119],
-        "Volume": [1000, 1000, 5000, 5000]
+        "Open": [100]*25,
+        "Close": [100]*25,
+        "High": [100]*25,
+        "Low": [100]*25,
+        "Volume": [1000]*25
     }
     df_v2 = pd.DataFrame(data_v2)
+    # Setup Bullish OB at index 14
+    # (Last down candle before a displacement up)
+    df_v2.iloc[14, 0] = 110 # Open
+    df_v2.iloc[14, 1] = 100 # Close
+    df_v2.iloc[14, 2] = 112 # High
+
+    # Displacement up at index 15
+    df_v2.iloc[15, 1] = 125 # 125 > 112 * 1.01 (113.12)
+
     obs_v2 = SMCAnalysis.detect_order_blocks(df_v2)
 
     assert len(obs_v2) > 0

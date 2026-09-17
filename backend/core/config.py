@@ -56,6 +56,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
+    # FINAL DELIVERY HARDENING: Admin Security
+    ADMIN_EMAILS: List[str] = ["admin@trademind.ai", "lakshmistoresonline@gmail.com"]
+
     model_config = SettingsConfigDict(case_sensitive=True, env_file=".env", extra="ignore")
 
 settings = Settings()

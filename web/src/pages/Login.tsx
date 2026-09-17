@@ -2,16 +2,30 @@ import { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Stack, Link } from '@mui/material';
 import { TrendingUp, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../core/firebase';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login - Bypassing real Firebase Auth for now
-    navigate('/');
+    setError('');
+    try {
+      if (isSignUp) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      navigate('/');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Authentication failed');
+    }
   };
 
   return (
@@ -28,10 +42,16 @@ export default function Login() {
           <Typography variant="h5" fontWeight="bold">TradeMind AI</Typography>
         </Box>
 
-        <Typography variant="h6" gutterBottom>Welcome Back</Typography>
+        <Typography variant="h6" gutterBottom>{isSignUp ? 'Create Account' : 'Welcome Back'}</Typography>
         <Typography variant="body2" color="textSecondary" sx={{ mb: 4 }}>
-          Login to access your institutional AI insights.
+          {isSignUp ? 'Sign up to start your AI investing journey.' : 'Login to access your institutional AI insights.'}
         </Typography>
+
+        {error && (
+          <Typography color="error" variant="caption" sx={{ mb: 2, display: 'block', fontWeight: 800 }}>
+            {error}
+          </Typography>
+        )}
 
         <form onSubmit={handleLogin}>
           <Stack spacing={3}>
@@ -58,14 +78,23 @@ export default function Login() {
               startIcon={<LogIn size={18} />}
               sx={{ py: 1.5, fontWeight: 'bold' }}
             >
-              Sign In
+              {isSignUp ? 'Sign Up' : 'Sign In'}
             </Button>
           </Stack>
         </form>
 
         <Box sx={{ mt: 4 }}>
           <Typography variant="body2" color="textSecondary">
-            Don't have an account? <Link href="#" underline="hover" color="primary">Create one</Link>
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <Link
+              component="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              underline="hover"
+              color="primary"
+              sx={{ fontWeight: 800, verticalAlign: 'baseline' }}
+            >
+              {isSignUp ? 'Sign In' : 'Create one'}
+            </Link>
           </Typography>
         </Box>
       </Paper>

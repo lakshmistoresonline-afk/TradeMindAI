@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from backend.core.auth import get_current_user
+from backend.core.auth import get_current_user, get_current_admin
 from backend.core.container import container
 import datetime
 
@@ -15,13 +15,11 @@ async def get_system_stats(current_user: dict = Depends(get_current_user)):
     }
 
 @router.get("/evaluation")
-async def get_model_evaluation():
+async def get_model_evaluation(current_user: dict = Depends(get_current_admin)):
     return await container.adaptive_service.evaluate_agent_performance()
 
 @router.post("/retrain/{model_name}")
-async def retrain_model(model_name: str, current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") != "admin":
-        return {"error": "Unauthorized"}
+async def retrain_model(model_name: str, current_user: dict = Depends(get_current_admin)):
     return {"message": f"Retraining started for {model_name}"}
 
 @router.get("/health")
@@ -72,7 +70,7 @@ async def get_data_health():
         session.close()
 
 @router.get("/db-audit")
-async def db_audit():
+async def db_audit(current_user: dict = Depends(get_current_admin)):
     from backend.core.postgres import engine
     from sqlalchemy import text
     results = {}
@@ -87,8 +85,8 @@ async def db_audit():
     return results
 
 @router.get("/force-repair")
-async def public_repair():
-    # TEMPORARY PUBLIC ENDPOINT FOR SCHEMA SYNC
+async def privileged_repair(current_user: dict = Depends(get_current_admin)):
+    # SECURE ADMIN ENDPOINT FOR SCHEMA SYNC
     from backend.core.postgres import engine, Base
     from sqlalchemy import text, inspect
 
@@ -115,7 +113,7 @@ async def public_repair():
     return {"status": "Complete", "changes": results}
 
 @router.get("/logs")
-async def get_system_logs(limit: int = 20):
+async def get_system_logs(limit: int = 20, current_user: dict = Depends(get_current_admin)):
     """
     Retrieves real-time forensic logs from the AI background workers.
     """

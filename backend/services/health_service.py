@@ -15,10 +15,28 @@ class SystemHealthService:
         # Perform component checks
         freeze_status = V22FreezeVerificationService.verify_freeze()
 
+        # 1. Database Check (Neon)
+        db_status = "HEALTHY"
+        try:
+            from backend.core.postgres import engine
+            from sqlalchemy import text
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except: db_status = "ERROR"
+
+        # 2. Market Data Check
+        market_data = await container.market_data_service.get_market_state()
+        md_status = "HEALTHY" if market_data["status"] != "ERROR" else "DEGRADED"
+
+        # 3. Firestore Check
+        fs_status = "HEALTHY"
+        from backend.core.database import db_client
+        if not db_client: fs_status = "UNAVAILABLE"
+
         components = {
             "API": "HEALTHY",
-            "Database": "HEALTHY", # Neon check
-            "Market Data": "HEALTHY",
+            "Database": db_status,
+            "Market Data": md_status,
             "Historical Data": "HEALTHY",
             "Feature Engine": "HEALTHY",
             "Model Registry": "HEALTHY",
@@ -26,7 +44,7 @@ class SystemHealthService:
             "Signal Engine": "HEALTHY",
             "Outcome Engine": "HEALTHY",
             "Research Engine": "HEALTHY",
-            "Firestore Mirror": "HEALTHY"
+            "Firestore Mirror": fs_status
         }
 
         # Subsystem audits for details
@@ -41,5 +59,6 @@ class SystemHealthService:
                 "total": universe["total"],
                 "fresh": universe["fresh"],
                 "blocked": universe["blocked"]
-            }
+            },
+            "market_state": market_data
         }

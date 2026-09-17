@@ -12,6 +12,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { API_BASE_URL } from '../api/client';
+import { useAuth } from '../hooks/useAuth';
 
 const drawerWidth = 260;
 
@@ -33,6 +34,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
+  const { user, logout } = useAuth();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -110,13 +112,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <Box sx={{ bgcolor: 'primary.main', color: '#000', px: 1, borderRadius: 0.5, fontSize: '0.8rem', fontWeight: 900 }}>TM</Box>
                 TRADEMIND AI
                 <Chip
-                  label="CHALLENGER V2.3"
+                  label="V2.2 FROZEN"
                   size="small"
                   sx={{
                     height: 18,
                     fontSize: '0.55rem',
                     fontWeight: 950,
-                    bgcolor: 'primary.main',
+                    bgcolor: 'success.main',
                     color: '#000',
                     borderRadius: 0.5,
                     ml: 1
@@ -142,7 +144,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               )}
 
               <IconButton onClick={handleProfileClick} sx={{ p: 0.5, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1 }}>
-                <Avatar sx={{ width: 28, height: 28, bgcolor: 'secondary.main', fontSize: '0.7rem', fontWeight: 900, borderRadius: 0.5 }}>SR</Avatar>
+                <Avatar sx={{ width: 28, height: 28, bgcolor: 'secondary.main', fontSize: '0.7rem', fontWeight: 900, borderRadius: 0.5 }}>
+                  {user?.email?.substring(0, 2).toUpperCase() || 'TR'}
+                </Avatar>
                 <ChevronDown size={14} style={{ marginLeft: 6, opacity: 0.5 }} color="white" />
               </IconButton>
 
@@ -162,8 +166,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 }}
               >
                 <Box sx={{ px: 2, py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>TradeMind Pro</Typography>
-                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>Alpha Tier Node: 7421</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>{user?.email || 'TradeMind Pro'}</Typography>
+                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>Institutional Access</Typography>
                 </Box>
                 <Divider sx={{ opacity: 0.05 }} />
                 <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.5 }}>
@@ -171,7 +175,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
                 </MenuItem>
                 <Divider sx={{ opacity: 0.05 }} />
-                <MenuItem onClick={handleProfileClose} sx={{ color: 'error.main', py: 1.5 }}>
+                <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: 'error.main', py: 1.5 }}>
                   <ListItemIcon><LogOut size={18} color="currentColor" /></ListItemIcon>
                   <ListItemText primary="Disconnect Terminal" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
                 </MenuItem>
@@ -237,7 +241,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <Box sx={{ mt: 'auto', p: 3, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.6rem' }}>
-                  © 2026 TRADEMIND AI • V2.3
+                  © 2026 TRADEMIND AI • STRATEGY V2.2
                </Typography>
             </Box>
           </Box>

@@ -29,7 +29,7 @@ export const getMarketStats = async () => {
 };
 
 export const getDataHealth = async () => {
-  const response = await apiClient.get('/admin/health');
+  const response = await apiClient.get('/system/health/');
   return response.data;
 };
 

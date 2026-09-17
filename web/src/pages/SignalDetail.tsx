@@ -250,7 +250,6 @@ export default function SignalDetail() {
                     <TraceItem label="Index Context" value="NIFTY 200" />
                     <TraceItem label="Market Regime" value={signal.regime || 'SIDEWAYS'} />
                     <TraceItem label="Sector" value={signal.sector || 'UNAVAILABLE'} />
-                    <TraceItem label="Universe Volatility" value="14.5 (VIX)" />
                 </Stack>
             </Paper>
 
@@ -261,7 +260,6 @@ export default function SignalDetail() {
                   <TraceItem label="Prediction ID" value={decision.predictionId || 'N/A'} small />
                   <TraceItem label="Model Version" value={signal.model_version || 'TradeMind Core v2.2'} />
                   <TraceItem label="Strategy" value="FROZEN V2.2" />
-                  <TraceItem label="Dataset" value={signal.dataset_id || 'NIFTY_200_AUG2026'} />
                   <Divider sx={{ my: 1, opacity: 0.05 }} />
                   <TraceItem label="Created At" value={new Date(decision.generatedAt).toLocaleString()} small />
                   <TraceItem label="Data Timestamp" value={new Date(signal.data_timestamp || signal.timestamp).toLocaleString()} small />

@@ -16,15 +16,14 @@ def test_calculate_indicators():
     df_result = TechnicalAnalysis.calculate_indicators(df)
 
     # Verify indicators are present
-    assert "EMA_20" in df_result.columns
-    assert "EMA_50" in df_result.columns
-    assert "EMA_200" in df_result.columns
-    assert "RSI" in df_result.columns
-    assert "MACD_12_26_9" in df_result.columns # Default pandas-ta macd col name
+    assert "ema_20" in df_result.columns
+    assert "ema_50" in df_result.columns
+    assert "ema_200" in df_result.columns
+    assert "momentum_rsi" in df_result.columns
 
-    # Verify no NaN values in latest row (except maybe EMA_200 if data is too short, but we have 300)
-    assert not np.isnan(df_result["EMA_20"].iloc[-1])
-    assert not np.isnan(df_result["RSI"].iloc[-1])
+    # Verify no NaN values in latest row
+    assert not np.isnan(df_result["ema_20"].iloc[-1])
+    assert not np.isnan(df_result["momentum_rsi"].iloc[-1])
 
 def test_calculate_volume_profile():
     data = {

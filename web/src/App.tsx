@@ -8,6 +8,22 @@ import SignalDetail from './pages/SignalDetail'
 import Performance from './pages/Performance'
 import SystemStatus from './pages/SystemStatus'
 import Login from './pages/Login'
+import Landing from './pages/Landing'
+import Methodology from './pages/Methodology'
+import Trust from './pages/Trust'
+import Evidence from './pages/Evidence'
+import Pricing from './pages/Pricing'
+import RiskDisclosure from './pages/RiskDisclosure'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
+import { AuthProvider, useAuth } from './hooks/useAuth'
+
+const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null; // Or a loading spinner
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+};
 
 const darkTheme = createTheme({
   palette: {
@@ -65,30 +81,48 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/*" element={
-            <Layout>
-              <Routes>
-                <Route path="/" element={<DashboardTerminal />} />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* PUBLIC MARKETING ROUTES */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/methodology" element={<Methodology />} />
+            <Route path="/trust" element={<Trust />} />
+            <Route path="/evidence" element={<Evidence />} />
+            <Route path="/pricing" element={<Pricing />} />
 
-                <Route path="/signals" element={<EquitySignals />} />
-                <Route path="/signals/:id" element={<SignalDetail />} />
+            {/* Placeholders for legal/info */}
+            <Route path="/how-it-works" element={<Methodology />} />
+            <Route path="/faq" element={<Pricing />} />
+            <Route path="/contact" element={<Landing />} />
+            <Route path="/risk-disclosure" element={<RiskDisclosure />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
 
-                <Route path="/performance" element={<Performance />} />
-                <Route path="/status" element={<SystemStatus />} />
+            {/* PROTECTED APPLICATION ROUTES */}
+            <Route path="/*" element={
+              <AuthGuard>
+                <Layout>
+                  <Routes>
+                    <Route path="/dashboard" element={<DashboardTerminal />} />
+                    <Route path="/signals" element={<EquitySignals />} />
+                    <Route path="/signals/:id" element={<SignalDetail />} />
+                    <Route path="/performance" element={<Performance />} />
+                    <Route path="/status" element={<SystemStatus />} />
 
-                {/* Compatibility redirects */}
-                <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
+                    {/* Compatibility redirects */}
+                    <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
 
-                {/* Fallback to Dashboard */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Layout>
-          } />
-        </Routes>
-      </Router>
+                    {/* Fallback to Dashboard */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </Layout>
+              </AuthGuard>
+            } />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   )
 }
