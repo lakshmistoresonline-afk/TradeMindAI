@@ -10,10 +10,11 @@ import { useNavigate } from 'react-router-dom';
 export default function EquitySignals() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<'ACTIVE' | 'HISTORY'>('ACTIVE');
-  const [activeTab, setActiveTab] = useState(1); // Default to SWING (index 1)
+  const [activeTab, setActiveTab] = useState(0); // Default to ALL ACTIVE (index 0)
   const [signals, setSignals] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('NEWEST');
 
@@ -39,16 +40,20 @@ export default function EquitySignals() {
   const universes = useMemo(() => [
     { label: 'ALL ACTIVE', value: 'ALL', color: '#00D1FF' },
     { label: 'SWING', value: 'SWING', color: '#10b981' },
-    { label: 'SHORT', value: 'SHORT', color: 'slategray' },
-    { label: 'LONG', value: 'LONG', color: '#00D1FF' }
+    { label: 'SHORT HORIZON', value: 'SHORT', color: 'slategray' },
+    { label: 'LONG HORIZON', value: 'LONG', color: '#00D1FF' }
   ], []);
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
     try {
       if (mode === 'ACTIVE') {
         const signalsData = await getEquitySignals({ limit: 100 });
-        const normalized = (Array.isArray(signalsData) ? signalsData : [])
+        if (!signalsData || !Array.isArray(signalsData)) {
+            throw new Error("Invalid response format from signal service.");
+        }
+        const normalized = signalsData
           .map((s: any) => mapCanonicalSignal(s))
           .sort((a: any, b: any) => {
             const timeA = new Date(a.decision?.generatedAt || 0).getTime();
@@ -67,15 +72,20 @@ export default function EquitySignals() {
             direction: hFilterDirection !== 'ALL' ? hFilterDirection : undefined
         };
         const historyData = await getEquityHistory(params);
-        const records = (historyData?.records || []).map((r: any) => mapCanonicalSignal(r));
+        if (!historyData || !historyData.records) {
+            throw new Error("Invalid response format from history service.");
+        }
+        const records = (historyData.records || []).map((r: any) => mapCanonicalSignal(r));
         setHistory(records);
-        setTotalHistory(historyData?.total || 0);
-        setHistorySummary(historyData?.summary || null);
+        setTotalHistory(historyData.total || 0);
+        setHistorySummary(historyData.summary || null);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to sync equity data:", e);
+      setError(e.message || "Failed to synchronize with authoritative signal ledger.");
     } finally {
       setLoading(false);
+      console.log(`[Forensic] Sync Complete. Mode: ${mode}, Signals: ${signals.length}, Tab: ${activeTab}`);
     }
   };
 
@@ -273,6 +283,13 @@ export default function EquitySignals() {
                         </Grid>
                     ))}
                 </Grid>
+            ) : error ? (
+                <Paper sx={{ py: 15, textAlign: 'center', bgcolor: alpha('#ef4444', 0.05), border: '1px dashed #ef4444', borderRadius: 1 }}>
+                    <ShieldAlert size={56} color="#ef4444" style={{ margin: '0 auto 24px', opacity: 0.5 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1 }}>CONNECTION FAILED</Typography>
+                    <Typography variant="body2" sx={{ color: 'slategray', mb: 4, maxWidth: 400, mx: 'auto' }}>{error}</Typography>
+                    <Button variant="outlined" onClick={fetchData} startIcon={<RefreshCw size={16} />}>RETRY SYNCHRONIZATION</Button>
+                </Paper>
             ) : (
                 <Box>
                     {finalDisplaySignals.length > 0 ? (

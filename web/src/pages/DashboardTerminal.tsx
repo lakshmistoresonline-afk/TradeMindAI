@@ -130,7 +130,7 @@ export default function DashboardTerminal() {
          <MarketTickerItem label="NIFTY 50" data={marketStats?.['NIFTY 50']} />
          <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} />
          <MarketTickerItem label="NIFTY 200" data={marketStats?.['NIFTY 200']} />
-         <MarketTickerItem label="INDIA VIX" data={marketState?.vix ? { value: marketState.vix, change: 0 } : null} />
+         <MarketTickerItem label="INDIA VIX" data={marketState?.vix ? { value: marketState.vix, change: 0 } : (marketStats?.['India VIX'] || null)} />
       </Stack>
 
       <Grid container spacing={4}>

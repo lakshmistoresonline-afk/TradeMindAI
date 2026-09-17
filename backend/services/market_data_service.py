@@ -103,15 +103,21 @@ class MarketDataService:
                 return
 
             for signal in non_terminal:
-                res = await PriceResolver.resolve_current_price(signal)
-                if res["status"] == "FRESH":
-                    updates = {
-                        "current_price": res["current_price"],
-                        "current_price_timestamp": res["timestamp"],
-                        "current_price_source": res["source"],
-                        "current_price_status": "FRESH"
-                    }
-                    await SignalLedgerService.update_signal(signal.id, updates)
+                try:
+                    res = await PriceResolver.resolve_current_price(signal)
+                    if res["status"] == "FRESH":
+                        updates = {
+                            "current_price": res["current_price"],
+                            "current_price_timestamp": res["timestamp"],
+                            "current_price_source": res["source"],
+                            "current_price_status": "FRESH"
+                        }
+                        await SignalLedgerService.update_signal(signal.id, updates)
+
+                    # Yield control to event loop after each signal update
+                    await asyncio.sleep(0.1)
+                except Exception as sig_err:
+                    print(f"   [!] Signal refresh failed for {signal.symbol}: {sig_err}")
 
             print(f"[+] MarketDataService: Successfully synced {len(non_terminal)} prices.")
         except Exception as e:
