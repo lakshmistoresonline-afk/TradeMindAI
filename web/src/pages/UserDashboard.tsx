@@ -133,15 +133,15 @@ export default function UserDashboard() {
         <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
                 <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 900, mb: 4 }}>TODAY'S STRUCTURAL EDGE</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 900, mb: 4 }}>SIGNAL REGIME CONTEXT</Typography>
                     <Stack spacing={3}>
                         <InsightItem
-                            title="NIFTY Sector Rotation"
-                            desc="Institutional flow migrating from IT to Financial Services as NIFTY-50 tests key supply node."
+                            title="NIFTY Structural State"
+                            desc={`The NIFTY-200 universe is currently in a ${market?.regime || 'SIDEWAYS'} regime with VIX at ${market?.vix || '—'}.`}
                         />
                         <InsightItem
-                            title="India VIX Divergence"
-                            desc="VIX remains compressed while underlying indices show structural distribution markers."
+                            title="Momentum Alignment"
+                            desc="Strategy V2.2 currently identifies high-conviction momentum nodes in the Financial and IT sectors."
                         />
                     </Stack>
                 </Paper>
@@ -165,7 +165,7 @@ export default function UserDashboard() {
 
       {/* 5. Quick Links */}
       <Box sx={{ mt: 10 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>YOUR TOOLS</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>PRODUCT DIRECTORY</Typography>
         <Grid container spacing={3}>
            <ToolCard
               icon={<ShieldCheck size={24} color="#10b981" />}
@@ -175,15 +175,15 @@ export default function UserDashboard() {
            />
            <ToolCard
               icon={<PieChart size={24} color="#7C3AED" />}
-              title="Methodology"
-              desc="Learn how Strategy V2.2 processes institutional order flow nodes."
-              onClick={() => navigate('/methodology')}
-           />
-           <ToolCard
-              icon={<Zap size={24} color="#00D1FF" />}
               title="Track Record"
               desc="Audit our 100% transparent historical signal performance ledger."
               onClick={() => navigate('/performance')}
+           />
+           <ToolCard
+              icon={<Zap size={24} color="#00D1FF" />}
+              title="Premium"
+              desc="Unlock institutional-grade deep dive forensics and advanced context."
+              onClick={() => navigate('/pricing')}
            />
         </Grid>
       </Box>

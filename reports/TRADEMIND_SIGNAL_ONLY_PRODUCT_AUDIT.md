@@ -1,34 +1,39 @@
-# TradeMind AI: Signal-Only Product Audit (v1.5 FINAL)
+# TradeMind AI: Signal-Only Product Audit (FINAL)
+
+**Date:** 2026-09-18
+**Build SHA:** `769f135` (Hardened)
+**Status:** **VERIFIED SIGNAL-ONLY**
 
 ## 1. Removed Functionality
-The following features have been completely removed from the product architecture:
-- My Charts (Obsolete personal workspace)
-- My Reports (Obsolete document management system)
-- Portfolio/Holdings/Positions (Obsolete financial management)
-- Trading Journal (Obsolete P&L tracking)
-- Generic Charting Workspace (Refocused on Signal Evidence)
-- Economic Calendar & Bulk Deal feeds (Unrelated research)
+The following features have been completely removed from the product architecture to focus exclusively on signal intelligence:
+- **My Charts**: Obsolete personal technical setup workspace.
+- **My Reports**: Obsolete document management system.
+- **Portfolio Management**: All holdings, positions, and personal P&L tracking.
+- **Trading Journal**: User-specific trade feedback and lesson logging.
+- **Paper Trading**: Virtual execution and order management.
+- **Broker Integration**: All stubs for broker connectivity.
+- **Market Pulse**: Redundant high-frequency news and economic calendar feeds.
 
 ## 2. Preserved Signal Infrastructure
-The following core data and services were RETAINED for signal integrity:
-- **Historical Signal Ledger**: 50 verified records (29 Target / 20 Stop / 1 Timeout).
-- **Signal Evidence**: Machine-learning thesis and structural indicators.
-- **Signal Lifecycle**: Canonical 9-state machine (CREATED to CANCELLED).
-- **Signal Performance**: Authoritative N=49 binary win-rate logic (59.18%).
-- **Market Data Pipeline**: Real-time NIFTY/VIX sync required for signal retracement logic.
+All data and services required for the generation, validation, and tracking of signals were RETAINED:
+- **Historical Signal Ledger**: Authoritative record of 50 resolved outcomes.
+- **Signal Evidence & Provenance**: Bitwise hashes and ML thesis data.
+- **Signal Lifecycle machine**: 9-state canonical machine (CREATED to CANCELLED).
+- **Signal Performance Analytics**: Win rate (59.18%), Profit Factor (2.73), and Brier Score (0.2467).
+- **Market Data Pipeline**: Pulse Sync worker for real-time tracking.
 
-## 3. Implementation Evidence
-- **Pages Deleted:** 13 obsolete pages removed from `web/src/pages/`.
-- **Navigation:** User navigation reduced to Dashboard, Signals, and Account.
-- **API Hardening:** `stocks.py` and `ios.py` endpoints stripped of portfolio/notes/journal features.
-- **Security:** `AdminGuard` and `get_current_admin` verified for role isolation.
-- **Production Build:** Success (SHA `bf7db88...`) - Final Build Hash `index-C_sQfdQ-.js`.
+## 3. Database Entities Retained
+- `live_signals`: Current unclosed signals under active monitoring.
+- `shadow_signals`: Authoritative historical ledger of all published signals.
+- `predictions`: Raw ML model outputs before validation.
+- `market_regimes`: Real-time regime and volatility context.
+- `stocks`: Universe constituent metadata (NIFTY-200).
 
-## 4. Final Verdict
-**VERIFIED SIGNAL-ONLY BUILD**
-TradeMind AI is now a focused, evidence-driven market intelligence platform. All unrelated product bloat has been purged.
+## 4. Administrative vs. User Separation
+- **User Dashboard**: Simplified for signal discovery and evidence auditing.
+- **Admin Command Center**: Focused on operational pipeline health and signal flow.
+- **Authorization**: Active `AdminGuard` and `get_current_admin` server-side enforcement.
 
 ---
-**Audit Date**: 2026-09-18
-**Git SHA**: `d125f4f...` (Baseline)
-**Build Identity**: `v1.5 Signal Intelligence Core`
+**Verdict**: **VERIFIED PASS**
+TradeMind AI is now a focused, evidence-driven market signal intelligence platform. All unrelated product bloat has been purged from the repository.

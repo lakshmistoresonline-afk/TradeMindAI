@@ -53,15 +53,15 @@ export default function Landing() {
               endIcon={<ArrowRight size={20} />}
               sx={{ px: 6, py: 2, fontSize: '1rem', fontWeight: 950 }}
             >
-              EXPLORE TRADEMIND
+              DISCOVER SIGNALS
             </Button>
             <Button
               size="large"
               variant="outlined"
-              onClick={() => navigate('/how-it-works')}
+              onClick={() => navigate('/performance')}
               sx={{ px: 6, py: 2, fontSize: '1rem', fontWeight: 800, borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
             >
-              SEE HOW IT WORKS
+              VIEW TRACK RECORD
             </Button>
           </Stack>
         </Container>

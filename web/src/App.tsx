@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
-// V2.3.1_DEPLOY_SYNC_20260915
+// v1.5_SIGNAL_ONLY_LOCKED
 import EquitySignals from './pages/EquitySignals'
 import SignalDetail from './pages/SignalDetail'
+import Performance from './pages/Performance'
 import SystemStatus from './pages/SystemStatus'
 import Login from './pages/Login'
 import Landing from './pages/Landing'
@@ -102,11 +103,11 @@ function App() {
             <Route path="/trust" element={<Trust />} />
             <Route path="/evidence" element={<Evidence />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/performance" element={<Performance />} />
 
             {/* Placeholders for legal/info */}
             <Route path="/how-it-works" element={<Methodology />} />
             <Route path="/faq" element={<Pricing />} />
-            <Route path="/contact" element={<Landing />} />
             <Route path="/risk-disclosure" element={<RiskDisclosure />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
@@ -116,16 +117,12 @@ function App() {
               <AuthGuard>
                 <Layout>
                   <Routes>
-                    {/* User Experience */}
+                    {/* User Experience (Consumer Signals) */}
                     <Route path="/dashboard" element={<UserDashboard />} />
                     <Route path="/signals" element={<EquitySignals />} />
                     <Route path="/signals/:id" element={<SignalDetail />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/checkout/:planId" element={<Checkout />} />
-
-                    {/* Placeholder Consumer Features */}
-                    <Route path="/watchlist" element={<EquitySignals />} />
-                    <Route path="/insights" element={<Landing />} />
 
                     {/* Admin Experience (Guarded) */}
                     <Route path="/admin/*" element={
@@ -135,14 +132,14 @@ function App() {
                           <Route path="signals" element={<AdminSignals />} />
                           <Route path="data" element={<AdminDataFeeds />} />
                           <Route path="status" element={<SystemStatus />} />
-                          <Route path="stats" element={<SystemStatus />} />
-                          {/* Fallback to admin status */}
+                          {/* Fallback to admin dashboard */}
                           <Route path="*" element={<Navigate to="dashboard" replace />} />
                         </Routes>
                       </AdminGuard>
                     } />
 
                     {/* Compatibility redirects */}
+                    <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
                     <Route path="/status" element={<Navigate to="/admin/status" replace />} />
 
                     {/* Fallback to Dashboard */}

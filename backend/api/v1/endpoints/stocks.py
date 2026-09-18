@@ -64,24 +64,10 @@ async def get_market_stats():
             except:
                 stats[name] = {"value": 0, "change": 0}
 
-        stocks_list = await container.repository.get_all_stocks(limit=150)
-        advancing, declining = 0, 0
-        for stock in stocks_list:
-            change = getattr(stock, 'change_pct', 0) or 0
-            if change > 0: advancing += 1
-            elif change < 0: declining += 1
-
-        stats["Breadth"] = {
-            "advancing": advancing,
-            "declining": declining,
-            "ratio": round(advancing/declining, 2) if declining > 0 else float(advancing)
-        }
+        return stats
     except Exception as e:
         print(f"Global market stats error: {e}")
-        if "Breadth" not in stats:
-            stats["Breadth"] = {"advancing": 0, "declining": 0, "ratio": 0}
-
-    return stats
+        return stats
 
 @router.get("/")
 @cache(expire=600)
@@ -102,10 +88,6 @@ async def get_stock_detail(
     if stock:
         return stock
     return {"error": "Stock not found"}
-
-@router.get("/provider/capabilities")
-async def get_provider_capabilities():
-    return container.provider.capabilities
 
 @router.get("/{symbol}/option-chain")
 async def get_option_chain(symbol: str, expiry: Optional[str] = None):

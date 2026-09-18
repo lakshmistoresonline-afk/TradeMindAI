@@ -7,8 +7,9 @@ from backend.domain.models.ios import LiveSignal
 from backend.services.signal_ledger_service import SignalLedgerService
 from backend.services.signal_lifecycle_service import SignalLifecycleService
 from backend.services.research_metrics_service import ResearchMetricsService
+from backend.services.forensic_analytical_service import ForensicAnalyticalService
 import datetime
-from sqlalchemy import func
+import json
 
 router = APIRouter()
 
@@ -19,7 +20,6 @@ async def get_equity_signals(
     limit: int = 100
 ):
     """
-    GET /api/v1/equity/signals
     Returns complete signal records from the authoritative Neon ledger.
     """
     from backend.core.postgres import SessionLocal, LiveSignalDB
@@ -31,14 +31,7 @@ async def get_equity_signals(
             query = query.filter(LiveSignalDB.symbol == symbol)
 
         db_signals = query.order_by(LiveSignalDB.timestamp.desc()).limit(limit).all()
-
-        # Mapping logic (Simplified for brevity, usually in repo)
-        results = []
-        for s in db_signals:
-            # Re-use repo mapping if available or manual mapping
-            results.append(container.ios_repo._map_db_to_live_signal(s))
-
-        return results
+        return [container.ios_repo._map_db_to_live_signal(s) for s in db_signals]
 
 @router.get("/signals/{signal_id}", response_model=LiveSignal)
 async def get_signal_detail(signal_id: str):
@@ -47,80 +40,28 @@ async def get_signal_detail(signal_id: str):
         raise HTTPException(status_code=404, detail="Signal not found")
     return signal
 
-@router.get("/scanner")
-async def get_equity_scanner(
-    direction: Optional[str] = None,
-    status: Optional[str] = None,
-    limit: int = 50
-):
+@router.get("/signals/{signal_id}/explanation")
+def get_signal_explanation(signal_id: str):
     """
-    GET /api/v1/equity/scanner
-    Returns a consolidated view for the Equity Scanner UI.
+    Explainability (Why this signal?).
     """
-    from backend.core.postgres import SessionLocal, LiveSignalDB, StockDB
+    from backend.core.postgres import SessionLocal, IntelligenceSynthesisDB
     with SessionLocal() as session:
-        query = session.query(LiveSignalDB, StockDB).join(StockDB, LiveSignalDB.symbol == StockDB.symbol)
-
-        if direction:
-            query = query.filter(LiveSignalDB.direction == direction)
-        if status:
-            query = query.filter(LiveSignalDB.status == status)
-
-        results = query.order_by(LiveSignalDB.timestamp.desc()).limit(limit).all()
-
-        scanner_data = []
-        for sig_db, stock_db in results:
-            sig = container.ios_repo._map_db_to_live_signal(sig_db)
-            data = sig.model_dump()
-            data["company_name"] = stock_db.name
-            data["change_pct"] = stock_db.change_pct
-            scanner_data.append(data)
-
-        return scanner_data
-
-@router.get("/research")
-async def get_equity_research_runs():
-    """
-    GET /api/v1/equity/research
-    Returns summary of historical research runs.
-    """
-    # For now, return a placeholder until ResearchRun is persisted in Neon
-    return [
-        {
-            "id": "run_initial_v22",
-            "strategy_version": "v2.2",
-            "dataset_id": "NIFTY_200_AUG2026",
-            "signal_count": 87,
-            "status": "COMPLETED",
-            "start_timestamp": "2026-09-01T12:00:00"
-        }
-    ]
+        res = session.query(IntelligenceSynthesisDB).filter(IntelligenceSynthesisDB.id == signal_id).first()
+        if res:
+            data = {c.name: getattr(res, c.name) for c in res.__table__.columns}
+            json_cols = ["market_context", "sector_context", "technical_context", "supporting_evidence", "risk_factors"]
+            for col in json_cols:
+                if data.get(col): data[col] = json.loads(data[col])
+            return data
+    return {"status": "NOT_FOUND"}
 
 @router.get("/accuracy")
 async def get_equity_accuracy():
     """
     GET /api/v1/equity/accuracy
-    Returns comprehensive accuracy forensics including multi-horizon OOS metrics.
+    Returns authoritative accuracy forensics derived from the 50-signal ledger (N=49 binary population).
     """
-    champions = await container.data_platform_repo.get_all_champion_models()
-
-    horizons_report = {}
-    for h in ["SHORT", "SWING", "LONG"]:
-        h_models = [m for m in champions if m.horizon == h]
-        if not h_models:
-            horizons_report[h] = {"sample_size": 0, "auc": 0, "win_rate": 0, "brier": 0}
-            continue
-
-        horizons_report[h] = {
-            "sample_size": len(h_models),
-            "auc": sum(m.roc_auc for m in h_models) / len(h_models),
-            "win_rate": sum(m.accuracy for m in h_models) * 100 / len(h_models),
-            "brier": sum(m.brier_score for m in h_models) / len(h_models),
-            "logloss": sum((m.calibration_metadata or {}).get("log_loss_calibrated", 0.69) for m in h_models) / len(h_models),
-            "ece": sum((m.calibration_metadata or {}).get("ece", 0.0) for m in h_models) / len(h_models)
-        }
-
-    # Authoritative Performance from Signal Ledger
     from backend.core.postgres import SessionLocal, ShadowSignalDB
     with SessionLocal() as session:
         resolved = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"])).all()
@@ -130,6 +71,24 @@ async def get_equity_accuracy():
             signals_data.append(data)
 
         perf = ResearchMetricsService.calculate_performance_metrics(signals_data)
+
+        # Multi-horizon champions
+        champions = await container.data_platform_repo.get_all_champion_models()
+        horizons_report = {}
+        for h in ["SHORT", "SWING", "LONG"]:
+            h_models = [m for m in champions if m.horizon == h]
+            if not h_models:
+                horizons_report[h] = {"sample_size": 0, "auc": 0, "win_rate": 0, "brier": 0, "logloss": 0, "ece": 0}
+                continue
+
+            horizons_report[h] = {
+                "sample_size": len(h_models),
+                "auc": sum(m.roc_auc for m in h_models) / len(h_models),
+                "win_rate": sum(m.accuracy for m in h_models) * 100 / len(h_models),
+                "brier": sum(m.brier_score for m in h_models) / len(h_models),
+                "logloss": sum((m.calibration_metadata or {}).get("log_loss_calibrated", 0.69) for m in h_models) / len(h_models),
+                "ece": sum((m.calibration_metadata or {}).get("ece", 0.0) for m in h_models) / len(h_models)
+            }
 
     return {
         "horizons": horizons_report,
@@ -160,6 +119,22 @@ async def get_market_state():
     from backend.services.market_data_service import MarketDataService
     return await MarketDataService.get_market_state()
 
+@router.get("/status")
+def get_strategy_status():
+    from backend.services.market_calendar import MarketCalendar
+    from backend.core.config import settings
+
+    return {
+        "strategy": "trademind-equity-v2.2",
+        "universe": "NIFTY 200",
+        "mode": "SHADOW_SIGNAL",
+        "status": "ONLINE",
+        "freeze_status": "FROZEN",
+        "environment": settings.ENVIRONMENT,
+        "market_open": MarketCalendar.is_market_open(),
+        "timestamp": datetime.datetime.utcnow().isoformat()
+    }
+
 @router.get("/history")
 async def get_equity_history(
     symbol: Optional[str] = None,
@@ -172,28 +147,19 @@ async def get_equity_history(
     user: dict = Depends(get_current_user)
 ):
     """
-    GET /api/v1/equity/history
     Returns historical signal records from the shadow_signals ledger.
     """
-    # 1. Entitlement Enforcement (Phase 58)
-    from backend.services.billing_service import BillingService
-    # For now, allow FREE users to see history but enforce authentication.
-    # In a real launch, we would check BillingService.verify_entitlement(user["uid"], "history")
     from backend.core.postgres import SessionLocal, ShadowSignalDB
     with SessionLocal() as session:
         query = session.query(ShadowSignalDB)
 
-        # Apply Filters
         if symbol and symbol != "ALL":
-            # Search by Symbol or Signal ID
             query = query.filter(or_(ShadowSignalDB.symbol.ilike(f"%{symbol}%"), ShadowSignalDB.id.ilike(f"%{symbol}%")))
         if horizon and horizon != "ALL":
-            # Map Horizon to signal_type (Authoritative Horizon Column)
             query = query.filter(ShadowSignalDB.signal_type == horizon)
         if quality and quality != "ALL":
             query = query.filter(ShadowSignalDB.quality_class == quality)
         if direction and direction != "ALL":
-            # Support both Direction and Rating columns
             if direction == "LONG":
                 query = query.filter(or_(ShadowSignalDB.direction == "LONG", ShadowSignalDB.signal_rating == "BUY"))
             else:
@@ -201,59 +167,35 @@ async def get_equity_history(
         if status and status != "ALL":
             query = query.filter(ShadowSignalDB.status == status)
         else:
-            # Default: show only terminal/closed signals in history
             query = query.filter(ShadowSignalDB.status != "ACTIVE")
 
         total = query.count()
-
-        # Summary stats for the currently filtered set (minus status filter)
-        # Always exclude ACTIVE for history summary
         base_query = session.query(ShadowSignalDB).filter(ShadowSignalDB.status != "ACTIVE")
 
-        if symbol and symbol != "ALL":
-            base_query = base_query.filter(or_(ShadowSignalDB.symbol.ilike(f"%{symbol}%"), ShadowSignalDB.id.ilike(f"%{symbol}%")))
-        if horizon and horizon != "ALL": base_query = base_query.filter(ShadowSignalDB.signal_type == horizon)
-        if quality and quality != "ALL": base_query = base_query.filter(ShadowSignalDB.quality_class == quality)
-        if direction and direction != "ALL":
-            if direction == "LONG":
-                base_query = base_query.filter(or_(ShadowSignalDB.direction == "LONG", ShadowSignalDB.signal_rating == "BUY"))
-            else:
-                base_query = base_query.filter(or_(ShadowSignalDB.direction == "SHORT", ShadowSignalDB.signal_rating == "SELL"))
-
+        # Summary for filtered set
         target_hits = base_query.filter(ShadowSignalDB.status == "TARGET_HIT").count()
         stop_losses = base_query.filter(ShadowSignalDB.status == "STOP_LOSS").count()
         expired = base_query.filter(ShadowSignalDB.status == "EXPIRED").count()
-        filtered_history_total = base_query.count()
 
         db_signals = query.order_by(ShadowSignalDB.timestamp.desc()).offset((page-1)*limit).limit(limit).all()
 
         results = []
         for s in db_signals:
-            # Map DB to Dict
             data = {c.name: getattr(s, c.name) for c in s.__table__.columns}
-            # Normalize timestamps
             for k, v in data.items():
-                if isinstance(v, datetime.datetime):
-                    data[k] = v.isoformat()
-
-            # Canonical Mapping for Frontend Compatibility
+                if isinstance(v, datetime.datetime): data[k] = v.isoformat()
             data["timeframe"] = data.get("signal_type") or data.get("timeframe") or "SWING"
             data["direction"] = data.get("signal_rating") or data.get("direction")
-            data["quality_class"] = data.get("quality_class") or ("PRIMARY" if data["timeframe"] == "SWING" else "EXPERIMENTAL")
-
             results.append(data)
 
         return {
             "records": results,
             "total": total,
-            "page": page,
-            "limit": limit,
             "summary": {
-                "total": filtered_history_total,
+                "total": base_query.count(),
                 "target_hits": target_hits,
                 "stop_losses": stop_losses,
-                "expired": expired,
-                "other": filtered_history_total - (target_hits + stop_losses + expired)
+                "expired": expired
             }
         }
 

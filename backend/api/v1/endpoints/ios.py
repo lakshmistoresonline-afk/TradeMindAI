@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Dict, Any, Optional
 from backend.core.container import container
 from backend.core.auth import get_current_user
-from backend.domain.models.ios import MarketRegime, MarketOpportunity, MarketIntelligenceReport, LiveSignal
+from backend.domain.models.ios import MarketRegime, MarketOpportunity, LiveSignal
 import uuid
 import datetime
 import traceback
@@ -47,21 +47,6 @@ async def get_opportunities(limit: int = 20):
     except Exception as e:
         print(f"Critical Error in get_opportunities: {e}")
         return []
-
-@router.get("/intel", response_model=MarketIntelligenceReport)
-async def get_market_intelligence(type: str = "CLOSING"):
-    try:
-        report = await container.ios_repo.get_latest_intel_report(type)
-        if not report:
-            return MarketIntelligenceReport(
-                id="initial", type=type, date=datetime.datetime.utcnow(),
-                summary="Market Intelligence Engine initialized. Synchronizing session data...",
-                key_events=["Sync Active"], top_movers=[], sector_performance={}, ai_bias="NEUTRAL"
-            )
-        return report
-    except Exception as e:
-        print(f"Error in get_market_intelligence: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/signals/live")
 async def get_live_signals_audit(limit: int = 100):

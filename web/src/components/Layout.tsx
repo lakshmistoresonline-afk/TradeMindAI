@@ -9,6 +9,7 @@ import {
   ChevronDown,
   User,
   Database,
+  FileText,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -27,13 +28,14 @@ export const useNotification = () => useContext(NotificationContext);
 const userMenuItems = [
   { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
   { text: 'SIGNALS', icon: <Zap size={20} />, path: '/signals' },
+  { text: 'PREMIUM', icon: <FileText size={20} />, path: '/pricing' },
   { text: 'ACCOUNT', icon: <User size={20} />, path: '/account' },
 ];
 
 const adminMenuItems = [
-  { text: 'COMMAND CENTER', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
+  { text: 'ADMIN DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
   { text: 'SIGNAL OPS', icon: <Zap size={20} />, path: '/admin/signals' },
-  { text: 'DATA FEEDS', icon: <Database size={20} />, path: '/admin/data' },
+  { text: 'DATA PIPELINE', icon: <Database size={20} />, path: '/admin/data' },
   { text: 'SYSTEM STATUS', icon: <Activity size={20} />, path: '/admin/status' },
 ];
 

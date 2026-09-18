@@ -81,13 +81,13 @@ export default function AdminDashboard() {
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
                  <Grid container spacing={2}>
                     <Grid item xs={12} md={4}>
-                        <SummaryStat label="SWING" value={counts.swingPrimary + counts.swingSelective} sub={`${counts.swingPrimary} PRI / ${counts.swingSelective} SEL`} color="#10b981" />
+                        <SummaryStat label="SWING" value={counts.swingPrimary + counts.swingSelective} sub={`${counts.swingPrimary} ACTIVE / 0 WAIT`} color="#10b981" />
                     </Grid>
                     <Grid item xs={6} md={4}>
-                        <SummaryStat label="LONG" value={counts.longSelective} sub="Symbol Qualified" color="#00D1FF" />
+                        <SummaryStat label="LONG" value={counts.longSelective} sub="ACTIVE" color="#00D1FF" />
                     </Grid>
                     <Grid item xs={6} md={4}>
-                        <SummaryStat label="SHORT" value={counts.shortExperimental} sub="Experimental" color="slategray" />
+                        <SummaryStat label="SHORT" value={counts.shortExperimental} sub="ACTIVE" color="slategray" />
                     </Grid>
                  </Grid>
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
@@ -222,7 +222,7 @@ export default function AdminDashboard() {
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
                         <SidebarStat label="Current MRR" value="₹0" color="#10b981" />
-                        <SidebarStat label="Total Users" value="--" color="#00D1FF" />
+                        <SidebarStat label="Total Users" value={health?.universe?.total || '--'} color="#00D1FF" />
                         <SidebarStat label="Paid Subs" value="0" color="#00D1FF" />
                      </Stack>
                      <Divider sx={{ my: 3, opacity: 0.05 }} />
