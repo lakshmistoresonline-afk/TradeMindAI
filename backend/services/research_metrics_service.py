@@ -11,7 +11,16 @@ class ResearchMetricsService:
     @staticmethod
     def calculate_performance_metrics(signals: List[Dict[str, Any]]) -> Dict[str, Any]:
         if not signals:
-            return {"trade_count": 0, "win_rate": 0.0, "net_pnl": 0.0}
+            return {
+                "sample_size": 0,
+                "wins": 0,
+                "losses": 0,
+                "win_rate": 0.0,
+                "profit_factor": 0.0,
+                "expectancy": 0.0,
+                "net_pnl": 0.0,
+                "brier_score": 0.0
+            }
 
         df = pd.DataFrame(signals)
 

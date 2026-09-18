@@ -68,9 +68,8 @@ class MarketDataService:
 
             # 3. Detect Regime
             from backend.services.ios.regime_engine import MarketRegimeEngine
-            # Create a mock VIX df for engine
-            vix_df = pd.DataFrame([{"Close": vix}]) if vix else pd.DataFrame()
-            regime_obj = MarketRegimeEngine.detect_regime(index_df, vix_df)
+            vix_val = float(vix) if (vix and vix > 0) else 14.5
+            regime_obj = MarketRegimeEngine.detect_regime(index_df, vix_val)
 
             return {
                 "regime": regime_obj.regime,
