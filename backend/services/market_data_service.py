@@ -27,9 +27,13 @@ class MarketDataService:
                     "status": "FRESH" if price_data.get("price") else "UNAVAILABLE"
                 }
 
-            # Check staleness
+            # Canonical Freshness Policy (Institutional 1.5)
+            # FRESH < 15m (900s), AGING < 120m (7200s), STALE >= 120m
             age = (datetime.datetime.utcnow() - stock.updated_at).total_seconds() if stock.updated_at else 999999
-            status = "FRESH" if age < 300 else ("AGING" if age < 3600 else "STALE")
+
+            if age < 900: status = "FRESH"
+            elif age < 7200: status = "AGING"
+            else: status = "STALE"
 
             return {
                 "price": stock.last_price,
@@ -86,15 +90,16 @@ class MarketDataService:
     @staticmethod
     async def sync_active_signal_prices():
         """
-        Background Worker: Syncs current prices for all non-terminal signals.
-        Institutional 4.0 Hardening.
+        Throttled Pulse Sync: Syncs current prices for all non-terminal signals.
+        Logs forensic metrics for institutional release.
         """
-        print("[*] MarketDataService: Syncing Active Signal Prices...")
+        print("[*] MarketDataService: Throttled Pulse Sync Started...")
         from backend.services.price_resolver import PriceResolver
         from backend.services.signal_ledger_service import SignalLedgerService
+        import time
 
         try:
-            # 1. Fetch all signals that need a price update
+            # 1. Fetch non-terminal signals
             all_signals = await container.ios_repo.get_all_live_signals()
             non_terminal = [s for s in all_signals if s.status in ["WAITING_FOR_ENTRY", "ENTRY_TRIGGERED", "ACTIVE"]]
 
@@ -102,23 +107,57 @@ class MarketDataService:
                 print("   [DEBUG] No active signals to sync.")
                 return
 
+            stats = {"success": 0, "failed": 0, "total": len(non_terminal), "start_time": time.time()}
+
             for signal in non_terminal:
                 try:
+                    start_fetch = time.time()
                     res = await PriceResolver.resolve_current_price(signal)
+                    fetch_duration = (time.time() - start_fetch) * 1000
+
                     if res["status"] == "FRESH":
                         updates = {
                             "current_price": res["current_price"],
                             "current_price_timestamp": res["timestamp"],
                             "current_price_source": res["source"],
-                            "current_price_status": "FRESH"
+                            "current_price_status": "FRESH",
+                            "last_reconciled_at": datetime.datetime.utcnow()
                         }
                         await SignalLedgerService.update_signal(signal.id, updates)
+                        stats["success"] += 1
 
-                    # Yield control to event loop after each signal update
-                    await asyncio.sleep(0.1)
+                        # Phase 10: Immediate Lifecycle Audit (Institutional 1.5)
+                        from backend.services.signal_lifecycle_service import SignalLifecycleService
+                        await SignalLifecycleService.audit_signal(signal.id)
+
+                        # Forensic Log in console
+                        print(f"   [SYNC_OK] {signal.symbol} | Price: {res['current_price']} | Provider: {res['source']} | Latency: {fetch_duration:.1f}ms")
+                    else:
+                        print(f"   [SYNC_WARN] {signal.symbol} failed resolution: {res['status']}")
+                        stats["failed"] += 1
+
+                    # Throttling to prevent 429
+                    await asyncio.sleep(0.2)
                 except Exception as sig_err:
                     print(f"   [!] Signal refresh failed for {signal.symbol}: {sig_err}")
+                    stats["failed"] += 1
 
-            print(f"[+] MarketDataService: Successfully synced {len(non_terminal)} prices.")
+            duration = time.time() - stats["start_time"]
+            print(f"[+] Pulse Sync Complete: {stats['success']} OK, {stats['failed']} FAIL. Duration: {duration:.1f}s")
+
+            # Store sync metadata in Firebase for Admin visibility
+            from backend.core.database import db_client
+            if db_client:
+                try:
+                    db_client.collection("system_metrics").document("last_price_sync").set({
+                        "timestamp": datetime.datetime.utcnow(),
+                        "duration_s": duration,
+                        "symbols_total": stats["total"],
+                        "symbols_success": stats["success"],
+                        "symbols_failed": stats["failed"],
+                        "status": "COMPLETED"
+                    })
+                except: pass
+
         except Exception as e:
-            print(f"[!] MarketDataService: Price sync failed: {e}")
+            print(f"[!] MarketDataService: Pulse sync failed: {e}")

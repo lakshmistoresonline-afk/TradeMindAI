@@ -633,56 +633,6 @@ class ModelMetadataDB(Base):
     feature_importances = Column(String) # JSON string
     calibration_metadata = Column(String) # JSON string
 
-class WorkspaceDB(Base):
-    __tablename__ = "workspaces"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, index=True)
-    name = Column(String)
-    type = Column(String)
-    layout_config = Column(String) # JSON string
-    active_stocks = Column(String) # JSON string
-    saved_indicators = Column(String) # JSON string
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
-
-class ResearchNoteDB(Base):
-    __tablename__ = "research_notes"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, index=True)
-    symbol = Column(String, index=True)
-    content = Column(String)
-    tags = Column(String) # JSON string
-    attachments = Column(String) # JSON string
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
-
-class TradeJournalDB(Base):
-    __tablename__ = "trade_journal"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, index=True)
-    symbol = Column(String, index=True)
-    entry_price = Column(Float)
-    exit_price = Column(Float)
-    quantity = Column(Integer)
-    entry_date = Column(DateTime)
-    exit_date = Column(DateTime)
-    pnl = Column(Float)
-    ai_score_at_entry = Column(Float)
-    feedback = Column(String)
-    mistakes = Column(String) # JSON string
-    lessons = Column(String) # JSON string
-
-class BulkDealDB(Base):
-    __tablename__ = "bulk_deals"
-    id = Column(Integer, primary_key=True)
-    symbol = Column(String, index=True)
-    date = Column(DateTime, index=True)
-    client_name = Column(String)
-    deal_type = Column(String) # BUY / SELL
-    quantity = Column(BigInteger)
-    price = Column(Float)
-    value_cr = Column(Float)
-    source = Column(String, default="NSE")
-
 class InstrumentDB(Base):
     __tablename__ = "instruments"
     id = Column(String, primary_key=True)
@@ -699,27 +649,6 @@ class InstrumentDB(Base):
     tick_size = Column(Float)
     source = Column(String)
     last_updated = Column(DateTime, default=datetime.datetime.utcnow)
-
-class UserChartDB(Base):
-    __tablename__ = "user_charts"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, index=True)
-    symbol = Column(String, index=True)
-    config_json = Column(String) # For drawing objects, indicators, etc.
-    name = Column(String)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-
-class UserReportDB(Base):
-    __tablename__ = "user_reports"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, index=True)
-    type = Column(String) # SIGNAL_AUDIT, MARKET_DEEP_DIVE, etc.
-    symbol = Column(String)
-    status = Column(String) # GENERATING, COMPLETED, FAILED
-    content_url = Column(String) # Link to PDF or structured data
-    purchased = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class UserWatchlistDB(Base):
     __tablename__ = "user_watchlists"

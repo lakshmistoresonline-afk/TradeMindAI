@@ -10,7 +10,7 @@ export default function ResearchNotebook({ symbol }: { symbol: string }) {
 
   useEffect(() => {
     setLoading(true);
-    getResearchNotes(symbol).then(data => {
+    getResearchNotes(symbol).then((data: any) => {
       setNotes(data);
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -19,7 +19,7 @@ export default function ResearchNotebook({ symbol }: { symbol: string }) {
   const handleSave = async () => {
     if (!note.trim()) return;
     try {
-      const newNote = await saveResearchNote({ symbol, content: note, tags: ['USER'] });
+      const newNote: any = await saveResearchNote({ symbol, content: note, tags: ['USER'] });
       setNotes([newNote, ...notes]);
       setNote('');
     } catch (e) {

@@ -3,26 +3,6 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 import uuid
 
-class WorkspaceState(BaseModel):
-    id: str
-    user_id: str
-    name: str
-    type: str # INTRADAY, SWING, LONG_TERM, etc.
-    layout_config: Dict[str, Any]
-    active_stocks: List[str]
-    saved_indicators: List[str]
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-class ResearchNote(BaseModel):
-    id: str
-    user_id: str
-    symbol: str
-    content: str
-    tags: List[str] = []
-    attachments: List[str] = [] # URLs to Firebase Storage
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
 class MarketRegime(BaseModel):
     date: datetime
     regime: str # BULL, BEAR, SIDEWAYS, VOLATILE
@@ -34,7 +14,7 @@ class MarketRegime(BaseModel):
 class MarketOpportunity(BaseModel):
     id: str
     symbol: str
-    type: str # BREAKOUT, REVERSAL, MOMENTUM, UNDERVALUED
+    type: str
     conviction_score: float
     ai_thesis: str
     indicators: List[str]
@@ -165,21 +145,6 @@ class LiveSignal(BaseModel):
     mfe: float = 0.0
     mae: float = 0.0
     profit_pct: Optional[float] = None
-
-class TradeFeedback(BaseModel):
-    id: str
-    user_id: str
-    symbol: str
-    entry_price: float
-    exit_price: float
-    quantity: int
-    entry_date: datetime
-    exit_date: datetime
-    pnl: float
-    ai_score_at_entry: float
-    feedback: str # AI generated feedback
-    mistakes: List[str]
-    lessons: List[str]
 
 class MarketIntelligenceReport(BaseModel):
     id: str

@@ -50,6 +50,15 @@ class SystemHealthService:
         # Subsystem audits for details
         universe = await container.universe_service.audit_universe_readiness()
 
+        # 4. Sync Metadata
+        sync_meta = {}
+        if db_client:
+            try:
+                sync_doc = db_client.collection("system_metrics").document("last_price_sync").get()
+                if sync_doc.exists:
+                    sync_meta = sync_doc.to_dict()
+            except: pass
+
         return {
             "status": "HEALTHY" if all(v == "HEALTHY" for v in components.values()) else "DEGRADED",
             "timestamp": datetime.datetime.utcnow().isoformat(),
@@ -66,5 +75,6 @@ class SystemHealthService:
                 "mapped": 37, # Authoritative from Phase 6.1 population
                 "coverage_pct": round(37 / universe["total"] * 100, 1) if universe["total"] > 0 else 0
             },
-            "market_state": market_data
+            "market_state": market_data,
+            "last_price_sync": sync_meta
         }

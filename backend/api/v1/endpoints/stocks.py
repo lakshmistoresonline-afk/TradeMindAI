@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 from backend.core.container import get_stock_service, container
 from backend.services.stock_service import StockService
-from backend.services.portfolio_engine import PortfolioEngine
 from backend.core.auth import get_current_user
 from fastapi_cache.decorator import cache
 import yfinance as yf
@@ -13,24 +12,8 @@ import traceback
 
 router = APIRouter()
 
-@router.post("/portfolio/analyze")
-async def analyze_portfolio(
-    symbols: List[str],
-    current_user: dict = Depends(get_current_user)
-):
-    service = get_stock_service()
-    holdings = []
-    for symbol in symbols:
-        stock = await service.repository.get_stock_by_symbol(symbol)
-        if stock:
-            holdings.append(stock)
-
-    health = PortfolioEngine.analyze_health(current_user["uid"], holdings)
-    await container.data_platform_repo.save_portfolio_health(health)
-    return health
-
 @router.get("/market-stats")
-@cache(expire=300) # Cache indices for 5 minutes
+@cache(expire=300)
 async def get_market_stats():
     from backend.services.market_data_service import MarketDataService
     market_state = await MarketDataService.get_market_state()
@@ -43,8 +26,7 @@ async def get_market_stats():
     }
     stats = {}
 
-    # 1. Map canonical state to stats for UI
-    stats["NIFTY 50"] = {"value": 0, "change": 0} # Placeholders if fetch fails
+    stats["NIFTY 50"] = {"value": 0, "change": 0}
     stats["India VIX"] = {"value": market_state.get("vix", 14.5), "change": 0}
 
     try:
@@ -54,10 +36,9 @@ async def get_market_stats():
         })
 
         for symbol, name in indices.items():
-            if name == "India VIX": continue # Already set from market_state
+            if name == "India VIX": continue
 
             try:
-                # Manual scraper (Fastest)
                 price, prev = 0.0, 0.0
                 r = session.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", timeout=5)
                 if r.status_code == 200:
@@ -83,7 +64,6 @@ async def get_market_stats():
             except:
                 stats[name] = {"value": 0, "change": 0}
 
-        # 3. Market Breadth Calculation (SQL Tier)
         stocks_list = await container.repository.get_all_stocks(limit=150)
         advancing, declining = 0, 0
         for stock in stocks_list:
@@ -102,11 +82,6 @@ async def get_market_stats():
             stats["Breadth"] = {"advancing": 0, "declining": 0, "ratio": 0}
 
     return stats
-
-@router.get("/fii-dii")
-async def get_institutional_flow():
-    stats = await get_market_stats()
-    return container.intel_service.estimate_institutional_flow(stats)
 
 @router.get("/")
 @cache(expire=600)
@@ -140,27 +115,3 @@ async def get_option_chain(symbol: str, expiry: Optional[str] = None):
 @router.get("/{symbol}/ltp")
 async def get_stock_ltp(symbol: str):
     return {"symbol": symbol, "ltp": await container.provider.get_ltp(symbol)}
-
-@router.get("/{symbol}/news")
-async def get_stock_news(symbol: str):
-    return await container.data_platform_repo.get_latest_news(symbol)
-
-@router.get("/{symbol}/earnings")
-async def get_stock_earnings(symbol: str):
-    return await container.data_platform_repo.get_latest_earnings(symbol)
-
-@router.get("/{symbol}/timeline")
-async def get_stock_timeline(symbol: str):
-    from google.cloud import firestore
-    from backend.core.database import db_client
-
-    if db_client is None:
-        return []
-
-    try:
-        docs = db_client.collection("stocks").document(symbol).collection("timeline")\
-            .order_by("date", direction=firestore.Query.DESCENDING).limit(20).stream()
-        return [doc.to_dict() for doc in docs]
-    except Exception as e:
-        print(f"Firestore timeline error: {e}")
-        return []

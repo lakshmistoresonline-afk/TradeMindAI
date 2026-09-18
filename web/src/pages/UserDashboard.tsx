@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, alpha, Skeleton, Tabs, Tab, Button, Chip } from '@mui/material';
-import { Zap, ShieldCheck, ArrowRight, BarChart3, PieChart } from 'lucide-react';
+import { Zap, ShieldCheck, ArrowRight, PieChart } from 'lucide-react';
 import { getMarketStats, getEquitySignals, getEquityMarketState } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
@@ -168,21 +168,21 @@ export default function UserDashboard() {
         <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>YOUR TOOLS</Typography>
         <Grid container spacing={3}>
            <ToolCard
-              icon={<BarChart3 size={24} color="#00D1FF" />}
-              title="My Charts"
-              desc="View your saved technical setups and structural markers."
-              onClick={() => navigate('/charts')}
+              icon={<ShieldCheck size={24} color="#10b981" />}
+              title="Evidence Ledger"
+              desc="Audit the bitwise forensic evidence behind our active signal generation."
+              onClick={() => navigate('/evidence')}
            />
            <ToolCard
               icon={<PieChart size={24} color="#7C3AED" />}
-              title="Portfolio Audit"
-              desc="Comprehensive risk and exposure forensics for your holdings."
-              onClick={() => navigate('/reports')}
+              title="Methodology"
+              desc="Learn how Strategy V2.2 processes institutional order flow nodes."
+              onClick={() => navigate('/methodology')}
            />
            <ToolCard
-              icon={<ShieldCheck size={24} color="#10b981" />}
+              icon={<Zap size={24} color="#00D1FF" />}
               title="Track Record"
-              desc="Audit our 100% transparent historical signal performance."
+              desc="Audit our 100% transparent historical signal performance ledger."
               onClick={() => navigate('/performance')}
            />
         </Grid>

@@ -4,7 +4,6 @@ import Layout from './components/Layout'
 // V2.3.1_DEPLOY_SYNC_20260915
 import EquitySignals from './pages/EquitySignals'
 import SignalDetail from './pages/SignalDetail'
-import Performance from './pages/Performance'
 import SystemStatus from './pages/SystemStatus'
 import Login from './pages/Login'
 import Landing from './pages/Landing'
@@ -19,8 +18,6 @@ import Checkout from './pages/Checkout'
 import Account from './pages/Account'
 import UserDashboard from './pages/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
-import MyCharts from './pages/MyCharts'
-import MyReports from './pages/MyReports'
 import AdminSignals from './pages/AdminSignals'
 import AdminDataFeeds from './pages/AdminDataFeeds'
 import { AuthProvider, useAuth } from './hooks/useAuth'
@@ -123,16 +120,12 @@ function App() {
                     <Route path="/dashboard" element={<UserDashboard />} />
                     <Route path="/signals" element={<EquitySignals />} />
                     <Route path="/signals/:id" element={<SignalDetail />} />
-                    <Route path="/performance" element={<Performance />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/checkout/:planId" element={<Checkout />} />
 
                     {/* Placeholder Consumer Features */}
-                    <Route path="/charts" element={<MyCharts />} />
-                    <Route path="/reports" element={<MyReports />} />
                     <Route path="/watchlist" element={<EquitySignals />} />
                     <Route path="/insights" element={<Landing />} />
-                    <Route path="/referral" element={<Account />} />
 
                     {/* Admin Experience (Guarded) */}
                     <Route path="/admin/*" element={
@@ -150,7 +143,6 @@ function App() {
                     } />
 
                     {/* Compatibility redirects */}
-                    <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
                     <Route path="/status" element={<Navigate to="/admin/status" replace />} />
 
                     {/* Fallback to Dashboard */}

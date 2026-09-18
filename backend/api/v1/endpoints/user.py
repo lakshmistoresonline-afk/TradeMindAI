@@ -1,37 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from backend.core.auth import get_current_user
-from backend.core.postgres import SessionLocal, UserChartDB, UserReportDB, UserWatchlistDB, UserSubscriptionDB, UserReferralDB
+from backend.core.postgres import SessionLocal, UserWatchlistDB, UserSubscriptionDB, UserReferralDB
 from typing import List, Dict, Any, Optional
 import uuid
 import datetime
 
 router = APIRouter()
-
-# --- CHARTS ---
-@router.get("/charts")
-async def get_user_charts(current_user: dict = Depends(get_current_user)):
-    with SessionLocal() as session:
-        return session.query(UserChartDB).filter(UserChartDB.user_id == current_user["uid"]).all()
-
-@router.post("/charts")
-async def save_user_chart(chart_data: Dict[str, Any], current_user: dict = Depends(get_current_user)):
-    with SessionLocal() as session:
-        chart = UserChartDB(
-            id=str(uuid.uuid4()),
-            user_id=current_user["uid"],
-            symbol=chart_data.get("symbol"),
-            name=chart_data.get("name", "Untitled Chart"),
-            config_json=chart_data.get("config")
-        )
-        session.add(chart)
-        session.commit()
-        return chart
-
-# --- REPORTS ---
-@router.get("/reports")
-async def get_user_reports(current_user: dict = Depends(get_current_user)):
-    with SessionLocal() as session:
-        return session.query(UserReportDB).filter(UserReportDB.user_id == current_user["uid"]).all()
 
 # --- WATCHLIST ---
 @router.get("/watchlist")
@@ -43,7 +17,7 @@ async def get_watchlist(current_user: dict = Depends(get_current_user)):
 async def add_to_watchlist(symbol: str, current_user: dict = Depends(get_current_user)):
     with SessionLocal() as session:
         item = UserWatchlistDB(user_id=current_user["uid"], symbol=symbol.upper())
-        session.merge(item) # merge handles duplicate symbol for same user
+        session.merge(item)
         session.commit()
         return {"status": "success"}
 

@@ -130,6 +130,7 @@ export default function AdminDashboard() {
          <HealthBadge label="DB" status={health?.components?.Database} />
          <HealthBadge label="SYNC" status={health?.components?.['Market Data']} />
          <HealthBadge label="CORE" status={health?.components?.['V2.2 Engine']} />
+         <HealthBadge label="PRICE REFRESH" status={health?.last_price_sync?.status || 'NOT ACTIVE'} />
          <HealthBadge label="UNIVERSE" status={`${health?.universe?.fresh || 0}/${health?.universe?.total || 200}`} />
       </Stack>
 
@@ -200,7 +201,11 @@ export default function AdminDashboard() {
                 <Paper sx={{ p: 0, bgcolor: '#070a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1, maxHeight: 300, overflow: 'auto' }}>
                     <Box sx={{ p: 2, fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: '#10b981' }}>
                         {`[${new Date().toISOString()}] Signal Engine: Heartbeat OK.`}<br/>
-                        {`[${new Date().toISOString()}] Price Worker: Last Sync Success (33 signals).`}<br/>
+                        {health?.last_price_sync ? (
+                            `[${new Date(health.last_price_sync.timestamp).toISOString()}] Price Worker: Pulse Sync Complete (${health.last_price_sync.symbols_success} OK, ${health.last_price_sync.symbols_failed} FAIL) in ${health.last_price_sync.duration_s?.toFixed(1)}s.`
+                        ) : (
+                            `[${new Date().toISOString()}] Price Worker: STANDBY (Automatic Refresh Inactive).`
+                        )}<br/>
                         {`[${new Date().toISOString()}] Model Service: Ensemble V2.2 Standby.`}<br/>
                         {`[${new Date().toISOString()}] Auth: Session Verified.`}
                     </Box>
@@ -213,15 +218,15 @@ export default function AdminDashboard() {
             <Stack spacing={4}>
                {/* REVENUE OVERVIEW */}
                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>REVENUE TRACKER</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>BUSINESS METRICS</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
                         <SidebarStat label="Current MRR" value="₹0" color="#10b981" />
-                        <SidebarStat label="Total Users" value={health?.database?.total_stocks || 0} color="#00D1FF" />
+                        <SidebarStat label="Total Users" value="--" color="#00D1FF" />
                         <SidebarStat label="Paid Subs" value="0" color="#00D1FF" />
                      </Stack>
                      <Divider sx={{ my: 3, opacity: 0.05 }} />
-                     <Button fullWidth size="small" variant="outlined" sx={{ fontSize: '0.6rem', fontWeight: 900, borderColor: 'rgba(255,255,255,0.1)', color: 'slategray' }}>REVENUE ANALYTICS →</Button>
+                     <Button fullWidth size="small" variant="outlined" onClick={() => navigate('/pricing')} sx={{ fontSize: '0.6rem', fontWeight: 900, borderColor: 'rgba(255,255,255,0.1)', color: 'slategray' }}>MONETIZATION SETTINGS →</Button>
                   </Paper>
                </Box>
 

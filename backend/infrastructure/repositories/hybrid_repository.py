@@ -3,11 +3,10 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
-from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB, LiveSignalDB, WorkspaceDB, ResearchNoteDB, TradeJournalDB, ModelMetadataDB
+from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB, LiveSignalDB, ModelMetadataDB, ShadowSignalDB, ShadowProvenanceDB
 from backend.core.duckdb_engine import analytical_engine
-from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert, EarningsData, OptionsChain
-from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
-from backend.domain.models.ios import WorkspaceState, ResearchNote, MarketRegime, MarketOpportunity, MarketIntelligenceReport, TradeFeedback, LiveSignal
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain
+from backend.domain.models.ios import MarketRegime, MarketOpportunity, LiveSignal
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import pandas as pd
 import json
@@ -196,11 +195,6 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         if 'date' in data: data['timestamp'] = data['date']
         return Prediction(**data)
 
-    async def save_portfolio_health(self, health: PortfolioHealth) -> None: self.fs.collection("portfolio_health").document(health.user_id).set(health.model_dump())
-    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]:
-        doc = self.fs.collection("portfolio_health").document(user_id).get()
-        return PortfolioHealth(**doc.to_dict()) if doc.exists else None
-
     async def save_alert(self, alert: Alert) -> None: self.fs.collection("alerts").document(alert.id).set(alert.model_dump())
     async def get_active_alerts(self, limit: int = 20) -> List[Alert]:
         docs = self.fs.collection("alerts").where("is_read", "==", False).limit(limit).stream()
@@ -266,17 +260,6 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 results.append(FeatureDefinition(**d_data))
             return results
 
-    async def save_strategy(self, strategy: UserStrategy) -> None: self.fs.collection("strategies").document(strategy.id).set(strategy.model_dump())
-    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]:
-        docs = self.fs.collection("strategies").where("user_id", "==", user_id).stream()
-        return [UserStrategy(**doc.to_dict()) for doc in docs]
-
-    async def save_paper_order(self, order: PaperOrder) -> None: self.fs.collection("paper_orders").document(order.id).set(order.model_dump())
-    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]:
-        doc = self.fs.collection("virtual_portfolios").document(user_id).get()
-        return VirtualPortfolio(**doc.to_dict()) if doc.exists else None
-
-    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None: self.fs.collection("virtual_portfolios").document(portfolio.user_id).set(portfolio.model_dump())
     async def save_model_metadata(self, metadata: ModelMetadata) -> None:
         from backend.core.postgres import ModelMetadataDB
         with self.session_factory() as pg:
@@ -341,90 +324,24 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         df = self.duck.create_ml_dataset(symbol, start_date.isoformat(), end_date.isoformat())
         results = []
         target_col = f"target_{horizon.lower()}"
-
-        # Determine features to exclude (targets)
         target_cols = [f"target_{h.lower()}" for h in ["SHORT", "SWING", "LONG"]]
-
         for _, row in df.iterrows():
             row_dict = row.to_dict()
             target = row_dict.get(target_col)
-
-            # Clean feature vector: Remove all target columns and non-feature columns
             date = row_dict.pop('date')
-            for col in target_cols:
-                row_dict.pop(col, None)
-            row_dict.pop('target', None) # Legacy
-
-            # OHLC might be in the dataset if prepare_horizon_datasets added them
-            # We usually want them for labeling but not necessarily as raw features for model
-            # unless normalized.
-
+            for col in target_cols: row_dict.pop(col, None)
+            row_dict.pop('target', None)
             results.append(FeatureVector(
-                symbol=symbol,
-                date=date,
-                version="v1.0.0",
+                symbol=symbol, date=date, version="v1.0.0",
                 features={k: v for k, v in row_dict.items() if isinstance(v, (int, float, bool))},
                 target=target
             ))
         return results
 
-    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: self.fs.collection("devices").document(device_info['device_id']).set({**device_info, "user_id": user_id})
-    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:
-        docs = self.fs.collection("devices").where("user_id", "==", user_id).stream()
-        return [doc.to_dict() for doc in docs]
-
 class HybridIOSRepository(IIOSRepository):
     def __init__(self, session_factory: Callable[[], Session], firestore_db: Any):
         self.session_factory = session_factory
         self.fs = firestore_db
-
-    async def save_workspace(self, workspace: WorkspaceState) -> None:
-        with self.session_factory() as pg:
-            db_ws = pg.query(WorkspaceDB).filter(WorkspaceDB.id == workspace.id).first()
-            data = workspace.model_dump()
-            for col in ["layout_config", "active_stocks", "saved_indicators"]:
-                if data.get(col): data[col] = json.dumps(data[col])
-            if db_ws:
-                for k, v in data.items(): setattr(db_ws, k, v)
-            else: pg.add(WorkspaceDB(**data))
-            pg.commit()
-
-    async def get_user_workspaces(self, user_id: str) -> List[WorkspaceState]:
-        with self.session_factory() as pg:
-            res = pg.query(WorkspaceDB).filter(WorkspaceDB.user_id == user_id).all()
-            results = []
-            for r in res:
-                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
-                for col in ["layout_config", "active_stocks", "saved_indicators"]:
-                    if data.get(col) and isinstance(data[col], str):
-                        try: data[col] = json.loads(data[col])
-                        except: pass
-                results.append(WorkspaceState(**data))
-            return results
-
-    async def save_research_note(self, note: ResearchNote) -> None:
-        with self.session_factory() as pg:
-            db_note = pg.query(ResearchNoteDB).filter(ResearchNoteDB.id == note.id).first()
-            data = note.model_dump()
-            for col in ["tags", "attachments"]:
-                if data.get(col): data[col] = json.dumps(data[col])
-            if db_note:
-                for k, v in data.items(): setattr(db_note, k, v)
-            else: pg.add(ResearchNoteDB(**data))
-            pg.commit()
-
-    async def get_stock_notes(self, user_id: str, symbol: str) -> List[ResearchNote]:
-        with self.session_factory() as pg:
-            res = pg.query(ResearchNoteDB).filter(ResearchNoteDB.user_id == user_id, ResearchNoteDB.symbol == symbol).all()
-            results = []
-            for r in res:
-                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
-                for col in ["tags", "attachments"]:
-                    if data.get(col) and isinstance(data[col], str):
-                        try: data[col] = json.loads(data[col])
-                        except: pass
-                results.append(ResearchNote(**data))
-            return results
 
     async def save_market_regime(self, regime: MarketRegime) -> None:
         with self.session_factory() as pg:
@@ -446,6 +363,7 @@ class HybridIOSRepository(IIOSRepository):
             pg.commit()
 
     async def get_active_opportunities(self, limit: int = 20) -> List[MarketOpportunity]:
+        from backend.core.postgres import OpportunityDB
         with self.session_factory() as pg:
             try:
                 res = pg.query(OpportunityDB).order_by(OpportunityDB.timestamp.desc()).limit(limit).all()
@@ -485,7 +403,7 @@ class HybridIOSRepository(IIOSRepository):
             res = query.order_by(LiveSignalDB.timestamp.desc()).all()
             return [self._map_db_to_live_signal(r) for r in res]
 
-    def _map_db_to_live_signal(self, db_obj: LiveSignalDB) -> LiveSignal:
+    def _map_db_to_live_signal(self, db_obj: Any) -> LiveSignal:
         try:
             data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
             for col in ['events', 'provenance']:
@@ -504,7 +422,7 @@ class HybridIOSRepository(IIOSRepository):
                     elif field == 'profit_pct': data[field] = 0.0
                     else: data[field] = None
             return LiveSignal(**data)
-        except: return LiveSignal(id=str(uuid.uuid4()), symbol="ERROR", rating="HOLD", direction="LONG", conviction=0, entry_price=0, timeframe="SWING", status="ERROR")
+        except: return LiveSignal(id=str(uuid.uuid4()), symbol="ERROR", direction="LONG", conviction=0, entry_price=0, status="ERROR")
 
     async def get_signal_by_id(self, signal_id: str) -> Optional[LiveSignal]:
         with self.session_factory() as pg:
@@ -536,38 +454,3 @@ class HybridIOSRepository(IIOSRepository):
         with self.session_factory() as pg:
             res = pg.query(ShadowSignalDB).filter(ShadowSignalDB.outcome_verified == True).all()
             return [self._map_db_to_live_signal(r) for r in res]
-
-    async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
-        with self.session_factory() as pg:
-            pg.add(IntelReportDB(id=report.id, type=report.type, date=report.date, summary=report.summary, key_events=report.key_events, ai_bias=report.ai_bias))
-            pg.commit()
-
-    async def get_latest_intel_report(self, report_type: str) -> Optional[MarketIntelligenceReport]:
-        with self.session_factory() as pg:
-            r = pg.query(IntelReportDB).filter(IntelReportDB.type == report_type).order_by(IntelReportDB.date.desc()).first()
-            if r: return MarketIntelligenceReport(id=r.id, type=r.type, date=r.date, summary=r.summary, key_events=r.key_events or [], top_movers=[], sector_performance={}, ai_bias=r.ai_bias or "NEUTRAL")
-            return None
-
-    async def save_trade_feedback(self, feedback: TradeFeedback) -> None:
-        with self.session_factory() as pg:
-            db_trade = pg.query(TradeJournalDB).filter(TradeJournalDB.id == feedback.id).first()
-            data = feedback.model_dump()
-            for col in ["mistakes", "lessons"]:
-                if data.get(col): data[col] = json.dumps(data[col])
-            if db_trade:
-                for k, v in data.items(): setattr(db_trade, k, v)
-            else: pg.add(TradeJournalDB(**data))
-            pg.commit()
-
-    async def get_user_trades(self, user_id: str) -> List[TradeFeedback]:
-        with self.session_factory() as pg:
-            res = pg.query(TradeJournalDB).filter(TradeJournalDB.user_id == user_id).all()
-            results = []
-            for r in res:
-                data = {c.name: getattr(r, c.name) for c in r.__table__.columns}
-                for col in ["mistakes", "lessons"]:
-                    if data.get(col) and isinstance(data[col], str):
-                        try: data[col] = json.loads(data[col])
-                        except: pass
-                results.append(TradeFeedback(**data))
-            return results

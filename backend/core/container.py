@@ -10,7 +10,6 @@ class Container:
         self._ai_provider = None
         self._ml_service = None
         self._feature_store = None
-        self._knowledge_service = None
         self._strategy_engine = None
         self._regime_engine = None
         self._opportunity_engine = None
@@ -47,7 +46,6 @@ class Container:
         self._evidence_matrix_service = None
         self._ai_research_service = None
         self._historical_research_service = None
-        self._portfolio_analytics_service = None
         self._canonical_signal_repo = None
         self._forensic_analytical_service = None
         self._export_service = None
@@ -149,7 +147,6 @@ class Container:
             from backend.infrastructure.repositories.hybrid_repository import HybridStockRepository
             from backend.core.database import get_db
             from backend.core.postgres import SessionLocal
-            # SQL Init moved to background thread in main.py
             self._repository = HybridStockRepository(SessionLocal, get_db())
         return self._repository
 
@@ -214,13 +211,6 @@ class Container:
             from backend.services.feature_store import FeatureStoreService
             self._feature_store = FeatureStoreService(self.data_platform_repo)
         return self._feature_store
-
-    @property
-    def knowledge_service(self):
-        if self._knowledge_service is None:
-            from backend.services.knowledge_service import KnowledgeService
-            self._knowledge_service = KnowledgeService(self.data_platform_repo)
-        return self._knowledge_service
 
     @property
     def strategy_engine(self):
@@ -438,13 +428,6 @@ class Container:
         return self._monitoring_service
 
     @property
-    def monitoring_service(self):
-        if self._monitoring_service is None:
-            from backend.services.monitoring_service import MonitoringService
-            self._monitoring_service = MonitoringService()
-        return self._monitoring_service
-
-    @property
     def opportunity_radar_service(self):
         if self._opportunity_radar_service is None:
             from backend.services.opportunity_radar_service import OpportunityRadarService
@@ -471,13 +454,6 @@ class Container:
             from backend.services.historical_research_service import HistoricalResearchService
             self._historical_research_service = HistoricalResearchService()
         return self._historical_research_service
-
-    @property
-    def portfolio_analytics_service(self):
-        if self._portfolio_analytics_service is None:
-            from backend.services.portfolio_analytics_service import PortfolioAnalyticsService
-            self._portfolio_analytics_service = PortfolioAnalyticsService()
-        return self._portfolio_analytics_service
 
     @property
     def canonical_signal_repo(self):
@@ -576,9 +552,6 @@ def get_ml_service():
 
 def get_feature_store():
     return container.feature_store
-
-def get_knowledge_service():
-    return container.knowledge_service
 
 def get_strategy_engine():
     return container.strategy_engine

@@ -7,10 +7,7 @@ import {
   Activity,
   Menu as MenuIcon,
   ChevronDown,
-  TrendingUp,
   User,
-  FileText,
-  BarChart3,
   Database,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -30,9 +27,6 @@ export const useNotification = () => useContext(NotificationContext);
 const userMenuItems = [
   { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
   { text: 'SIGNALS', icon: <Zap size={20} />, path: '/signals' },
-  { text: 'MY CHARTS', icon: <BarChart3 size={20} />, path: '/charts' },
-  { text: 'MY REPORTS', icon: <FileText size={20} />, path: '/reports' },
-  { text: 'PERFORMANCE', icon: <TrendingUp size={20} />, path: '/performance' },
   { text: 'ACCOUNT', icon: <User size={20} />, path: '/account' },
 ];
 

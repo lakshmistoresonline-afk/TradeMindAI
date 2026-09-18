@@ -9,7 +9,7 @@ export default function PortfolioOptimization() {
 
   useEffect(() => {
     getPortfolioOptimizations()
-      .then(setRecommendations)
+      .then((data: any) => setRecommendations(data))
       .finally(() => setLoading(false));
   }, []);
 

@@ -61,7 +61,18 @@ class OutcomeService:
                 exit_price = open_p
                 break
 
-            # Check for Target/Stop
+            # A. ENTRY MONITORING (If waiting)
+            if current_status == "WAITING_FOR_ENTRY":
+                triggered = False
+                if direction == "LONG" and low <= entry: triggered = True
+                elif direction == "SHORT" and high >= entry: triggered = True
+
+                if triggered:
+                    current_status = "ACTIVE" # Move straight to ACTIVE for outcome check
+                    # We can use ENTRY_TRIGGERED as a sub-state or just transition to ACTIVE
+
+            # B. OUTCOME MONITORING (Only if ACTIVE)
+            if current_status == "ACTIVE":
             hit_target = False
             hit_stop = False
 

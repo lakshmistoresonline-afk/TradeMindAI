@@ -38,20 +38,23 @@ async def startup():
             print("[+] Redis Cache Standby.")
         except: pass
 
-        # 2. Disabled Price Synchronization Loop (Render Free Tier Stability)
-        # while True:
-        #     try:
-        #         from backend.services.market_data_service import MarketDataService
-        #         await MarketDataService.sync_active_signal_prices()
-        #
-        #         # Phase 10: Signal Publication Gate
-        #         from backend.services.signal_publication_service import SignalPublicationService
-        #         await SignalPublicationService.publish_pending_signals()
-        #     except Exception as e:
-        #         print(f"[!] Background Task Error (Operational Pipeline): {e}")
-        #
-        #     # Run every 5 minutes in production
-        #     await asyncio.sleep(300)
+        # 2. Institutional Pulse Sync (Institutional 1.5)
+        # Handles real-time signal retracement and outcome resolution.
+        while True:
+            try:
+                from backend.services.market_calendar import MarketCalendar
+                from backend.services.market_data_service import MarketDataService
+
+                # Market Hours Guard: Run every 5m only when open, otherwise 1h.
+                if MarketCalendar.is_market_open():
+                    await MarketDataService.sync_active_signal_prices()
+                    await asyncio.sleep(300)
+                else:
+                    print("[*] Pulse Sync: Market Closed. Next check in 60m.")
+                    await asyncio.sleep(3600)
+            except Exception as e:
+                print(f"[!] Background Task Error (Pulse Sync): {e}")
+                await asyncio.sleep(60) # Wait before retry
 
     asyncio.create_task(background_inits())
 
