@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { Box, Typography, Paper, Grid, Stack, Button, Divider, alpha, CircularProgress } from '@mui/material';
 import { ShieldCheck, CreditCard, CheckCircle2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { apiClient } from '../api/client';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Checkout() {
   const { planId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -14,11 +17,25 @@ export default function Checkout() {
 
   const handlePayment = async () => {
     setLoading(true);
-    // Simulate Payment Provider Redirect & Webhook Delay
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-    }, 2000);
+    try {
+        // 1. Simulate Gateway Interaction
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 2. Authoritative Server-Side Upgrade
+        const response = await apiClient.post('/user/upgrade', {
+            plan: plan,
+            provider_ref: `txn_${Math.random().toString(36).substring(7)}`
+        });
+
+        if (response.data.status === 'success') {
+            localStorage.setItem(`tm_premium_${user?.uid}`, 'true');
+            setSuccess(true);
+        }
+    } catch (e) {
+        console.error("Payment Flow Failed:", e);
+    } finally {
+        setLoading(false);
+    }
   };
 
   if (success) {

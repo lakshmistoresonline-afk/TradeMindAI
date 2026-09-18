@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import Layout from './components/Layout'
 // V2.3.1_DEPLOY_SYNC_20260915
-import DashboardTerminal from './pages/DashboardTerminal'
 import EquitySignals from './pages/EquitySignals'
 import SignalDetail from './pages/SignalDetail'
 import Performance from './pages/Performance'
@@ -18,12 +17,25 @@ import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Checkout from './pages/Checkout'
 import Account from './pages/Account'
+import UserDashboard from './pages/UserDashboard'
+import AdminDashboard from './pages/AdminDashboard'
+import MyCharts from './pages/MyCharts'
+import MyReports from './pages/MyReports'
+import AdminSignals from './pages/AdminSignals'
+import AdminDataFeeds from './pages/AdminDataFeeds'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return null; // Or a loading spinner
+  if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+};
+
+const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAdmin, loading } = useAuth();
+  if (loading) return null;
+  if (!user || !isAdmin) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 };
 
@@ -107,16 +119,39 @@ function App() {
               <AuthGuard>
                 <Layout>
                   <Routes>
-                    <Route path="/dashboard" element={<DashboardTerminal />} />
+                    {/* User Experience */}
+                    <Route path="/dashboard" element={<UserDashboard />} />
                     <Route path="/signals" element={<EquitySignals />} />
                     <Route path="/signals/:id" element={<SignalDetail />} />
                     <Route path="/performance" element={<Performance />} />
-                    <Route path="/status" element={<SystemStatus />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/checkout/:planId" element={<Checkout />} />
 
+                    {/* Placeholder Consumer Features */}
+                    <Route path="/charts" element={<MyCharts />} />
+                    <Route path="/reports" element={<MyReports />} />
+                    <Route path="/watchlist" element={<EquitySignals />} />
+                    <Route path="/insights" element={<Landing />} />
+                    <Route path="/referral" element={<Account />} />
+
+                    {/* Admin Experience (Guarded) */}
+                    <Route path="/admin/*" element={
+                      <AdminGuard>
+                        <Routes>
+                          <Route path="dashboard" element={<AdminDashboard />} />
+                          <Route path="signals" element={<AdminSignals />} />
+                          <Route path="data" element={<AdminDataFeeds />} />
+                          <Route path="status" element={<SystemStatus />} />
+                          <Route path="stats" element={<SystemStatus />} />
+                          {/* Fallback to admin status */}
+                          <Route path="*" element={<Navigate to="dashboard" replace />} />
+                        </Routes>
+                      </AdminGuard>
+                    } />
+
                     {/* Compatibility redirects */}
                     <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
+                    <Route path="/status" element={<Navigate to="/admin/status" replace />} />
 
                     {/* Fallback to Dashboard */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

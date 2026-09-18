@@ -299,7 +299,7 @@ export default function EquitySignals() {
                                 {finalDisplaySignals.map((s) => (
                                     <Grid item xs={12} md={6} lg={4} key={s.id}>
                                         <Box sx={{ position: 'relative', height: '100%' }}>
-                                            <LiveSignalCard stock={s} decision={s.decision} />
+                                            <LiveSignalCard stock={s} decision={s.decision} variant="SIMPLE" />
                                             <MuiChip
                                                 label={selectedForCompare.includes(s.id) ? "SELECTED" : "COMPARE"}
                                                 onClick={() => toggleCompare(s.id)}

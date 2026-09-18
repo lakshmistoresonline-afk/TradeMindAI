@@ -43,8 +43,12 @@ async def startup():
         #     try:
         #         from backend.services.market_data_service import MarketDataService
         #         await MarketDataService.sync_active_signal_prices()
+        #
+        #         # Phase 10: Signal Publication Gate
+        #         from backend.services.signal_publication_service import SignalPublicationService
+        #         await SignalPublicationService.publish_pending_signals()
         #     except Exception as e:
-        #         print(f"[!] Background Task Error (Price Sync): {e}")
+        #         print(f"[!] Background Task Error (Operational Pipeline): {e}")
         #
         #     # Run every 5 minutes in production
         #     await asyncio.sleep(300)

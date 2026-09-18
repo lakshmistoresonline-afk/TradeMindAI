@@ -9,6 +9,9 @@ import {
   ChevronDown,
   TrendingUp,
   User,
+  FileText,
+  BarChart3,
+  Database,
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -24,19 +27,27 @@ export const NotificationContext = createContext({
 
 export const useNotification = () => useContext(NotificationContext);
 
-const menuItems = [
+const userMenuItems = [
   { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
   { text: 'SIGNALS', icon: <Zap size={20} />, path: '/signals' },
+  { text: 'MY CHARTS', icon: <BarChart3 size={20} />, path: '/charts' },
+  { text: 'MY REPORTS', icon: <FileText size={20} />, path: '/reports' },
   { text: 'PERFORMANCE', icon: <TrendingUp size={20} />, path: '/performance' },
-  { text: 'SYSTEM STATUS', icon: <Activity size={20} />, path: '/status' },
   { text: 'ACCOUNT', icon: <User size={20} />, path: '/account' },
+];
+
+const adminMenuItems = [
+  { text: 'COMMAND CENTER', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
+  { text: 'SIGNAL OPS', icon: <Zap size={20} />, path: '/admin/signals' },
+  { text: 'DATA FEEDS', icon: <Database size={20} />, path: '/admin/data' },
+  { text: 'SYSTEM STATUS', icon: <Activity size={20} />, path: '/admin/status' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -207,7 +218,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Box sx={{ overflow: 'auto', mt: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <List sx={{ px: 2 }}>
                <Typography variant="caption" sx={{ px: 2, mb: 2, display: 'block', fontWeight: 900, color: 'slategray', letterSpacing: 2 }}>PRIMARY COMMANDS</Typography>
-               {menuItems.map((item) => (
+               {userMenuItems.map((item) => (
                  <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                     <ListItemButton
                       onClick={() => { navigate(item.path); if (isMobile) setDrawerOpen(false); }}
@@ -239,6 +250,44 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </ListItemButton>
                   </ListItem>
                ))}
+
+               {isAdmin && (
+                 <>
+                   <Typography variant="caption" sx={{ px: 2, mt: 4, mb: 2, display: 'block', fontWeight: 900, color: 'secondary.main', letterSpacing: 2 }}>ADMINISTRATION</Typography>
+                   {adminMenuItems.map((item) => (
+                     <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+                        <ListItemButton
+                          onClick={() => { navigate(item.path); if (isMobile) setDrawerOpen(false); }}
+                          selected={currentPath === item.path || (location.pathname.startsWith(item.path))}
+                          sx={{
+                            borderRadius: 1,
+                            py: 1.4,
+                            '&.Mui-selected': {
+                              backgroundColor: alpha('#7C3AED', 0.08),
+                              color: 'secondary.main',
+                              '& .MuiListItemIcon-root': { color: 'secondary.main' },
+                              '& .MuiTypography-root': { fontWeight: 950 }
+                            },
+                            '&:hover': { backgroundColor: alpha('#fff', 0.03) }
+                          }}
+                        >
+                          <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
+                            {item.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={item.text}
+                            primaryTypographyProps={{
+                              variant: 'body2',
+                              fontWeight: 800,
+                              letterSpacing: 1,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                   ))}
+                 </>
+               )}
             </List>
 
             <Box sx={{ mt: 'auto', p: 3, borderTop: '1px solid rgba(255,255,255,0.05)' }}>

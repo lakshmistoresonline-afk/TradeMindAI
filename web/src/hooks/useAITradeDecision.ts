@@ -87,7 +87,7 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   };
 
   // 9. Quality Class (Strict V2.3 Classification)
-  // Backend quality_class is the authority. Fallback is deterministic.
+  // Backend quality_class is the authority. Fallback is deterministic based on horizon.
   const qualityClass = signal.quality_class || (timeframe === 'SWING' ? 'PRIMARY' : timeframe === 'LONG' ? 'SELECTIVE' : 'EXPERIMENTAL');
 
   // 10. Timing (UTC Enforcement)
@@ -119,7 +119,14 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     qualityClass: qualityClass as any,
     assetClass: signal.asset_class || 'EQUITY',
     underlyingSymbol: signal.symbol,
-    priceStatus: signal.current_price_status || signal.data_quality_status || 'FRESH',
+    priceStatus: (function() {
+        const dataTs = signal.current_price_timestamp || signal.data_timestamp || signal.timestamp;
+        if (!dataTs) return 'DATA_UNAVAILABLE';
+        const ageMin = (Date.now() - new Date(dataTs).getTime()) / (1000 * 60);
+        if (ageMin < 15) return 'FRESH';
+        if (ageMin < 120) return 'AGING';
+        return 'STALE';
+    })(),
 
     // Historical Fields
     exitPrice: parseNum(signal.exit_price),

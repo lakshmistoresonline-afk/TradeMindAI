@@ -700,6 +700,52 @@ class InstrumentDB(Base):
     source = Column(String)
     last_updated = Column(DateTime, default=datetime.datetime.utcnow)
 
+class UserChartDB(Base):
+    __tablename__ = "user_charts"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, index=True)
+    symbol = Column(String, index=True)
+    config_json = Column(String) # For drawing objects, indicators, etc.
+    name = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+class UserReportDB(Base):
+    __tablename__ = "user_reports"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, index=True)
+    type = Column(String) # SIGNAL_AUDIT, MARKET_DEEP_DIVE, etc.
+    symbol = Column(String)
+    status = Column(String) # GENERATING, COMPLETED, FAILED
+    content_url = Column(String) # Link to PDF or structured data
+    purchased = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class UserWatchlistDB(Base):
+    __tablename__ = "user_watchlists"
+    user_id = Column(String, primary_key=True)
+    symbol = Column(String, primary_key=True)
+    added_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class UserSubscriptionDB(Base):
+    __tablename__ = "user_subscriptions"
+    user_id = Column(String, primary_key=True)
+    plan_id = Column(String) # FREE, PRO, ALPHA
+    status = Column(String) # ACTIVE, CANCELLED, EXPIRED
+    current_period_start = Column(DateTime)
+    current_period_end = Column(DateTime)
+    provider_subscription_id = Column(String)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class UserReferralDB(Base):
+    __tablename__ = "user_referrals"
+    id = Column(String, primary_key=True)
+    referrer_id = Column(String, index=True)
+    referred_email = Column(String, unique=True)
+    status = Column(String) # SENT, REGISTERED, CONVERTED
+    reward_earned = Column(Float, default=0.0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
 from sqlalchemy import event
 from .config import settings
 

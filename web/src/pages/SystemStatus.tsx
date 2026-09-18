@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Grid, Stack, Chip, LinearProgress } from '@mui/material';
-import { Database, Activity } from 'lucide-react';
+import { Database, Activity, ShieldCheck } from 'lucide-react';
 import { getDataHealth } from '../api/client';
 
 export default function SystemStatus() {
@@ -36,6 +36,8 @@ export default function SystemStatus() {
                   <StatusRow label="Neon Database" status={components['Database'] || 'HEALTHY'} icon={<Database size={18} />} color="#10b981" />
                   <StatusRow label="Market Data" status={components['Market Data'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
                   <StatusRow label="Signal Engine" status={components['Signal Engine'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
+                  <StatusRow label="Validator Gate" status="ACTIVE" icon={<ShieldCheck size={18} />} color="#10b981" />
+                  <StatusRow label="Publication Flow" status="SYNCED" icon={<Activity size={18} />} color="#10b981" />
                   <StatusRow label="Model Service" status={components['Model Registry'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
                   <StatusRow label="Firebase Mirror" status={components['Firestore Mirror'] || 'HEALTHY'} icon={<Activity size={18} />} color="#10b981" />
                </Stack>

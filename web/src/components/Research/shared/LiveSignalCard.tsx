@@ -7,9 +7,10 @@ import { AITradeDecision } from '../../../types/domain';
 interface LiveSignalCardProps {
   stock: any;
   decision: AITradeDecision;
+  variant?: 'TECHNICAL' | 'SIMPLE';
 }
 
-export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps) {
+export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' }: LiveSignalCardProps) {
   const navigate = useNavigate();
 
   if (!decision) return null;
@@ -100,28 +101,32 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
       </Box>
 
       {/* 2. Trade Levels Area */}
-      <Box sx={{ p: 2.5, flexGrow: 1 }}>
-         <Grid container spacing={3}>
-            <LevelItem label="ENTRY" value={entry} />
-            <LevelItem label="CURRENT" value={current} color={(current && entry) ? (isBuy ? (current >= entry ? '#10b981' : '#ef4444') : (current <= entry ? '#10b981' : '#ef4444')) : '#fff'} />
-            <LevelItem label="TARGET" value={target} color="#10b981" />
-            <LevelItem label="STOP LOSS" value={stop} color="#ef4444" />
+      <Box sx={{ p: variant === 'SIMPLE' ? 2 : 2.5, flexGrow: 1 }}>
+         <Grid container spacing={variant === 'SIMPLE' ? 2 : 3}>
+            <LevelItem label="ENTRY" value={entry} simple={variant === 'SIMPLE'} />
+            <LevelItem label="CURRENT" value={current} color={(current && entry) ? (isBuy ? (current >= entry ? '#10b981' : '#ef4444') : (current <= entry ? '#10b981' : '#ef4444')) : '#fff'} simple={variant === 'SIMPLE'} />
+            <LevelItem label="TARGET" value={target} color="#10b981" simple={variant === 'SIMPLE'} />
+            <LevelItem label="STOP LOSS" value={stop} color="#ef4444" simple={variant === 'SIMPLE'} />
          </Grid>
 
-         <Divider sx={{ my: 3, opacity: 0.05 }} />
+         {variant !== 'SIMPLE' && (
+           <>
+            <Divider sx={{ my: 3, opacity: 0.05 }} />
 
-         <Grid container spacing={3}>
-            <Grid item xs={6}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>EXPECTED VALUE</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 950, color: (decision.expectedValue || 0) > 0 ? '#10b981' : '#ef4444', fontFamily: 'JetBrains Mono' }}>
-                  {decision.expectedValue !== undefined ? `₹${decision.expectedValue.toFixed(2)}` : 'UNAVAILABLE'}
-               </Typography>
+            <Grid container spacing={3}>
+                <Grid item xs={6}>
+                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>EXPECTED VALUE</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 950, color: (decision.expectedValue || 0) > 0 ? '#10b981' : '#ef4444', fontFamily: 'JetBrains Mono' }}>
+                    {decision.expectedValue !== undefined ? `₹${decision.expectedValue.toFixed(2)}` : 'UNAVAILABLE'}
+                </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ textAlign: 'right' }}>
+                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>RISK / REWARD</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 950, color: '#00D1FF', fontFamily: 'JetBrains Mono' }}>{decision.riskReward}</Typography>
+                </Grid>
             </Grid>
-            <Grid item xs={6} sx={{ textAlign: 'right' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>RISK / REWARD</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 950, color: '#00D1FF', fontFamily: 'JetBrains Mono' }}>{decision.riskReward}</Typography>
-            </Grid>
-         </Grid>
+           </>
+         )}
       </Box>
 
       {/* 3. Status & Timing Area */}
@@ -139,7 +144,25 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
                   borderRadius: 0.5
                }}
             />
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.55rem' }}>{stock.price_status || 'FRESH'} FEED</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    bgcolor: decision.priceStatus === 'FRESH' ? '#10b981' : (decision.priceStatus === 'AGING' ? '#f59e0b' : '#ef4444')
+                }} />
+                <Typography variant="caption" sx={{
+                    color: decision.priceStatus === 'FRESH' ? '#10b981' : (decision.priceStatus === 'AGING' ? '#f59e0b' : '#ef4444'),
+                    fontWeight: 950, fontSize: '0.55rem'
+                }}>
+                    {decision.priceStatus} FEED
+                </Typography>
+            </Box>
+         </Box>
+
+         <Box sx={{ mb: 2, p: 1.5, bgcolor: alpha('#7C3AED', 0.02), borderRadius: 1, border: '1px solid rgba(124, 58, 237, 0.05)' }}>
+            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 0.5, fontSize: '0.45rem' }}>EVIDENCE SUMMARY</Typography>
+            <Typography variant="caption" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.55rem' }}>
+                {decision.formattedThesis?.trend} · {decision.formattedThesis?.momentum}
+            </Typography>
          </Box>
 
          <Stack spacing={1.5}>
@@ -194,11 +217,11 @@ export default function LiveSignalCard({ stock, decision }: LiveSignalCardProps)
   );
 }
 
-function LevelItem({ label, value, color = '#fff' }: { label: string, value?: number, color?: string }) {
+function LevelItem({ label, value, color = '#fff', simple = false }: { label: string, value?: number, color?: string, simple?: boolean }) {
    return (
       <Grid item xs={6}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block', mb: 0.5 }}>{label}</Typography>
-         <Typography variant="body1" sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', color }}>{value ? `₹${value.toLocaleString()}` : 'UNAVAILABLE'}</Typography>
+         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: simple ? '0.45rem' : '0.55rem', display: 'block', mb: 0.5 }}>{label}</Typography>
+         <Typography variant={simple ? 'body2' : 'body1'} sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', color }}>{value ? `₹${value.toLocaleString()}` : 'UNAVAILABLE'}</Typography>
       </Grid>
    );
 }

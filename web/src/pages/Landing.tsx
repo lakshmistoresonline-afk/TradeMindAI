@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Container, Grid, Stack, Divider } from '@mui/material';
-import { ShieldCheck, Zap, Globe, Clock, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Search, Clock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Landing() {
@@ -72,30 +72,30 @@ export default function Landing() {
         <Grid container spacing={6}>
           <Grid item xs={12} md={3}>
             <PillarItem
-              icon={<Globe size={32} color="#00D1FF" />}
+              icon={<Search size={32} color="#00D1FF" />}
               title="DISCOVER"
-              text="Institutional-grade momentum scans across the NIFTY-200 universe."
+              text="Identify institutional-grade momentum setups across the NIFTY-200 universe."
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <PillarItem
               icon={<Zap size={32} color="#10b981" />}
               title="UNDERSTAND"
-              text="Full machine-generated evidence synthesis for every decision."
+              text="Analyze the machine-learning evidence and structural logic behind every signal."
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <PillarItem
               icon={<Clock size={32} color="#7C3AED" />}
               title="TRACK"
-              text="Real-time lifecycle monitoring from creation to terminal state."
+              text="Monitor signal evolution in real-time from publication to terminal state."
             />
           </Grid>
           <Grid item xs={12} md={3}>
             <PillarItem
               icon={<ShieldCheck size={32} color="#00D1FF" />}
               title="VERIFY"
-              text="Transparent historical ledger with 100% auditability."
+              text="Audit our 100% transparent historical ledger of observed outcomes."
             />
           </Grid>
         </Grid>

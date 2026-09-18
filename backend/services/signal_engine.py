@@ -8,6 +8,7 @@ from backend.services.regime_engine import MarketRegimeEngine
 from backend.services.risk_engine import RiskEngine
 from backend.services.calibration_service import CalibrationService
 from backend.services.signal_quality_service import SignalQualityService
+from backend.services.signal_validator_service import SignalValidatorService
 from backend.core.container import container
 from backend.domain.models.data_platform import ModelMetadata
 
@@ -182,6 +183,12 @@ class SignalEngine:
             eligibility = "STALE_DATA"
         elif coverage_score < 0.5:
             eligibility = "DATA_BLOCKED"
+
+        # 10.5 Production Publication Gate (Institutional 4.0)
+        validation = SignalValidatorService.validate_publication(LiveSignal(**signal_dict_pre)) # Mock instantiation for check
+        if not validation["is_valid"]:
+            print(f"   [GATE_REJECTED] {symbol} failed publication audit: {validation['issues']}")
+            return None
 
         # 11. Construct Canonical Signal
         sig_id = f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}"
@@ -360,3 +367,11 @@ class SignalEngine:
             mfe=0.0,
             mae=0.0
         )
+
+        # 12. Final Validation Gate (Phase 10)
+        validation = SignalValidatorService.validate_publication(signal)
+        if not validation["is_valid"]:
+             print(f"   [GATE_REJECTED] {symbol} failed final publication audit: {validation['issues']}")
+             return None
+
+        return signal

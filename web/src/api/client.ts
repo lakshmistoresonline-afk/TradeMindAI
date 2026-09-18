@@ -64,6 +64,15 @@ export const getEquityHistory = async (params: any = {}) => {
   return response.data;
 };
 
+// User Personalization API (Phase 15)
+export const getUserCharts = async () => (await apiClient.get('/user/charts')).data;
+export const saveUserChart = async (data: any) => (await apiClient.post('/user/charts', data)).data;
+export const getUserReports = async () => (await apiClient.get('/user/reports')).data;
+export const getWatchlist = async () => (await apiClient.get('/user/watchlist')).data;
+export const addToWatchlist = async (symbol: string) => (await apiClient.post(`/user/watchlist/${symbol}`)).data;
+export const getUserSubscription = async () => (await apiClient.get('/user/subscription')).data;
+export const getUserReferrals = async () => (await apiClient.get('/user/referrals')).data;
+
 // --- OBSOLETE / DEPRECATED ENDPOINTS (Satisfying legacy components) ---
 export const getStockNews = async (..._args: any[]) => ([]);
 export const getStockTimeline = async (..._args: any[]) => ([]);

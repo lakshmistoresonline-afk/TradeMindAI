@@ -5,11 +5,14 @@ import { getEquitySignalDetail } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { ShieldCheck, HelpCircle, Activity, Target, Clock, ArrowLeft, BarChart2, Briefcase, RefreshCw, Zap, TrendingUp } from 'lucide-react';
 import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
+import PremiumOverlay from '../components/PremiumOverlay';
+import { useAuth } from '../hooks/useAuth';
 
 export default function SignalDetail() {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isPremium } = useAuth();
   const [signal, setSignal] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,7 +69,7 @@ export default function SignalDetail() {
       {/* 1. Executive Summary Tier */}
       <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 3 }}>
          <Box>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
                <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff' }}>{signal.symbol}</Typography>
                <MuiChip
                  label={decision.status?.replace(/_/g, ' ')}
@@ -142,30 +145,32 @@ export default function SignalDetail() {
 
             {/* 3. Signal Evidence Section */}
             <SectionHeader icon={<BarChart2 size={18} />} title="SIGNAL EVIDENCE & FORENSICS" />
-            <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>WHY THIS SIGNAL EXISTS</Typography>
-               <Typography variant="body1" sx={{ color: '#e2e8f0', fontWeight: 500, lineHeight: 1.6, mb: 4 }}>
-                  {decision.thesis || "Signal identified via V2.2 structural breakout logic combined with V2.3 ML classification. Forensic validation of institutional order flow confirmed at decision timestamp."}
-               </Typography>
+            {isPremium ? (
+                <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>WHY THIS SIGNAL EXISTS</Typography>
+                <Typography variant="body1" sx={{ color: '#e2e8f0', fontWeight: 500, lineHeight: 1.6, mb: 4 }}>
+                    {decision.thesis || "Signal identified via V2.2 structural breakout logic combined with V2.3 ML classification. Forensic validation of institutional order flow confirmed at decision timestamp."}
+                </Typography>
 
-               <Grid container spacing={3}>
-                  <EvidenceItem label="MARKET REGIME" value={signal.regime || 'SIDEWAYS'} />
-                  <EvidenceItem label="SECTOR CONTEXT" value={signal.sector || 'UNAVAILABLE'} />
-                  <EvidenceItem label="RELATIVE STRENGTH" value="UNAVAILABLE" />
-                  <EvidenceItem label="VOLUME ANALYSIS" value="UNAVAILABLE" />
-               </Grid>
+                <Grid container spacing={3}>
+                    <EvidenceItem label="MARKET REGIME" value={signal.regime || 'SIDEWAYS'} />
+                    <EvidenceItem label="SECTOR CONTEXT" value={signal.sector || 'UNAVAILABLE'} />
+                    <EvidenceItem label="RELATIVE STRENGTH" value="UNAVAILABLE" />
+                    <EvidenceItem label="VOLUME ANALYSIS" value="UNAVAILABLE" />
+                </Grid>
 
-               {decision.drivers && decision.drivers.length > 0 && (
-                  <Box sx={{ mt: 4 }}>
-                     <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>KEY DRIVERS</Typography>
-                     <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                        {decision.drivers.map((d: string, i: number) => (
-                           <MuiChip key={i} label={d.toUpperCase()} size="small" sx={{ fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)', color: 'slategray' }} />
-                        ))}
-                     </Stack>
-                  </Box>
-               )}
-            </Paper>
+                {decision.drivers && decision.drivers.length > 0 && (
+                    <Box sx={{ mt: 4 }}>
+                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>KEY DRIVERS</Typography>
+                        <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                            {decision.drivers.map((d: string, i: number) => (
+                            <MuiChip key={i} label={d.toUpperCase()} size="small" sx={{ fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)', color: 'slategray' }} />
+                            ))}
+                        </Stack>
+                    </Box>
+                )}
+                </Paper>
+            ) : <Box sx={{ mb: 4 }}><PremiumOverlay title="UNLOCK EVIDENCE FORENSICS" /></Box>}
 
             {/* 4. Outcome Forensics (Visible for historical signals) */}
             {decision.status !== 'ACTIVE' && decision.status !== 'WAITING_FOR_ENTRY' && (
@@ -191,30 +196,42 @@ export default function SignalDetail() {
 
             {/* 5. Signal Thesis (Signal Intelligence 4.0) */}
             <SectionHeader icon={<Zap size={18} />} title="SIGNAL THESIS" />
-            <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <Grid container spacing={4}>
-                    <ThesisItem label="TREND" value={decision.formattedThesis?.trend} />
-                    <ThesisItem label="MOMENTUM" value={decision.formattedThesis?.momentum} />
-                    <ThesisItem label="VOLUME" value={decision.formattedThesis?.volume} />
-                    <ThesisItem label="MARKET" value={decision.formattedThesis?.market} />
-                </Grid>
-                <Divider sx={{ my: 3, opacity: 0.05 }} />
-                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic' }}>
-                    Machine-generated deterministic synthesis of authoritative evidence.
-                </Typography>
-            </Paper>
+            {isPremium ? (
+                <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <Box sx={{ mb: 4 }}>
+                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1.5, display: 'block' }}>CONSENSUS INTERPRETATION</Typography>
+                        <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500, lineHeight: 1.8 }}>
+                            Our ensemble architecture identifies a **{decision.formattedThesis?.trend}** aligned with institutional positioning.
+                            The structural breakout confirmed at ₹{decision.entry} demonstrates **{decision.formattedThesis?.momentum}**
+                            within a **{decision.formattedThesis?.market}**.
+                        </Typography>
+                    </Box>
+                    <Grid container spacing={4}>
+                        <ThesisItem label="TREND" value={decision.formattedThesis?.trend} />
+                        <ThesisItem label="MOMENTUM" value={decision.formattedThesis?.momentum} />
+                        <ThesisItem label="VOLUME" value={decision.formattedThesis?.volume} />
+                        <ThesisItem label="MARKET" value={decision.formattedThesis?.market} />
+                    </Grid>
+                    <Divider sx={{ my: 3, opacity: 0.05 }} />
+                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic' }}>
+                        Machine-generated deterministic synthesis of authoritative evidence.
+                    </Typography>
+                </Paper>
+            ) : <Box sx={{ mb: 4 }}><PremiumOverlay title="UNLOCK AI THESIS SYNTHESIS" /></Box>}
 
             {/* 6. Signal Replay (Chronological Lifecycle) */}
             <Box id="lifecycle-replay" sx={{ scrollMarginTop: 100 }}>
                 <SectionHeader icon={<Clock size={18} />} title="SIGNAL REPLAY (CHRONOLOGICAL RECONSTRUCTION)" />
-                <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <SignalLifecycleTimeline events={decision.lifecycleEvents} currentStatus={decision.status} />
-                    <Divider sx={{ my: 3, opacity: 0.05 }} />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>REPLAY FIDELITY: HIGH</Typography>
-                        <MuiChip label="VERIFIED RECONSTRUCTION" size="small" variant="outlined" sx={{ height: 18, fontSize: '0.5rem', fontWeight: 950, color: '#00D1FF', borderColor: alpha('#00D1FF', 0.3) }} />
-                    </Box>
-                </Paper>
+                {isPremium ? (
+                    <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <SignalLifecycleTimeline events={decision.lifecycleEvents} currentStatus={decision.status} />
+                        <Divider sx={{ my: 3, opacity: 0.05 }} />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>REPLAY FIDELITY: HIGH</Typography>
+                            <MuiChip label="VERIFIED RECONSTRUCTION" size="small" variant="outlined" sx={{ height: 18, fontSize: '0.5rem', fontWeight: 950, color: '#00D1FF', borderColor: alpha('#00D1FF', 0.3) }} />
+                        </Box>
+                    </Paper>
+                ) : <Box sx={{ mb: 4 }}><PremiumOverlay title="UNLOCK SIGNAL REPLAY" /></Box>}
             </Box>
          </Grid>
 

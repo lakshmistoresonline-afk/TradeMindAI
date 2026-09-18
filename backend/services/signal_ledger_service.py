@@ -95,6 +95,16 @@ class SignalLedgerService:
             if not db_obj:
                 return False
 
+            # 1. Immutability Protection (Phase 11)
+            TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED"]
+            if db_obj.status in TERMINAL_STATES:
+                # Only allow updating metadata or events, not core levels or outcomes
+                RESTRICTED_FIELDS = ["entry_price", "target_price", "stop_price", "direction", "profit_pct", "status", "outcome_date"]
+                for key in updates:
+                    if key in RESTRICTED_FIELDS:
+                        print(f"[SignalLedger] Update BLOCKED: Signal {signal_id} is in terminal state {db_obj.status}")
+                        return False
+
             for key, value in updates.items():
                 if hasattr(db_obj, key):
                     if key in ["provenance", "events"] and isinstance(value, (dict, list)):
