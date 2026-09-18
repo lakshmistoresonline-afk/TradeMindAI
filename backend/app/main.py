@@ -20,11 +20,14 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
 
+background_tasks = set()
+
 @app.on_event("startup")
 async def startup():
     print("[*] API Node ready.")
     # Async background task for non-critical inits
     async def background_inits():
+        redis = None
         try:
             # 1. Redis
             redis = aioredis.from_url(
@@ -36,7 +39,8 @@ async def startup():
             )
             FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
             print("[+] Redis Cache Standby.")
-        except: pass
+        except Exception as re:
+            print(f"[!] Redis Cache Initialization Error: {re}")
 
         # 2. Institutional Pulse Sync (Institutional 1.5)
         # Handles real-time signal retracement and outcome resolution.
@@ -47,7 +51,31 @@ async def startup():
 
                 # Market Hours Guard: Run every 5m only when open, otherwise 1h.
                 if MarketCalendar.is_market_open():
-                    await MarketDataService.sync_active_signal_prices()
+                    lock_acquired = False
+                    if redis:
+                        try:
+                            # Part 5: Atomic lock acquisition with TTL of 280 seconds to avoid multi-instance execution
+                            lock_acquired = await redis.set("lock:pulse", "acquired", ex=280, nx=True)
+                        except Exception as le:
+                            print(f"[!] Redis lock check failed: {le}")
+                            lock_acquired = False
+                    else:
+                        print("[!] Redis unavailable. Failing safe by denying lock.")
+                        lock_acquired = False
+
+                    if lock_acquired:
+                        print("[+] lock:pulse ACQUIRED. Starting Pulse Execution Cycle.")
+                        try:
+                            await MarketDataService.sync_active_signal_prices()
+                        finally:
+                            try:
+                                await redis.delete("lock:pulse")
+                                print("[+] lock:pulse RELEASED safely.")
+                            except:
+                                pass
+                    else:
+                        print("[*] lock:pulse DENIED / SKIPPED. Another instance is active or Redis is down.")
+
                     await asyncio.sleep(300)
                 else:
                     print("[*] Pulse Sync: Market Closed. Next check in 60m.")
@@ -56,7 +84,9 @@ async def startup():
                 print(f"[!] Background Task Error (Pulse Sync): {e}")
                 await asyncio.sleep(60) # Wait before retry
 
-    asyncio.create_task(background_inits())
+    task = asyncio.create_task(background_inits())
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)
 
 @app.get("/")
 def root():

@@ -1,3 +1,7 @@
+# [SUPERSEDED] HISTORICAL MARKET DATA REFRESH AUDIT
+> [!NOTE]
+> This historical audit has been superseded by the final production hardening release in reports/MARKET_DATA_REFRESH_FORENSIC_AUDIT_FINAL.md.
+
 ## 1. Current Production Status
 - **PRODUCTION AUTOMATIC PRICE REFRESH**: **NOT ACTIVE**
 - **Background Workers**: Disabled on Render Free Tier to maintain API stability.

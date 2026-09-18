@@ -73,28 +73,28 @@ class OutcomeService:
 
             # B. OUTCOME MONITORING (Only if ACTIVE)
             if current_status == "ACTIVE":
-            hit_target = False
-            hit_stop = False
+                hit_target = False
+                hit_stop = False
 
-            if direction == "LONG":
-                if open_p <= stop: hit_stop, exit_price = True, open_p
-                elif open_p >= target: hit_target, exit_price = True, open_p
-                elif low <= stop: hit_stop, exit_price = True, stop
-                elif high >= target: hit_target, exit_price = True, target
-            else: # SHORT
-                if open_p >= stop: hit_stop, exit_price = True, open_p
-                elif open_p <= target: hit_target, exit_price = True, open_p
-                elif high >= stop: hit_stop, exit_price = True, stop
-                elif low <= target: hit_target, exit_price = True, target
+                if direction == "LONG":
+                    if open_p <= stop: hit_stop, exit_price = True, open_p
+                    elif open_p >= target: hit_target, exit_price = True, open_p
+                    elif low <= stop: hit_stop, exit_price = True, stop
+                    elif high >= target: hit_target, exit_price = True, target
+                else: # SHORT
+                    if open_p >= stop: hit_stop, exit_price = True, open_p
+                    elif open_p <= target: hit_target, exit_price = True, open_p
+                    elif high >= stop: hit_stop, exit_price = True, stop
+                    elif low <= target: hit_target, exit_price = True, target
 
-            if hit_stop:
-                current_status = "STOP_LOSS"
-                outcome_ts = ts.to_pydatetime()
-                break
-            if hit_target:
-                current_status = "TARGET_HIT"
-                outcome_ts = ts.to_pydatetime()
-                break
+                if hit_stop:
+                    current_status = "STOP_LOSS"
+                    outcome_ts = ts.to_pydatetime()
+                    break
+                if hit_target:
+                    current_status = "TARGET_HIT"
+                    outcome_ts = ts.to_pydatetime()
+                    break
 
         # 2. Finalize Results
         if current_status in ["TARGET_HIT", "STOP_LOSS", "EXPIRED"]:
