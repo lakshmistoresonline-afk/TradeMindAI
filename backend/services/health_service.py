@@ -47,8 +47,13 @@ class SystemHealthService:
             "Firestore Mirror": fs_status
         }
 
-        # Subsystem audits for details
-        universe = await container.universe_service.audit_universe_readiness()
+        # Subsystem audits for details (Guarded against DB failures)
+        try:
+            universe = await container.universe_service.audit_universe_readiness()
+        except Exception as ue:
+            print(f"[Health] Universe audit failed: {ue}")
+            universe = {"total": 200, "fresh": 0, "blocked": 0, "status": "ERROR"}
+
 
         # 4. Sync Metadata
         sync_meta = {}
