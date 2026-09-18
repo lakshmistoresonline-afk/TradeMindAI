@@ -75,7 +75,7 @@ export default function AdminDashboard() {
                  <Grid container spacing={4}>
                     <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'BEAR'} color="#ef4444" />
                     <HeroStat label="STRATEGY" value="V2.2 FROZEN" color="#00D1FF" />
-                    <HeroStat label="ACTIVE SIGNALS" value={counts.total} color="#fff" />
+                    <HeroStat label="OPEN SIGNALS" value={counts.total} color="#fff" />
                     <HeroStat label="SYSTEM MODE" value="SHADOW" color="#00D1FF" />
                  </Grid>
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
@@ -230,7 +230,7 @@ export default function AdminDashboard() {
                   <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>SIGNAL FLOW</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
-                        <SidebarStat label="Total Active" value={counts.total} color="#00D1FF" />
+                        <SidebarStat label="Total Open" value={counts.total} color="#00D1FF" />
                         <SidebarStat label="Rejected (Gate)" value="0" color="#ef4444" />
                         <SidebarStat label="Wait for Sync" value="0" color="orange" />
                      </Stack>
