@@ -15,55 +15,51 @@ router = APIRouter()
 @router.get("/market-stats")
 @cache(expire=300)
 async def get_market_stats():
+    """
+    Hardened Market Index Fetcher (Institutional V2.2).
+    Fetches NIFTY 50, 100, 200 and VIX via authoritative yfinance bulk wrappers.
+    """
     from backend.services.market_data_service import MarketDataService
     market_state = await MarketDataService.get_market_state()
 
     indices = {
         "^NSEI": "NIFTY 50",
         "^CNX100": "NIFTY 100",
-        "^NSEBANK": "BANK NIFTY",
+        "^CNX200": "NIFTY 200",
         "^INDIAVIX": "India VIX"
     }
     stats = {}
 
-    stats["NIFTY 50"] = {"value": 0, "change": 0}
-    stats["India VIX"] = {"value": market_state.get("vix", 14.5), "change": 0}
+    # Initialize with default/cache values
+    for name in indices.values():
+        stats[name] = {"value": 0, "change": 0}
+
+    stats["India VIX"]["value"] = market_state.get("vix", 14.5)
 
     try:
-        session = requests.Session()
-        session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
+        # P0: Bulk download indices for atomic consistency
+        symbols = list(indices.keys())
+        data = yf.download(symbols, period="2d", interval="1d", group_by='ticker', progress=False)
 
-        for symbol, name in indices.items():
-            if name == "India VIX": continue
-
+        for sym, name in indices.items():
             try:
-                price, prev = 0.0, 0.0
-                r = session.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=5d", timeout=5)
-                if r.status_code == 200:
-                    data = r.json()
-                    chart = data['chart']['result'][0]
-                    closes = chart['indicators']['quote'][0]['close']
-                    valid_closes = [c for c in closes if c is not None]
-                    if valid_closes:
-                        price = valid_closes[-1]
-                        prev = valid_closes[-2] if len(valid_closes) > 1 else price
+                ticker_data = data[sym] if len(symbols) > 1 else data
+                if not ticker_data.empty and 'Close' in ticker_data.columns:
+                    valid_df = ticker_data.dropna(subset=['Close'])
+                    if len(valid_df) >= 1:
+                        curr = float(valid_df['Close'].iloc[-1])
+                        prev = float(valid_df['Close'].iloc[-2]) if len(valid_df) > 1 else curr
 
-                if price == 0:
-                    ticker = yf.Ticker(symbol, session=session)
-                    df = ticker.history(period="2d")
-                    if not df.empty:
-                        price = float(df["Close"].iloc[-1])
-                        prev = float(df["Close"].iloc[-2]) if len(df) > 1 else price
+                        stats[name] = {
+                            "value": round(curr, 2),
+                            "change": round(((curr - prev) / prev * 100), 2) if prev != 0 else 0.0
+                        }
+            except Exception as e:
+                print(f"   [!] Stats parsing error for {name}: {e}")
 
-                stats[name] = {
-                    "value": round(float(price), 2),
-                    "change": round(float(((price - prev) / prev) * 100), 2) if (prev and prev != 0) else 0.0
-                }
-            except:
-                stats[name] = {"value": 0, "change": 0}
-
+        return stats
+    except Exception as e:
+        print(f"[!] Global Market Stats Retrieval Failed: {e}")
         return stats
     except Exception as e:
         print(f"Global market stats error: {e}")

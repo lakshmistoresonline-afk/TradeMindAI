@@ -17,14 +17,19 @@ export default function UserDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [statsData, marketData, signalsData] = await Promise.all([
+      const results = await Promise.allSettled([
         getMarketStats(),
         getEquityMarketState(),
-        getEquitySignals({ limit: 20 })
+        getEquitySignals({ limit: 100 }) // Increased limit for better coverage across horizons
       ]);
+
+      const statsData = results[0].status === 'fulfilled' ? results[0].value : null;
+      const marketData = results[1].status === 'fulfilled' ? results[1].value : null;
+      const signalsData = results[2].status === 'fulfilled' ? (results[2].value || []) : [];
+
       setStats(statsData);
       setMarket(marketData);
-      setSignals((signalsData || []).map((s: any) => mapCanonicalSignal(s)));
+      setSignals(signalsData.map((s: any) => mapCanonicalSignal(s)));
     } catch (e) {
       console.error("Dashboard Fetch Failed:", e);
     } finally {
@@ -66,8 +71,8 @@ export default function UserDashboard() {
                   size="small"
                   sx={{
                     fontWeight: 950,
-                    bgcolor: market?.regime === 'BULL' ? alpha('#10b981', 0.1) : alpha('#ef4444', 0.1),
-                    color: market?.regime === 'BULL' ? '#10b981' : '#ef4444'
+                    bgcolor: market?.regime === 'BULL' ? alpha('#10b981', 0.1) : (market?.regime === 'BEAR' ? alpha('#ef4444', 0.1) : alpha('#00D1FF', 0.1)),
+                    color: market?.regime === 'BULL' ? '#10b981' : (market?.regime === 'BEAR' ? '#ef4444' : '#00D1FF')
                   }}
                />
             </Paper>
@@ -75,7 +80,9 @@ export default function UserDashboard() {
          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 2.5, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', height: '100%' }}>
                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1, display: 'block' }}>DATA FRESHNESS</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 800, color: '#10b981' }}>● LIVE FEED ACTIVE</Typography>
+               <Typography variant="body2" sx={{ fontWeight: 800, color: (market?.status === 'HEALTHY' || (stats?.['NIFTY 50']?.value > 0)) ? '#10b981' : 'orange' }}>
+                  { (market?.status === 'HEALTHY' || (stats?.['NIFTY 50']?.value > 0)) ? '● LIVE FEED ACTIVE' : '● FEED DEGRADED' }
+               </Typography>
             </Paper>
          </Grid>
       </Grid>
@@ -137,7 +144,7 @@ export default function UserDashboard() {
                     <Stack spacing={3}>
                         <InsightItem
                             title="NIFTY Structural State"
-                            desc={`The NIFTY-200 universe is currently in a ${market?.regime || 'SIDEWAYS'} regime with VIX at ${market?.vix || '—'}.`}
+                            desc={`The NIFTY-200 universe is currently in a ${market?.regime || 'SIDEWAYS'} regime with VIX at ${market?.vix?.toFixed(2) || '—'}.`}
                         />
                         <InsightItem
                             title="Momentum Alignment"
@@ -192,7 +199,8 @@ export default function UserDashboard() {
 }
 
 function MarketMiniCard({ label, data, value }: any) {
-    const val = value || data?.value || 0;
+    const rawVal = value || data?.value || 0;
+    const val = (rawVal === 0) ? '---' : rawVal;
     const change = data?.change || 0;
     const isPos = change >= 0;
 
@@ -201,7 +209,7 @@ function MarketMiniCard({ label, data, value }: any) {
             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1, display: 'block' }}>{label}</Typography>
             <Stack direction="row" spacing={1.5} alignItems="baseline">
                 <Typography sx={{ fontWeight: 950, fontSize: '1.2rem', fontFamily: 'JetBrains Mono' }}>{typeof val === 'number' ? val.toLocaleString() : val}</Typography>
-                {data && (
+                {data && rawVal !== 0 && (
                     <Typography sx={{ fontWeight: 900, fontSize: '0.75rem', color: isPos ? '#10b981' : '#ef4444' }}>
                         {isPos ? '+' : ''}{change}%
                     </Typography>

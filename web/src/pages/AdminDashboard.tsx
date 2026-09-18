@@ -73,7 +73,7 @@ export default function AdminDashboard() {
            <Grid item xs={12} md={8}>
               <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                  <Grid container spacing={4}>
-                    <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'BEAR'} color="#ef4444" />
+                    <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'SIDEWAYS'} color={marketState?.regime === 'BULL' ? '#10b981' : (marketState?.regime === 'BEAR' ? '#ef4444' : '#00D1FF')} />
                     <HeroStat label="STRATEGY" value="V2.2 FROZEN" color="#00D1FF" />
                     <HeroStat label="OPEN SIGNALS" value={counts.total} color="#fff" />
                     <HeroStat label="SYSTEM MODE" value="SHADOW" color="#00D1FF" />
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
          <MarketTickerItem label="NIFTY 50" data={marketStats?.['NIFTY 50']} />
          <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} />
          <MarketTickerItem label="NIFTY 200" data={marketStats?.['NIFTY 200']} />
-         <MarketTickerItem label="INDIA VIX" data={marketState?.vix ? { value: marketState.vix, change: 0 } : (marketStats?.['India VIX'] || null)} />
+         <MarketTickerItem label="INDIA VIX" data={(marketState?.vix && marketState.vix > 0) ? { value: marketState.vix, change: 0 } : (marketStats?.['India VIX'] || null)} />
       </Stack>
 
       <Grid container spacing={4}>
@@ -266,10 +266,11 @@ export default function AdminDashboard() {
 }
 
 function HeroStat({ label, value, color = '#fff' }: any) {
+   const displayValue = (value === 0 || value === '0') ? '---' : value;
    return (
       <Grid item xs={6} md={3}>
          <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, letterSpacing: 1, display: 'block', mb: 0.5 }}>{label}</Typography>
-         <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
+         <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{displayValue}</Typography>
       </Grid>
    );
 }
@@ -297,7 +298,8 @@ function SidebarStat({ label, value, color }: any) {
 
 function MarketTickerItem({ label, data, value }: any) {
   if (!data && !value) return <Skeleton width={120} height={40} />;
-  const val = value || data?.value || 0;
+  const rawVal = value || data?.value || 0;
+  const val = (rawVal === 0) ? '---' : rawVal;
   const change = data?.change || 0;
   const isPositive = change >= 0;
   return (
@@ -307,7 +309,7 @@ function MarketTickerItem({ label, data, value }: any) {
           <Typography sx={{ fontWeight: 900, fontSize: '1rem', fontFamily: 'JetBrains Mono', color: '#fff' }}>
              {typeof val === 'number' ? val.toLocaleString() : val}
           </Typography>
-          {data && (
+          {data && rawVal !== 0 && (
             <Typography sx={{ fontWeight: 900, fontSize: '0.7rem', color: isPositive ? '#10b981' : '#ef4444' }}>
                 {isPositive ? '+' : ''}{change}%
             </Typography>

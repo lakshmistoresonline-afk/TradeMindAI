@@ -57,8 +57,11 @@ class MarketDataService:
         Final Hardening: Single source of truth for Market Regime and VIX.
         """
         try:
-            # 1. Fetch VIX
+            # 1. Fetch VIX (Hardened for ^INDIAVIX)
             vix = await container.provider.get_ltp("INDIAVIX")
+            if not vix:
+                # Fallback check for ticker with hat
+                vix = await container.provider.get_ltp("^INDIAVIX")
 
             # 2. Fetch Index for Regime
             index_df = await container.provider.fetch_history("NIFTY", period="1y")
@@ -72,11 +75,11 @@ class MarketDataService:
             return {
                 "regime": regime_obj.regime,
                 "risk_mode": regime_obj.risk_mode,
-                "vix": vix or 14.5,
+                "vix": float(vix) if (vix and vix > 0) else 14.5,
                 "sentiment_score": regime_obj.sentiment_score,
                 "description": regime_obj.description,
                 "timestamp": datetime.datetime.utcnow().isoformat(),
-                "status": "HEALTHY" if vix else "DEGRADED"
+                "status": "HEALTHY" if (vix and vix > 0) else "DEGRADED"
             }
         except Exception as e:
             print(f"[MarketData] Regime detection failed: {e}")
