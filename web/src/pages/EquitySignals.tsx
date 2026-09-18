@@ -238,7 +238,7 @@ export default function EquitySignals() {
             {/* 3. Active Signal Summary */}
             <Grid container spacing={2} sx={{ mb: 4 }}>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="TOTAL ACTIVE" value={counts.all} color="#00D1FF" />
+                    <SummaryStat label="TOTAL OPEN" value={counts.all} color="#00D1FF" />
                 </Grid>
                 <Grid item xs={6} md={3}>
                     <SummaryStat label="SWING" value={counts.swing} color="#10b981" />

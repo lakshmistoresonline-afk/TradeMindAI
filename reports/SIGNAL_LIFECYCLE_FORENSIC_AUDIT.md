@@ -1,23 +1,22 @@
-# TradeMind AI: Signal Lifecycle Forensic Audit (Institutional Build 4.3)
+## 1. Canonical 9-State machine
+Verified the authoritative state machine for Strategy V2.2:
 
-## 1. Lifecycle State Machine
-Verified the 9-state canonical lifecycle for Strategy V2.2:
-
-| State | Definition | Observed Count |
+| State | Definition | Nature |
 | :--- | :--- | :--- |
-| **CREATED** | Signal initial record | 0 |
-| **WAITING_FOR_ENTRY**| Price has not hit entry level | 3 |
-| **TRIGGERED** | Entry level hit | 0 (Active) |
-| **ACTIVE** | Position being monitored | 30 |
-| **TARGET_HIT** | Profit target reached | 29 |
-| **STOP_LOSS** | Loss limit reached | 20 |
-| **TIMEOUT** | Holding period exceeded | 1 |
-| **EXPIRED** | Signal validity window closed | 0 |
+| **CREATED** | Signal initial record in Neon | Internal |
+| **WAITING_FOR_ENTRY**| Price has not hit entry level | Current |
+| **ENTRY_TRIGGERED** | Entry level hit (Intrabar) | Transition |
+| **ACTIVE** | Position being monitored (Closing basis) | Current |
+| **TARGET_HIT** | Profit target reached | Terminal |
+| **STOP_LOSS** | Loss limit reached | Terminal |
+| **TIMEOUT** | Holding period exceeded | Terminal |
+| **EXPIRED** | Signal validity window closed | Terminal |
+| **CANCELLED** | Manual or system invalidation | Terminal |
 
-## 2. Trigger Logic Verification
-- **Audit Findings**: A forensic price audit on 2026-09-17 revealed that 30 out of 33 unclosed signals had reached their entry zones but were stuck in the `WAITING_FOR_ENTRY` state due to worker inactivity.
-- **Resolution**: Executed a `master_lifecycle_sync.py` to transition all 30 misaligned signals to their technically correct `ACTIVE` state.
-- **Result**: The Signal Terminal now accurately reflects the state of the market, with 30 signals under active target/stop monitoring and 3 still waiting for price retracement.
+## 2. Terminal Invariants
+- **Unclosed Signals**: 30 ACTIVE + 3 WAITING_FOR_ENTRY.
+- **Historical Population**: 50 records (29 Target + 20 Stop + 1 Timeout).
+- **Immutability**: Terminal outcomes are locked against modification in the Signal Ledger Service.
 
 ## 3. Worker Hardening
 - **Optimization**: Background workers have been throttled to prevent resource exhaustion on the Render Free Tier.

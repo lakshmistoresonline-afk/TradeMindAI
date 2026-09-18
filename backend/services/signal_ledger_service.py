@@ -134,15 +134,16 @@ class SignalLedgerService:
     async def get_signal(signal_id: str) -> Optional[LiveSignal]:
         db = SessionLocal()
         try:
+            # 1. Check Live signals (Active)
             db_obj = db.query(LiveSignalDB).filter(LiveSignalDB.id == signal_id).first()
-            if not db_obj:
-                return None
+            if db_obj:
+                return container.ios_repo._map_db_to_live_signal(db_obj)
 
-            # Convert back to Domain model
-            data = {c.name: getattr(db_obj, c.name) for c in db_obj.__table__.columns}
-            if data.get("provenance"): data["provenance"] = json.loads(data["provenance"])
-            if data.get("events"): data["events"] = json.loads(data["events"])
+            # 2. Check Shadow signals (History)
+            db_obj_h = db.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()
+            if db_obj_h:
+                return container.ios_repo._map_db_to_live_signal(db_obj_h)
 
-            return LiveSignal(**data)
+            return None
         finally:
             db.close()

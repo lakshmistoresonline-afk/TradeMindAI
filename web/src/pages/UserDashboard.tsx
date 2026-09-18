@@ -56,7 +56,7 @@ export default function UserDashboard() {
             <MarketMiniCard label="NIFTY 50" data={stats?.['NIFTY 50']} />
          </Grid>
          <Grid item xs={12} md={3}>
-            <MarketMiniCard label="INDIA VIX" value={market?.vix} />
+            <MarketMiniCard label="INDIA VIX" value={market?.vix || (stats?.['India VIX']?.value)} />
          </Grid>
          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 2.5, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', height: '100%' }}>

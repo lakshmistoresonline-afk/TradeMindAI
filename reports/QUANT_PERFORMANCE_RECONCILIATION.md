@@ -3,11 +3,13 @@
 ## 1. Authoritative Denominator
 Verified population from Neon PostgreSQL authoritative Signal Ledger:
 
-| Metric | Value | Status |
+| Metric | Value | Population |
 | :--- | :--- | :--- |
-| **Total Historical Records** | 50 | Verified |
-| **Binary Resolved Outcomes** | 49 | (Wins + Losses) |
-| **Timeouts** | 1 | Excluded from WR |
+| **Total Historical Records** | 50 | Authoritative Neon Ledger |
+| **Binary Resolved Outcomes** | 49 | {TARGET_HIT, STOP_LOSS} subset |
+| **Timeouts** | 1 | Excluded from Win-Rate Denominator |
+| **WR Denominator** | **N=49** | (Wins + Losses) |
+| **Win Rate** | **59.18%** | 29 / 49 |
 
 ## 2. Realized Performance (N=49)
 | Performance Indicator | Value | Confidence |
