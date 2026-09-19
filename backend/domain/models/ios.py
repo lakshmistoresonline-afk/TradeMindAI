@@ -155,3 +155,27 @@ class MarketIntelligenceReport(BaseModel):
     top_movers: List[Dict[str, Any]]
     sector_performance: Dict[str, float]
     ai_bias: str
+
+class WorkspaceState(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    layout_config: Dict[str, Any] = {}
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ResearchNote(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    symbol: str
+    content: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class TradeFeedback(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    symbol: str
+    entry_date: datetime
+    exit_date: datetime
+    pnl: float
+    feedback: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
