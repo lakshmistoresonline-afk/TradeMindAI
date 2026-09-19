@@ -8,12 +8,14 @@ from backend.services.signal_ledger_service import SignalLedgerService
 from backend.services.signal_lifecycle_service import SignalLifecycleService
 from backend.services.research_metrics_service import ResearchMetricsService
 from backend.services.forensic_analytical_service import ForensicAnalyticalService
+from fastapi_cache.decorator import cache
 import datetime
 import json
 
 router = APIRouter()
 
 @router.get("/signals", response_model=List[LiveSignal])
+@cache(expire=60)
 async def get_equity_signals(
     status: Optional[str] = None,
     symbol: Optional[str] = None,
@@ -115,6 +117,7 @@ async def get_equity_performance():
         return ResearchMetricsService.calculate_performance_metrics(signals_data)
 
 @router.get("/market")
+@cache(expire=300)
 async def get_market_state():
     from backend.services.market_data_service import MarketDataService
     return await MarketDataService.get_market_state()

@@ -74,41 +74,40 @@ class MarketDataService:
     async def get_market_state() -> Dict[str, Any]:
         """
         Final Hardening: Single source of truth for Market Regime and VIX.
-        No fabricated data fallback (Phase 2 Hardening).
+        Optimized for performance with parallel bulk fetching (V2.3).
         """
         try:
-            # 1. Fetch VIX (Hardened for ^INDIAVIX)
-            vix = await container.provider.get_ltp("INDIAVIX")
-            if not vix:
-                # Fallback check for ticker with hat
-                vix = await container.provider.get_ltp("^INDIAVIX")
-
-            # 2. Fetch Index for Regime (Harden with YahooQuery for Resiliency)
+            # 1. Fetch Index & VIX in parallel using YahooQuery (Resilient Bulk)
             from yahooquery import Ticker as YQTicker
-            yq = YQTicker("^NSEI")
-            index_df = yq.history(period="1y")
+            yq = YQTicker("^NSEI ^INDIAVIX")
+            hist = yq.history(period="3mo") # Optimized for performance (50-60 bars needed)
 
-            if not index_df.empty:
-                # Normalize column names for engine
-                index_df = index_df.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
-                if isinstance(index_df.index, pd.MultiIndex):
-                    index_df = index_df.reset_index(level=0, drop=True)
+            if hist.empty:
+                return {
+                    "regime": "UNKNOWN", "risk_mode": "UNKNOWN", "vix": None,
+                    "status": "UNAVAILABLE", "timestamp": None
+                }
+
+            # 2. Extract Data
+            nifty_df = pd.DataFrame()
+            vix_val = None
+
+            if "^NSEI" in hist.index.get_level_values('symbol'):
+                nifty_df = hist.xs("^NSEI", level='symbol').rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
+
+            if "^INDIAVIX" in hist.index.get_level_values('symbol'):
+                vix_val = float(hist.xs("^INDIAVIX", level='symbol')['Close'].iloc[-1])
 
             # 3. Detect Regime
             from backend.services.ios.regime_engine import MarketRegimeEngine
 
-            vix_val = vix.get("price") if isinstance(vix, dict) else vix
-
-            if vix_val is None or vix_val <= 0 or index_df.empty:
+            if vix_val is None or vix_val <= 0 or nifty_df.empty:
                  return {
-                    "regime": "UNKNOWN",
-                    "risk_mode": "UNKNOWN",
-                    "vix": None,
-                    "status": "UNAVAILABLE",
-                    "timestamp": None # P0: No fake timestamps
+                    "regime": "UNKNOWN", "risk_mode": "UNKNOWN", "vix": vix_val,
+                    "status": "UNAVAILABLE", "timestamp": None
                 }
 
-            regime_obj = MarketRegimeEngine.detect_regime(index_df, float(vix_val))
+            regime_obj = MarketRegimeEngine.detect_regime(nifty_df, float(vix_val))
 
             return {
                 "regime": regime_obj.regime,
@@ -123,11 +122,8 @@ class MarketDataService:
         except Exception as e:
             print(f"[MarketData] Regime detection failed: {e}")
             return {
-                "regime": "ERROR",
-                "risk_mode": "ERROR",
-                "vix": None,
-                "status": "ERROR",
-                "error": "Market source connectivity failure.",
+                "regime": "ERROR", "risk_mode": "ERROR", "vix": None,
+                "status": "ERROR", "error": f"Internal connectivity error: {str(e)}",
                 "timestamp": None
             }
 

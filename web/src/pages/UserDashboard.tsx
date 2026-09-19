@@ -16,22 +16,22 @@ export default function UserDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
+
+    // 1. Kick off all requests in parallel
+    const marketStatsPromise = getMarketStats();
+    const marketStatePromise = getEquityMarketState();
+    const signalsPromise = getEquitySignals({ limit: 12 }); // Optimized limit for dashboard summary
+
+    // 2. Resolve market data first (usually faster and independent)
+    marketStatsPromise.then(data => setStats(data)).catch(e => console.error("Stats Error:", e));
+    marketStatePromise.then(data => setMarket(data)).catch(e => console.error("Market Error:", e));
+
+    // 3. Resolve signals and manage loading state
     try {
-      const results = await Promise.allSettled([
-        getMarketStats(),
-        getEquityMarketState(),
-        getEquitySignals({ limit: 100 }) // Increased limit for better coverage across horizons
-      ]);
-
-      const statsData = results[0].status === 'fulfilled' ? results[0].value : null;
-      const marketData = results[1].status === 'fulfilled' ? results[1].value : null;
-      const signalsData = results[2].status === 'fulfilled' ? (results[2].value || []) : [];
-
-      setStats(statsData);
-      setMarket(marketData);
-      setSignals(signalsData.map((s: any) => mapCanonicalSignal(s)));
+      const signalsData = await signalsPromise;
+      setSignals((signalsData || []).map((s: any) => mapCanonicalSignal(s)));
     } catch (e) {
-      console.error("Dashboard Fetch Failed:", e);
+      console.error("Dashboard Signals Fetch Failed:", e);
     } finally {
       setLoading(false);
     }
