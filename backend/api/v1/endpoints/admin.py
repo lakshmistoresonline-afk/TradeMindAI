@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends
 from backend.core.auth import get_current_user, get_current_admin
 from backend.core.container import container
 import datetime
+from datetime import timezone
+from backend.services.universe_service import UniverseService
+
 
 router = APIRouter()
 
@@ -32,6 +35,7 @@ async def get_data_health():
     try:
         stocks = session.query(StockDB).all()
         total = len(stocks)
+        universe_size = len(UniverseService.NIFTY_200_CONSTITUENTS)
 
         # High-fidelity completion check
         complete = len([s for s in stocks if s.last_price and s.analysis and s.options_data and s.financial_history and s.health_metrics])
@@ -39,7 +43,8 @@ async def get_data_health():
         ai_pending = len([s for s in stocks if s.ai_status == "PENDING"])
         ai_failed = len([s for s in stocks if s.ai_status == "FAILED"])
 
-        stale = len([s for s in stocks if s.updated_at and (datetime.datetime.utcnow() - s.updated_at).total_seconds() > 86400])
+        now = datetime.datetime.now(timezone.utc)
+        stale = len([s for s in stocks if s.updated_at and (now - (s.updated_at if s.updated_at.tzinfo else s.updated_at.replace(tzinfo=timezone.utc))).total_seconds() > 86400])
         partial = total - complete
 
         return {
@@ -48,17 +53,18 @@ async def get_data_health():
                 "complete_stocks": complete,
                 "partial_stocks": partial,
                 "stale_stocks": stale,
-                "unavailable_stocks": 100 - total if total < 100 else 0,
-                "fidelity_pct": (complete / 100 * 100) if total > 0 else 0,
+                "unavailable_stocks": universe_size - total if total < universe_size else 0,
+                "fidelity_pct": (complete / universe_size * 100) if universe_size > 0 else 0,
                 "freshness_pct": ((total - stale) / total * 100) if total > 0 else 0,
-                "universe_coverage_pct": (total / 100 * 100)
+                "universe_coverage_pct": (total / universe_size * 100) if universe_size > 0 else 0
             },
             "ai_health": {
                 "success": ai_success,
                 "pending": ai_pending,
                 "failed": ai_failed,
-                "completion_pct": (ai_success / 100 * 100) if total > 0 else 0
+                "completion_pct": (ai_success / universe_size * 100) if universe_size > 0 else 0
             },
+
             "services": {
                 "market_data": "HEALTHY",
                 "ai_engine": "HEALTHY",

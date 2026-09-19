@@ -123,6 +123,8 @@ class LiveSignal(BaseModel):
     last_reconciled_at: Optional[datetime] = None
     record_hash: Optional[str] = None
     data_quality_score: Optional[float] = None
+    deployment_sha: Optional[str] = None # Phase 3: Forensic Reconstruction
+
 
     # Legacy/Internal Compatibility
     rating: Optional[str] = None

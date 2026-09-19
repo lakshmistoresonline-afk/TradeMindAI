@@ -1,4 +1,5 @@
 import datetime
+from datetime import timezone
 from typing import Dict, Any, Optional
 
 class FreshnessPolicy:
@@ -15,12 +16,19 @@ class FreshnessPolicy:
             return "UNAVAILABLE"
 
         # Ensure UTC comparison
-        if timestamp.tzinfo:
-            now = datetime.datetime.now(datetime.timezone.utc)
-        else:
-            now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(timezone.utc)
 
-        age = (now - timestamp).total_seconds()
+        # Normalize timestamp to UTC if naive
+        if timestamp.tzinfo is None:
+            compare_ts = timestamp.replace(tzinfo=timezone.utc)
+        else:
+            compare_ts = timestamp
+
+        # Future timestamp detection (Phase 3 Integrity)
+        if compare_ts > now + datetime.timedelta(seconds=60):
+            return "INVALID_FUTURE"
+
+        age = (now - compare_ts).total_seconds()
 
         if age < cls.FRESH_THRESHOLD:
             return "FRESH"
@@ -28,19 +36,22 @@ class FreshnessPolicy:
             return "AGING"
         return "STALE"
 
+
     @classmethod
     def get_metadata(cls, timestamp: Optional[datetime.datetime]) -> Dict[str, Any]:
         status = cls.get_status(timestamp)
         if not timestamp:
             return {"status": status, "age_seconds": None}
 
-        if timestamp.tzinfo:
-            now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(timezone.utc)
+        if timestamp.tzinfo is None:
+            compare_ts = timestamp.replace(tzinfo=timezone.utc)
         else:
-            now = datetime.datetime.utcnow()
+            compare_ts = timestamp
 
         return {
             "status": status,
-            "age_seconds": (now - timestamp).total_seconds(),
-            "timestamp": timestamp.isoformat()
+            "age_seconds": (now - compare_ts).total_seconds(),
+            "timestamp": compare_ts.isoformat()
         }
+

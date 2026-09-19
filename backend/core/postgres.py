@@ -69,7 +69,8 @@ class StockDB(Base):
     fii_holding = Column(Float)
     dii_holding = Column(Float)
     public_holding = Column(Float)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     ai_investment_score = Column(Float)
     ai_investment_grade = Column(String)
     ai_status = Column(String, default="PENDING")
@@ -90,13 +91,15 @@ class StockDB(Base):
     universe_version = Column(String, default="NIFTY_200_AUG2026")
     data_freshness_status = Column(String) # FRESH, STALE, UNAVAILABLE
     missing_data_reason = Column(String)
-    ingestion_timestamp = Column(DateTime)
+    ingestion_timestamp = Column(DateTime(timezone=True)
+)
 
 class PriceDB(Base):
     __tablename__ = "historical_prices"
     id = Column(Integer, primary_key=True, index=True)
     symbol = Column(String, index=True)
-    date = Column(DateTime, index=True)
+    date = Column(DateTime(timezone=True)
+, index=True)
     open = Column(Float)
     high = Column(Float)
     low = Column(Float)
@@ -117,12 +120,14 @@ class FeatureDefinitionDB(Base):
     version = Column(String)
     dependencies = Column(String)
     lineage = Column(String)
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class RegimeDB(Base):
     __tablename__ = "market_regimes"
     id = Column(Integer, primary_key=True)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    date = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     regime = Column(String)
     risk_mode = Column(String)
     sentiment_score = Column(Float, default=0.5)
@@ -133,7 +138,8 @@ class PredictionDB(Base):
     __tablename__ = "predictions"
     id = Column(String, primary_key=True, index=True)
     symbol = Column(String, index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     model_version = Column(String)
     feature_version = Column(String)
     prediction = Column(String)
@@ -143,13 +149,15 @@ class PredictionDB(Base):
     confidence = Column(Float)
     regime = Column(String)
     metadata_json = Column(String) # JSON string
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class IntelReportDB(Base):
     __tablename__ = "intel_reports"
     id = Column(String, primary_key=True)
     type = Column(String)
-    date = Column(DateTime)
+    date = Column(DateTime(timezone=True)
+)
     summary = Column(String)
     key_events = Column(String) # JSON string
     ai_bias = Column(String)
@@ -161,7 +169,8 @@ class NewsDB(Base):
     title = Column(String)
     url = Column(String)
     source = Column(String)
-    published_at = Column(DateTime, index=True)
+    published_at = Column(DateTime(timezone=True)
+, index=True)
     content = Column(String)
     sentiment_label = Column(String)
     sentiment_score = Column(Float)
@@ -170,7 +179,8 @@ class EarningsDB(Base):
     __tablename__ = "earnings"
     id = Column(String, primary_key=True)
     symbol = Column(String, ForeignKey("stocks.symbol"), index=True)
-    date = Column(DateTime, index=True)
+    date = Column(DateTime(timezone=True)
+, index=True)
     eps_actual = Column(Float)
     eps_estimate = Column(Float)
     revenue_actual = Column(Float)
@@ -181,23 +191,28 @@ class OptionsChainDB(Base):
     __tablename__ = "options_chains"
     id = Column(String, primary_key=True)
     symbol = Column(String, index=True)
-    expiry = Column(DateTime, index=True)
+    expiry = Column(DateTime(timezone=True)
+, index=True)
     underlying_price = Column(Float)
     pcr = Column(Float)
     max_pain = Column(Float)
     total_oi = Column(BigInteger)
     iv_atm = Column(Float)
     greeks_aggregate = Column(String) # JSON string
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class MLDatasetDB(Base):
     __tablename__ = "ml_datasets"
     id = Column(String, primary_key=True)
     symbol = Column(String, index=True)
     version = Column(String)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
+    start_date = Column(DateTime(timezone=True)
+)
+    end_date = Column(DateTime(timezone=True)
+)
     split_ratio = Column(Float)
     features_included = Column(String) # JSON string
     storage_path = Column(String)
@@ -210,7 +225,8 @@ class OpportunityDB(Base):
     conviction_score = Column(Float)
     ai_thesis = Column(String)
     indicators = Column(String) # JSON string
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class LiveSignalDB(Base):
     __tablename__ = "live_signals"
@@ -228,15 +244,23 @@ class LiveSignalDB(Base):
     signal_version = Column(String, default="1.0")
 
     # Timing
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    signal_timestamp = Column(DateTime)
-    decision_timestamp = Column(DateTime)
-    data_timestamp = Column(DateTime)
-    feature_timestamp = Column(DateTime)
-    prediction_timestamp = Column(DateTime)
-    price_timestamp = Column(DateTime)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
+    signal_timestamp = Column(DateTime(timezone=True)
+)
+    decision_timestamp = Column(DateTime(timezone=True)
+)
+    data_timestamp = Column(DateTime(timezone=True)
+)
+    feature_timestamp = Column(DateTime(timezone=True)
+)
+    prediction_timestamp = Column(DateTime(timezone=True)
+)
+    price_timestamp = Column(DateTime(timezone=True)
+)
     timezone = Column(String, default="UTC")
-    timestamp = Column(DateTime) # Legacy alias
+    timestamp = Column(DateTime(timezone=True)
+) # Legacy alias
 
     # Trade Plan
     entry_price = Column(Float)
@@ -277,17 +301,22 @@ class LiveSignalDB(Base):
     provenance_id = Column(String, index=True)
     provenance = Column(String) # JSON string
     data_source = Column(String)
-    data_source_timestamp = Column(DateTime)
+    data_source_timestamp = Column(DateTime(timezone=True)
+)
     dataset_id = Column(String)
     dataset_hash = Column(String)
 
     # Lifecycle
     status = Column(String) # WAITING_FOR_ENTRY, ACTIVE, etc.
     lifecycle_state = Column(String)
-    activated_at = Column(DateTime)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    exit_at = Column(DateTime)
-    outcome_timestamp = Column(DateTime)
+    activated_at = Column(DateTime(timezone=True)
+)
+    updated_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    exit_at = Column(DateTime(timezone=True)
+)
+    outcome_timestamp = Column(DateTime(timezone=True)
+)
 
     # Outcome
     outcome = Column(String) # TARGET_HIT, STOP_LOSS, etc.
@@ -308,13 +337,17 @@ class LiveSignalDB(Base):
     price_status = Column(String) # Alias for current_price_status
     current_price_status = Column(String)
     current_price_source = Column(String)
-    current_price_timestamp = Column(DateTime)
+    current_price_timestamp = Column(DateTime(timezone=True)
+)
     data_quality_status = Column(String)
     validation_status = Column(String)
     audit_status = Column(String, default="PENDING")
-    last_reconciled_at = Column(DateTime)
+    last_reconciled_at = Column(DateTime(timezone=True)
+)
     record_hash = Column(String)
     data_quality_score = Column(Float)
+    deployment_sha = Column(String) # Phase 3: Forensic Reconstruction
+
 
     # Universal Price Tier
     underlying_price = Column(Float)
@@ -345,20 +378,25 @@ class LiveSignalDB(Base):
     underlying_symbol = Column(String(20))
     strike = Column(Float)
     option_type = Column(String(10))
-    expiry = Column(DateTime)
+    expiry = Column(DateTime(timezone=True)
+)
     lot_size = Column(Integer)
     rating = Column(String) # Legacy
     conviction = Column(Float) # Legacy
-    validated_at = Column(DateTime)
-    triggered_at = Column(DateTime)
+    validated_at = Column(DateTime(timezone=True)
+)
+    triggered_at = Column(DateTime(timezone=True)
+)
     trigger_price = Column(Float)
     trigger_condition = Column(String)
-    outcome_date = Column(DateTime)
+    outcome_date = Column(DateTime(timezone=True)
+)
 
 class ShadowSignalDB(Base):
     __tablename__ = "shadow_signals"
     id = Column(String, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     symbol = Column(String, index=True)
     direction = Column(String)
     asset_class = Column(String(20), default="EQUITY")
@@ -377,7 +415,8 @@ class ShadowSignalDB(Base):
     feature_version = Column(String)
     regime = Column(String)
     outcome = Column(String) # For legacy compatibility, redundant with status
-    outcome_timestamp = Column(DateTime)
+    outcome_timestamp = Column(DateTime(timezone=True)
+)
     exit_price = Column(Float)
     realized_return = Column(Float)
     realized_mfe = Column(Float)
@@ -386,8 +425,10 @@ class ShadowSignalDB(Base):
     slippage = Column(Float)
     net_return = Column(Float)
     exit_reason = Column(String)
-    data_timestamp = Column(DateTime)
-    market_timestamp = Column(DateTime)
+    data_timestamp = Column(DateTime(timezone=True)
+)
+    market_timestamp = Column(DateTime(timezone=True)
+)
     evaluation_mode = Column(String, default="LIVE_SHADOW", index=True)
     status = Column(String, default="ACTIVE", index=True)
     signal_eligibility = Column(String)
@@ -404,8 +445,10 @@ class ShadowSignalDB(Base):
     provenance_id = Column(String, index=True)
     run_id = Column(String, index=True)
     dataset_type = Column(String, index=True) # V2.2_VERIFIED_REFERENCE, V2.2_HISTORICAL_REPLAY, V2.2_CURRENT_SHADOW
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     # Ledger 2.0 Extensions
     asset_type = Column(String(20)) # EQUITY, DERIVATIVE
@@ -418,9 +461,11 @@ class ShadowSignalDB(Base):
     entry_zone_high = Column(Float)
     current_price = Column(Float)
     underlying_price = Column(Float)
-    underlying_price_timestamp = Column(DateTime)
+    underlying_price_timestamp = Column(DateTime(timezone=True)
+)
     price_adjustment_factor = Column(Float, default=1.0)
-    price_timestamp = Column(DateTime)
+    price_timestamp = Column(DateTime(timezone=True)
+)
     price_source = Column(String)
     price_status = Column(String)
 
@@ -428,19 +473,25 @@ class ShadowSignalDB(Base):
     derivative_symbol = Column(String(50))
     contract_multiplier = Column(Integer)
     strike = Column(Float)
-    expiry = Column(DateTime)
+    expiry = Column(DateTime(timezone=True)
+)
     option_type = Column(String(10))
     derivative_entry = Column(Float)
     derivative_current = Column(Float)
     derivative_target = Column(Float)
     derivative_stop = Column(Float)
-    premium_timestamp = Column(DateTime)
+    premium_timestamp = Column(DateTime(timezone=True)
+)
 
     # Timing Extensions
-    signal_timestamp = Column(DateTime)
-    last_updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    entry_timestamp = Column(DateTime)
-    exit_timestamp = Column(DateTime)
+    signal_timestamp = Column(DateTime(timezone=True)
+)
+    last_updated_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    entry_timestamp = Column(DateTime(timezone=True)
+)
+    exit_timestamp = Column(DateTime(timezone=True)
+)
 
     # Lifecycle Extensions
     lifecycle_state = Column(String(30)) # CREATED, ENTERED, TERMINAL
@@ -465,7 +516,8 @@ class ShadowSignalDB(Base):
     pnl_engine_version = Column(String, default="1.0")
     outcome_engine_version = Column(String, default="1.0")
     reconstruction_version = Column(String, default="1.0")
-    last_reconciled_at = Column(DateTime)
+    last_reconciled_at = Column(DateTime(timezone=True)
+)
     record_hash = Column(String)
     audit_status = Column(String, default="PENDING")
 
@@ -477,7 +529,8 @@ class SignalCorrectionDB(Base):
     old_value = Column(String)
     new_value = Column(String)
     reason = Column(String)
-    detected_at = Column(DateTime, default=datetime.datetime.utcnow)
+    detected_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     detected_by = Column(String)
     approved_by = Column(String)
     correction_version = Column(String)
@@ -488,8 +541,10 @@ class ShadowProvenanceDB(Base):
     id = Column(String, primary_key=True)
     signal_id = Column(String, index=True)
     prediction_id = Column(String, index=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    data_snapshot_timestamp = Column(DateTime)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
+    data_snapshot_timestamp = Column(DateTime(timezone=True)
+)
     model_version = Column(String)
     strategy_version = Column(String)
     feature_version = Column(String)
@@ -503,7 +558,8 @@ class ShadowEventDB(Base):
     __tablename__ = "shadow_events"
     id = Column(Integer, primary_key=True)
     signal_id = Column(String, index=True) # Optional link to a specific signal
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     event_type = Column(String, index=True) # EVALUATION, OUTCOME_RESOLUTION, GATE_FAILURE
     symbol = Column(String, index=True)
     strategy_version = Column(String)
@@ -511,15 +567,18 @@ class ShadowEventDB(Base):
     decision = Column(String) # TRADE_SIGNAL, NO_TRADE, etc.
     rejection_reason = Column(String)
     payload_json = Column(String) # For detailed parameters (EMA, ATR, Prob, etc.)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     evaluation_mode = Column(String, default="LIVE_SHADOW", index=True)
 
 class ShadowScanDiagnosticDB(Base):
     __tablename__ = "shadow_scan_diagnostics"
     id = Column(Integer, primary_key=True)
     symbol = Column(String, index=True)
-    scan_timestamp = Column(DateTime, default=datetime.datetime.utcnow)
-    market_data_timestamp = Column(DateTime)
+    scan_timestamp = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
+    market_data_timestamp = Column(DateTime(timezone=True)
+)
     data_age_hours = Column(Float)
     signal_score = Column(Float)
     threshold = Column(Float, default=0.52)
@@ -530,7 +589,8 @@ class ShadowScanDiagnosticDB(Base):
     model_version = Column(String)
     provider_name = Column(String)
     provider_latency_ms = Column(Integer)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class SectorMetricDB(Base):
     __tablename__ = "sector_metrics"
@@ -543,7 +603,8 @@ class SectorMetricDB(Base):
     volume_score = Column(Float)
     volatility = Column(Float)
     rank = Column(Integer)
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class InstitutionalMetricDB(Base):
     __tablename__ = "institutional_metrics"
@@ -554,7 +615,8 @@ class InstitutionalMetricDB(Base):
     dii_cumulative = Column(Float)
     sentiment_bias = Column(String) # BULLISH, BEARISH, NEUTRAL
     institutional_pressure = Column(Float) # -1.0 to 1.0
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class StockIntelligenceDB(Base):
     __tablename__ = "stock_intelligence"
@@ -572,13 +634,15 @@ class StockIntelligenceDB(Base):
     market_regime = Column(String)
     sector_regime = Column(String)
     composite_intelligence_score = Column(Float)
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class IntelligenceSynthesisDB(Base):
     __tablename__ = "intelligence_synthesis"
     id = Column(String, primary_key=True) # Usually signal_id or prediction_id
     symbol = Column(String, index=True)
-    timestamp = Column(DateTime, index=True)
+    timestamp = Column(DateTime(timezone=True)
+, index=True)
     market_context = Column(String) # JSON
     sector_context = Column(String) # JSON
     technical_context = Column(String) # JSON
@@ -611,7 +675,34 @@ class DailyMetricDB(Base):
     exposure = Column(Float)
     provider_reliability_pct = Column(Float)
     avg_latency_ms = Column(Integer)
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
+
+class PulseExecutionDB(Base):
+    __tablename__ = "pulse_executions"
+    execution_id = Column(String, primary_key=True)
+    started_at = Column(DateTime(timezone=True)
+, index=True)
+    finished_at = Column(DateTime(timezone=True)
+)
+    duration_ms = Column(Integer)
+    market_status = Column(String)
+    lock_acquired = Column(Boolean)
+    deployment_sha = Column(String)
+    signals_seen = Column(Integer)
+    signals_processed = Column(Integer)
+    signals_updated = Column(Integer)
+    signals_skipped = Column(Integer)
+    signals_failed = Column(Integer)
+    fresh_count = Column(Integer)
+    aging_count = Column(Integer)
+    stale_count = Column(Integer)
+    unavailable_count = Column(Integer)
+    lifecycle_transitions = Column(Integer)
+    error_count = Column(Integer)
+    last_error = Column(String)
+    status = Column(String) # COMPLETED, FAILED, TIMEOUT
+
 
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"
@@ -628,7 +719,8 @@ class ModelMetadataDB(Base):
     roc_auc = Column(Float)
     brier_score = Column(Float)
     is_champion = Column(Boolean, default=False)
-    last_trained = Column(DateTime, default=datetime.datetime.utcnow)
+    last_trained = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
     hyperparameters = Column(String) # JSON string
     feature_importances = Column(String) # JSON string
     calibration_metadata = Column(String) # JSON string
@@ -642,29 +734,35 @@ class InstrumentDB(Base):
     instrument_type = Column(String)
     groww_symbol = Column(String, index=True)
     underlying_symbol = Column(String)
-    expiry = Column(DateTime)
+    expiry = Column(DateTime(timezone=True)
+)
     strike = Column(Float)
     option_type = Column(String)
     lot_size = Column(Integer)
     tick_size = Column(Float)
     source = Column(String)
-    last_updated = Column(DateTime, default=datetime.datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class UserWatchlistDB(Base):
     __tablename__ = "user_watchlists"
     user_id = Column(String, primary_key=True)
     symbol = Column(String, primary_key=True)
-    added_at = Column(DateTime, default=datetime.datetime.utcnow)
+    added_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class UserSubscriptionDB(Base):
     __tablename__ = "user_subscriptions"
     user_id = Column(String, primary_key=True)
     plan_id = Column(String) # FREE, PRO, ALPHA
     status = Column(String) # ACTIVE, CANCELLED, EXPIRED
-    current_period_start = Column(DateTime)
-    current_period_end = Column(DateTime)
+    current_period_start = Column(DateTime(timezone=True)
+)
+    current_period_end = Column(DateTime(timezone=True)
+)
     provider_subscription_id = Column(String)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 class UserReferralDB(Base):
     __tablename__ = "user_referrals"
@@ -673,7 +771,8 @@ class UserReferralDB(Base):
     referred_email = Column(String, unique=True)
     status = Column(String) # SENT, REGISTERED, CONVERTED
     reward_earned = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime(timezone=True)
+, default=datetime.datetime.utcnow)
 
 from sqlalchemy import event
 from .config import settings

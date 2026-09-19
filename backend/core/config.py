@@ -1,4 +1,6 @@
+import os
 from typing import List, Union, Optional
+
 from pydantic import AnyHttpUrl, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -67,7 +69,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
+    # Production Identity (Phase 3)
+    GIT_SHA: str = os.getenv("RENDER_GIT_COMMIT", "LOCAL_HEAD")
+
     # FINAL DELIVERY HARDENING: Admin Security
+
     ADMIN_EMAILS: List[str] = ["admin@trademind.ai", "admin@trademindai.com", "lakshmistoresonline@gmail.com"]
 
     model_config = SettingsConfigDict(case_sensitive=True, env_file=".env", extra="ignore")

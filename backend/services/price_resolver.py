@@ -1,5 +1,7 @@
 import datetime
+from datetime import timezone
 import pandas as pd
+
 from typing import Dict, Any, Optional, List
 from backend.core.container import container
 from backend.domain.models.ios import LiveSignal
@@ -96,11 +98,12 @@ class PriceResolver:
             "current_price": None,
             "underlying_price": None,
             "normalized_current_price": None,
-            "timestamp": datetime.datetime.utcnow(),
+            "timestamp": datetime.datetime.now(timezone.utc),
             "source": "FAILOVER_EXHAUSTED",
             "status": "DATA_UNAVAILABLE",
             "eligibility": "DATA_BLOCKED"
         }
+
 
     @staticmethod
     async def _try_resolve_with_provider(signal: LiveSignal, provider_code: str) -> Dict[str, Any]:
@@ -140,12 +143,13 @@ class PriceResolver:
 
         # Resolve
         instr_id = signal.instrument_id or signal.symbol
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(timezone.utc)
 
         try:
             # Fetch LTP
             u_sym = signal.underlying_symbol or signal.symbol
             u_price = await provider.get_ltp(u_sym)
+
 
             if asset_class in ["EQUITY", "INDEX"]:
                 price = u_price

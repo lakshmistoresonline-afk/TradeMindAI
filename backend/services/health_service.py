@@ -3,6 +3,8 @@ import asyncio
 from typing import Dict, Any
 from backend.core.container import container
 from backend.services.freeze_verification_service import V22FreezeVerificationService
+from backend.services.pulse_watchdog import PulseWatchdog
+
 
 class SystemHealthService:
     """
@@ -34,18 +36,19 @@ class SystemHealthService:
         if not db_client: fs_status = "UNAVAILABLE"
 
         components = {
-            "API": "HEALTHY",
-            "Database": db_status,
-            "Market Data": md_status,
-            "Historical Data": "HEALTHY",
-            "Feature Engine": "HEALTHY",
-            "Model Registry": "HEALTHY",
-            "V2.2 Engine": "HEALTHY" if freeze_status["status"] == "PASS" else "FAILED",
-            "Signal Engine": "HEALTHY",
-            "Outcome Engine": "HEALTHY",
-            "Research Engine": "HEALTHY",
-            "Firestore Mirror": fs_status
+            "API": "UP",
+            "Database": "UP" if db_status == "HEALTHY" else "DOWN",
+            "Market Data": "UP" if md_status == "HEALTHY" else "DEGRADED",
+            "Historical Data": "NOT_CHECKED",
+            "Feature Engine": "NOT_CHECKED",
+            "Model Registry": "NOT_CHECKED",
+            "V2.2 Engine": "UP" if freeze_status["status"] == "PASS" else "FAILED",
+            "Signal Engine": "UP", # Basic status for now
+            "Outcome Engine": "UP",
+            "Research Engine": "NOT_CHECKED",
+            "Firestore Mirror": "UP" if fs_status == "HEALTHY" else fs_status
         }
+
 
         # Subsystem audits for details (Guarded against DB failures)
         try:
@@ -62,16 +65,27 @@ class SystemHealthService:
                 sync_doc = db_client.collection("system_metrics").document("last_price_sync").get()
                 if sync_doc.exists:
                     sync_meta = sync_doc.to_dict()
-            except: pass
+            except Exception as e:
+                print(f"[Health] Firestore sync metadata fetch failed: {e}")
 
         from backend.core.version import get_version_metadata
 
-        return {
-            "status": "HEALTHY" if all(v == "HEALTHY" for v in components.values()) else "DEGRADED",
-            **get_version_metadata(),
-            "components": components,
-            "freeze_report": freeze_status,
+        # Calculate actual sector mapping (Phase 3 Truth)
+        try:
+            mapped_count = 0
+            with container.repository.session_factory() as db:
+                from backend.core.postgres import StockDB
+                mapped_count = db.query(StockDB).filter(StockDB.sector != "Unknown", StockDB.sector.isnot(None)).count()
+        except:
+            mapped_count = 0
 
+        return {
+            "status": "HEALTHY" if all(v in ["UP", "HEALTHY", "NOT_CHECKED"] for v in components.values()) else "DEGRADED",
+            **get_version_metadata(),
+            "pulse_watchdog": PulseWatchdog.get_status(),
+            "components": components,
+
+            "freeze_report": freeze_status,
             "universe": {
                 "total": universe["total"],
                 "fresh": universe["fresh"],
@@ -80,9 +94,10 @@ class SystemHealthService:
             },
             "sector": {
                 "total": universe["total"],
-                "mapped": 37, # Authoritative from Phase 6.1 population
-                "coverage_pct": round(37 / universe["total"] * 100, 1) if universe["total"] > 0 else 0
+                "mapped": mapped_count,
+                "coverage_pct": round(mapped_count / universe["total"] * 100, 1) if universe["total"] > 0 else 0
             },
             "market_state": market_data,
             "last_price_sync": sync_meta
         }
+

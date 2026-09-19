@@ -3,9 +3,12 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from typing import List
+from datetime import timezone
 from backend.api.v1.api import api_router
 from backend.core.config import settings
+from backend.core.version import APP_VERSION, get_version_metadata
 from fastapi_cache import FastAPICache
+
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 import datetime
@@ -15,11 +18,12 @@ import asyncio
 import uuid
 
 app = FastAPI(
-    title="TradeMind AI MASTER 4.5.40A",
-    description="Institutional AI Investment Operating System API.",
-    version="2.0.0-RC5.8",
+    title="TradeMind AI Institutional OS",
+    description="Deterministic Signal Intelligence & Forensic Verification API.",
+    version=APP_VERSION,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
+
 
 background_tasks = set()
 
@@ -146,7 +150,8 @@ async def readiness():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "timestamp": datetime.datetime.utcnow().isoformat()}
+    return {"status": "healthy", "timestamp": datetime.datetime.now(timezone.utc).isoformat()}
+
 
 app.add_middleware(
     CORSMiddleware,

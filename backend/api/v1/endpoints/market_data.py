@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, Security
 from fastapi.security import APIKeyHeader
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+import datetime
+from datetime import timezone
+
+
 from backend.core.postgres import SessionLocal, StockDB, ShadowSignalDB
 from sqlalchemy import text
 import json
@@ -51,7 +54,8 @@ async def ingest_market_data(payload: List[Dict[str, Any]], collector_key: str =
                 stock = session.query(StockDB).filter(StockDB.symbol == symbol).first()
                 if stock:
                     stock.last_price = float(price)
-                    stock.updated_at = datetime.fromisoformat(ts_str) if ts_str else datetime.utcnow()
+                    stock.updated_at = datetime.fromisoformat(ts_str) if ts_str else datetime.now(timezone.utc)
+
                     processed += 1
 
                 # Note: For signals, they resolve price via PriceResolver which now
@@ -76,12 +80,15 @@ async def get_market_data_status():
     """
     with SessionLocal() as session:
         total = session.query(StockDB).count()
-        fresh = session.query(StockDB).filter(StockDB.updated_at > datetime.utcnow() - datetime.timedelta(minutes=15)).count()
+        now = datetime.now(timezone.utc)
+        fresh = session.query(StockDB).filter(StockDB.updated_at > now - datetime.timedelta(minutes=15)).count()
 
     return {
-        "fabric_version": "v1.0.0",
+        "fabric_version": "v1.1.0", # Phase 3 Identity
         "source": "NSE_OPEN_DATA_GATEWAY",
         "total_universe": total,
         "fresh_count": fresh,
-        "freshness_pct": (fresh / total * 100) if total > 0 else 0
+        "freshness_pct": (fresh / total * 100) if total > 0 else 0,
+        "server_time": now.isoformat()
     }
+

@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Optional
 import datetime
+from datetime import timezone
 import uuid
+
 import json
 import hashlib
 from backend.domain.models.ios import LiveSignal, SignalEvent
@@ -31,7 +33,8 @@ class SignalEngine:
         Vision 2.2: Fully Time-Aware for Historical Replay.
         """
         # Execution time context
-        eval_time = evaluation_timestamp or datetime.datetime.utcnow()
+        eval_time = evaluation_timestamp or datetime.datetime.now(timezone.utc)
+
 
         # 1. Fetch Fresh Data (if not provided)
         if stock is None:
@@ -239,8 +242,9 @@ class SignalEngine:
             confidence=float(calibrated_prob),
             regime=regime_label,
             metadata=diag_provenance,
-            created_at=datetime.datetime.utcnow()
+            created_at=datetime.datetime.now(timezone.utc)
         )
+
         await container.data_platform_repo.save_prediction(prediction_obj)
 
         # 11.7 Generate Provenance Record (Workstream 9)
@@ -342,13 +346,15 @@ class SignalEngine:
             status="WAITING_FOR_ENTRY",
             lifecycle_state="CREATED",
             activated_at=eval_time,
-            updated_at=datetime.datetime.utcnow(),
+            updated_at=datetime.datetime.now(timezone.utc),
 
             # Quality
             quality_class=quality_class,
             data_quality_status="FRESH" if staleness < 24 else "STALE",
             validation_status="CERTIFIED",
             audit_status="PENDING",
+            deployment_sha=settings.GIT_SHA, # Phase 3: Forensic Reconstruction
+
 
             # Legacy/Internal
             rating="BUY" if direction == "LONG" else "SELL",

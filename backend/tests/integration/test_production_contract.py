@@ -36,6 +36,51 @@ def test_market_stats_contract():
         assert "NIFTY 50" in data
         assert "India VIX" in data
 
+        # Phase 3 Hardening: Truthful nulls check
+        # (Assuming test env might not have credentials, so stats should be UNAVAILABLE)
+        for name in ["NIFTY 50", "India VIX"]:
+            assert "status" in data[name]
+            if data[name]["status"] == "UNAVAILABLE":
+                assert data[name]["value"] is None
+
+def test_negative_security_missing_secret():
+    """P0: Production mode requires SECRET_KEY."""
+    import os
+    from backend.core.config import Settings
+
+    # Mock production environment
+    os.environ["ENVIRONMENT"] = "production"
+    os.environ["SECRET_KEY"] = "SECRET" # The forbidden default
+
+    with pytest.raises(Exception):
+        Settings()
+
+    # Cleanup
+    os.environ["ENVIRONMENT"] = "development"
+    os.environ["SECRET_KEY"] = "SECRET"
+
+def test_negative_ingest_bad_key():
+    """P0: Ingestion fails with wrong key."""
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/market-data/ingest",
+            json=[{"symbol": "RELIANCE", "price": 2500}],
+            headers={"X-Collector-Key": "wrong-key"}
+        )
+        assert response.status_code == 403
+
+def test_deep_health_contract():
+    """P1: Deep health model truth check."""
+    with TestClient(app) as client:
+        response = client.get("/api/v1/system/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert "pulse_watchdog" in data
+        assert "components" in data
+        # Historical Data should be NOT_CHECKED if not actually implemented check
+        assert data["components"]["Historical Data"] == "NOT_CHECKED"
+
+
 
 def test_signals_contract():
     """Verify primary signal intelligence endpoint."""

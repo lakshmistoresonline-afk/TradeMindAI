@@ -1,5 +1,7 @@
 import datetime
+from datetime import timezone
 import uuid
+
 import json
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
@@ -70,8 +72,10 @@ class SignalLedgerService:
                     try:
                         mirror_data = signal.model_dump()
                         # Add mirror metadata
-                        mirror_data["mirrored_at"] = datetime.datetime.utcnow()
+                        # Add mirror metadata
+                        mirror_data["mirrored_at"] = datetime.datetime.now(timezone.utc)
                         mirror_data["source_neon_id"] = signal.id
+
 
                         db_client.collection("signals").document(signal.id).set(mirror_data)
                     except Exception as e:
@@ -99,15 +103,23 @@ class SignalLedgerService:
             if not db_obj:
                 return False
 
-            # 1. Immutability Protection (Phase 11)
-            TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED"]
+            # 1. Immutability Protection (Phase 3 Final Truth Lock)
+            TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED", "AMBIGUOUS"]
             if db_obj.status in TERMINAL_STATES:
                 # Only allow updating metadata or events, not core levels or outcomes
-                RESTRICTED_FIELDS = ["entry_price", "target_price", "stop_price", "direction", "profit_pct", "status", "outcome_date"]
+                RESTRICTED_FIELDS = [
+                    "symbol", "direction", "asset_class", "instrument_id",
+                    "entry_price", "target_price", "stop_price", "profit_pct",
+                    "status", "outcome_date", "exit_price", "realized_return",
+                    "decision_timestamp", "strategy_version", "signal_version",
+                    "model_id", "model_version", "model_hash", "feature_version",
+                    "feature_hash", "prediction_id", "provenance_id", "decision_hash"
+                ]
                 for key in updates:
                     if key in RESTRICTED_FIELDS:
-                        print(f"[SignalLedger] Update BLOCKED: Signal {signal_id} is in terminal state {db_obj.status}")
+                        print(f"[SignalLedger] Update BLOCKED: Signal {signal_id} is in terminal state {db_obj.status}. Cannot mutate immutable fact: {key}")
                         return False
+
 
             for key, value in updates.items():
                 if hasattr(db_obj, key):
@@ -116,8 +128,9 @@ class SignalLedgerService:
                     else:
                         setattr(db_obj, key, value)
 
-            db_obj.updated_at = datetime.datetime.utcnow()
+            db_obj.updated_at = datetime.datetime.now(timezone.utc)
             db.commit()
+
 
             # Mirror to Firestore (P1 Hardening: Run in thread to avoid blocking loop)
             if db_client:

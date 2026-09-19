@@ -10,7 +10,8 @@ class OutcomeService:
     Handles terminal state evaluation for both Live and Replay.
     """
 
-    TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED", "TIMEOUT"]
+    TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED", "TIMEOUT", "AMBIGUOUS"]
+
 
     @staticmethod
     def evaluate_signal_outcome(
@@ -79,13 +80,37 @@ class OutcomeService:
                 if direction == "LONG":
                     if open_p <= stop: hit_stop, exit_price = True, open_p
                     elif open_p >= target: hit_target, exit_price = True, open_p
-                    elif low <= stop: hit_stop, exit_price = True, stop
-                    elif high >= target: hit_target, exit_price = True, target
+                    else:
+                        # P0: Check for same-bar ambiguity
+                        low_hit = low <= stop
+                        high_hit = high >= target
+
+                        if low_hit and high_hit:
+                            current_status = "AMBIGUOUS"
+                            outcome_ts = ts.to_pydatetime()
+                            exit_price = None # Cannot determine exit price
+                            break
+                        elif low_hit:
+                            hit_stop, exit_price = True, stop
+                        elif high_hit:
+                            hit_target, exit_price = True, target
                 else: # SHORT
                     if open_p >= stop: hit_stop, exit_price = True, open_p
                     elif open_p <= target: hit_target, exit_price = True, open_p
-                    elif high >= stop: hit_stop, exit_price = True, stop
-                    elif low <= target: hit_target, exit_price = True, target
+                    else:
+                        # P0: Check for same-bar ambiguity
+                        high_hit = high >= stop
+                        low_hit = low <= target
+
+                        if high_hit and low_hit:
+                            current_status = "AMBIGUOUS"
+                            outcome_ts = ts.to_pydatetime()
+                            exit_price = None
+                            break
+                        elif high_hit:
+                            hit_stop, exit_price = True, stop
+                        elif low_hit:
+                            hit_target, exit_price = True, target
 
                 if hit_stop:
                     current_status = "STOP_LOSS"
@@ -97,8 +122,18 @@ class OutcomeService:
                     break
 
         # 2. Finalize Results
-        if current_status in ["TARGET_HIT", "STOP_LOSS", "EXPIRED"]:
+        if current_status in ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "AMBIGUOUS"]:
+            if current_status == "AMBIGUOUS":
+                return {
+                    "status": "AMBIGUOUS",
+                    "outcome_date": outcome_ts,
+                    "exit_price": None,
+                    "outcome_verified": True,
+                    "exit_reason": "SAME_BAR_AMBIGUITY"
+                }
+
             pnl_results = PnlService.calculate_trade_pnl(
+
                 entry_price=entry,
                 exit_price=exit_price,
                 direction=direction,

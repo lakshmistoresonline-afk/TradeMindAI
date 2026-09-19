@@ -1,5 +1,7 @@
 import datetime
+from datetime import timezone
 from typing import Dict, Any, List, Optional
+
 from backend.domain.models.ios import LiveSignal, SignalEvent
 from backend.services.outcome_service import OutcomeService
 from backend.services.signal_ledger_service import SignalLedgerService
@@ -15,12 +17,13 @@ class SignalLifecycleService:
         "CREATED": ["ACTIVE", "WAITING_FOR_ENTRY", "CANCELLED"],
         "WAITING_FOR_ENTRY": ["ACTIVE", "ENTRY_TRIGGERED", "CANCELLED", "EXPIRED"],
         "ENTRY_TRIGGERED": ["ACTIVE", "CANCELLED"],
-        "ACTIVE": ["TARGET_HIT", "STOP_LOSS", "TIMEOUT", "EXPIRED", "CANCELLED"],
+        "ACTIVE": ["TARGET_HIT", "STOP_LOSS", "TIMEOUT", "EXPIRED", "CANCELLED", "AMBIGUOUS"],
         "TARGET_HIT": [],
         "STOP_LOSS": [],
         "EXPIRED": [],
         "CANCELLED": [],
-        "TIMEOUT": []
+        "TIMEOUT": [],
+        "AMBIGUOUS": []
     }
 
     @staticmethod
@@ -36,11 +39,12 @@ class SignalLifecycleService:
 
         full_updates = updates or {}
         full_updates["status"] = new_status
-        full_updates["updated_at"] = datetime.datetime.utcnow()
+        full_updates["updated_at"] = datetime.datetime.now(timezone.utc)
 
         if new_status in OutcomeService.TERMINAL_STATES:
             full_updates["lifecycle_state"] = "TERMINAL"
-            full_updates["exit_at"] = datetime.datetime.utcnow()
+            full_updates["exit_at"] = datetime.datetime.now(timezone.utc)
+
 
         return await SignalLedgerService.update_signal(signal_id, full_updates)
 

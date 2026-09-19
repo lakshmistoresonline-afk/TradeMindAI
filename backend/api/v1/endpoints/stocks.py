@@ -32,11 +32,12 @@ async def get_market_stats():
     }
     stats = {}
 
-    # Initialize with default/cache values
+    # Initialize with truthful nulls (Phase 3 Hardening)
     for name in indices.values():
-        stats[name] = {"value": 0, "change": 0}
+        stats[name] = {"value": None, "change": None, "status": "UNAVAILABLE"}
 
-    stats["India VIX"]["value"] = market_state.get("vix", 14.5)
+    stats["India VIX"]["value"] = market_state.get("vix")
+    stats["India VIX"]["status"] = market_state.get("status", "UNAVAILABLE")
 
     try:
         # P0 Hardening: Use YahooQuery for more resilient bulk fetching
@@ -53,26 +54,30 @@ async def get_market_stats():
                             valid_df = ticker_data.dropna(subset=['close'])
                             if len(valid_df) >= 1:
                                 curr = float(valid_df['close'].iloc[-1])
-                                prev = float(valid_df['close'].iloc[-2]) if len(valid_df) > 1 else curr
+                                prev = float(valid_df['close'].iloc[-2]) if len(valid_df) > 1 else None
 
                                 stats[name] = {
                                     "value": round(curr, 2),
-                                    "change": round(((curr - prev) / prev * 100), 2) if prev != 0 else 0.0
+                                    "change": round(((curr - prev) / prev * 100), 2) if prev else None,
+                                    "status": "HEALTHY"
                                 }
                 except Exception as e:
                     print(f"   [!] YahooQuery parsing error for {name}: {e}")
 
-        # Final sanity check: if NIFTY is still 0, try yfinance as a last resort
-        if stats["NIFTY 50"]["value"] == 0:
-            print("[*] NIFTY 0 via YahooQuery, attempting yfinance fallback...")
+
+        # Final sanity check: if NIFTY is still UNAVAILABLE, try yfinance as a last resort
+        if stats["NIFTY 50"]["status"] == "UNAVAILABLE":
+            print("[*] NIFTY UNAVAILABLE via YahooQuery, attempting yfinance fallback...")
             y_data = yf.download("^NSEI", period="2d", interval="1d", progress=False)
             if not y_data.empty:
                 curr = float(y_data['Close'].iloc[-1])
-                prev = float(y_data['Close'].iloc[-2]) if len(y_data) > 1 else curr
+                prev = float(y_data['Close'].iloc[-2]) if len(y_data) > 1 else None
                 stats["NIFTY 50"] = {
                     "value": round(curr, 2),
-                    "change": round(((curr - prev) / prev * 100), 2) if prev != 0 else 0.0
+                    "change": round(((curr - prev) / prev * 100), 2) if prev else None,
+                    "status": "HEALTHY"
                 }
+
 
         return stats
     except Exception as e:
