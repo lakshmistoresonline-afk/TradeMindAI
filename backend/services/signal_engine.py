@@ -188,10 +188,24 @@ class SignalEngine:
             eligibility = "DATA_BLOCKED"
 
         # 10.5 Production Publication Gate (Institutional 4.0)
-        validation = SignalValidatorService.validate_publication(LiveSignal(**signal_dict_pre)) # Mock instantiation for check
+        signal_dict_pre = {
+            "id": f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}",
+            "symbol": symbol,
+            "direction": direction,
+            "timeframe": timeframe,
+            "entry_price": price,
+            "target_price": risk_params["target"],
+            "stop_price": risk_params["stop_loss"],
+            "conviction": float(calibrated_prob * 100),
+            "data_timestamp": data_ts,
+            "provenance_id": provenance_id
+        }
+
+        validation = SignalValidatorService.validate_publication(LiveSignal(**signal_dict_pre))
         if not validation["is_valid"]:
             print(f"   [GATE_REJECTED] {symbol} failed publication audit: {validation['issues']}")
             return None
+
 
         # 11. Construct Canonical Signal
         sig_id = f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}"

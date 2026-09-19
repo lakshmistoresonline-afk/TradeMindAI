@@ -50,15 +50,11 @@ class SystemHealthService:
         }
 
 
-        # Subsystem audits for details (Guarded against DB failures)
-        try:
-            universe = await container.universe_service.audit_universe_readiness()
-        except Exception as ue:
-            print(f"[Health] Universe audit failed: {ue}")
-            universe = {"total": 200, "fresh": 0, "blocked": 0, "status": "ERROR"}
-
+        # Subsystem audits for details (P1: Light-weight metadata only for deep health)
+        universe = {"total": 200, "fresh": 0, "blocked": 0, "status": "NOT_CHECKED"}
 
         # 4. Sync Metadata
+
         sync_meta = {}
         if db_client:
             try:
