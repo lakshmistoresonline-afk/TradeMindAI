@@ -123,6 +123,7 @@ async def readiness():
     """
     Ready: required dependencies available.
     """
+    from sqlalchemy import text
     status = {"status": "ready", "dependencies": {}}
 
     # 1. Database
@@ -173,13 +174,13 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    print(f"CRITICAL ERROR [{request.method} {request.url.path}]: {traceback.format_exc()}")
+    error_id = str(uuid.uuid4())
+    print(f"CRITICAL ERROR [{error_id}] [{request.method} {request.url.path}]: {traceback.format_exc()}")
     return JSONResponse(
         status_code=500,
         content={
             "detail": "Internal server error.",
-            "type": exc.__class__.__name__,
-            "request_id": str(uuid.uuid4()) # Added for P0 observability
+            "request_id": error_id
         },
     )
 

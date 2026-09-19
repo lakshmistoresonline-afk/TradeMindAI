@@ -1,19 +1,21 @@
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timezone
+from typing import Any, Optional
 from backend.domain.models.ios import MarketRegime
 
 class MarketRegimeEngine:
     @staticmethod
-    def detect_regime(nifty_df: Any, vix_value: float) -> MarketRegime:
+    def detect_regime(nifty_df: Any, vix_value: Optional[float]) -> MarketRegime:
         """
-        Institutional Market Regime Detection logic.
-        Uses Nifty 50 returns and India VIX.
+        Institutional Market Regime Detection logic (Phase 4 Hardening).
+        Uses Nifty 50 returns and India VIX. Fails closed on missing data.
         """
-        if nifty_df is None or len(nifty_df) < 50: # Need at least 50 days for rolling mean
+        now = datetime.now(timezone.utc)
+
+        if nifty_df is None or len(nifty_df) < 50 or vix_value is None or vix_value <= 0:
             return MarketRegime(
-                date=datetime.utcnow(), regime="SIDEWAYS", risk_mode="RISK_OFF",
-                sentiment_score=0.5, volatility_index=vix_value,
-                description="Insufficient benchmark data to detect regime. Defaulting to SIDEWAYS."
+                date=now, regime="UNKNOWN", risk_mode="UNKNOWN",
+                sentiment_score=0.0, volatility_index=vix_value or 0.0,
+                description="Insufficient evidence to determine market regime."
             )
 
         import pandas as pd
@@ -22,6 +24,7 @@ class MarketRegimeEngine:
         returns = nifty_df["Close"].pct_change().tail(20) # Last 20 days
         avg_return = returns.mean()
         volatility = returns.std()
+
 
         # 1. Regime Logic
         regime = "SIDEWAYS"

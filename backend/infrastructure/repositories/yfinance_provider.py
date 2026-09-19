@@ -170,11 +170,19 @@ class YFinanceProvider(IMarketDataProvider, INewsProvider, IInstitutionalDataPro
             ))
         return prices
 
-    async def get_ltp(self, symbol: str) -> Optional[float]:
-        df = self._get_history_yq(symbol, period="1d")
+    async def get_ltp(self, symbol: str) -> Dict[str, Any]:
+        df = await self.fetch_history(symbol, period="1d")
         if not df.empty:
-            return float(df["Close"].iloc[-1])
-        return None
+            price = float(df["Close"].iloc[-1])
+            ts = df.index[-1]
+            if hasattr(ts, 'to_pydatetime'):
+                ts = ts.to_pydatetime()
+            # Ensure it has TZ info
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=datetime.timezone.utc)
+            return {"price": price, "timestamp": ts}
+        return {"price": None, "timestamp": None}
+
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
         return await self.fetch_stock_info(symbol)

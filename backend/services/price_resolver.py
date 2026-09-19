@@ -93,16 +93,19 @@ class PriceResolver:
             if res["status"] == "FRESH":
                 return res
 
-        # 4. Final Fallback (NULL)
+        # 4. Final Fallback (NULL) (Phase 4 Hardening)
         return {
             "current_price": None,
             "underlying_price": None,
             "normalized_current_price": None,
-            "timestamp": datetime.datetime.now(timezone.utc),
+            "timestamp": None, # P0: Do not pretend server time is market time
+            "provider_timestamp": None,
+            "received_at": datetime.datetime.now(timezone.utc),
             "source": "FAILOVER_EXHAUSTED",
             "status": "DATA_UNAVAILABLE",
             "eligibility": "DATA_BLOCKED"
         }
+
 
 
     @staticmethod
@@ -143,30 +146,42 @@ class PriceResolver:
 
         # Resolve
         instr_id = signal.instrument_id or signal.symbol
-        now = datetime.datetime.now(timezone.utc)
+        received_at = datetime.datetime.now(timezone.utc)
 
         try:
             # Fetch LTP
             u_sym = signal.underlying_symbol or signal.symbol
-            u_price = await provider.get_ltp(u_sym)
-
+            u_res = await provider.get_ltp(u_sym)
+            u_price = u_res.get("price")
+            u_ts = u_res.get("timestamp")
 
             if asset_class in ["EQUITY", "INDEX"]:
                 price = u_price
+                p_ts = u_ts
             else:
-                price = await provider.get_ltp(instr_id)
+                p_res = await provider.get_ltp(instr_id)
+                price = p_res.get("price")
+                p_ts = p_res.get("timestamp")
+
                 # Anti-Contamination Check (Underlying != Derivative)
                 if u_price and price and abs(price - u_price) < 0.0001:
                     return {"status": "IDENTITY_MISMATCH", "reason": "Derivative premium equals underlying spot."}
 
             if price and price > 0:
+                # P0: preserve provider timestamp
+                from backend.services.freshness_policy import FreshnessPolicy
+                status = FreshnessPolicy.get_status(p_ts)
+
                 return {
                     "current_price": price,
                     "underlying_price": u_price,
-                    "timestamp": now,
+                    "timestamp": p_ts or received_at, # Backward compatibility
+                    "provider_timestamp": p_ts,
+                    "received_at": received_at,
                     "source": provider_name,
-                    "status": "FRESH"
+                    "status": status
                 }
+
         except Exception as e:
             print(f"   [!] Failover: {provider_name} failed for {signal.symbol}: {e}")
 

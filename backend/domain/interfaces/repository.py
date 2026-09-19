@@ -193,8 +193,10 @@ class IMarketDataProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_ltp(self, symbol: str) -> float:
+    async def get_ltp(self, symbol: str) -> Dict[str, Any]:
+        """Returns {price, timestamp}"""
         pass
+
 
     @abstractmethod
     async def get_quote(self, symbol: str) -> Dict[str, Any]:

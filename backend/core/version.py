@@ -3,12 +3,13 @@ from datetime import timezone
 from backend.core.config import settings
 
 
-# Canonical Version Identity (Phase 3 Final Hardening)
-APP_VERSION = "2.2.0-STABLE-TRUTH"
-RELEASE_ID = "TRADEMIND_FINAL_LOCK_20260919"
+# Canonical Version Identity (Phase 4 Final Production Completion)
+APP_VERSION = "2.3.0-GOLD-RELEASE"
+RELEASE_ID = "TRADEMIND_GOLD_LOCK_20260919"
 GIT_SHA = settings.GIT_SHA
-BUILD_TIMESTAMP = "2026-09-19T13:00:00Z"
+BUILD_TIMESTAMP = datetime.datetime.now(timezone.utc).isoformat()
 ENVIRONMENT = settings.ENVIRONMENT
+
 
 
 def get_version_metadata():

@@ -199,7 +199,32 @@ async def get_equity_history(
             }
         }
 
-@router.get("/verify-freeze")
-async def verify_v22_freeze():
-    from backend.services.freeze_verification_service import V22FreezeVerificationService
-    return V22FreezeVerificationService.verify_freeze()
+@router.get("/signals/{signal_id}/forensics")
+async def get_signal_forensics(signal_id: str):
+    """
+    Forensic Reconstruction (Phase 4).
+    Reconstructs complete timeline and evidence for a specific signal.
+    """
+    signal = await SignalLedgerService.get_signal(signal_id)
+    if not signal:
+        raise HTTPException(status_code=404, detail="Signal not found")
+
+    provenance = await container.ios_repo.get_signal_provenance(signal_id)
+    explanation = get_signal_explanation(signal_id)
+
+    return {
+        "signal": signal,
+        "provenance": provenance,
+        "explanation": explanation,
+        "identity": {
+            "deployment_sha": signal.deployment_sha,
+            "strategy_version": signal.strategy_version,
+            "model_version": signal.model_version
+        },
+        "verification": {
+            "is_verified": signal.outcome_verified,
+            "outcome": signal.outcome,
+            "exit_reason": signal.exit_reason
+        }
+    }
+

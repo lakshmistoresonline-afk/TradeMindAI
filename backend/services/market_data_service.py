@@ -1,8 +1,11 @@
 import datetime
+from datetime import timezone
 import pandas as pd
 import asyncio
+import uuid
 from typing import List, Dict, Any, Optional
 from backend.core.container import container
+
 
 class MarketDataService:
     """
@@ -21,11 +24,20 @@ class MarketDataService:
             if not stock or not stock.last_price:
                 # Fallback to provider live call
                 price_data = await container.provider.get_live_price(symbol)
+                price = price_data.get("price")
+                p_ts = price_data.get("timestamp")
+                received_at = datetime.datetime.now(timezone.utc)
+
+                from backend.services.freshness_policy import FreshnessPolicy
+                status = FreshnessPolicy.get_status(p_ts)
+
                 return {
-                    "price": price_data.get("price"),
-                    "timestamp": datetime.datetime.utcnow(),
+                    "price": price,
+                    "timestamp": p_ts or received_at,
+                    "provider_timestamp": p_ts,
+                    "received_at": received_at,
                     "source": "Live_Provider",
-                    "status": "FRESH" if price_data.get("price") else "UNAVAILABLE"
+                    "status": status
                 }
 
             # Canonical Freshness Policy (Phase 2 Hardening)
@@ -35,13 +47,23 @@ class MarketDataService:
             return {
                 "price": stock.last_price,
                 "timestamp": stock.updated_at,
+                "provider_timestamp": stock.updated_at,
+                "received_at": stock.updated_at,
                 "source": "SQL_Cache",
                 "status": status
             }
 
         except Exception as e:
             print(f"[MarketData] Error fetching price for {symbol}: {e}")
-            return {"price": None, "timestamp": None, "source": None, "status": "UNAVAILABLE"}
+            return {
+                "price": None,
+                "timestamp": None,
+                "provider_timestamp": None,
+                "received_at": datetime.datetime.now(timezone.utc),
+                "source": None,
+                "status": "UNAVAILABLE"
+            }
+
 
     @staticmethod
     async def get_ohlc_history(symbol: str, days: int = 30) -> pd.DataFrame:

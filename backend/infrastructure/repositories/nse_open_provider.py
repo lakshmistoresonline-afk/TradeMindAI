@@ -47,19 +47,18 @@ class NSEOpenProvider(IMarketDataProvider):
         except Exception as e:
             print(f"   [!] NSE Session Init Failed: {e}")
 
-    async def get_ltp(self, symbol: str) -> Optional[float]:
+    async def get_ltp(self, symbol: str) -> Dict[str, Any]:
         """
         Fetches LTP using public NSE API.
-        Attempts direct access; if blocked, relies on local collector ingestion.
+        Returns {price, timestamp}
         """
         # 1. Try to fetch from Neon (Last Ingested by Local Collector)
         from backend.core.container import container
         stock = await container.repository.get_stock_by_symbol(symbol)
         if stock and stock.last_price:
              # Check freshness (e.g. within 5 mins for 'live')
-             age = (datetime.datetime.utcnow() - stock.updated_at).total_seconds() if stock.updated_at else 999999
-             if age < 300: # 5 minutes
-                  return stock.last_price
+             # Note: PriceResolver will re-validate age
+             return {"price": stock.last_price, "timestamp": stock.updated_at}
 
         # 2. Try direct fetch (Experimental / Limited)
         try:
@@ -70,16 +69,19 @@ class NSEOpenProvider(IMarketDataProvider):
             resp = await self.client.get(url, headers=self.headers, cookies=self.cookies)
             if resp.status_code == 200:
                 data = resp.json()
-                return float(data.get("priceInfo", {}).get("lastPrice", 0.0))
+                price = float(data.get("priceInfo", {}).get("lastPrice", 0.0))
+                # For direct NSE scrapers, arrival time is usually close to observation time if not specified
+                return {"price": price, "timestamp": datetime.datetime.now(datetime.timezone.utc)}
         except: pass
 
-        return None
+        return {"price": None, "timestamp": None}
 
     async def get_quote(self, symbol: str) -> Dict[str, Any]:
-        ltp = await self.get_ltp(symbol)
-        if ltp is None:
+        res = await self.get_ltp(symbol)
+        if res["price"] is None:
              return {"status": "DATA_UNAVAILABLE", "price": None, "source": "NSE_OPEN"}
-        return {"status": "FRESH", "price": ltp, "last_price": ltp, "source": "NSE_OPEN", "timestamp": datetime.datetime.utcnow()}
+        return {"status": "FRESH", "price": res["price"], "last_price": res["price"], "source": "NSE_OPEN", "timestamp": res["timestamp"]}
+
 
     async def fetch_stock_info(self, symbol: str) -> Dict[str, Any]:
         return {"symbol": symbol, "name": symbol, "last_price": await self.get_ltp(symbol)}
