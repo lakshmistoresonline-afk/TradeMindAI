@@ -44,6 +44,11 @@ export const getEquitySignalDetail = async (id: string) => {
   return response.data;
 };
 
+export const getEquitySignalForensics = async (id: string) => {
+  const response = await apiClient.get(`/equity/signals/${id}/forensics`);
+  return response.data;
+};
+
 export const getEquityPerformance = async () => {
   const response = await apiClient.get('/equity/performance');
   return response.data;

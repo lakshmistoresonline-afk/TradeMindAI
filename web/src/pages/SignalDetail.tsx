@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Chip, Divider, Skeleton, alpha, Tooltip, Button } from '@mui/material';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { getEquitySignalDetail } from '../api/client';
+import { getEquitySignalDetail, getEquitySignalForensics } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
-import { ShieldCheck, HelpCircle, Activity, Target, Clock, ArrowLeft, BarChart2, Briefcase, RefreshCw, Zap, TrendingUp } from 'lucide-react';
+import { ShieldCheck, HelpCircle, Activity, Target, Clock, ArrowLeft, BarChart2, Briefcase, RefreshCw, Zap, TrendingUp, History } from 'lucide-react';
 import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
 import PremiumOverlay from '../components/PremiumOverlay';
 import { useAuth } from '../hooks/useAuth';
@@ -14,26 +14,35 @@ export default function SignalDetail() {
   const navigate = useNavigate();
   const { isPremium } = useAuth();
   const [signal, setSignal] = useState<any>(null);
+  const [forensics, setForensics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (id) {
-       if (location.state?.signal) {
-           setSignal(mapCanonicalSignal(location.state.signal));
-           setLoading(false);
-       } else {
-           getEquitySignalDetail(id).then(data => {
-             setSignal(mapCanonicalSignal(data));
-             setLoading(false);
-           }).catch(() => setLoading(false));
-       }
+       const loadData = async () => {
+           try {
+               const data = await getEquitySignalDetail(id);
+               setSignal(mapCanonicalSignal(data));
+
+               if (isPremium) {
+                   const forens = await getEquitySignalForensics(id);
+                   setForensics(forens);
+               }
+           } catch (e) {
+               console.error("Forensic Load Failed:", e);
+           } finally {
+               setLoading(false);
+           }
+       };
+       loadData();
+
        if (location.state?.scrollReplay) {
            setTimeout(() => {
                document.getElementById('lifecycle-replay')?.scrollIntoView({ behavior: 'smooth' });
            }, 500);
        }
     }
-  }, [id, location.state]);
+  }, [id, isPremium]);
 
   if (loading) return (
      <Box sx={{ p: 4, bgcolor: '#020617', minHeight: '100vh' }}>
@@ -276,12 +285,28 @@ export default function SignalDetail() {
                <Stack spacing={2}>
                   <TraceItem label="Prediction ID" value={decision.predictionId || 'N/A'} small />
                   <TraceItem label="Model Version" value={signal.model_version || 'TradeMind Core v2.2'} />
-                  <TraceItem label="Strategy" value="FROZEN V2.2" />
+                  <TraceItem label="Deployment SHA" value={signal.deployment_sha || 'N/A'} small />
+                  <TraceItem label="Universe" value={signal.universe_version || 'NIFTY_200'} />
                   <Divider sx={{ my: 1, opacity: 0.05 }} />
                   <TraceItem label="Created At" value={new Date(decision.generatedAt).toLocaleString()} small />
                   <TraceItem label="Data Timestamp" value={new Date(signal.data_timestamp || signal.timestamp).toLocaleString()} small />
                </Stack>
             </Paper>
+
+            {/* 8. Forensic Audit (Institutional 4.0) */}
+            {isPremium && forensics && (
+                <>
+                    <SectionHeader icon={<History size={18} />} title="FORENSIC AUDIT" />
+                    <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <Stack spacing={2}>
+                            <TraceItem label="Verification" value={forensics.verification?.is_verified ? "VERIFIED" : "PENDING"} color={forensics.verification?.is_verified ? "#10b981" : "orange"} />
+                            <TraceItem label="Strategy V" value={forensics.identity?.strategy_version} />
+                            <TraceItem label="Decision Hash" value={forensics.provenance?.decision_hash} small />
+                            <TraceItem label="Input Hash" value={forensics.provenance?.input_hash} small />
+                        </Stack>
+                    </Paper>
+                </>
+            )}
          </Grid>
       </Grid>
     </Box>
