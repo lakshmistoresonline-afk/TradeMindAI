@@ -15,3 +15,15 @@ async def get_public_config():
         "strategy": "V2.2 FROZEN",
         "real_trading": False
     }
+
+@router.get("/schema-debug")
+def check_schema():
+    from backend.core.postgres import engine
+    from sqlalchemy import inspect
+    inspector = inspect(engine)
+    try:
+        cols = inspector.get_columns("live_signals")
+        return {"live_signals_columns": [c['name'] for c in cols]}
+    except Exception as e:
+        return {"error": str(e)}
+
