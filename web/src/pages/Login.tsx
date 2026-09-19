@@ -198,7 +198,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                InputLabelProps={{ style: { color: '#64748b', fontWeight: 600 } }}
+                InputLabelProps={{ style: { color: '#94a3b8', fontWeight: 600 } }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     color: '#fff',
@@ -218,7 +218,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                InputLabelProps={{ style: { color: '#64748b', fontWeight: 600 } }}
+                InputLabelProps={{ style: { color: '#94a3b8', fontWeight: 600 } }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -226,7 +226,7 @@ export default function Login() {
                         onClick={() => setShowPassword(!showPassword)}
                         onMouseDown={(e) => e.preventDefault()}
                         edge="end"
-                        sx={{ color: '#64748b' }}
+                        sx={{ color: '#94a3b8' }}
                       >
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </IconButton>
@@ -252,7 +252,7 @@ export default function Login() {
                     variant="body2"
                     onClick={handleForgotPassword}
                     underline="hover"
-                    sx={{ color: '#64748b', fontWeight: 700, fontSize: '0.85rem', '&:hover': { color: '#10b981' } }}
+                    sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.85rem', '&:hover': { color: '#10b981' } }}
                   >
                     Forgot Password?
                   </Link>
