@@ -99,16 +99,24 @@ class MarketDataService:
                 nifty_df = hist.xs("^NSEI", level='symbol').rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
                 # Capture actual provider timestamp from index
                 obs_raw = hist.index.get_level_values('date')[-1]
-                if hasattr(obs_raw, 'to_pydatetime'):
+
+                # Normalize to datetime (V2.3 Robustness)
+                if isinstance(obs_raw, datetime.date) and not isinstance(obs_raw, datetime.datetime):
+                    observation_ts = datetime.datetime.combine(obs_raw, datetime.time.min)
+                elif hasattr(obs_raw, 'to_pydatetime'):
                     observation_ts = obs_raw.to_pydatetime()
                 else:
                     observation_ts = obs_raw
 
-                if observation_ts.tzinfo is None:
+                if observation_ts and observation_ts.tzinfo is None:
                     observation_ts = observation_ts.replace(tzinfo=timezone.utc)
 
             if "^INDIAVIX" in hist.index.get_level_values('symbol'):
-                vix_val = float(hist.xs("^INDIAVIX", level='symbol')['Close'].iloc[-1])
+                vix_df = hist.xs("^INDIAVIX", level='symbol')
+                # Bulk normalization (V2.3)
+                vix_df = vix_df.rename(columns={c: c.capitalize() for c in vix_df.columns})
+                if 'Close' in vix_df.columns and not vix_df['Close'].dropna().empty:
+                    vix_val = float(vix_df['Close'].dropna().iloc[-1])
 
             # 3. Detect Regime
             from backend.services.ios.regime_engine import MarketRegimeEngine

@@ -112,14 +112,14 @@ export default function Landing() {
           <Divider sx={{ mb: 8, opacity: 0.1 }} />
           <Grid container spacing={4} justifyContent="center">
             <Grid item xs={12} md={4}>
-              <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>59.18%</Typography>
-              <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>OBSERVED WIN RATE</Typography>
-              <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>N=49 Resolved Signals</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>59.2%</Typography>
+              <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>V2.2 BENCHMARK WIN RATE</Typography>
+              <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>Audit Population: N=49</Typography>
             </Grid>
             <Grid item xs={12} md={4}>
                <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>2.73</Typography>
-               <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>PROFIT FACTOR</Typography>
-               <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>Observed Performance</Typography>
+               <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>CERTIFIED PROFIT FACTOR</Typography>
+               <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>Forensic Accuracy Audit</Typography>
             </Grid>
           </Grid>
         </Container>
