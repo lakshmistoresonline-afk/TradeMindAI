@@ -224,7 +224,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                InputLabelProps={{ style: { color: '#94a3b8', fontWeight: 600 } }}
+                InputLabelProps={{ shrink: true, style: { color: '#ffffff', fontWeight: 800, fontSize: '0.9rem', marginBottom: '8px' } }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -232,7 +232,7 @@ export default function Login() {
                         onClick={() => setShowPassword(!showPassword)}
                         onMouseDown={(e) => e.preventDefault()}
                         edge="end"
-                        sx={{ color: '#94a3b8' }}
+                        sx={{ color: '#ffffff' }}
                       >
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </IconButton>
@@ -243,9 +243,15 @@ export default function Login() {
                   '& .MuiOutlinedInput-root': {
                     color: '#fff',
                     fontWeight: 600,
+                    bgcolor: 'rgba(15, 23, 42, 0.5)',
                     '& fieldset': { borderColor: 'rgba(255,255,255,0.1)', borderWidth: 2 },
-                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
                     '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#fff !important',
+                    transform: 'translate(0, -24px) scale(1)',
+                    pointerEvents: 'none'
                   }
                 }}
               />
