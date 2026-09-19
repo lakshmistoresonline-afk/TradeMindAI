@@ -148,7 +148,7 @@ export default function UserDashboard() {
                         />
                         <InsightItem
                             title="Momentum Alignment"
-                            desc="Strategy V2.2 currently identifies high-conviction momentum nodes in the Financial and IT sectors."
+                            desc="Institutional order flow indicates sector rotation dynamics currently aligned with V2.2 quantitative nodes."
                         />
                     </Stack>
                 </Paper>

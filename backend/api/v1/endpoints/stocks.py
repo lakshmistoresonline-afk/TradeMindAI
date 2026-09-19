@@ -16,10 +16,11 @@ router = APIRouter()
 @cache(expire=300)
 async def get_market_stats():
     """
-    Hardened Market Index Fetcher (Institutional V2.2).
-    Uses YahooQuery fallback to bypass yfinance 429 rate limits for NIFTY/VIX.
+    Hardened Market Index Fetcher (Institutional V2.3).
+    Returns value, source, provider_timestamp, and canonical freshness.
     """
     from backend.services.market_data_service import MarketDataService
+    from backend.services.freshness_policy import FreshnessPolicy
     from yahooquery import Ticker as YQTicker
 
     market_state = await MarketDataService.get_market_state()
@@ -31,16 +32,27 @@ async def get_market_stats():
         "^INDIAVIX": "India VIX"
     }
     stats = {}
+    now = datetime.datetime.now(datetime.timezone.utc)
 
-    # Initialize with truthful nulls (Phase 3 Hardening)
+    # Initialize with truthful nulls
     for name in indices.values():
-        stats[name] = {"value": None, "change": None, "status": "UNAVAILABLE"}
+        stats[name] = {
+            "value": None, "change": None, "source": "YAHOO_QUERY",
+            "provider_timestamp": None, "received_at": now.isoformat(),
+            "freshness": "UNAVAILABLE", "status": "UNAVAILABLE"
+        }
 
-    stats["India VIX"]["value"] = market_state.get("vix")
-    stats["India VIX"]["status"] = market_state.get("status", "UNAVAILABLE")
+    # 1. Integrate VIX from authorative state
+    vix_val = market_state.get("vix")
+    obs_ts = market_state.get("observation_timestamp")
+    stats["India VIX"].update({
+        "value": vix_val,
+        "provider_timestamp": obs_ts,
+        "freshness": market_state.get("freshness", "UNAVAILABLE"),
+        "status": market_state.get("status", "UNAVAILABLE")
+    })
 
     try:
-        # P0 Hardening: Use YahooQuery for more resilient bulk fetching
         symbols = " ".join(indices.keys())
         yq = YQTicker(symbols)
         data = yq.history(period="2d")
@@ -56,35 +68,23 @@ async def get_market_stats():
                                 curr = float(valid_df['close'].iloc[-1])
                                 prev = float(valid_df['close'].iloc[-2]) if len(valid_df) > 1 else None
 
-                                stats[name] = {
+                                # Resolve timestamp
+                                ts_raw = valid_df.index[-1]
+                                if hasattr(ts_raw, 'to_pydatetime'): ts_raw = ts_raw.to_pydatetime()
+                                if ts_raw.tzinfo is None: ts_raw = ts_raw.replace(tzinfo=datetime.timezone.utc)
+
+                                stats[name].update({
                                     "value": round(curr, 2),
                                     "change": round(((curr - prev) / prev * 100), 2) if prev else None,
+                                    "provider_timestamp": ts_raw.isoformat(),
+                                    "freshness": FreshnessPolicy.get_status(ts_raw),
                                     "status": "HEALTHY"
-                                }
-                except Exception as e:
-                    print(f"   [!] YahooQuery parsing error for {name}: {e}")
-
-
-        # Final sanity check: if NIFTY is still UNAVAILABLE, try yfinance as a last resort
-        if stats["NIFTY 50"]["status"] == "UNAVAILABLE":
-            print("[*] NIFTY UNAVAILABLE via YahooQuery, attempting yfinance fallback...")
-            y_data = yf.download("^NSEI", period="2d", interval="1d", progress=False)
-            if not y_data.empty:
-                curr = float(y_data['Close'].iloc[-1])
-                prev = float(y_data['Close'].iloc[-2]) if len(y_data) > 1 else None
-                stats["NIFTY 50"] = {
-                    "value": round(curr, 2),
-                    "change": round(((curr - prev) / prev * 100), 2) if prev else None,
-                    "status": "HEALTHY"
-                }
-
+                                })
+                except: pass
 
         return stats
     except Exception as e:
         print(f"[!] Global Market Stats Retrieval Failed: {e}")
-        return stats
-    except Exception as e:
-        print(f"Global market stats error: {e}")
         return stats
 
 @router.get("/")

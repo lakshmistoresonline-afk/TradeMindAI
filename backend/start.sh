@@ -37,11 +37,16 @@ fi
 # Note: Celery worker/beat branches removed to prevent accidental cloud execution.
 # Background tasks are preserved in the codebase for local manual execution only.
 
-# --- PRODUCTION SCHEMA REPAIR (Phase 4 Hardening) ---
+# --- PRODUCTION SCHEMA MANAGEMENT (Phase 4 Hardening) ---
 if [ "$ENVIRONMENT" = "production" ]; then
-    echo "[*] AUDIT: Verifying database schema integrity..."
-    # Attempt a lightweight schema repair for known missing columns in live Neon
-    python -c "from backend.api.v1.endpoints.admin import privileged_repair; import asyncio; from backend.core.auth import get_current_admin; print(asyncio.run(privileged_repair(None)))"
+    echo "[*] AUDIT: Executing Alembic migrations..."
+    # Explicitly upgrade to latest production-certified head
+    alembic upgrade head
+    if [ $? -ne 0 ]; then
+        echo "[!] CRITICAL ERROR: Alembic migration failed. Aborting startup to prevent data corruption."
+        exit 1
+    fi
+    echo "[+] Database schema synchronized."
 fi
 
 echo "Starting FastAPI API..."

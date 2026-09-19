@@ -53,10 +53,9 @@ class Settings(BaseSettings):
     def validate_secret_key(cls, v: str, info) -> str:
         if info.data.get("ENVIRONMENT") == "production":
             if v == "SECRET":
-                raise ValueError("SECRET_KEY must be set in production environment via environment variables.")
+                raise ValueError("CRITICAL: SECRET_KEY must be set in production environment via environment variables. Cannot use default 'SECRET'.")
             if len(v) < 32:
-                 # Warning only, but highly recommended
-                 print("[!] WARNING: production SECRET_KEY is weak (< 32 chars).")
+                 raise ValueError("CRITICAL: production SECRET_KEY is too weak (< 32 chars). Security audit failure.")
         return v
 
     MARKET_DATA_INGEST_KEY: str = "LOCAL_ONLY_DEV_KEY"
@@ -64,8 +63,11 @@ class Settings(BaseSettings):
     @field_validator("MARKET_DATA_INGEST_KEY")
     @classmethod
     def validate_ingest_key(cls, v: str, info) -> str:
-        if info.data.get("ENVIRONMENT") == "production" and v == "LOCAL_ONLY_DEV_KEY":
-            raise ValueError("MARKET_DATA_INGEST_KEY must be set in production.")
+        if info.data.get("ENVIRONMENT") == "production":
+            if v == "LOCAL_ONLY_DEV_KEY":
+                raise ValueError("CRITICAL: MARKET_DATA_INGEST_KEY must be set in production. Cannot use development default.")
+            if len(v) < 16:
+                raise ValueError("CRITICAL: MARKET_DATA_INGEST_KEY is too weak for production.")
         return v
 
 

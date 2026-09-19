@@ -73,6 +73,7 @@ class PriceResolver:
     async def resolve_current_price(cls, signal: LiveSignal) -> Dict[str, Any]:
         """
         Entry point for institutional price resolution.
+        Harden: Enforces sequence and preservation of source truth.
         """
         asset_class = signal.asset_class
 
@@ -82,25 +83,29 @@ class PriceResolver:
         else:
              sequence = cls.EQUITY_SEQUENCE
 
-        # 2. Re-prioritize based on settings
+        # 2. Re-prioritize based on settings (Production Guard)
         primary = settings.MARKET_DATA_PROVIDER
         if primary in sequence:
             sequence = [primary] + [p for p in sequence if p != primary]
 
         # 3. Iterate through providers
         for provider_code in sequence:
-            res = await cls._try_resolve_with_provider(signal, provider_code)
-            if res["status"] == "FRESH":
-                return res
+            try:
+                res = await cls._try_resolve_with_provider(signal, provider_code)
+                # Truth Rule: Only accept if price is strictly positive and status is valid
+                if res.get("current_price") and res.get("current_price") > 0 and res["status"] in ["FRESH", "AGING"]:
+                    return res
+            except Exception as e:
+                print(f"[PriceResolver] Provider {provider_code} fatal error: {e}")
 
         # 4. Final Fallback (NULL) (Phase 4 Hardening)
         return {
             "current_price": None,
             "underlying_price": None,
             "normalized_current_price": None,
-            "timestamp": None, # P0: Do not pretend server time is market time
+            "timestamp": None,
             "provider_timestamp": None,
-            "received_at": datetime.datetime.now(timezone.utc),
+            "received_at": datetime.datetime.now(timezone.utc).isoformat(),
             "source": "FAILOVER_EXHAUSTED",
             "status": "DATA_UNAVAILABLE",
             "eligibility": "DATA_BLOCKED"

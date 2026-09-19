@@ -4,8 +4,8 @@ from typing import Dict, Any, Optional
 
 class PulseWatchdog:
     """
-    P1 Production Watchdog.
-    Tracks health of the background Pulse loop.
+    Hardened Durable Pulse Watchdog (Phase 4).
+    Uses PulseExecutionDB to maintain state across process restarts.
     """
     _last_started: Optional[datetime.datetime] = None
     _last_completed: Optional[datetime.datetime] = None
@@ -32,19 +32,45 @@ class PulseWatchdog:
 
     @classmethod
     def get_status(cls) -> Dict[str, Any]:
+        """
+        Calculates health based on durable database history.
+        """
         now = datetime.datetime.now(timezone.utc)
+
+        # 1. Try to fetch last execution from DB (Neon Authority)
+        try:
+            from backend.core.postgres import SessionLocal, PulseExecutionDB
+            with SessionLocal() as db:
+                last_exec = db.query(PulseExecutionDB).order_by(PulseExecutionDB.started_at.desc()).first()
+                if last_exec:
+                    cls._last_started = last_exec.started_at
+                    cls._last_completed = last_exec.finished_at
+                    if last_exec.status == "COMPLETED":
+                        cls._last_success = last_exec.finished_at
+                        cls._last_duration_ms = last_exec.duration_ms
+                    else:
+                        cls._last_failed = last_exec.finished_at
+                        cls._last_error = last_exec.last_error
+        except Exception as e:
+            print(f"[Watchdog] DB fetch failed: {e}")
+
         status = "UNKNOWN"
 
         if cls._last_success:
-            age = (now - cls._last_success).total_seconds()
-            # If market is open, we expect pulse every 5-10m.
-            # 15m threshold for LATE.
-            if age < 900:
-                status = "HEALTHY"
-            elif age < 3600:
-                status = "LATE"
-            else:
-                status = "STALE"
+            # Normalize to UTC
+            last_ok = cls._last_success if cls._last_success.tzinfo else cls._last_success.replace(tzinfo=timezone.utc)
+            age = (now - last_ok).total_seconds()
+
+            # Context-aware thresholds
+            from backend.services.market_calendar import MarketCalendar
+            is_open = MarketCalendar.is_market_open()
+
+            threshold_late = 900 if is_open else 7200 # 15m vs 2h
+            threshold_stale = 3600 if is_open else 86400 # 1h vs 24h
+
+            if age < threshold_late: status = "HEALTHY"
+            elif age < threshold_stale: status = "LATE"
+            else: status = "STALE"
 
         if cls._last_failed and (not cls._last_success or cls._last_failed > cls._last_success):
             status = "FAILED"

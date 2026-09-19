@@ -26,16 +26,7 @@ fun NavGraph(navController: NavHostController) {
             DashboardScreen(navController)
         }
         composable(Screen.Opportunities.route) {
-            androidx.compose.material3.Text("Opportunities Feed coming soon")
-        }
-        composable(Screen.Journal.route) {
-            androidx.compose.material3.Text("Trade Journal coming soon")
-        }
-        composable(Screen.Portfolio.route) {
-            androidx.compose.material3.Text("Portfolio AI Manager coming soon")
-        }
-        composable(Screen.Analysis.route) {
-            androidx.compose.material3.Text("AI Analysis Hub coming soon")
+            androidx.compose.material3.Text("Signal Terminal coming soon")
         }
         composable(Screen.Chat.route) {
             ChatScreen()
@@ -54,8 +45,5 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Dashboard : Screen("dashboard")
     object Opportunities : Screen("opportunities")
-    object Journal : Screen("journal")
-    object Portfolio : Screen("portfolio")
-    object Analysis : Screen("analysis")
     object Chat : Screen("chat")
 }

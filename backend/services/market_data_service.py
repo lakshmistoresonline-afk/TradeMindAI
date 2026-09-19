@@ -73,41 +73,57 @@ class MarketDataService:
     @staticmethod
     async def get_market_state() -> Dict[str, Any]:
         """
-        Final Hardening: Single source of truth for Market Regime and VIX.
-        Optimized for performance with parallel bulk fetching (V2.3).
+        Hardened Market State Truth Model (V2.3 Production).
+        Distinguishes observation, reception, and processing time.
         """
+        received_at = datetime.datetime.now(timezone.utc)
         try:
             # 1. Fetch Index & VIX in parallel using YahooQuery (Resilient Bulk)
             from yahooquery import Ticker as YQTicker
             yq = YQTicker("^NSEI ^INDIAVIX")
-            hist = yq.history(period="3mo") # Optimized for performance (50-60 bars needed)
+            hist = yq.history(period="3mo")
 
             if hist.empty:
                 return {
                     "regime": "UNKNOWN", "risk_mode": "UNKNOWN", "vix": None,
-                    "status": "UNAVAILABLE", "timestamp": None
+                    "status": "UNAVAILABLE", "source": "YAHOO_QUERY",
+                    "observation_timestamp": None, "received_at": received_at.isoformat()
                 }
 
-            # 2. Extract Data
+            # 2. Extract Data & Timestamps
             nifty_df = pd.DataFrame()
             vix_val = None
+            observation_ts = None
 
             if "^NSEI" in hist.index.get_level_values('symbol'):
                 nifty_df = hist.xs("^NSEI", level='symbol').rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
+                # Capture actual provider timestamp from index
+                obs_raw = hist.index.get_level_values('date')[-1]
+                if hasattr(obs_raw, 'to_pydatetime'):
+                    observation_ts = obs_raw.to_pydatetime()
+                else:
+                    observation_ts = obs_raw
+
+                if observation_ts.tzinfo is None:
+                    observation_ts = observation_ts.replace(tzinfo=timezone.utc)
 
             if "^INDIAVIX" in hist.index.get_level_values('symbol'):
                 vix_val = float(hist.xs("^INDIAVIX", level='symbol')['Close'].iloc[-1])
 
             # 3. Detect Regime
             from backend.services.ios.regime_engine import MarketRegimeEngine
+            from backend.services.freshness_policy import FreshnessPolicy
 
             if vix_val is None or vix_val <= 0 or nifty_df.empty:
                  return {
                     "regime": "UNKNOWN", "risk_mode": "UNKNOWN", "vix": vix_val,
-                    "status": "UNAVAILABLE", "timestamp": None
+                    "status": "UNAVAILABLE", "source": "YAHOO_QUERY",
+                    "observation_timestamp": observation_ts.isoformat() if observation_ts else None,
+                    "received_at": received_at.isoformat()
                 }
 
             regime_obj = MarketRegimeEngine.detect_regime(nifty_df, float(vix_val))
+            freshness = FreshnessPolicy.get_status(observation_ts)
 
             return {
                 "regime": regime_obj.regime,
@@ -115,16 +131,20 @@ class MarketDataService:
                 "vix": float(vix_val),
                 "sentiment_score": regime_obj.sentiment_score,
                 "description": regime_obj.description,
-                "timestamp": datetime.datetime.now(timezone.utc).isoformat(),
-                "status": "HEALTHY"
+                "observation_timestamp": observation_ts.isoformat(),
+                "received_at": received_at.isoformat(),
+                "calculated_at": datetime.datetime.now(timezone.utc).isoformat(),
+                "source": "YAHOO_QUERY",
+                "freshness": freshness,
+                "status": "HEALTHY" if freshness in ["FRESH", "AGING"] else "DEGRADED"
             }
 
         except Exception as e:
             print(f"[MarketData] Regime detection failed: {e}")
             return {
                 "regime": "ERROR", "risk_mode": "ERROR", "vix": None,
-                "status": "ERROR", "error": f"Internal connectivity error: {str(e)}",
-                "timestamp": None
+                "status": "ERROR", "error": str(e),
+                "observation_timestamp": None, "received_at": received_at.isoformat()
             }
 
 

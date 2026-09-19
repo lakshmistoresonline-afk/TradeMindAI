@@ -21,12 +21,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.webcraft.trademindai.ui.analysis.AnalysisScreen
 import com.webcraft.trademindai.ui.dashboard.DashboardScreen
 import com.webcraft.trademindai.ui.market.MarketScreen
 import com.webcraft.trademindai.ui.opportunities.OpportunitiesScreen
-import com.webcraft.trademindai.ui.papertrading.PaperTradingScreen
-import com.webcraft.trademindai.ui.portfolio.PortfolioScreen
 
 @Composable
 fun MainScreen() {
@@ -43,10 +40,7 @@ fun MainScreen() {
         ) {
             composable("dashboard") { DashboardScreen() }
             composable("market") { MarketScreen(onStockClick = { /* Navigate to detail */ }) }
-            composable("portfolio") { PortfolioScreen() }
-            composable("analysis") { AnalysisScreen() }
-            composable("opportunities") { OpportunitiesScreen() }
-            composable("paper_trading") { PaperTradingScreen() }
+            composable("signals") { OpportunitiesScreen() }
         }
     }
 }
@@ -54,11 +48,9 @@ fun MainScreen() {
 @Composable
 fun BottomBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem("Home", "dashboard", Icons.Default.Dashboard),
+        BottomNavItem("Dashboard", "dashboard", Icons.Default.Dashboard),
         BottomNavItem("Markets", "market", Icons.Default.TrendingUp),
-        BottomNavItem("Signals", "opportunities", Icons.Default.Star),
-        BottomNavItem("Portfolio", "portfolio", Icons.Default.AccountBalanceWallet),
-        BottomNavItem("AI", "analysis", Icons.Default.AutoAwesome)
+        BottomNavItem("Terminal", "signals", Icons.Default.Star)
     )
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()

@@ -31,19 +31,15 @@ background_tasks = set()
 async def startup():
     print("[*] API Node starting up...")
 
-    # P0: Ensure database tables exist (Phase 4 Hardening)
-    try:
-        from backend.core.postgres import init_db
-        init_db()
-        print("[+] Database initialized.")
-
-        # P0: Auto-Repair missing columns in production Neon
-        from backend.api.v1.endpoints.admin import privileged_repair
-        repair_res = await privileged_repair(None)
-        print(f"[+] Database repair status: {repair_res['status']}")
-    except Exception as e:
-        print(f"[!] Database Initialization/Repair Failed: {e}")
-
+    # P0 Integrity: Alembic handles production migrations now.
+    # Base.metadata.create_all is a development fallback only.
+    if settings.ENVIRONMENT != "production":
+        try:
+            from backend.core.postgres import init_db
+            init_db()
+            print("[+] Development database initialized (Base.metadata).")
+        except Exception as e:
+            print(f"[!] Database Initialization Failed: {e}")
 
     print("[*] API Node ready.")
 

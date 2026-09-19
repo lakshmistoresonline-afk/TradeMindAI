@@ -52,16 +52,31 @@ class SignalLifecycleService:
     async def audit_signal(signal_id: str) -> bool:
         """
         Retrieves current market data and checks for lifecycle triggers.
+        Harden: Blocks mutation if data is STALE. (Phase 4).
         """
         signal = await SignalLedgerService.get_signal(signal_id)
         if not signal or signal.status in OutcomeService.TERMINAL_STATES:
             return False
 
-        # Fetch recent price action
+        # 1. Freshness Check (Phase 4 Hardening)
+        from backend.services.market_data_service import MarketDataService
+        from backend.services.freshness_policy import FreshnessPolicy
+
+        # Use underlying symbol for horizon evaluation if derivative
+        sym = signal.underlying_symbol or signal.symbol
+        price_meta = await MarketDataService.get_current_price(sym)
+
+        if price_meta["status"] in ["STALE", "UNAVAILABLE"]:
+            print(f"[Lifecycle] Audit BLOCKED for {signal.symbol}: Market data is {price_meta['status']}.")
+            return False
+
+        # 2. Fetch recent price action for outcome resolution
         try:
-            # Use provider from container
             provider = container.provider
             history = await provider.get_history(signal.symbol, start_date=signal.timestamp)
+
+            if history.empty:
+                 return False
 
             outcome = OutcomeService.evaluate_signal_outcome(signal, history)
 

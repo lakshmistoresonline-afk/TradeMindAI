@@ -68,20 +68,18 @@ class SignalLedgerService:
 
             # 2. Firestore Mirror (P1 Hardening: Run in thread to avoid blocking loop)
             if db_client:
+                import asyncio
                 def run_mirror():
                     try:
                         mirror_data = signal.model_dump()
-                        # Add mirror metadata
-                        # Add mirror metadata
-                        mirror_data["mirrored_at"] = datetime.datetime.now(timezone.utc)
+                        mirror_data["mirrored_at"] = datetime.datetime.now(timezone.utc).isoformat()
                         mirror_data["source_neon_id"] = signal.id
-
-
+                        # Firestore client is often synchronous in python admin SDK
                         db_client.collection("signals").document(signal.id).set(mirror_data)
                     except Exception as e:
                         print(f"[SignalLedger] Mirror failed for {signal.id}: {e}")
 
-                await asyncio.to_thread(run_mirror)
+                asyncio.create_task(asyncio.to_thread(run_mirror))
 
             return signal
 
@@ -134,13 +132,14 @@ class SignalLedgerService:
 
             # Mirror to Firestore (P1 Hardening: Run in thread to avoid blocking loop)
             if db_client:
+                import asyncio
                 def run_mirror_update():
                     try:
                         db_client.collection("signals").document(signal_id).update(updates)
                     except Exception as e:
                         print(f"[SignalLedger] Mirror update failed for {signal_id}: {e}")
 
-                await asyncio.to_thread(run_mirror_update)
+                asyncio.create_task(asyncio.to_thread(run_mirror_update))
 
             return True
 
