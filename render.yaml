@@ -8,10 +8,13 @@ services:
     dockerContext: .
     dockerfilePath: backend/Dockerfile
     envVars:
+      - key: ENVIRONMENT
+        value: production
       - key: FIREBASE_PROJECT_ID
         value: com-webcraft-trademindai-c8f75
       - key: SERVICE_TYPE
         value: api
+
       - key: GROQ_API_KEY
         sync: false
       - key: REDIS_URL

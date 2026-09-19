@@ -29,7 +29,24 @@ background_tasks = set()
 
 @app.on_event("startup")
 async def startup():
+    print("[*] API Node starting up...")
+
+    # P0: Ensure database tables exist (Phase 4 Hardening)
+    try:
+        from backend.core.postgres import init_db
+        init_db()
+        print("[+] Database initialized.")
+
+        # P0: Auto-Repair missing columns in production Neon
+        from backend.api.v1.endpoints.admin import privileged_repair
+        repair_res = await privileged_repair(None)
+        print(f"[+] Database repair status: {repair_res['status']}")
+    except Exception as e:
+        print(f"[!] Database Initialization/Repair Failed: {e}")
+
+
     print("[*] API Node ready.")
+
     # Async background task for non-critical inits
     async def background_inits():
         redis = None
