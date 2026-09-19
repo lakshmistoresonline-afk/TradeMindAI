@@ -62,10 +62,8 @@ class ShadowSyncService:
 
         try:
             with SessionLocal() as session:
-                # 1. Summary & Portfolio (Always sync latest state)
-                # These are single documents, low impact.
+                # 1. Summary (Always sync latest state)
                 await ShadowSyncService._sync_summary(session, db_client)
-                await ShadowSyncService._sync_portfolio(session, db_client)
 
                 # 2. Incremental Signal Sync
                 last_sig_ts = state.get("last_signal_ts")
@@ -130,22 +128,6 @@ class ShadowSyncService:
             "market_status": session_type # Mirror current session state
         }
         db_client.collection("shadow_summary").document("latest").set(summary, timeout=5)
-
-    @staticmethod
-    async def _sync_portfolio(session, db_client):
-        # Mirror current equity to the expected portfolio path
-        # Fetch latest summary info
-        terminal = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(['TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'TIMEOUT'])).all()
-        returns = [t.net_return for t in terminal if t.net_return is not None]
-        allocation = 100000.0
-        total_realized_pnl = round(sum([allocation * (r / 100.0) for r in returns]), 2)
-
-        db_client.collection("portfolio").document("equity").set({
-            "current_equity": round(1000000.0 + total_realized_pnl, 2),
-            "realized_pnl": total_realized_pnl,
-            "last_updated": datetime.utcnow().isoformat(),
-            "currency": "INR"
-        }, timeout=5)
 
     @staticmethod
     async def _mirror_signals(signals, db_client):

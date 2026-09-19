@@ -103,18 +103,9 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
         self.db.collection("feature_store").document(doc_id).set(vector.model_dump())
 
     async def save_prediction(self, prediction: Prediction) -> None:
-        date_id = prediction.date.strftime("%Y-%m-%d")
+        date_id = prediction.timestamp.strftime("%Y-%m-%d")
         doc_id = f"{prediction.symbol}_{date_id}_{prediction.model_version}"
         self.db.collection("predictions").document(doc_id).set(prediction.model_dump())
-
-    async def save_portfolio_health(self, health: PortfolioHealth) -> None:
-        self.db.collection("portfolio_health").document(health.user_id).set(health.model_dump())
-
-    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]:
-        doc = self.db.collection("portfolio_health").document(user_id).get()
-        if doc.exists:
-            return PortfolioHealth(**doc.to_dict())
-        return None
 
     async def save_alert(self, alert: Alert) -> None:
         self.db.collection("alerts").document(alert.id).set(alert.model_dump())
@@ -126,90 +117,11 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
             .limit(limit).stream()
         return [Alert(**doc.to_dict()) for doc in docs]
 
-    async def save_earnings(self, earnings: EarningsData) -> None:
-        doc_id = f"{earnings.symbol}_{earnings.date.strftime('%Y-%m-%d')}"
-        self.db.collection("earnings").document(doc_id).set(earnings.model_dump())
-
-    async def get_latest_earnings(self, symbol: str) -> Optional[EarningsData]:
-        docs = self.db.collection("earnings")\
-            .where("symbol", "==", symbol)\
-            .order_by("date", direction=firestore.Query.DESCENDING)\
-            .limit(1).stream()
-        for doc in docs:
-            return EarningsData(**doc.to_dict())
-        return None
-
-    async def save_options_chain(self, chain: OptionsChain) -> None:
-        self.db.collection("options_chains").document(chain.symbol).set(chain.model_dump())
-
-    async def get_latest_options_chain(self, symbol: str) -> Optional[OptionsChain]:
-        doc = self.db.collection("options_chains").document(symbol).get()
-        if doc.exists:
-            return OptionsChain(**doc.to_dict())
-        return None
-
-    async def save_model_metadata(self, metadata: ModelMetadata) -> None:
-        doc_id = f"{metadata.symbol}_{metadata.version}"
-        self.db.collection("model_registry").document(doc_id).set(metadata.model_dump())
-
-    async def get_champion_model(self, symbol: str) -> Optional[ModelMetadata]:
-        docs = self.db.collection("model_registry")\
-            .where("symbol", "==", symbol)\
-            .where("is_champion", "==", True)\
-            .limit(1).stream()
-        for doc in docs:
-            return ModelMetadata(**doc.to_dict())
-        return None
-
-    async def save_ml_dataset(self, dataset: MLDataset) -> None:
-        self.db.collection("ml_datasets").document(dataset.id).set(dataset.model_dump())
-
-    async def get_features_by_range(self, symbol: str, start_date: datetime, end_date: datetime) -> List[FeatureVector]:
-        docs = self.db.collection("feature_store")\
-            .where("symbol", "==", symbol)\
-            .where("date", ">=", start_date)\
-            .where("date", "<=", end_date)\
-            .order_by("date").stream()
-        return [FeatureVector(**doc.to_dict()) for doc in docs]
-
-    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None:
-        doc_id = f"{user_id}_{device_info['device_id']}"
-        self.db.collection("devices").document(doc_id).set({
-            **device_info,
-            "user_id": user_id,
-            "last_active": datetime.utcnow()
-        })
-
-    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:
-        docs = self.db.collection("devices").where("user_id", "==", user_id).stream()
-        return [doc.to_dict() for doc in docs]
-
-    async def save_feature_definition(self, definition: FeatureDefinition) -> None:
-        doc_id = f"{definition.name}_{definition.version}"
-        self.db.collection("feature_definitions").document(doc_id).set(definition.model_dump())
-
-    async def get_feature_definitions(self, category: Optional[str] = None) -> List[FeatureDefinition]:
-        query = self.db.collection("feature_definitions")
-        if category:
-            query = query.where("category", "==", category)
-        docs = query.stream()
-        return [FeatureDefinition(**doc.to_dict()) for doc in docs]
-
-    async def save_strategy(self, strategy: UserStrategy) -> None:
-        self.db.collection("strategies").document(strategy.id).set(strategy.model_dump())
-
-    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]:
-        docs = self.db.collection("strategies").where("user_id", "==", user_id).stream()
-        return [UserStrategy(**doc.to_dict()) for doc in docs]
-
-    async def save_paper_order(self, order: PaperOrder) -> None:
-        self.db.collection("paper_orders").document(order.id).set(order.model_dump())
-
-    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]:
-        doc = self.db.collection("virtual_portfolios").document(user_id).get()
-        if doc.exists:
-            return VirtualPortfolio(**doc.to_dict())
-        return None
-
-    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None:
-        self.db.collection("virtual_portfolios").document(portfolio.user_id).set(portfolio.model_dump())
+    # --- OBSOLETE PRODUCT INTERFACES (REMOVED) ---
+    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]: return None
+    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None: pass
+    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]: return None
+    async def save_portfolio_health(self, health: PortfolioHealth) -> None: pass
+    async def save_paper_order(self, order: PaperOrder) -> None: pass
+    async def save_strategy(self, strategy: UserStrategy) -> None: pass
+    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]: return []

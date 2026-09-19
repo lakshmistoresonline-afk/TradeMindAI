@@ -10,70 +10,24 @@ router = APIRouter()
 
 @router.get("/stats")
 async def get_system_stats(current_user: dict = Depends(get_current_admin)):
-    # Check if user is admin (Vision 2.0: Restricted access)
+    """
+    Returns high-level system summary (Real-time).
+    """
+    from backend.core.postgres import SessionLocal, LiveSignalDB, ShadowSignalDB
+    with SessionLocal() as session:
+        active = session.query(LiveSignalDB).count()
+        total_hist = session.query(ShadowSignalDB).count()
+
     return {
-        "total_users": 1240,
-        "active_jobs": 12,
+        "active_signals": active,
+        "historical_signals": total_hist,
         "system_health": "OPTIMAL"
     }
 
 @router.get("/evaluation")
 async def get_model_evaluation(current_user: dict = Depends(get_current_admin)):
-    return await container.adaptive_service.evaluate_agent_performance()
-
-@router.post("/retrain/{model_name}")
-async def retrain_model(model_name: str, current_user: dict = Depends(get_current_admin)):
-    return {"message": f"Retraining started for {model_name}"}
-
-@router.get("/health")
-async def get_data_health():
-    """
-    Vision 2.2: Data Integrity & Health Audit.
-    """
-    from backend.core.postgres import SessionLocal, StockDB
-    session = SessionLocal()
-    try:
-        stocks = session.query(StockDB).all()
-        total = len(stocks)
-        universe_size = len(UniverseService.NIFTY_200_CONSTITUENTS)
-
-        # High-fidelity completion check
-        complete = len([s for s in stocks if s.last_price and s.analysis and s.options_data and s.financial_history and s.health_metrics])
-        ai_success = len([s for s in stocks if s.ai_status == "SUCCESS"])
-        ai_pending = len([s for s in stocks if s.ai_status == "PENDING"])
-        ai_failed = len([s for s in stocks if s.ai_status == "FAILED"])
-
-        now = datetime.datetime.now(timezone.utc)
-        stale = len([s for s in stocks if s.updated_at and (now - (s.updated_at if s.updated_at.tzinfo else s.updated_at.replace(tzinfo=timezone.utc))).total_seconds() > 86400])
-        partial = total - complete
-
-        return {
-            "database": {
-                "total_stocks": total,
-                "complete_stocks": complete,
-                "partial_stocks": partial,
-                "stale_stocks": stale,
-                "unavailable_stocks": universe_size - total if total < universe_size else 0,
-                "fidelity_pct": (complete / universe_size * 100) if universe_size > 0 else 0,
-                "freshness_pct": ((total - stale) / total * 100) if total > 0 else 0,
-                "universe_coverage_pct": (total / universe_size * 100) if universe_size > 0 else 0
-            },
-            "ai_health": {
-                "success": ai_success,
-                "pending": ai_pending,
-                "failed": ai_failed,
-                "completion_pct": (ai_success / universe_size * 100) if universe_size > 0 else 0
-            },
-
-            "services": {
-                "market_data": "HEALTHY",
-                "ai_engine": "HEALTHY",
-                "quant_analytics": "HEALTHY"
-            },
-            "last_global_sync": stocks[0].updated_at if total > 0 else None
-        }
-    finally:
-        session.close()
+    # Returns champion performance across universe
+    return await container.data_platform_repo.get_all_champion_models()
 
 @router.get("/db-audit")
 async def db_audit(current_user: dict = Depends(get_current_admin)):
@@ -81,7 +35,7 @@ async def db_audit(current_user: dict = Depends(get_current_admin)):
     from sqlalchemy import text
     results = {}
     with engine.connect() as conn:
-        tables = ["stocks", "opportunities", "trade_journal", "predictions", "historical_prices"]
+        tables = ["stocks", "opportunities", "predictions", "historical_prices", "live_signals", "shadow_signals"]
         for t in tables:
             try:
                 count = conn.execute(text(f"SELECT count(*) FROM {t}")).scalar()
@@ -89,34 +43,6 @@ async def db_audit(current_user: dict = Depends(get_current_admin)):
             except:
                 results[t] = "ERROR"
     return results
-
-@router.get("/force-repair")
-async def privileged_repair(current_user: dict = Depends(get_current_admin)):
-    # SECURE ADMIN ENDPOINT FOR SCHEMA SYNC
-    from backend.core.postgres import engine, Base
-    from sqlalchemy import text, inspect
-
-    results = []
-    inspector = inspect(engine)
-    with engine.connect() as conn:
-        for table_name, model in Base.metadata.tables.items():
-            try:
-                existing_cols = {col['name'] for col in inspector.get_columns(table_name)}
-                for col_name, column in model.columns.items():
-                    if col_name not in existing_cols:
-                        col_type = "JSON"
-                        if "Float" in str(column.type): col_type = "DOUBLE PRECISION"
-                        elif "BigInteger" in str(column.type): col_type = "BIGINT"
-                        elif "Integer" in str(column.type): col_type = "INTEGER"
-                        elif "String" in str(column.type): col_type = "VARCHAR"
-                        elif "DateTime" in str(column.type): col_type = "TIMESTAMP"
-
-                        conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type}"))
-                        results.append(f"Added {col_name} to {table_name}")
-            except Exception as e:
-                results.append(f"Error on {table_name}: {str(e)}")
-        conn.commit()
-    return {"status": "Complete", "changes": results}
 
 @router.get("/logs")
 async def get_system_logs(limit: int = 20, current_user: dict = Depends(get_current_admin)):

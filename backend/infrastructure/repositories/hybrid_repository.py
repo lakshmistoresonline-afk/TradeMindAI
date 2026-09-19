@@ -6,7 +6,7 @@ from backend.domain.interfaces.repository import IStockRepository, IDataPlatform
 from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB, LiveSignalDB, ModelMetadataDB, ShadowSignalDB, ShadowProvenanceDB
 from backend.core.duckdb_engine import analytical_engine
 from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain
-from backend.domain.models.ios import MarketRegime, MarketOpportunity, LiveSignal, WorkspaceState, ResearchNote, TradeFeedback, MarketIntelligenceReport
+from backend.domain.models.ios import MarketRegime, MarketOpportunity, LiveSignal, MarketIntelligenceReport
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import pandas as pd
 import json
@@ -455,34 +455,7 @@ class HybridIOSRepository(IIOSRepository):
             res = pg.query(ShadowSignalDB).filter(ShadowSignalDB.outcome_verified == True).all()
             return [self._map_db_to_live_signal(r) for r in res]
 
-    # --- RESTORING ABSENT CANONICAL IIOSREPOSITORY CONFLICT INTERFACES ---
-    async def save_workspace(self, workspace: WorkspaceState) -> None:
-        self.fs.collection("workspaces").document(workspace.id).set(workspace.model_dump())
-
-    async def get_user_workspaces(self, user_id: str) -> List[WorkspaceState]:
-        docs = self.fs.collection("workspaces").where("user_id", "==", user_id).stream()
-        return [WorkspaceState(**doc.to_dict()) for doc in docs]
-
-    async def save_research_note(self, note: ResearchNote) -> None:
-        self.fs.collection("research_notes").document(note.id).set(note.model_dump())
-
-    async def get_stock_notes(self, user_id: str, symbol: str) -> List[ResearchNote]:
-        docs = self.fs.collection("research_notes").where("user_id", "==", user_id).where("symbol", "==", symbol).stream()
-        return [ResearchNote(**doc.to_dict()) for doc in docs]
-
-    async def save_intel_report(self, report: MarketIntelligenceReport) -> None:
-        self.fs.collection("intel_reports").document(report.id).set(report.model_dump())
-
-    async def get_latest_intel_report(self, report_type: str) -> Optional[MarketIntelligenceReport]:
-        from google.cloud import firestore
-        docs = self.fs.collection("intel_reports").where("type", "==", report_type).order_by("date", direction=firestore.Query.DESCENDING).limit(1).stream()
-        for doc in docs: return MarketIntelligenceReport(**doc.to_dict())
-        return None
-
-    async def save_trade_feedback(self, feedback: TradeFeedback) -> None:
-        self.fs.collection("trade_journal").document(feedback.id).set(feedback.model_dump())
-
-    async def get_user_trades(self, user_id: str) -> List[TradeFeedback]:
-        docs = self.fs.collection("trade_journal").where("user_id", "==", user_id).stream()
-        return [TradeFeedback(**doc.to_dict()) for doc in docs]
+    # --- OBSOLETE PRODUCT INTERFACES (REMOVED) ---
+    async def save_intel_report(self, report: MarketIntelligenceReport) -> None: pass
+    async def get_latest_intel_report(self, report_type: str) -> Optional[MarketIntelligenceReport]: return None
 

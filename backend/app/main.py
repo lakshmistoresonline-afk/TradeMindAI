@@ -32,12 +32,12 @@ async def startup():
     print("[*] API Node starting up...")
 
     # P0 Integrity: Alembic handles production migrations now.
-    # Base.metadata.create_all is a development fallback only.
+    # init_db is a development fallback for fresh environments.
     if settings.ENVIRONMENT != "production":
         try:
             from backend.core.postgres import init_db
             init_db()
-            print("[+] Development database initialized (Base.metadata).")
+            print("[+] Development database initialized.")
         except Exception as e:
             print(f"[!] Database Initialization Failed: {e}")
 

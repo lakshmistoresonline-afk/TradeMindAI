@@ -783,11 +783,6 @@ def guard_live_signal(mapper, connection, target):
     if settings.ENVIRONMENT in ["production", "shadow"] and target.evaluation_mode == "TEST":
         raise ValueError(f"CRITICAL: Rejected TEST signal insertion into {settings.ENVIRONMENT} database.")
 
-@event.listens_for(ShadowSignalDB, 'before_insert')
-def guard_shadow_signal(mapper, connection, target):
-    if settings.ENVIRONMENT in ["production", "shadow"] and target.evaluation_mode == "TEST":
-        raise ValueError(f"CRITICAL: Rejected TEST signal insertion into {settings.ENVIRONMENT} database.")
-
 def init_db():
     Base.metadata.create_all(bind=engine)
 
