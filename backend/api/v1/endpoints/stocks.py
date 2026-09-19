@@ -17,9 +17,11 @@ router = APIRouter()
 async def get_market_stats():
     """
     Hardened Market Index Fetcher (Institutional V2.2).
-    Fetches NIFTY 50, 100, 200 and VIX via authoritative yfinance bulk wrappers.
+    Uses YahooQuery fallback to bypass yfinance 429 rate limits for NIFTY/VIX.
     """
     from backend.services.market_data_service import MarketDataService
+    from yahooquery import Ticker as YQTicker
+
     market_state = await MarketDataService.get_market_state()
 
     indices = {
@@ -37,25 +39,40 @@ async def get_market_stats():
     stats["India VIX"]["value"] = market_state.get("vix", 14.5)
 
     try:
-        # P0: Bulk download indices for atomic consistency
-        symbols = list(indices.keys())
-        data = yf.download(symbols, period="2d", interval="1d", group_by='ticker', progress=False)
+        # P0 Hardening: Use YahooQuery for more resilient bulk fetching
+        symbols = " ".join(indices.keys())
+        yq = YQTicker(symbols)
+        data = yq.history(period="2d")
 
-        for sym, name in indices.items():
-            try:
-                ticker_data = data[sym] if len(symbols) > 1 else data
-                if not ticker_data.empty and 'Close' in ticker_data.columns:
-                    valid_df = ticker_data.dropna(subset=['Close'])
-                    if len(valid_df) >= 1:
-                        curr = float(valid_df['Close'].iloc[-1])
-                        prev = float(valid_df['Close'].iloc[-2]) if len(valid_df) > 1 else curr
+        if not data.empty:
+            for sym, name in indices.items():
+                try:
+                    if sym in data.index.get_level_values('symbol'):
+                        ticker_data = data.xs(sym, level='symbol')
+                        if not ticker_data.empty and 'close' in ticker_data.columns:
+                            valid_df = ticker_data.dropna(subset=['close'])
+                            if len(valid_df) >= 1:
+                                curr = float(valid_df['close'].iloc[-1])
+                                prev = float(valid_df['close'].iloc[-2]) if len(valid_df) > 1 else curr
 
-                        stats[name] = {
-                            "value": round(curr, 2),
-                            "change": round(((curr - prev) / prev * 100), 2) if prev != 0 else 0.0
-                        }
-            except Exception as e:
-                print(f"   [!] Stats parsing error for {name}: {e}")
+                                stats[name] = {
+                                    "value": round(curr, 2),
+                                    "change": round(((curr - prev) / prev * 100), 2) if prev != 0 else 0.0
+                                }
+                except Exception as e:
+                    print(f"   [!] YahooQuery parsing error for {name}: {e}")
+
+        # Final sanity check: if NIFTY is still 0, try yfinance as a last resort
+        if stats["NIFTY 50"]["value"] == 0:
+            print("[*] NIFTY 0 via YahooQuery, attempting yfinance fallback...")
+            y_data = yf.download("^NSEI", period="2d", interval="1d", progress=False)
+            if not y_data.empty:
+                curr = float(y_data['Close'].iloc[-1])
+                prev = float(y_data['Close'].iloc[-2]) if len(y_data) > 1 else curr
+                stats["NIFTY 50"] = {
+                    "value": round(curr, 2),
+                    "change": round(((curr - prev) / prev * 100), 2) if prev != 0 else 0.0
+                }
 
         return stats
     except Exception as e:
