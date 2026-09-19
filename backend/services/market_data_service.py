@@ -83,13 +83,23 @@ class MarketDataService:
                 # Fallback check for ticker with hat
                 vix = await container.provider.get_ltp("^INDIAVIX")
 
-            # 2. Fetch Index for Regime
-            index_df = await container.provider.fetch_history("NIFTY", period="1y")
+            # 2. Fetch Index for Regime (Harden with YahooQuery for Resiliency)
+            from yahooquery import Ticker as YQTicker
+            yq = YQTicker("^NSEI")
+            index_df = yq.history(period="1y")
+
+            if not index_df.empty:
+                # Normalize column names for engine
+                index_df = index_df.rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
+                if isinstance(index_df.index, pd.MultiIndex):
+                    index_df = index_df.reset_index(level=0, drop=True)
 
             # 3. Detect Regime
             from backend.services.ios.regime_engine import MarketRegimeEngine
 
-            if vix is None or vix <= 0:
+            vix_val = vix.get("price") if isinstance(vix, dict) else vix
+
+            if vix_val is None or vix_val <= 0 or index_df.empty:
                  return {
                     "regime": "UNKNOWN",
                     "risk_mode": "UNKNOWN",
@@ -98,13 +108,12 @@ class MarketDataService:
                     "timestamp": None # P0: No fake timestamps
                 }
 
-
-            regime_obj = MarketRegimeEngine.detect_regime(index_df, float(vix))
+            regime_obj = MarketRegimeEngine.detect_regime(index_df, float(vix_val))
 
             return {
                 "regime": regime_obj.regime,
                 "risk_mode": regime_obj.risk_mode,
-                "vix": float(vix),
+                "vix": float(vix_val),
                 "sentiment_score": regime_obj.sentiment_score,
                 "description": regime_obj.description,
                 "timestamp": datetime.datetime.now(timezone.utc).isoformat(),
@@ -121,6 +130,7 @@ class MarketDataService:
                 "error": "Market source connectivity failure.",
                 "timestamp": None
             }
+
 
 
 

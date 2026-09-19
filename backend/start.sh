@@ -37,6 +37,14 @@ fi
 # Note: Celery worker/beat branches removed to prevent accidental cloud execution.
 # Background tasks are preserved in the codebase for local manual execution only.
 
+# --- PRODUCTION SCHEMA REPAIR (Phase 4 Hardening) ---
+if [ "$ENVIRONMENT" = "production" ]; then
+    echo "[*] AUDIT: Verifying database schema integrity..."
+    # Attempt a lightweight schema repair for known missing columns in live Neon
+    python -c "from backend.api.v1.endpoints.admin import privileged_repair; import asyncio; from backend.core.auth import get_current_admin; print(asyncio.run(privileged_repair(None)))"
+fi
+
 echo "Starting FastAPI API..."
+
 PORT=${PORT:-8000}
 uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-keep-alive 60
