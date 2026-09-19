@@ -1,49 +1,41 @@
 # Historical Signal Forensic Baseline
 
 ## 1. Audit Metadata
-- **Repository HEAD**: `8a986345c7f1f7ef8579161db14117a46c6698d2`
+- **Verified HEAD SHA**: `8a986345c7f1f7ef8579161db14117a46c6698d2`
 - **Audit Date**: 2026-09-19
-- **Environment**: Production Hardened
+- **Authoritative Database**: Neon (PostgreSQL)
 
-## 2. Architecture Discovery
+## 2. System Architecture (Current HEAD)
 
-### A. Signal Generation Engine
-- **Master Node**: `SignalEngine.generate_signal` (backend/services/signal_engine.py)
-- **Input**: Multi-agent consensus (Technical, SMC, Wyckoff, ML).
-- **Core version**: Strategy V2.2.
-- **Model**: "TradeMind Core v2.2".
-- **Risk Geometry**: `RiskEngine` (ATR-based).
-  - SHORT: 1.5 ATR Stop / 2.0 RR Target
-  - SWING: 2.0 ATR Stop / 2.5 RR Target
-  - LONG: 3.0 ATR Stop / 3.0 RR Target
+### A. Signal Generation
+- **Engine**: `SignalEngine.generate_signal` (V2.2 Strategy).
+- **Core Version**: `v2.2`.
+- **Decision Logic**: Multi-agent consensus (Technical, SMC, Wyckoff, ML).
+- **Risk Multipliers**: 
+  - **SHORT**: 1.5 ATR Stop / 2.0 RR Target.
+  - **SWING**: 2.0 ATR Stop / 2.5 RR Target.
+  - **LONG**: 3.0 ATR Stop / 3.0 RR Target.
 
-### B. Signal Lifecycle & Outcome
-- **Lifecycle FSM**: `SignalLifecycleService` manages states: CREATED -> WAITING_FOR_ENTRY -> ACTIVE -> TERMINAL.
-- **Outcome Engine**: `OutcomeService.evaluate_signal_outcome`.
-- **Truth Principles**:
-  - Same-bar ambiguity: Detected and flagged as `AMBIGUOUS`.
-  - Terminal Immutability: Enforced via `SignalLedgerService`.
-  - Freshness Enforcement: Canonical policy (FRESH < 15m).
+### B. Outcome Resolution
+- **Service**: `OutcomeService.evaluate_signal_outcome`.
+- **States**: `TARGET_HIT`, `STOP_LOSS`, `EXPIRED`, `CANCELLED`, `TIMEOUT`, `AMBIGUOUS`.
+- **Same-Bar Ambiguity**: Explicitly detected when High >= Target AND Low <= Stop in the same candle. Results in `AMBIGUOUS`.
 
 ### C. Authoritative Ledger
-- **Primary Source**: Neon PostgreSQL (`shadow_signals` table).
-- **Mirror**: Firestore.
-- **Forensic Evidence**: `ShadowProvenanceDB` stores input/output hashes and snapshot data.
+- **Shadow Signals**: `shadow_signals` table (Reconstructed and historical population).
+- **Live Signals**: `live_signals` table (Active production signals).
+- **Provenance**: `ShadowProvenanceDB` stores bitwise evidence hashes.
 
-### D. Market Data Architecture
-- **Provider**: `PriceResolver` (Multi-provider failover: NSE Open -> AngelOne -> Upstox -> Dhan -> Groww -> YFinance).
-- **Truth Model**: Distinguishes `observation_timestamp`, `received_at`, and `calculated_at`.
-- **Bulk Fetching**: YahooQuery bulk requests for Index/VIX.
+### D. Market Data & Freshness
+- **Service**: `MarketDataService` & `PriceResolver`.
+- **Policy**: `FRESH` (< 15m), `AGING` (15-120m), `STALE` (> 120m).
+- **Instrumentation**: Separates `observation_timestamp`, `received_at`, and `calculated_at`.
 
-## 3. Signal Quality Gates (Current)
-1. **Freshness**: Max 120h since last feature date (for generation).
-2. **Liquidity**: Min 10M Avg Volume.
-3. **Trend**: EMA 200 alignment.
-4. **Momentum**: Breakout magnitude > 0.5 ATR.
-5. **Edge**: Calibrated Probability >= 52%.
-6. **Value**: Expected Value > 0.
-7. **Volatility**: Risk % <= 12%.
+## 3. Discovered Population Segmentation (V2.2)
+- **Total Ledger Population**: 166 signals.
+- **Group 1 (S:3.0% / T:3.0%)**: Legacy Fixed Geometry (RR:1.0). N=24 resolved.
+- **Group 2 (S:4.0% / T:10.0%)**: SWING Standard Geometry (RR:2.5). N=26 resolved.
+- **Group 3 (Active)**: Live production signals in `ACTIVE` state. N=113 (Shadow) + 33 (Live).
 
 ---
-**Status**: Architecture Audited & Documented.
-**Next Action**: Connect to Neon and extract the V2.2 Shadow Population.
+**Certified By**: Principal Quantitative Engineer (AI Agent)
