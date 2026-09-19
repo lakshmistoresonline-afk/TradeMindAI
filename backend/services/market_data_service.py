@@ -28,13 +28,9 @@ class MarketDataService:
                     "status": "FRESH" if price_data.get("price") else "UNAVAILABLE"
                 }
 
-            # Canonical Freshness Policy (Institutional 1.5)
-            # FRESH < 15m (900s), AGING < 120m (7200s), STALE >= 120m
-            age = (datetime.datetime.utcnow() - stock.updated_at).total_seconds() if stock.updated_at else 999999
-
-            if age < 900: status = "FRESH"
-            elif age < 7200: status = "AGING"
-            else: status = "STALE"
+            # Canonical Freshness Policy (Phase 2 Hardening)
+            from backend.services.freshness_policy import FreshnessPolicy
+            status = FreshnessPolicy.get_status(stock.updated_at)
 
             return {
                 "price": stock.last_price,
@@ -42,6 +38,7 @@ class MarketDataService:
                 "source": "SQL_Cache",
                 "status": status
             }
+
         except Exception as e:
             print(f"[MarketData] Error fetching price for {symbol}: {e}")
             return {"price": None, "timestamp": None, "source": None, "status": "UNAVAILABLE"}
@@ -55,6 +52,7 @@ class MarketDataService:
     async def get_market_state() -> Dict[str, Any]:
         """
         Final Hardening: Single source of truth for Market Regime and VIX.
+        No fabricated data fallback (Phase 2 Hardening).
         """
         try:
             # 1. Fetch VIX (Hardened for ^INDIAVIX)
@@ -68,35 +66,47 @@ class MarketDataService:
 
             # 3. Detect Regime
             from backend.services.ios.regime_engine import MarketRegimeEngine
-            vix_val = float(vix) if (vix and vix > 0) else 14.5
-            regime_obj = MarketRegimeEngine.detect_regime(index_df, vix_val)
+
+            if vix is None or vix <= 0:
+                 return {
+                    "regime": "UNKNOWN",
+                    "risk_mode": "UNKNOWN",
+                    "vix": None,
+                    "status": "UNAVAILABLE",
+                    "timestamp": datetime.datetime.utcnow().isoformat()
+                }
+
+            regime_obj = MarketRegimeEngine.detect_regime(index_df, float(vix))
 
             return {
                 "regime": regime_obj.regime,
                 "risk_mode": regime_obj.risk_mode,
-                "vix": float(vix) if (vix and vix > 0) else 14.5,
+                "vix": float(vix),
                 "sentiment_score": regime_obj.sentiment_score,
                 "description": regime_obj.description,
                 "timestamp": datetime.datetime.utcnow().isoformat(),
-                "status": "HEALTHY" if (vix and vix > 0) else "DEGRADED"
+                "status": "HEALTHY"
             }
         except Exception as e:
             print(f"[MarketData] Regime detection failed: {e}")
             return {
-                "regime": "SIDEWAYS",
-                "risk_mode": "NEUTRAL",
-                "vix": 14.5,
+                "regime": "ERROR",
+                "risk_mode": "ERROR",
+                "vix": None,
                 "status": "ERROR",
-                "error": str(e)
+                "error": "Market source connectivity failure.",
+                "timestamp": datetime.datetime.utcnow().isoformat()
             }
 
+
     @staticmethod
-    async def sync_active_signal_prices():
+    async def sync_active_signal_prices(execution_id: Optional[str] = None):
         """
         Throttled Pulse Sync: Syncs current prices for all non-terminal signals.
         Logs forensic metrics for institutional release.
         """
-        print("[*] MarketDataService: Throttled Pulse Sync Started...")
+        pulse_id = execution_id or str(uuid.uuid4())
+        print(f"[*] MarketDataService: Throttled Pulse Sync Started (ID: {pulse_id[:8]})...")
         from backend.services.price_resolver import PriceResolver
         from backend.services.signal_ledger_service import SignalLedgerService
         import time
@@ -110,57 +120,70 @@ class MarketDataService:
                 print("   [DEBUG] No active signals to sync.")
                 return
 
-            stats = {"success": 0, "failed": 0, "total": len(non_terminal), "start_time": time.time()}
+            stats = {
+                "success": 0, "failed": 0, "total": len(non_terminal),
+                "start_time": time.time(), "skipped": 0, "transitions": 0
+            }
 
-            for signal in non_terminal:
-                try:
-                    start_fetch = time.time()
-                    res = await PriceResolver.resolve_current_price(signal)
-                    fetch_duration = (time.time() - start_fetch) * 1000
+            # P1 Bounded Concurrency (Phase 2 Hardening)
+            semaphore = asyncio.Semaphore(10)
 
-                    if res["status"] == "FRESH":
-                        updates = {
-                            "current_price": res["current_price"],
-                            "current_price_timestamp": res["timestamp"],
-                            "current_price_source": res["source"],
-                            "current_price_status": "FRESH",
-                            "last_reconciled_at": datetime.datetime.utcnow()
-                        }
-                        await SignalLedgerService.update_signal(signal.id, updates)
-                        stats["success"] += 1
+            async def process_signal(sig):
+                async with semaphore:
+                    try:
+                        start_fetch = time.time()
+                        res = await PriceResolver.resolve_current_price(sig)
+                        fetch_duration = (time.time() - start_fetch) * 1000
 
-                        # Phase 10: Immediate Lifecycle Audit (Institutional 1.5)
-                        from backend.services.signal_lifecycle_service import SignalLifecycleService
-                        await SignalLifecycleService.audit_signal(signal.id)
+                        if res["status"] == "FRESH":
+                            updates = {
+                                "current_price": res["current_price"],
+                                "current_price_timestamp": res["timestamp"],
+                                "current_price_source": res["source"],
+                                "current_price_status": "FRESH",
+                                "last_reconciled_at": datetime.datetime.utcnow(),
+                                "pulse_execution_id": pulse_id
+                            }
+                            await SignalLedgerService.update_signal(sig.id, updates)
+                            stats["success"] += 1
 
-                        # Forensic Log in console
-                        print(f"   [SYNC_OK] {signal.symbol} | Price: {res['current_price']} | Provider: {res['source']} | Latency: {fetch_duration:.1f}ms")
-                    else:
-                        print(f"   [SYNC_WARN] {signal.symbol} failed resolution: {res['status']}")
+                            from backend.services.signal_lifecycle_service import SignalLifecycleService
+                            changed = await SignalLifecycleService.audit_signal(sig.id)
+                            if changed: stats["transitions"] += 1
+
+                            print(f"   [SYNC_OK] {sig.symbol} | Price: {res['current_price']} | Provider: {res['source']} | Latency: {fetch_duration:.1f}ms")
+                        else:
+                            print(f"   [SYNC_WARN] {sig.symbol} failed resolution: {res['status']}")
+                            stats["failed"] += 1
+                    except Exception as sig_err:
+                        print(f"   [!] Signal refresh failed for {sig.symbol}: {sig_err}")
                         stats["failed"] += 1
 
-                    # Throttling to prevent 429
-                    await asyncio.sleep(0.2)
-                except Exception as sig_err:
-                    print(f"   [!] Signal refresh failed for {signal.symbol}: {sig_err}")
-                    stats["failed"] += 1
+            # Run in parallel with bounding
+            await asyncio.gather(*[process_signal(s) for s in non_terminal])
+
 
             duration = time.time() - stats["start_time"]
             print(f"[+] Pulse Sync Complete: {stats['success']} OK, {stats['failed']} FAIL. Duration: {duration:.1f}s")
 
-            # Store sync metadata in Firebase for Admin visibility
+            # Store sync metadata in Firebase for Admin visibility (P1 Observability)
             from backend.core.database import db_client
             if db_client:
                 try:
                     db_client.collection("system_metrics").document("last_price_sync").set({
-                        "timestamp": datetime.datetime.utcnow(),
-                        "duration_s": duration,
-                        "symbols_total": stats["total"],
-                        "symbols_success": stats["success"],
-                        "symbols_failed": stats["failed"],
+                        "pulse_execution_id": pulse_id,
+                        "started_at": datetime.datetime.fromtimestamp(stats["start_time"]),
+                        "finished_at": datetime.datetime.utcnow(),
+                        "duration_ms": int(duration * 1000),
+                        "signals_total": stats["total"],
+                        "signals_success": stats["success"],
+                        "signals_failed": stats["failed"],
+                        "signals_skipped": stats["skipped"],
+                        "lifecycle_transitions": stats["transitions"],
                         "status": "COMPLETED"
                     })
                 except: pass
 
         except Exception as e:
             print(f"[!] MarketDataService: Pulse sync failed: {e}")
+

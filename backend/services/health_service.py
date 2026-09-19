@@ -64,11 +64,14 @@ class SystemHealthService:
                     sync_meta = sync_doc.to_dict()
             except: pass
 
+        from backend.core.version import get_version_metadata
+
         return {
             "status": "HEALTHY" if all(v == "HEALTHY" for v in components.values()) else "DEGRADED",
-            "timestamp": datetime.datetime.utcnow().isoformat(),
+            **get_version_metadata(),
             "components": components,
             "freeze_report": freeze_status,
+
             "universe": {
                 "total": universe["total"],
                 "fresh": universe["fresh"],

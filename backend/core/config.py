@@ -47,11 +47,22 @@ class Settings(BaseSettings):
 
     @validator("SECRET_KEY")
     def validate_secret_key(cls, v: str, values: dict) -> str:
-        if values.get("ENVIRONMENT") == "production" and v == "SECRET":
-            # Vision 2.2: Log warning but allow boot to prevent 502 crash.
-            # Recommendation: Set a secure SECRET_KEY in Railway variables.
-            return "tm-production-hardened-default-key-2026"
+        if values.get("ENVIRONMENT") == "production":
+            if v == "SECRET":
+                raise ValueError("SECRET_KEY must be set in production environment via environment variables.")
+            if len(v) < 32:
+                 # Warning only, but highly recommended
+                 print("[!] WARNING: production SECRET_KEY is weak (< 32 chars).")
         return v
+
+    MARKET_DATA_INGEST_KEY: str = "LOCAL_ONLY_DEV_KEY"
+
+    @validator("MARKET_DATA_INGEST_KEY")
+    def validate_ingest_key(cls, v: str, values: dict) -> str:
+        if values.get("ENVIRONMENT") == "production" and v == "LOCAL_ONLY_DEV_KEY":
+            raise ValueError("MARKET_DATA_INGEST_KEY must be set in production.")
+        return v
+
 
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8

@@ -64,19 +64,23 @@ class SignalLedgerService:
             db.commit()
             db.refresh(db_obj)
 
-            # 2. Firestore Mirror
+            # 2. Firestore Mirror (P1 Hardening: Run in thread to avoid blocking loop)
             if db_client:
-                try:
-                    mirror_data = signal.model_dump()
-                    # Add mirror metadata
-                    mirror_data["mirrored_at"] = datetime.datetime.utcnow()
-                    mirror_data["source_neon_id"] = signal.id
+                def run_mirror():
+                    try:
+                        mirror_data = signal.model_dump()
+                        # Add mirror metadata
+                        mirror_data["mirrored_at"] = datetime.datetime.utcnow()
+                        mirror_data["source_neon_id"] = signal.id
 
-                    db_client.collection("signals").document(signal.id).set(mirror_data)
-                except Exception as e:
-                    print(f"[SignalLedger] Mirror failed for {signal.id}: {e}")
+                        db_client.collection("signals").document(signal.id).set(mirror_data)
+                    except Exception as e:
+                        print(f"[SignalLedger] Mirror failed for {signal.id}: {e}")
+
+                await asyncio.to_thread(run_mirror)
 
             return signal
+
         except Exception as e:
             db.rollback()
             raise e
@@ -115,14 +119,18 @@ class SignalLedgerService:
             db_obj.updated_at = datetime.datetime.utcnow()
             db.commit()
 
-            # Mirror to Firestore
+            # Mirror to Firestore (P1 Hardening: Run in thread to avoid blocking loop)
             if db_client:
-                try:
-                    db_client.collection("signals").document(signal_id).update(updates)
-                except Exception as e:
-                    print(f"[SignalLedger] Mirror update failed for {signal_id}: {e}")
+                def run_mirror_update():
+                    try:
+                        db_client.collection("signals").document(signal_id).update(updates)
+                    except Exception as e:
+                        print(f"[SignalLedger] Mirror update failed for {signal_id}: {e}")
+
+                await asyncio.to_thread(run_mirror_update)
 
             return True
+
         except Exception as e:
             db.rollback()
             raise e

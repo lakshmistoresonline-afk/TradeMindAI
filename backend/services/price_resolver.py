@@ -96,7 +96,7 @@ class PriceResolver:
             "current_price": None,
             "underlying_price": None,
             "normalized_current_price": None,
-            "timestamp": datetime.datetime.now(),
+            "timestamp": datetime.datetime.utcnow(),
             "source": "FAILOVER_EXHAUSTED",
             "status": "DATA_UNAVAILABLE",
             "eligibility": "DATA_BLOCKED"

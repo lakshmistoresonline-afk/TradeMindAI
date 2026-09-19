@@ -12,6 +12,7 @@ import datetime
 import json
 import traceback
 import asyncio
+import uuid
 
 app = FastAPI(
     title="TradeMind AI MASTER 4.5.40A",
@@ -52,10 +53,11 @@ async def startup():
                 # Market Hours Guard: Run every 5m only when open, otherwise 1h.
                 if MarketCalendar.is_market_open():
                     lock_acquired = False
+                    execution_id = str(uuid.uuid4())
                     if redis:
                         try:
-                            # Part 5: Atomic lock acquisition with TTL of 280 seconds to avoid multi-instance execution
-                            lock_acquired = await redis.set("lock:pulse", "acquired", ex=280, nx=True)
+                            # P1 Hardening: Atomic lock acquisition with unique token
+                            lock_acquired = await redis.set("lock:pulse", execution_id, ex=280, nx=True)
                         except Exception as le:
                             print(f"[!] Redis lock check failed: {le}")
                             lock_acquired = False
@@ -63,20 +65,34 @@ async def startup():
                         print("[!] Redis unavailable. Failing safe by denying lock.")
                         lock_acquired = False
 
+
                     if lock_acquired:
-                        print("[+] lock:pulse ACQUIRED. Starting Pulse Execution Cycle.")
+                        print(f"[+] lock:pulse ACQUIRED (Token: {execution_id[:8]}). Starting Pulse Execution Cycle.")
                         try:
-                            await MarketDataService.sync_active_signal_prices()
+                            await MarketDataService.sync_active_signal_prices(execution_id=execution_id)
+
                         finally:
                             try:
-                                await redis.delete("lock:pulse")
-                                print("[+] lock:pulse RELEASED safely.")
-                            except:
-                                pass
+                                # Atomic delete-if-matches
+                                lua_script = """
+                                if redis.call("get", KEYS[1]) == ARGV[1] then
+                                    return redis.call("del", KEYS[1])
+                                else
+                                    return 0
+                                end
+                                """
+                                result = await redis.eval(lua_script, 1, "lock:pulse", execution_id)
+                                if result:
+                                    print("[+] lock:pulse RELEASED safely.")
+                                else:
+                                    print("[!] lock:pulse RELEASE REJECTED: Lock ownership mismatch or expired.")
+                            except Exception as re:
+                                print(f"[!] Redis lock release error: {re}")
                     else:
                         print("[*] lock:pulse DENIED / SKIPPED. Another instance is active or Redis is down.")
 
                     await asyncio.sleep(300)
+
                 else:
                     print("[*] Pulse Sync: Market Closed. Next check in 60m.")
                     await asyncio.sleep(3600)
@@ -90,13 +106,13 @@ async def startup():
 
 @app.get("/")
 def root():
+    from backend.core.version import get_version_metadata
     return {
         "message": "Welcome to TradeMind AI API",
         "status": "ONLINE",
-        "version": "1.4.1-COMMERCIAL-FINAL",
-        "deployed_at": datetime.datetime.utcnow().isoformat(),
-        "forensic_id": "COMMERCIAL_RELEASE_20260918"
+        **get_version_metadata()
     }
+
 
 @app.get("/ready")
 async def readiness():
@@ -152,8 +168,13 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    print(f"CRITICAL ERROR: {exc}")
+    print(f"CRITICAL ERROR [{request.method} {request.url.path}]: {traceback.format_exc()}")
     return JSONResponse(
         status_code=500,
-        content={"detail": str(exc)},
+        content={
+            "detail": "Internal server error.",
+            "type": exc.__class__.__name__,
+            "request_id": str(uuid.uuid4()) # Added for P0 observability
+        },
     )
+

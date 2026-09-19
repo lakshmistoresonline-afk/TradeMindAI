@@ -6,16 +6,26 @@ from backend.core.postgres import SessionLocal, StockDB, ShadowSignalDB
 from sqlalchemy import text
 import json
 
+from backend.core.config import settings
+import secrets
+
 router = APIRouter()
 API_KEY_NAME = "X-Collector-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 def verify_collector_key(api_key: str = Security(api_key_header)):
-    # Simple hardcoded key for local gateway in Phase 1
-    # In production, this should be a managed secret.
-    if api_key != "trademind-open-gateway-v1":
-        raise HTTPException(status_code=403, detail="Invalid Collector Key")
+    """
+    P0 Hardening: Constant-time comparison for ingestion key.
+    """
+    if not api_key:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    # Constant-time compare to prevent timing attacks
+    if not secrets.compare_digest(api_key, settings.MARKET_DATA_INGEST_KEY):
+        print(f"[SECURITY] Unauthorized ingestion attempt from {api_key[:4]}...")
+        raise HTTPException(status_code=403, detail="Forbidden: Invalid ingestion credentials")
     return api_key
+
 
 @router.post("/ingest")
 async def ingest_market_data(payload: List[Dict[str, Any]], collector_key: str = Depends(verify_collector_key)):
