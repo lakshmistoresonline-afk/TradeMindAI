@@ -5,8 +5,7 @@ from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
 from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB, LiveSignalDB, ModelMetadataDB, ShadowSignalDB, ShadowProvenanceDB
 from backend.core.duckdb_engine import analytical_engine
-from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain, PortfolioHealth
-from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain
 from backend.domain.models.ios import MarketRegime, MarketOpportunity, LiveSignal, MarketIntelligenceReport
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import pandas as pd
@@ -340,13 +339,13 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         return results
 
     # --- RESTORING ABSENT CANONICAL IDATAPLATFORMREPOSITORY CONFLICT INTERFACES ---
-    async def save_portfolio_health(self, health: PortfolioHealth) -> None: pass
-    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]: return None
-    async def save_strategy(self, strategy: UserStrategy) -> None: pass
-    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]: return []
-    async def save_paper_order(self, order: PaperOrder) -> None: pass
-    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]: return None
-    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None: pass
+    async def save_portfolio_health(self, health: Any) -> None: pass
+    async def get_portfolio_health(self, user_id: str) -> Optional[Any]: return None
+    async def save_strategy(self, strategy: Any) -> None: pass
+    async def get_user_strategies(self, user_id: str) -> List[Any]: return []
+    async def save_paper_order(self, order: Any) -> None: pass
+    async def get_virtual_portfolio(self, user_id: str) -> Optional[Any]: return None
+    async def save_virtual_portfolio(self, portfolio: Any) -> None: pass
     async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: pass
     async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]: return []
 

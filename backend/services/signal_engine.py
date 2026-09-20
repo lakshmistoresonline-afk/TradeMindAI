@@ -252,6 +252,7 @@ class SignalEngine:
             "provenance_id": provenance_id,
             "candidate_timestamp": eval_time,
             "price_at_signal": price,
+            "status": "WAITING_FOR_ENTRY",
             **regime_meta
         }
 

@@ -3,6 +3,7 @@ import os
 import asyncio
 import datetime
 from datetime import timezone
+from unittest.mock import MagicMock
 
 # Add project root to path
 sys.path.append(os.getcwd())
@@ -34,7 +35,35 @@ async def test_instrumentation():
     container.ios_repo.get_latest_regime = mock_get_regime
 
     # 2. Generate Signal
-    # We need features and stock
+    # Mock data platform features to ensure freshness
+    from backend.domain.models.data_platform import FeatureVector
+    async def mock_get_features(*args, **kwargs):
+        return [FeatureVector(
+            symbol=symbol, date=datetime.datetime.now(timezone.utc),
+            version="v1.0.0", features={"Close": 100.0, "ATR": 2.0, "ema_200": 90.0, "sma_20": 95.0, "rsi_14": 50.0}
+        )]
+    container.data_platform_repo.get_features_by_range = mock_get_features
+
+    # Mock ML service
+    async def mock_predict(*args, **kwargs):
+        return {
+            "prediction": "UP",
+            "metadata": {"calibrated_probability_up": 0.75, "raw_probability_up": 0.70},
+            "model_id": "mock_model", "model_version": "v1"
+        }
+    container.ml_service.predict_with_champion = mock_predict
+
+    # Mock Quality Service
+    from backend.services.signal_quality_service import SignalQualityService
+    SignalQualityService.should_publish = MagicMock(return_value=True)
+    SignalQualityService.get_quality_class = MagicMock(return_value="PRIMARY")
+
+    # Mock PriceResolver
+    from backend.services.price_resolver import PriceResolver
+    async def mock_resolve(*args, **kwargs):
+        return {"current_price": 100.0, "status": "FRESH", "source": "MOCK", "timestamp": datetime.datetime.now(timezone.utc)}
+    PriceResolver.resolve_current_price = mock_resolve
+
     stock = await container.repository.get_stock_by_symbol(symbol)
     if not stock:
         print("   [!] RELIANCE not found in DB. Skipping.")

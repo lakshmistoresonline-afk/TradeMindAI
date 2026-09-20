@@ -3,8 +3,7 @@ from typing import List, Optional, Dict, Any
 from google.cloud import firestore
 from datetime import datetime
 from backend.domain.models.stock import Stock, StockPrice
-from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, PortfolioHealth, Alert, EarningsData, OptionsChain
-from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
 
 class FirestoreStockRepository(IStockRepository):
@@ -118,12 +117,12 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
         return [Alert(**doc.to_dict()) for doc in docs]
 
     # --- OBSOLETE PRODUCT INTERFACES (REMOVED) ---
-    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]: return None
-    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None: pass
-    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]: return None
-    async def save_portfolio_health(self, health: PortfolioHealth) -> None: pass
-    async def save_paper_order(self, order: PaperOrder) -> None: pass
-    async def save_strategy(self, strategy: UserStrategy) -> None: pass
-    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]: return []
+    async def get_virtual_portfolio(self, user_id: str) -> Optional[Any]: return None
+    async def save_virtual_portfolio(self, portfolio: Any) -> None: pass
+    async def get_portfolio_health(self, user_id: str) -> Optional[Any]: return None
+    async def save_portfolio_health(self, health: Any) -> None: pass
+    async def save_paper_order(self, order: Any) -> None: pass
+    async def save_strategy(self, strategy: Any) -> None: pass
+    async def get_user_strategies(self, user_id: str) -> List[Any]: return []
     async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: pass
     async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]: return []
