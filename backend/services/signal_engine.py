@@ -273,7 +273,10 @@ class SignalEngine:
 
         if not v22_valid["is_valid"]:
             print(f"   [GATE_REJECTED] {symbol} failed production V2.2 audit: {v22_valid['issues']}")
-            await SignalShadowService.record_shadow_decision(None, v23_gate_res, candidate_data)
+            try:
+                await SignalShadowService.record_shadow_decision(None, v23_gate_res, candidate_data)
+            except Exception as se:
+                print(f"[Shadow] Failsafe (NO_SIGNAL): {se}")
             return None
 
         # 11. Final V2.2 Production Signal
@@ -383,7 +386,10 @@ class SignalEngine:
             mae=0.0
         )
 
-        # Record Shadow Decision for V2.3
-        await SignalShadowService.record_shadow_decision(v22_signal, v23_gate_res, candidate_data)
+        # Record Shadow Decision for V2.3 (Phase 1 Isolation)
+        try:
+            await SignalShadowService.record_shadow_decision(v22_signal, v23_gate_res, candidate_data)
+        except Exception as se:
+            print(f"[Shadow] Failsafe: Shadow recording failed but V2.2 production proceeds: {se}")
 
         return v22_signal

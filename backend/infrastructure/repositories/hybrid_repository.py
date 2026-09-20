@@ -5,7 +5,8 @@ from backend.domain.models.stock import Stock, StockPrice
 from backend.domain.interfaces.repository import IStockRepository, IDataPlatformRepository
 from backend.core.postgres import StockDB, PriceDB, RegimeDB, PredictionDB, IntelReportDB, FeatureDefinitionDB, LiveSignalDB, ModelMetadataDB, ShadowSignalDB, ShadowProvenanceDB
 from backend.core.duckdb_engine import analytical_engine
-from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain
+from backend.domain.models.data_platform import NewsArticle, InstitutionalFlow, FeatureVector, Prediction, FeatureDefinition, ModelMetadata, MLDataset, Alert, EarningsData, OptionsChain, PortfolioHealth
+from backend.domain.models.strategy import UserStrategy, PaperOrder, VirtualPortfolio
 from backend.domain.models.ios import MarketRegime, MarketOpportunity, LiveSignal, MarketIntelligenceReport
 from backend.domain.interfaces.ios_repository import IIOSRepository
 import pandas as pd
