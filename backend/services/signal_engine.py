@@ -330,11 +330,9 @@ class SignalEngine:
             opportunity_score=float(calibrated_prob * 100),
             confidence=float(calibrated_prob),
             signal_score=float(expected_val),
-            regime=regime_label,
-            regime_probability=float(regime_prob),
-
             # Phase 9: Regime Instrumentation
             **regime_meta,
+            regime_probability=float(regime_prob),
 
             # Lineage
             model_id=ml_res.get("model_id", f"mod_{symbol}_v2.2"),
