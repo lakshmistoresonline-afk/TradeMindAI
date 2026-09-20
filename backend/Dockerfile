@@ -1,3 +1,4 @@
+# V2.3.0 Final Release Build
 FROM python:3.12-slim
 
 # Set environment variables for non-interactive installs and memory safety
