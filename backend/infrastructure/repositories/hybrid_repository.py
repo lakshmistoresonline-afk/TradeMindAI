@@ -339,15 +339,47 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
         return results
 
     # --- RESTORING ABSENT CANONICAL IDATAPLATFORMREPOSITORY CONFLICT INTERFACES ---
-    async def save_portfolio_health(self, health: Any) -> None: pass
-    async def get_portfolio_health(self, user_id: str) -> Optional[Any]: return None
-    async def save_strategy(self, strategy: Any) -> None: pass
-    async def get_user_strategies(self, user_id: str) -> List[Any]: return []
-    async def save_paper_order(self, order: Any) -> None: pass
-    async def get_virtual_portfolio(self, user_id: str) -> Optional[Any]: return None
-    async def save_virtual_portfolio(self, portfolio: Any) -> None: pass
-    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: pass
-    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]: return []
+    async def save_portfolio_health(self, health: 'PortfolioHealth') -> None:
+        from backend.domain.models.data_platform import PortfolioHealth
+        self.fs.collection("portfolio_health").document(health.user_id).set(health.model_dump())
+
+    async def get_portfolio_health(self, user_id: str) -> Optional['PortfolioHealth']:
+        from backend.domain.models.data_platform import PortfolioHealth
+        doc = self.fs.collection("portfolio_health").document(user_id).get()
+        return PortfolioHealth(**doc.to_dict()) if doc.exists else None
+
+    async def save_strategy(self, strategy: 'UserStrategy') -> None:
+        from backend.domain.models.strategy import UserStrategy
+        self.fs.collection("user_strategies").document(strategy.id).set(strategy.model_dump())
+
+    async def get_user_strategies(self, user_id: str) -> List['UserStrategy']:
+        from backend.domain.models.strategy import UserStrategy
+        docs = self.fs.collection("user_strategies").where("user_id", "==", user_id).stream()
+        return [UserStrategy(**doc.to_dict()) for doc in docs]
+
+    async def save_paper_order(self, order: 'PaperOrder') -> None:
+        from backend.domain.models.strategy import PaperOrder
+        self.fs.collection("paper_orders").document(order.id).set(order.model_dump())
+
+    async def get_virtual_portfolio(self, user_id: str) -> Optional['VirtualPortfolio']:
+        from backend.domain.models.strategy import VirtualPortfolio
+        doc = self.fs.collection("virtual_portfolios").document(user_id).get()
+        return VirtualPortfolio(**doc.to_dict()) if doc.exists else None
+
+    async def save_virtual_portfolio(self, portfolio: 'VirtualPortfolio') -> None:
+        from backend.domain.models.strategy import VirtualPortfolio
+        self.fs.collection("virtual_portfolios").document(portfolio.user_id).set(portfolio.model_dump())
+
+    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None:
+        device_id = device_info.get("device_id", str(uuid.uuid4()))
+        self.fs.collection("users").document(user_id).collection("devices").document(device_id).set({
+            **device_info,
+            "registered_at": datetime.utcnow()
+        })
+
+    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]:
+        docs = self.fs.collection("users").document(user_id).collection("devices").stream()
+        return [doc.to_dict() for doc in docs]
 
 class HybridIOSRepository(IIOSRepository):
     def __init__(self, session_factory: Callable[[], Session], firestore_db: Any):
