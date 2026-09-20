@@ -338,6 +338,17 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
             ))
         return results
 
+    # --- RESTORING ABSENT CANONICAL IDATAPLATFORMREPOSITORY CONFLICT INTERFACES ---
+    async def save_portfolio_health(self, health: PortfolioHealth) -> None: pass
+    async def get_portfolio_health(self, user_id: str) -> Optional[PortfolioHealth]: return None
+    async def save_strategy(self, strategy: UserStrategy) -> None: pass
+    async def get_user_strategies(self, user_id: str) -> List[UserStrategy]: return []
+    async def save_paper_order(self, order: PaperOrder) -> None: pass
+    async def get_virtual_portfolio(self, user_id: str) -> Optional[VirtualPortfolio]: return None
+    async def save_virtual_portfolio(self, portfolio: VirtualPortfolio) -> None: pass
+    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: pass
+    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]: return []
+
 class HybridIOSRepository(IIOSRepository):
     def __init__(self, session_factory: Callable[[], Session], firestore_db: Any):
         self.session_factory = session_factory

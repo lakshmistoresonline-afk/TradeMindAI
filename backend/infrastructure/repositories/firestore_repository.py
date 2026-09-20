@@ -125,3 +125,5 @@ class FirestoreDataPlatformRepository(IDataPlatformRepository):
     async def save_paper_order(self, order: PaperOrder) -> None: pass
     async def save_strategy(self, strategy: UserStrategy) -> None: pass
     async def get_user_strategies(self, user_id: str) -> List[UserStrategy]: return []
+    async def register_device(self, user_id: str, device_info: Dict[str, Any]) -> None: pass
+    async def get_user_devices(self, user_id: str) -> List[Dict[str, Any]]: return []
