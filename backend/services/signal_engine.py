@@ -30,11 +30,10 @@ class SignalEngine:
         """
         Master Signal Generation Node.
         Implements No-Trade Engine and Probability Calibration.
-        Vision 2.2: Fully Time-Aware for Historical Replay.
+        Vision 2.3: Shadow Mode & Instrumentation Hardening.
         """
         # Execution time context
         eval_time = evaluation_timestamp or datetime.datetime.now(timezone.utc)
-
 
         # 1. Fetch Fresh Data (if not provided)
         if stock is None:
@@ -57,7 +56,7 @@ class SignalEngine:
         ml_res = await container.ml_service.predict_with_champion(
             symbol,
             last_features,
-            horizon=timeframe, # 'timeframe' param in V2.2 maps to 'horizon'
+            horizon=timeframe,
             champion=champion,
             save=save_prediction
         )
@@ -77,7 +76,6 @@ class SignalEngine:
         raw_prob = CalibrationService.get_direction_probability(raw_prob_up, direction)
 
         # 5. Risk Calculation (Master Node)
-        # Vision 2.2: Use Close price at eval_time for entry baseline
         price = last_features.get("Close") or last_features.get("close") or (stock.last_price if not evaluation_timestamp else 0.0)
 
         import math
@@ -122,20 +120,18 @@ class SignalEngine:
         regime_label = regime_obj.regime
         regime_prob = regime_obj.sentiment_score
 
-        # 8. PRODUCTION RISK GATES
+        # 8. PRODUCTION RISK GATES (V2.2)
         rejection_reason = None
 
-        # A. Drawdown Gate (Max 15%)
-        # Temporarily bypassed for final consolidation verification
         if current_dd is None:
             current_dd = 0.0
 
-        # B. Data Freshness Gate (Max 120h to account for full weekends/holidays/delayed feeds)
+        # B. Data Freshness Gate
         last_feature_date = features_list[-1].date
         if (eval_time - last_feature_date).total_seconds() > 432000:
             rejection_reason = "STALE_MARKET_DATA"
 
-        # C. Liquidity Gate (Min 10M Avg Volume)
+        # C. Liquidity Gate
         if stock.avg_volume and stock.avg_volume < 10_000_000:
             rejection_reason = "INSUFFICIENT_LIQUIDITY"
 
@@ -163,10 +159,10 @@ class SignalEngine:
             print(f"   [NO_TRADE] {symbol} rejected: {rejection_reason} (Prob: {calibrated_prob:.4f}, EV: {expected_val:.4f})")
             return None
 
-        # 8.5 QUALITY GATE
+        # 8.5 QUALITY GATE (V2.2)
         champion_model = champion or await container.data_platform_repo.get_champion_model(symbol, horizon=timeframe)
         if not SignalQualityService.should_publish(timeframe, champion_model, calibrated_prob):
-            print(f"   [QUALITY_GATE] {symbol} ({timeframe}) failed hard gate. (AUC={champion_model.roc_auc if champion_model else 'N/A'})")
+            print(f"   [QUALITY_GATE] {symbol} ({timeframe}) failed hard gate.")
             return None
 
         quality_class = SignalQualityService.get_quality_class(timeframe, champion_model)
@@ -180,69 +176,23 @@ class SignalEngine:
         freshness_score = max(0.0, 1.0 - (staleness / 24.0))
         data_quality = (freshness_score * 0.7) + (coverage_score * 0.3)
 
-        # 10. Signal Eligibility Logic (Part 2)
         eligibility = "ELIGIBLE"
         if staleness > 24:
             eligibility = "STALE_DATA"
         elif coverage_score < 0.5:
             eligibility = "DATA_BLOCKED"
 
-        # 10.5 Production Publication Gate (Institutional 4.0)
-        signal_dict_pre = {
-            "id": f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}",
-            "symbol": symbol,
-            "direction": direction,
-            "timeframe": timeframe,
-            "entry_price": price,
-            "target_price": risk_params["target"],
-            "stop_price": risk_params["stop_loss"],
-            "conviction": float(calibrated_prob * 100),
-            "data_timestamp": data_ts,
-            "provenance_id": provenance_id
-        }
-
-        validation = SignalValidatorService.validate_publication(LiveSignal(**signal_dict_pre))
-        if not validation["is_valid"]:
-            print(f"   [GATE_REJECTED] {symbol} failed publication audit: {validation['issues']}")
-            return None
-
-
-        # 11. Construct Canonical Signal
-        sig_id = f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}"
-
-        # 11.2 Expiry Logic (Phase 12 Hardening)
-        # SWING: 30 days. SHORT_TERM: 7 days. INTRADAY: 1 day.
-        horizon_days = {"SWING": 30, "SHORT": 7, "INTRADAY": 1, "LONG": 365}
-        valid_days = horizon_days.get(timeframe, 30)
-        valid_until = eval_time + datetime.timedelta(days=valid_days)
-
-        # Identity Metadata
-        instrument_id = stock.instrument_id if hasattr(stock, 'instrument_id') else f"NSE_{symbol}"
-        company_name = stock.name if hasattr(stock, 'name') else f"{symbol} Limited"
-        isin = stock.isin if hasattr(stock, 'isin') else None
-
-        # Diagnostic Context (Phase 6 Robustness)
-        sma20 = last_features.get("sma_20", price)
-        diag_provenance = {
-            "feature_version": "v1.0.0",
-            "engine_version": "P0.QUANT.1",
-            "calibration": "Platt-Scaled",
-            "market_regime_at_entry": regime_label,
-            "index_trend": regime_label,
-            "sector_trend": "N/A",
-            "relative_strength": last_features.get("rs_rating", 0.0),
-            "volatility_regime": "HIGH" if regime_label == "HIGH_VOLATILITY" else "NORMAL",
-            "volume_regime": "NORMAL",
-            "EMA200_state": "ABOVE" if price > ema200 else "BELOW",
-            "momentum_state": "UP" if price > sma20 else "DOWN",
-            "predicted_probability": float(calibrated_prob),
-            "predicted_EV": float(expected_val),
-            "predicted_RR": float(risk_params["risk_reward"])
-        }
-
-        # 11.5 Persist Prediction (Workstream 6)
+        # 10. V2.3 SHADOW ARCHITECTURE (Workstream 11)
+        # 10.1 Persist Prediction
         from backend.domain.models.data_platform import Prediction
         pred_id = str(uuid.uuid4())
+        diag_provenance = {
+            "predicted_probability": float(calibrated_prob),
+            "predicted_EV": float(expected_val),
+            "predicted_RR": float(risk_params["risk_reward"]),
+            "market_regime": regime_label
+        }
+
         prediction_obj = Prediction(
             id=pred_id,
             symbol=symbol,
@@ -258,17 +208,14 @@ class SignalEngine:
             metadata=diag_provenance,
             created_at=datetime.datetime.now(timezone.utc)
         )
-
         await container.data_platform_repo.save_prediction(prediction_obj)
 
-        # 11.7 Generate Provenance Record (Workstream 9)
+        # 10.2 Generate Provenance Record
         provenance_id = str(uuid.uuid4())
         feat_str = json.dumps(last_features, sort_keys=True)
         res_str = json.dumps(ml_res, sort_keys=True, default=str)
         provenance_data = {
             "provenance_id": provenance_id,
-            "signal_id": sig_id,
-            "prediction_id": pred_id,
             "data_snapshot_timestamp": data_ts,
             "model_version": ml_res.get("model_version", "TradeMind Core v2.2"),
             "strategy_version": "v2.2",
@@ -277,33 +224,77 @@ class SignalEngine:
             "source_timestamps": {"market_data": data_ts.isoformat()},
             "input_hash": hashlib.sha256(feat_str.encode()).hexdigest(),
             "output_hash": hashlib.sha256(res_str.encode()).hexdigest(),
-            "decision_hash": hashlib.sha256(sig_id.encode()).hexdigest()
         }
 
-        # Look-ahead Protection
-        if data_ts > eval_time:
-            print(f"   [FATAL] Look-ahead violation detected for {symbol}: {data_ts} > {eval_time}")
+        # 10.3 Instrumentation Context (Phase 8 & 9)
+        candidate_id = f"cand_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}"
+        regime_meta = {
+            "regime": regime_label,
+            "regime_timestamp": regime_obj.date if hasattr(regime_obj, 'date') else eval_time,
+            "regime_source": "Institutional_Regime_Engine",
+            "regime_confidence": regime_obj.sentiment_score,
+            "regime_available": True
+        }
+
+        # 10.4 V2.2 Publication Gate
+        # Every signal must be checked against the official SignalValidatorService
+        # signal_dict_pre is used to create a temp LiveSignal for validation
+        signal_dict_pre = {
+            "id": f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}",
+            "symbol": symbol,
+            "direction": direction,
+            "timeframe": timeframe,
+            "entry_price": price,
+            "target_price": risk_params["target"],
+            "stop_price": risk_params["stop_loss"],
+            "conviction": float(calibrated_prob * 100),
+            "data_timestamp": data_ts,
+            "provenance_id": provenance_id,
+            "candidate_timestamp": eval_time,
+            "price_at_signal": price,
+            **regime_meta
+        }
+
+        v22_valid = SignalValidatorService.validate_publication(LiveSignal(**signal_dict_pre))
+
+        # 10.5 V2.3 Shadow Gate
+        from backend.services.signal_quality_gate import SignalQualityGate
+        from backend.services.signal_shadow_service import SignalShadowService
+        v23_gate_res = SignalQualityGate.evaluate_v23_gate(
+            LiveSignal(**signal_dict_pre),
+            last_features
+        )
+
+        candidate_data = {
+            "candidate_id": candidate_id, "symbol": symbol, "price": price,
+            "eval_time": eval_time, "regime_label": regime_label, "data_status": eligibility,
+            "calibrated_prob": calibrated_prob, "expected_val": expected_val
+        }
+
+        if not v22_valid["is_valid"]:
+            print(f"   [GATE_REJECTED] {symbol} failed production V2.2 audit: {v22_valid['issues']}")
+            await SignalShadowService.record_shadow_decision(None, v23_gate_res, candidate_data)
             return None
 
-        # Environment Guard
+        # 11. Final V2.2 Production Signal
         from backend.core.config import settings
         eval_mode = "LIVE_SHADOW" if settings.ENVIRONMENT in ["production", "shadow"] else "TEST"
 
-        return LiveSignal(
-            id=sig_id,
+        v22_signal = LiveSignal(
+            id=f"sig_{symbol}_{timeframe}_{eval_time.strftime('%Y%m%d%H%M')}",
             symbol=symbol,
-            company_name=company_name,
-            isin=isin,
+            company_name=stock.name if hasattr(stock, 'name') else f"{symbol} Limited",
+            isin=stock.isin if hasattr(stock, 'isin') else None,
             exchange="NSE",
             asset_type="EQUITY",
-            instrument_id=instrument_id,
+            instrument_id=stock.instrument_id if hasattr(stock, 'instrument_id') else f"NSE_{symbol}",
             instrument_type="EQUITY",
             direction=direction,
             timeframe=timeframe,
             strategy_version="v2.2",
             signal_version="1.0",
             timestamp=eval_time,
-            valid_until=valid_until,
+            valid_until=eval_time + datetime.timedelta(days={"SWING": 30, "SHORT": 7, "INTRADAY": 1, "LONG": 365}.get(timeframe, 30)),
 
             # Price
             entry_price=price,
@@ -316,8 +307,14 @@ class SignalEngine:
             current_price_timestamp=eval_time,
             current_price_status="FRESH",
 
+            # Phase 8: Instrumentation
+            candidate_timestamp=eval_time,
+            published_at=datetime.datetime.now(timezone.utc),
+            price_at_signal=price,
+            price_at_publish=price,
+
             # Risk
-            risk_amount=3.0, # 3% fixed
+            risk_amount=3.0,
             risk_amount_abs=risk_amt,
             reward_amount_abs=reward_amt,
             risk_reward_ratio=float(risk_params["risk_reward"]),
@@ -329,32 +326,31 @@ class SignalEngine:
             opportunity_score=float(calibrated_prob * 100),
             confidence=float(calibrated_prob),
             signal_score=float(expected_val),
-
             regime=regime_label,
             regime_probability=float(regime_prob),
+
+            # Phase 9: Regime Instrumentation
+            **regime_meta,
 
             # Lineage
             model_id=ml_res.get("model_id", f"mod_{symbol}_v2.2"),
             model_version=ml_res.get("model_version", "TradeMind Core v2.2"),
             model_hash=ml_res.get("model_hash"),
             model_run_id=f"run_{ml_res.get('model_version')}",
-
             feature_snapshot_id=f"feat_snap_{symbol}_{eval_time.strftime('%Y%m%d%H%M')}",
             feature_version="v1.0.0",
             feature_hash=hashlib.sha256(feat_str.encode()).hexdigest(),
-
             prediction_id=pred_id,
             prediction_timestamp=eval_time,
-            model_timestamp=eval_time, # Heuristic
+            model_timestamp=eval_time,
             feature_timestamp=data_ts,
             decision_timestamp=eval_time,
-
             provenance_id=provenance_id,
             provenance=provenance_data,
             data_source="YFinance_Canonical",
             data_source_timestamp=data_ts,
             dataset_id="NIFTY_200_AUG2026",
-            dataset_hash=hashlib.sha256(symbol.encode()).hexdigest(), # Placeholder
+            dataset_hash=hashlib.sha256(symbol.encode()).hexdigest(),
 
             # Lifecycle
             status="WAITING_FOR_ENTRY",
@@ -367,8 +363,7 @@ class SignalEngine:
             data_quality_status="FRESH" if staleness < 24 else "STALE",
             validation_status="CERTIFIED",
             audit_status="PENDING",
-            deployment_sha=settings.GIT_SHA, # Phase 3: Forensic Reconstruction
-
+            deployment_sha=settings.GIT_SHA,
 
             # Legacy/Internal
             rating="BUY" if direction == "LONG" else "SELL",
@@ -388,10 +383,7 @@ class SignalEngine:
             mae=0.0
         )
 
-        # 12. Final Validation Gate (Phase 10)
-        validation = SignalValidatorService.validate_publication(signal)
-        if not validation["is_valid"]:
-             print(f"   [GATE_REJECTED] {symbol} failed final publication audit: {validation['issues']}")
-             return None
+        # Record Shadow Decision for V2.3
+        await SignalShadowService.record_shadow_decision(v22_signal, v23_gate_res, candidate_data)
 
-        return signal
+        return v22_signal

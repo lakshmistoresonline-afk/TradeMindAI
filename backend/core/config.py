@@ -80,6 +80,12 @@ class Settings(BaseSettings):
     # FINAL DELIVERY HARDENING: Admin Security
     ADMIN_EMAILS: List[str] = ["admin@trademind.ai", "admin@trademindai.com", "lakshmistoresonline@gmail.com"]
 
+    # V2.3 Shadow Mode (Workstream 11)
+    V23_MIN_CALIBRATED_PROBABILITY: float = 0.60
+    V23_RSI_EXHAUSTION_ENABLED: bool = False
+    V23_RSI_LONG_THRESHOLD: float = 75.0
+    V23_RSI_SHORT_THRESHOLD: float = 25.0
+
     model_config = SettingsConfigDict(case_sensitive=True, env_file=".env", extra="ignore")
 
 settings = Settings()

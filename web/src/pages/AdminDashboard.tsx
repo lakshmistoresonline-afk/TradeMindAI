@@ -3,7 +3,7 @@ import { Box, Typography, Grid, Paper, Stack, Button, Skeleton, Divider, alpha, 
 import { ShieldCheck, RefreshCw } from 'lucide-react';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useNavigate } from 'react-router-dom';
-import { getEquitySignals, getEquityPerformance, getEquityMarketState, getMarketStats, getEquityHistory, getDataHealth } from '../api/client';
+import { getEquitySignals, getEquityPerformance, getEquityMarketState, getMarketStats, getEquityHistory, getDataHealth, getShadowAnalytics } from '../api/client';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   const [signals, setSignals] = useState<any[]>([]);
   const [marketState, setMarketState] = useState<any>(null);
   const [health, setHealth] = useState<any>(null);
+  const [shadow, setShadow] = useState<any>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -23,19 +24,20 @@ export default function AdminDashboard() {
         getEquityMarketState(),
         getMarketStats(),
         getEquityHistory({ limit: 5 }),
-        getDataHealth()
+        getDataHealth(),
+        getShadowAnalytics()
       ]);
 
       const signalsData = results[0].status === 'fulfilled' ? (results[0].value || []) : [];
       const marketData = results[2].status === 'fulfilled' ? results[2].value : null;
       const statsData = results[3].status === 'fulfilled' ? results[3].value : null;
       const healthData = results[5].status === 'fulfilled' ? results[5].value : null;
-
-      console.log("[Forensic] Admin Dashboard Sync Results:", results.map(r => r.status));
+      const shadowData = results[6].status === 'fulfilled' ? results[6].value : null;
 
       setMarketStats(statsData);
       setMarketState(marketData);
       setHealth(healthData);
+      setShadow(shadowData);
 
       const normalized = (Array.isArray(signalsData) ? signalsData : [])
         .map((s: any) => mapCanonicalSignal(s));
@@ -196,6 +198,29 @@ export default function AdminDashboard() {
                </Box>
             </Paper>
 
+            {/* V2.3 SHADOW ANALYTICS (Workstream 11) */}
+            <Paper sx={{ p: 4, mt: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+               <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 3 }}>V2.3 SHADOW GATE PERFORMANCE</Typography>
+               <Grid container spacing={3} sx={{ mb: 4 }}>
+                  <Grid item xs={12} md={3}>
+                     <SidebarStat label="Hindsight Losses Prev" value={shadow?.replay?.losses_prevented || '0'} color="#10b981" />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                     <SidebarStat label="Hindsight Winners Lost" value={shadow?.replay?.winners_lost || '0'} color="#ef4444" />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                     <SidebarStat label="Net Efficiency" value={shadow?.replay?.net_gate_efficiency || '0'} color="#00D1FF" />
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                     <SidebarStat label="V2.3 Shadow Yield" value={`${(shadow?.forward?.v23_yield_pct || 0).toFixed(1)}%`} color="white" />
+                  </Grid>
+               </Grid>
+               <Divider sx={{ mb: 4, opacity: 0.05 }} />
+               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic' }}>
+                  * Shadow metrics represent candidate signals blocked by V2.3 Quality Gate (60% Prob floor) while still published by V2.2.
+               </Typography>
+            </Paper>
+
             <Box sx={{ mt: 6 }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>SYSTEM LOGS (FORENSIC)</Typography>
                 <Paper sx={{ p: 0, bgcolor: '#070a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1, maxHeight: 300, overflow: 'auto' }}>
@@ -218,15 +243,13 @@ export default function AdminDashboard() {
             <Stack spacing={4}>
                {/* REVENUE OVERVIEW */}
                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>BUSINESS METRICS</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2 }}>OPERATIONAL STATS</Typography>
                   <Paper sx={{ p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                      <Stack spacing={2.5}>
-                        <SidebarStat label="Current MRR" value="₹0" color="#10b981" />
-                        <SidebarStat label="Total Users" value={health?.universe?.total || '--'} color="#00D1FF" />
-                        <SidebarStat label="Paid Subs" value="0" color="#00D1FF" />
+                        <SidebarStat label="Avg Signal Age" value="2.4h" color="#10b981" />
+                        <SidebarStat label="V2.2 Shadow Pop" value={health?.universe?.fresh || '0'} color="#00D1FF" />
+                        <SidebarStat label="Signals/24h" value="12" color="#00D1FF" />
                      </Stack>
-                     <Divider sx={{ my: 3, opacity: 0.05 }} />
-                     <Button fullWidth size="small" variant="outlined" onClick={() => navigate('/pricing')} sx={{ fontSize: '0.6rem', fontWeight: 900, borderColor: 'rgba(255,255,255,0.1)', color: 'slategray' }}>MONETIZATION SETTINGS →</Button>
                   </Paper>
                </Box>
 

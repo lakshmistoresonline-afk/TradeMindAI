@@ -348,6 +348,19 @@ class LiveSignalDB(Base):
     data_quality_score = Column(Float)
     deployment_sha = Column(String) # Phase 3: Forensic Reconstruction
 
+    # Phase 8: Entry Instrumentation
+    candidate_timestamp = Column(DateTime(timezone=True))
+    published_at = Column(DateTime(timezone=True))
+    price_at_signal = Column(Float)
+    price_at_publish = Column(Float)
+    price_at_activation = Column(Float)
+
+    # Phase 9: Regime Instrumentation
+    regime_timestamp = Column(DateTime(timezone=True))
+    regime_source = Column(String)
+    regime_confidence = Column(Float)
+    regime_available = Column(Boolean, default=False)
+
 
     # Universal Price Tier
     underlying_price = Column(Float)
@@ -703,6 +716,35 @@ class PulseExecutionDB(Base):
     last_error = Column(String)
     status = Column(String) # COMPLETED, FAILED, TIMEOUT
 
+
+class SignalShadowDecisionDB(Base):
+    __tablename__ = "signal_shadow_decisions"
+    id = Column(String, primary_key=True)
+    signal_id = Column(String, index=True) # ID of the V2.2 signal this shadows
+    candidate_id = Column(String, index=True)
+    current_engine = Column(String, default="v2.2")
+    shadow_engine = Column(String, default="v2.3")
+    current_decision = Column(String) # PUBLISH or NO_SIGNAL
+    shadow_decision = Column(String)  # PUBLISH, BLOCK, NO_SIGNAL
+    current_probability = Column(Float)
+    shadow_probability = Column(Float)
+    current_ev = Column(Float)
+    shadow_ev = Column(Float)
+    current_entry = Column(Float)
+    shadow_entry = Column(Float)
+    current_stop = Column(Float)
+    shadow_stop = Column(Float)
+    current_target = Column(Float)
+    shadow_target = Column(Float)
+    current_regime = Column(String)
+    shadow_regime = Column(String)
+    gate_result = Column(JSON) # Detailed reasons/metadata
+    block_reason = Column(String)
+    rsi_result = Column(Float)
+    data_status = Column(String)
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
+    evaluation_timestamp = Column(DateTime(timezone=True))
+    record_hash = Column(String)
 
 class ModelMetadataDB(Base):
     __tablename__ = "model_registry"

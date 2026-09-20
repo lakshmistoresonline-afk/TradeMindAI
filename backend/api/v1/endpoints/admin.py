@@ -35,7 +35,7 @@ async def db_audit(current_user: dict = Depends(get_current_admin)):
     from sqlalchemy import text
     results = {}
     with engine.connect() as conn:
-        tables = ["stocks", "opportunities", "predictions", "historical_prices", "live_signals", "shadow_signals"]
+        tables = ["stocks", "opportunities", "predictions", "historical_prices", "live_signals", "shadow_signals", "signal_shadow_decisions"]
         for t in tables:
             try:
                 count = conn.execute(text(f"SELECT count(*) FROM {t}")).scalar()
@@ -43,6 +43,33 @@ async def db_audit(current_user: dict = Depends(get_current_admin)):
             except:
                 results[t] = "ERROR"
     return results
+
+@router.get("/shadow-analytics")
+async def get_shadow_analytics(current_user: dict = Depends(get_current_admin)):
+    """
+    V2.3 Shadow Analytics (Institutional 4.0).
+    Aggregates comparisons between V2.2 and V2.3.
+    """
+    from backend.core.postgres import SessionLocal, SignalShadowDecisionDB
+    from backend.services.signal_replay_engine import SignalReplayEngine
+
+    with SessionLocal() as db:
+        total = db.query(SignalShadowDecisionDB).count()
+        blocked = db.query(SignalShadowDecisionDB).filter(SignalShadowDecisionDB.shadow_decision == "BLOCK").count()
+
+        # Performance Attribution (Forward only - limited sample)
+        # In a real system, we'd join with original outcome.
+
+    replay = await SignalReplayEngine.replay_shadow_gate(limit=100)
+
+    return {
+        "forward": {
+            "total_candidates": total,
+            "v23_blocked": blocked,
+            "v23_yield_pct": ((total - blocked) / total * 100) if total > 0 else 0
+        },
+        "replay": replay
+    }
 
 @router.get("/logs")
 async def get_system_logs(limit: int = 20, current_user: dict = Depends(get_current_admin)):

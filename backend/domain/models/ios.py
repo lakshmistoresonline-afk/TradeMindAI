@@ -125,6 +125,19 @@ class LiveSignal(BaseModel):
     data_quality_score: Optional[float] = None
     deployment_sha: Optional[str] = None # Phase 3: Forensic Reconstruction
 
+    # Phase 8: Entry Instrumentation
+    candidate_timestamp: Optional[datetime] = None
+    published_at: Optional[datetime] = None
+    price_at_signal: Optional[float] = None
+    price_at_publish: Optional[float] = None
+    price_at_activation: Optional[float] = None
+
+    # Phase 9: Regime Instrumentation
+    regime_timestamp: Optional[datetime] = None
+    regime_source: Optional[str] = None
+    regime_confidence: Optional[float] = None
+    regime_available: bool = False
+
 
     # Legacy/Internal Compatibility
     rating: Optional[str] = None

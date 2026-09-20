@@ -75,6 +75,11 @@ export const getUserReferrals = async () => (await apiClient.get('/user/referral
 // --- OBSOLETE / DEPRECATED ENDPOINTS (Satisfying legacy components) ---
 export const getPortfolioOptimizations = async (..._args: any[]) => ([]);
 export const getResearchNotes = async (..._args: any[]) => ([]);
+export const getShadowAnalytics = async () => {
+  const response = await apiClient.get('/admin/shadow-analytics');
+  return response.data;
+};
+
 export const saveResearchNote = async (..._args: any[]) => ({});
 export const getStockNews = async (..._args: any[]) => ([]);
 export const getStockTimeline = async (..._args: any[]) => ([]);
