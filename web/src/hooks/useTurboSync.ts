@@ -6,6 +6,7 @@ import { collection, query, limit, onSnapshot, orderBy } from 'firebase/firestor
 export function useTurboSync() {
   const [updates, setUpdates] = useState<any[]>([]);
   const [firestoreSignals, setFirestoreSignals] = useState<any[]>([]);
+  const [marketContext, setMarketContext] = useState<any>(null);
   const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'ERROR'>('CONNECTING');
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export function useTurboSync() {
     const signalsRef = collection(db, "signals");
     const q = query(signalsRef, orderBy("mirrored_at", "desc"), limit(20));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeSignals = onSnapshot(q, (snapshot) => {
       const signals = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -49,9 +50,19 @@ export function useTurboSync() {
       console.error("[Turbo-Sync] Firestore Mirror Error:", err);
     });
 
+    // 3. Listen to Local Master Heartbeat for Market Context
+    const unsubscribeMarket = onSnapshot(doc(db, "system_metrics", "local_master"), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        console.log("[Turbo-Sync] Market Context received from local master.");
+        setMarketContext(data.market_context);
+      }
+    });
+
     return () => {
       eventSource.close();
-      unsubscribe();
+      unsubscribeSignals();
+      unsubscribeMarket();
       console.log("[Turbo-Sync] SSE & Firestore Connections Closed");
     };
   }, []);
@@ -60,5 +71,5 @@ export function useTurboSync() {
   // Logic: Prefer SSE if ONLINE, otherwise use Firestore.
   const mergedSignals = connectionStatus === 'ONLINE' && updates.length > 0 ? updates : firestoreSignals;
 
-  return { updates: mergedSignals, connectionStatus, firestoreSignals };
+  return { updates: mergedSignals, connectionStatus, firestoreSignals, marketContext };
 }

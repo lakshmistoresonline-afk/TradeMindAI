@@ -45,7 +45,7 @@ class SignalEngine:
         if features_list is None:
             features_list = await container.data_platform_repo.get_features_by_range(
                 symbol,
-                eval_time - datetime.timedelta(days=7),
+                eval_time - datetime.timedelta(days=14),
                 eval_time
             )
         if not features_list:
@@ -128,6 +128,9 @@ class SignalEngine:
 
         # B. Data Freshness Gate
         last_feature_date = features_list[-1].date
+        if last_feature_date.tzinfo is None:
+             last_feature_date = last_feature_date.replace(tzinfo=timezone.utc)
+
         if (eval_time - last_feature_date).total_seconds() > 432000:
             rejection_reason = "STALE_MARKET_DATA"
 
@@ -169,6 +172,9 @@ class SignalEngine:
 
         # 9. DATA QUALITY SCORE
         data_ts = features_list[-1].date
+        if data_ts.tzinfo is None:
+             data_ts = data_ts.replace(tzinfo=timezone.utc)
+
         staleness = (eval_time - data_ts).total_seconds() / 3600.0 # hours
 
         recent_prices = await container.repository.get_recent_prices(symbol, limit=20)

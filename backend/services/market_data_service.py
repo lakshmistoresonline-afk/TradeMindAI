@@ -137,6 +137,7 @@ class MarketDataService:
                 "regime": regime_obj.regime,
                 "risk_mode": regime_obj.risk_mode,
                 "vix": float(vix_val),
+                "nifty_price": float(nifty_df['Close'].iloc[-1]) if not nifty_df.empty else None,
                 "sentiment_score": regime_obj.sentiment_score,
                 "description": regime_obj.description,
                 "observation_timestamp": observation_ts.isoformat(),

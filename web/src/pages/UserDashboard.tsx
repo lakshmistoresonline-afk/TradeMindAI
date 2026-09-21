@@ -3,6 +3,7 @@ import { Box, Typography, Grid, Paper, Stack, alpha, Skeleton, Tabs, Tab, Button
 import { Zap, ShieldCheck, ArrowRight, PieChart } from 'lucide-react';
 import { getMarketStats, getEquitySignals, getEquityMarketState } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
+import { useTurboSync } from '../hooks/useTurboSync';
 import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +14,8 @@ export default function UserDashboard() {
   const [market, setMarket] = useState<any>(null);
   const [signals, setSignals] = useState<any[]>([]);
   const [tab, setTab] = useState(0);
+
+  const { connectionStatus, firestoreSignals, marketContext } = useTurboSync();
 
   const fetchData = async () => {
     setLoading(true);
@@ -41,6 +44,19 @@ export default function UserDashboard() {
     fetchData();
   }, []);
 
+  // Hybrid Sync: Merge Firestore data if API fails or is empty (V2.3)
+  useEffect(() => {
+    if (connectionStatus !== 'ONLINE' || signals.length === 0) {
+      if (firestoreSignals.length > 0) {
+        const normalized = firestoreSignals.map(s => mapCanonicalSignal(s));
+        setSignals(normalized);
+      }
+      if (marketContext) {
+        setMarket(marketContext);
+      }
+    }
+  }, [firestoreSignals, marketContext, connectionStatus, signals.length]);
+
   const filteredSignals = useMemo(() => {
     const horizon = ['SWING', 'SHORT', 'LONG'][tab];
     return signals.filter(s => s.decision.timeframe === horizon).slice(0, 3);
@@ -58,7 +74,7 @@ export default function UserDashboard() {
       <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>MARKET SNAPSHOT</Typography>
       <Grid container spacing={3} sx={{ mb: 6 }}>
          <Grid item xs={12} md={3}>
-            <MarketMiniCard label="NIFTY 50" data={stats?.['NIFTY 50']} />
+            <MarketMiniCard label="NIFTY 50" data={stats?.['NIFTY 50']} value={market?.nifty_price} />
          </Grid>
          <Grid item xs={12} md={3}>
             <MarketMiniCard label="INDIA VIX" value={market?.vix || (stats?.['India VIX']?.value)} />
