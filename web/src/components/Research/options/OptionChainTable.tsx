@@ -57,7 +57,7 @@ export default function OptionChainTable({ symbol }: OptionChainTableProps) {
           </Grid>
        </Paper>
 
-       <Typography variant="caption" sx={{ color: 'slategray', mb: 2, display: 'block', fontWeight: 800 }}>
+       <Typography variant="caption" sx={{ color: '#708090', mb: 2, display: 'block', fontWeight: 800 }}>
           LIVE OPTION CHAIN • EXPIRY: {new Date(chain.expiry).toLocaleDateString()}
        </Typography>
 
@@ -113,7 +113,7 @@ export default function OptionChainTable({ symbol }: OptionChainTableProps) {
 function MetricBox({ label, value, color = 'white' }: any) {
    return (
       <Box>
-         <Typography variant="caption" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>{label}</Typography>
+         <Typography variant="caption" sx={{ fontWeight: 900, color: '#708090', letterSpacing: 1 }}>{label}</Typography>
          <Typography variant="h5" sx={{ fontWeight: 900, color }}>{value}</Typography>
       </Box>
    );

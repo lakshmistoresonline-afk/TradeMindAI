@@ -76,7 +76,7 @@ export default function Evidence() {
       </Box>
 
       <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px dashed rgba(255,255,255,0.1)' }}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontStyle: 'italic', lineHeight: 1.6, display: 'block', textAlign: 'center' }}>
+         <Typography variant="caption" sx={{ color: '#708090', fontStyle: 'italic', lineHeight: 1.6, display: 'block', textAlign: 'center' }}>
             TradeMind AI is delivers evidence-driven signal intelligence.
             Every metric above links to an authoritative database identity record in the Signal Ledger.
          </Typography>
@@ -88,7 +88,7 @@ export default function Evidence() {
 function EvidenceRow({ label, count, status }: any) {
     return (
         <TableRow>
-            <TableCell sx={{ fontWeight: 800, color: 'slategray' }}>{label}</TableCell>
+            <TableCell sx={{ fontWeight: 800, color: '#708090' }}>{label}</TableCell>
             <TableCell sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', color: 'white' }}>{count}</TableCell>
             <TableCell sx={{ fontWeight: 900, color: '#00D1FF', fontSize: '0.65rem' }}>{status}</TableCell>
         </TableRow>
@@ -105,7 +105,7 @@ function AuditItem({ title, status, text }: any) {
                         <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, fontSize: '0.6rem' }}>{status}</Typography>
                     </Box>
                 </Box>
-                <Typography variant="body2" sx={{ color: 'slategray' }}>{text}</Typography>
+                <Typography variant="body2" sx={{ color: '#708090' }}>{text}</Typography>
             </Paper>
         </Grid>
     );
@@ -118,7 +118,7 @@ function LimitItem({ label, val, text }: any) {
                 <Typography variant="caption" sx={{ fontWeight: 950, color: '#00D1FF' }}>{label}:</Typography>
                 <Typography variant="caption" sx={{ fontWeight: 900, color: '#ef4444' }}>{val}</Typography>
             </Stack>
-            <Typography variant="body2" sx={{ color: 'slategray' }}>{text}</Typography>
+            <Typography variant="body2" sx={{ color: '#708090' }}>{text}</Typography>
         </Box>
     );
 }

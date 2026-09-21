@@ -139,10 +139,16 @@ class MLService:
             champion = await self.repository.get_champion_model(symbol, horizon=horizon)
 
         if not champion:
+             # V2.3 Local Resilience: Return mock if no record exists in dev mode
+            if os.getenv("ENVIRONMENT") == "development":
+                return self._generate_mock_prediction(symbol, horizon)
             return {"prediction": "N/A", "confidence": 0, "model_version": "none"}
 
         model_path = os.path.join(self.model_dir, champion.name)
         if not os.path.exists(model_path):
+            # V2.3 Local Resilience: Return mock if DB record exists but file is missing
+            if os.getenv("ENVIRONMENT") == "development":
+                return self._generate_mock_prediction(symbol, horizon, champion.version)
             return {"prediction": "ERROR", "confidence": 0, "error": "Model file missing"}
 
         model = joblib.load(model_path)
@@ -186,4 +192,25 @@ class MLService:
             "model_version": champion.version,
             "is_calibrated": calibrator is not None,
             "metadata": prediction.metadata
+        }
+
+    def _generate_mock_prediction(self, symbol: str, horizon: str, version: str = "v2.2-local-mock") -> Dict[str, Any]:
+        """
+        Generates a stable, high-conviction BUY signal for local testing and population.
+        """
+        calibrated_prob = 0.82
+        raw_prob = 0.80
+        prediction_label = "UP"
+
+        return {
+            "prediction": prediction_label,
+            "confidence": 85.0,
+            "model_version": version,
+            "is_calibrated": True,
+            "metadata": {
+                "calibrated_probability_up": calibrated_prob,
+                "raw_probability_up": raw_prob,
+                "is_calibrated": True,
+                "mock_generated": True
+            }
         }

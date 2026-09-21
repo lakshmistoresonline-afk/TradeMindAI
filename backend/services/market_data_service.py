@@ -80,7 +80,8 @@ class MarketDataService:
         try:
             # 1. Fetch Index & VIX in parallel using YahooQuery (Resilient Bulk)
             from yahooquery import Ticker as YQTicker
-            yq = YQTicker("^NSEI ^INDIAVIX")
+            # V2.3: Upgraded benchmark from NIFTY 50 (^NSEI) to NIFTY 200 (^CNX200)
+            yq = YQTicker("^CNX200 ^INDIAVIX")
             hist = yq.history(period="3mo")
 
             if hist.empty:
@@ -95,8 +96,8 @@ class MarketDataService:
             vix_val = None
             observation_ts = None
 
-            if "^NSEI" in hist.index.get_level_values('symbol'):
-                nifty_df = hist.xs("^NSEI", level='symbol').rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
+            if "^CNX200" in hist.index.get_level_values('symbol'):
+                nifty_df = hist.xs("^CNX200", level='symbol').rename(columns={'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'volume': 'Volume'})
                 # Capture actual provider timestamp from index
                 obs_raw = hist.index.get_level_values('date')[-1]
 

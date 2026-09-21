@@ -239,6 +239,7 @@ class LiveSignalDB(Base):
     instrument_id = Column(String)
     instrument_type = Column(String)
     direction = Column(String) # LONG, SHORT
+    rating = Column(String) # BUY, SELL, HOLD
     timeframe = Column(String)
     strategy_version = Column(String, default="v2.2")
     signal_version = Column(String, default="1.0")
@@ -412,6 +413,7 @@ class ShadowSignalDB(Base):
 , default=datetime.datetime.utcnow)
     symbol = Column(String, index=True)
     direction = Column(String)
+    rating = Column(String) # BUY, SELL, HOLD
     asset_class = Column(String(20), default="EQUITY")
     instrument_id = Column(String)
     instrument_type = Column(String)

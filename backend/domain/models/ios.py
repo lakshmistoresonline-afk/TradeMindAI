@@ -38,6 +38,7 @@ class LiveSignal(BaseModel):
     instrument_id: Optional[str] = None
     instrument_type: Optional[str] = None
     direction: str # LONG or SHORT
+    rating: Optional[str] = None # BUY, SELL, HOLD
     timeframe: Optional[str] = None
     strategy_version: str = "v2.2"
     signal_version: str = "1.0"

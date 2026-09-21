@@ -41,7 +41,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
       case 'WAITING_FOR_ENTRY': return '#f59e0b';
       case 'TARGET_HIT': return '#10b981';
       case 'STOP_LOSS': return '#ef4444';
-      default: return 'slategray';
+      default: return '#708090';
     }
   };
 
@@ -65,7 +65,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
            <Box>
               <Typography variant="h6" sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', letterSpacing: -0.5, color: '#fff' }}>{stock.symbol}</Typography>
-              <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, textTransform: 'uppercase', display: 'block', mt: 0.2 }}>{stock.company_name || stock.name || 'INSTRUMENT'}</Typography>
+              <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, textTransform: 'uppercase', display: 'block', mt: 0.2 }}>{stock.company_name || stock.name || 'INSTRUMENT'}</Typography>
            </Box>
            <Box sx={{ textAlign: 'right' }}>
               <Chip
@@ -85,14 +85,14 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 
         <Stack direction="row" spacing={1.5} sx={{ mt: 2.5 }}>
            <Box sx={{ borderLeft: `3px solid ${decision.timeframe === 'SWING' ? '#10b981' : '#00D1FF'}`, pl: 1.5 }}>
-              <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', fontSize: '0.55rem' }}>HORIZON · CLASS</Typography>
+              <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block', fontSize: '0.55rem' }}>HORIZON · CLASS</Typography>
               <Typography variant="caption" sx={{ fontWeight: 950, color: '#fff', letterSpacing: 0.5 }}>{decision.timeframe} · {decision.qualityClass}</Typography>
            </Box>
            <Box sx={{ borderLeft: '3px solid rgba(255,255,255,0.05)', pl: 1.5 }}>
               <Stack direction="row" spacing={0.5} alignItems="center">
-                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', fontSize: '0.55rem' }}>MODEL PROBABILITY</Typography>
+                  <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block', fontSize: '0.55rem' }}>MODEL PROBABILITY</Typography>
                   <Tooltip title="Model-derived probability estimate based on the current model and evidence. It is not a guarantee of outcome.">
-                     <HelpCircle size={10} color="slategray" style={{ cursor: 'help' }} />
+                     <HelpCircle size={10} color="#708090" style={{ cursor: 'help' }} />
                   </Tooltip>
               </Stack>
               <Typography variant="caption" sx={{ fontWeight: 950, color: '#00D1FF', fontSize: '0.8rem' }}>{decision.conviction}%</Typography>
@@ -115,13 +115,13 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 
             <Grid container spacing={3}>
                 <Grid item xs={6}>
-                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>EXPECTED VALUE</Typography>
+                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>EXPECTED VALUE</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 950, color: (decision.expectedValue || 0) > 0 ? '#10b981' : '#ef4444', fontFamily: 'JetBrains Mono' }}>
                     {decision.expectedValue !== undefined ? `₹${decision.expectedValue.toFixed(2)}` : 'UNAVAILABLE'}
                 </Typography>
                 </Grid>
                 <Grid item xs={6} sx={{ textAlign: 'right' }}>
-                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>RISK / REWARD</Typography>
+                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.55rem', display: 'block' }}>RISK / REWARD</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 950, color: '#00D1FF', fontFamily: 'JetBrains Mono' }}>{decision.riskReward}</Typography>
                 </Grid>
             </Grid>
@@ -159,7 +159,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
          </Box>
 
          <Box sx={{ mb: 2, p: 1.5, bgcolor: alpha('#7C3AED', 0.02), borderRadius: 1, border: '1px solid rgba(124, 58, 237, 0.05)' }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 0.5, fontSize: '0.45rem' }}>EVIDENCE SUMMARY</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block', mb: 0.5, fontSize: '0.45rem' }}>EVIDENCE SUMMARY</Typography>
             <Typography variant="caption" sx={{ color: '#fff', fontWeight: 700, fontSize: '0.55rem' }}>
                 {decision.formattedThesis?.trend} · {decision.formattedThesis?.momentum}
             </Typography>
@@ -167,17 +167,17 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 
          <Stack spacing={1.5}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>CREATED AT</Typography>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>CREATED AT</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(decision.generatedAt)}</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME</Typography>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(stock.data_timestamp || stock.timestamp)}</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                 {decision.signalAgeHours !== undefined && (
                     <Box sx={{ flex: 1 }}>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>SIGNAL AGE</Typography>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>SIGNAL AGE</Typography>
                         <Typography variant="caption" sx={{ color: decision.signalAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem', display: 'block' }}>
                             {decision.signalAgeHours.toFixed(1)} HOURS
                         </Typography>
@@ -185,7 +185,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
                 )}
                 {decision.dataAgeHours !== undefined && (
                     <Box sx={{ flex: 1, textAlign: 'right' }}>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.5rem' }}>DATA AGE</Typography>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>DATA AGE</Typography>
                         <Typography variant="caption" sx={{ color: decision.dataAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem', display: 'block' }}>
                             {decision.dataAgeHours.toFixed(1)} HOURS
                         </Typography>
@@ -220,7 +220,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 function LevelItem({ label, value, color = '#fff', simple = false }: { label: string, value?: number, color?: string, simple?: boolean }) {
    return (
       <Grid item xs={6}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: simple ? '0.45rem' : '0.55rem', display: 'block', mb: 0.5 }}>{label}</Typography>
+         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: simple ? '0.45rem' : '0.55rem', display: 'block', mb: 0.5 }}>{label}</Typography>
          <Typography variant={simple ? 'body2' : 'body1'} sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', color }}>{value ? `₹${value.toLocaleString()}` : 'UNAVAILABLE'}</Typography>
       </Grid>
    );

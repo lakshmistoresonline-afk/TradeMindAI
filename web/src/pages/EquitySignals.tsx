@@ -40,7 +40,7 @@ export default function EquitySignals() {
   const universes = useMemo(() => [
     { label: 'ALL ACTIVE', value: 'ALL', color: '#00D1FF' },
     { label: 'SWING', value: 'SWING', color: '#10b981' },
-    { label: 'SHORT HORIZON', value: 'SHORT', color: 'slategray' },
+    { label: 'SHORT HORIZON', value: 'SHORT', color: '#708090' },
     { label: 'LONG HORIZON', value: 'LONG', color: '#00D1FF' }
   ], []);
 
@@ -94,20 +94,26 @@ export default function EquitySignals() {
     fetchData();
   }, [mode, page, rowsPerPage, hFilterHorizon, hFilterQuality, hFilterStatus, hFilterDirection]);
 
-  // Sync Firestore signals into local state for universal visibility (V2.3 Hybrid)
+  // Hybrid Data Integration (V2.3)
+  // Authoritatively merges REST API and Firestore Shadow Mirror
   useEffect(() => {
-    if (firestoreSignals.length > 0 && mode === 'ACTIVE') {
-      const normalizedFirestore = firestoreSignals.map(s => mapCanonicalSignal(s));
-      setSignals(prev => {
-          // Merge based on ID to avoid duplicates
-          const existingIds = new Set(prev.map(p => p.id));
-          const newSignals = normalizedFirestore.filter(f => !existingIds.has(f.id));
-          return [...prev, ...newSignals].sort((a, b) =>
+    const fsSignals = firestoreSignals.map(s => ({ ...mapCanonicalSignal(s), _isFirestore: true }));
+
+    setSignals(prev => {
+        const mergedMap = new Map();
+
+        // Add existing signals to map
+        prev.forEach(s => mergedMap.set(s.id, s));
+
+        // Overwrite/Add with Firestore signals (as they are usually fresher in Shadow Mode)
+        fsSignals.forEach(s => mergedMap.set(s.id, s));
+
+        // Return sorted array
+        return Array.from(mergedMap.values()).sort((a, b) =>
             new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
-          );
-      });
-    }
-  }, [firestoreSignals, mode]);
+        );
+    });
+  }, [firestoreSignals]);
 
   const counts = useMemo(() => {
     return {
@@ -122,6 +128,10 @@ export default function EquitySignals() {
     const universe = universes[activeTab].value;
 
     return signals.filter(s => {
+        // V2.3 Hybrid: Ensure we only show truly ACTIVE signals in this mode
+        const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision.status);
+        if (!isActive) return false;
+
         const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
                              (s.company_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -187,7 +197,7 @@ export default function EquitySignals() {
                transition: '0.2s',
                '&:focus-within': { borderColor: '#10b981', bgcolor: '#111827', boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.1)' }
             }}>
-               <Search size={18} color="slategray" />
+               <Search size={18} color="#708090" />
                <InputBase
                   placeholder="SEARCH SYMBOL OR ID..."
                   value={searchQuery}
@@ -197,7 +207,7 @@ export default function EquitySignals() {
                />
             </Box>
             <IconButton onClick={fetchData} sx={{ border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 1.5, bgcolor: '#0f172a' }}>
-               <RefreshCw size={20} className={loading ? 'animate-spin' : ''} color="slategray" />
+               <RefreshCw size={20} className={loading ? 'animate-spin' : ''} color="#708090" />
             </IconButton>
          </Stack>
       </Box>
@@ -211,7 +221,7 @@ export default function EquitySignals() {
 
          <Stack direction="row" spacing={1}>
             <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel sx={{ color: 'slategray', fontSize: '0.6rem', fontWeight: 900 }}>DISPLAY RANKING</InputLabel>
+                <InputLabel sx={{ color: '#708090', fontSize: '0.6rem', fontWeight: 900 }}>DISPLAY RANKING</InputLabel>
                 <Select
                     value={sortBy}
                     label="DISPLAY RANKING"
@@ -226,10 +236,10 @@ export default function EquitySignals() {
             <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
             {mode === 'ACTIVE' && (
                 <>
-                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? '#00D1FF' : 'slategray' }}>
+                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? '#00D1FF' : '#708090' }}>
                         <LayoutGrid size={20} />
                     </IconButton>
-                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? '#00D1FF' : 'slategray' }}>
+                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? '#00D1FF' : '#708090' }}>
                         <ListIcon size={20} />
                     </IconButton>
                 </>
@@ -262,7 +272,7 @@ export default function EquitySignals() {
                     <SummaryStat label="LONG" value={counts.long} color="#00D1FF" />
                 </Grid>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="SHORT" value={counts.short} color="slategray" />
+                    <SummaryStat label="SHORT" value={counts.short} color="#708090" />
                 </Grid>
             </Grid>
 
@@ -275,7 +285,7 @@ export default function EquitySignals() {
                         minHeight: 44,
                         '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
                         '& .MuiTab-root': {
-                            color: 'slategray',
+                            color: '#708090',
                             fontWeight: 950,
                             fontSize: '0.7rem',
                             minWidth: 160,
@@ -303,7 +313,7 @@ export default function EquitySignals() {
                 <Paper sx={{ py: 15, textAlign: 'center', bgcolor: alpha('#ef4444', 0.05), border: '1px dashed #ef4444', borderRadius: 1 }}>
                     <ShieldAlert size={56} color="#ef4444" style={{ margin: '0 auto 24px', opacity: 0.5 }} />
                     <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1 }}>CONNECTION FAILED</Typography>
-                    <Typography variant="body2" sx={{ color: 'slategray', mb: 4, maxWidth: 400, mx: 'auto' }}>{error}</Typography>
+                    <Typography variant="body2" sx={{ color: '#708090', mb: 4, maxWidth: 400, mx: 'auto' }}>{error}</Typography>
                     <Button variant="outlined" onClick={fetchData} startIcon={<RefreshCw size={16} />}>RETRY SYNCHRONIZATION</Button>
                 </Paper>
             ) : (
@@ -388,8 +398,8 @@ export default function EquitySignals() {
                         )
                     ) : (
                         <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
-                            <ShieldAlert size={56} color="slategray" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
-                            <Typography variant="h6" sx={{ fontWeight: 900, color: 'slategray', letterSpacing: 1 }}>
+                            <ShieldAlert size={56} color="#708090" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 900, color: '#708090', letterSpacing: 1 }}>
                                 {universes[activeTab].label} — NO QUALIFIED SIGNALS
                             </Typography>
                         </Paper>
@@ -405,7 +415,7 @@ export default function EquitySignals() {
                 <Grid item xs={6} md={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color="#10b981" /></Grid>
                 <Grid item xs={6} md={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color="#ef4444" /></Grid>
                 <Grid item xs={6} md={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color="orange" /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color="slategray" /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color="#708090" /></Grid>
             </Grid>
 
             <Paper sx={{ p: 2, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
@@ -420,7 +430,7 @@ export default function EquitySignals() {
                         variant="outlined"
                         onClick={() => { setHFilterDirection('ALL'); setHFilterHorizon('ALL'); setHFilterQuality('ALL'); setHFilterStatus('ALL'); setSearchQuery(''); }}
                         startIcon={<RefreshCw size={14} />}
-                        sx={{ height: 40, fontWeight: 900, borderColor: 'rgba(255,255,255,0.1)', color: 'slategray' }}
+                        sx={{ height: 40, fontWeight: 900, borderColor: 'rgba(255,255,255,0.1)', color: '#708090' }}
                      >
                         RESET FILTERS
                      </Button>
@@ -466,9 +476,9 @@ export default function EquitySignals() {
                                       }}
                                   />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 700, color: 'slategray', fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
+                              <TableCell sx={{ fontWeight: 700, color: '#708090', fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
                               <TableCell><Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
-                              <TableCell sx={{ fontSize: '0.6rem', color: 'slategray', fontFamily: 'JetBrains Mono' }}>{s.id}</TableCell>
+                              <TableCell sx={{ fontSize: '0.6rem', color: '#708090', fontFamily: 'JetBrains Mono' }}>{s.id}</TableCell>
                               <TableCell>
                                  <MuiChip
                                     label={s.decision.rating}
@@ -488,8 +498,8 @@ export default function EquitySignals() {
                                     variant="outlined"
                                     sx={{
                                         height: 18, fontSize: '0.5rem', fontWeight: 900,
-                                        borderColor: s.decision.qualityClass === 'PRIMARY' ? '#10b981' : s.decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : 'slategray',
-                                        color: s.decision.qualityClass === 'PRIMARY' ? '#10b981' : s.decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : 'slategray'
+                                        borderColor: s.decision.qualityClass === 'PRIMARY' ? '#10b981' : s.decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090',
+                                        color: s.decision.qualityClass === 'PRIMARY' ? '#10b981' : s.decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090'
                                     }}
                                  />
                               </TableCell>
@@ -523,7 +533,7 @@ export default function EquitySignals() {
                      ) : (
                         <TableRow>
                            <TableCell colSpan={12} sx={{ py: 10, textAlign: 'center' }}>
-                              <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>NO HISTORICAL RECORDS MATCHING CURRENT FILTERS</Typography>
+                              <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700 }}>NO HISTORICAL RECORDS MATCHING CURRENT FILTERS</Typography>
                            </TableCell>
                         </TableRow>
                      )}
@@ -537,7 +547,7 @@ export default function EquitySignals() {
                   rowsPerPage={rowsPerPage}
                   onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
                   rowsPerPageOptions={[25, 50, 100]}
-                  sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', color: 'slategray' }}
+                  sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', color: '#708090' }}
                />
             </TableContainer>
         </Box>
@@ -586,7 +596,7 @@ export default function EquitySignals() {
             <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 1 }}><Info size={20} color="#10b981" /></Box>
             <Box>
                <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>FORENSIC SIGNAL PROTOCOL</Typography>
-               <Typography variant="caption" sx={{ color: 'slategray', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
+               <Typography variant="caption" sx={{ color: '#708090', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
                   Authoritative signals are derived from institutional order flow and Strategy V2.2 breakout logic.
                   All historical outcomes are verified against NSE Spot closing nodes.
                   Latest sync confirmed at {latestUpdate} IST.
@@ -606,7 +616,7 @@ function ModeButton({ active, children, onClick }: any) {
                 px: 3, py: 1,
                 borderRadius: 0.5,
                 bgcolor: active ? '#00D1FF' : 'transparent',
-                color: active ? '#000' : 'slategray',
+                color: active ? '#000' : '#708090',
                 fontWeight: 950,
                 fontSize: '0.75rem',
                 border: active ? 'none' : '1px solid rgba(255,255,255,0.08)',
@@ -621,7 +631,7 @@ function ModeButton({ active, children, onClick }: any) {
 function SummaryStat({ label, value, color }: any) {
     return (
         <Paper sx={{ p: 2, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.03)', height: '100%' }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
         </Paper>
     );
@@ -630,7 +640,7 @@ function SummaryStat({ label, value, color }: any) {
 function HistorySelect({ label, value, onChange, options }: any) {
     return (
         <FormControl fullWidth size="small">
-            <InputLabel sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.7rem' }}>{label}</InputLabel>
+            <InputLabel sx={{ color: '#708090', fontWeight: 800, fontSize: '0.7rem' }}>{label}</InputLabel>
             <Select value={value} label={label} onChange={(e) => onChange(e.target.value)}
                 sx={{ bgcolor: 'rgba(255,255,255,0.02)', color: 'white', fontWeight: 800, fontSize: '0.75rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' } }}>
                 {options.map((o: string) => (<MenuItem key={o} value={o} sx={{ fontSize: '0.75rem', fontWeight: 700 }}>{o.replace(/_/g, ' ')}</MenuItem>))}
@@ -640,7 +650,7 @@ function HistorySelect({ label, value, onChange, options }: any) {
 }
 
 function OutcomeBadge({ outcome }: { outcome: string }) {
-    let color = 'slategray';
+    let color = '#708090';
     let icon = <Clock size={12} />;
     if (outcome === 'TARGET_HIT') { color = '#10b981'; icon = <CheckCircle size={12} />; }
     if (outcome === 'STOP_LOSS' || outcome === 'STOP_HIT') { color = '#ef4444'; icon = <XCircle size={12} />; }
@@ -656,7 +666,7 @@ function OutcomeBadge({ outcome }: { outcome: string }) {
 function CompareRow({ label, values }: any) {
     return (
         <TableRow>
-            <TableCell sx={{ fontWeight: 800, color: 'slategray', fontSize: '0.65rem' }}>{label}</TableCell>
+            <TableCell sx={{ fontWeight: 800, color: '#708090', fontSize: '0.65rem' }}>{label}</TableCell>
             {values.map((v: any, i: number) => <TableCell key={i} sx={{ fontWeight: 900, color: 'white', fontSize: '0.75rem' }}>{v || '—'}</TableCell>)}
         </TableRow>
     );

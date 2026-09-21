@@ -73,13 +73,13 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
             <Paper variant="outlined" sx={{ p: 3, bgcolor: alpha('#fff', 0.02), border: '1px solid rgba(0, 209, 255, 0.2)' }}>
               <Grid container spacing={4}>
                  <Grid item xs={6} md={3}>
-                    <Typography variant="caption" color="slategray" sx={{ fontWeight: 900 }}>NET P&L %</Typography>
+                    <Typography variant="caption" color="#708090" sx={{ fontWeight: 900 }}>NET P&L %</Typography>
                     <Typography variant="h4" sx={{ fontWeight: 950, color: (signal.net_pnl || 0) >= 0 ? '#10b981' : '#ef4444' }}>
                        {signal.net_pnl !== null ? `${signal.net_pnl > 0 ? '+' : ''}${signal.net_pnl.toFixed(2)}%` : '--'}
                     </Typography>
                  </Grid>
                  <Grid item xs={6} md={3}>
-                    <Typography variant="caption" color="slategray" sx={{ fontWeight: 900 }}>EXIT PRICE</Typography>
+                    <Typography variant="caption" color="#708090" sx={{ fontWeight: 900 }}>EXIT PRICE</Typography>
                     <Typography variant="h4" sx={{ fontWeight: 950 }}>{signal.exit_price ? `₹${signal.exit_price.toFixed(2)}` : '--'}</Typography>
                  </Grid>
                  <Grid item xs={12} md={6}>
@@ -173,7 +173,7 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
                     <DataRow label="MODEL VERSION" value={signal.provenance_data.model_version} />
                     <DataRow label="INPUT HASH" value={signal.provenance_data.input_hash} />
                     <Divider sx={{ my: 2, opacity: 0.1 }} />
-                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900 }}>DATA SOURCES</Typography>
+                    <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900 }}>DATA SOURCES</Typography>
                     <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                        {Object.entries(signal.provenance_data.data_sources || {}).map(([k, v]: [string, any]) => (
                           <Chip key={k} label={`${k.toUpperCase()}: ${v}`} size="small" variant="outlined" sx={{ fontSize: '0.6rem' }} />
@@ -216,8 +216,8 @@ export default function SignalDetailView({ signal, loading }: SignalDetailViewPr
               <Paper variant="outlined" sx={{ p: 2, bgcolor: alpha('#fff', 0.01) }}>
                  <Typography variant="body2" color="text.secondary">Institutional 1m OHLC reconstruction data for {signal.symbol} at exit window.</Typography>
                  <Box sx={{ mt: 2, py: 4, textAlign: 'center', bgcolor: alpha('#fff', 0.02), borderRadius: 1 }}>
-                    <Search size={32} color="slategray" style={{ opacity: 0.3 }} />
-                    <Typography variant="caption" display="block" color="slategray" sx={{ mt: 1 }}>Interactive Chart Reconstruction Pending.</Typography>
+                    <Search size={32} color="#708090" style={{ opacity: 0.3 }} />
+                    <Typography variant="caption" display="block" color="#708090" sx={{ mt: 1 }}>Interactive Chart Reconstruction Pending.</Typography>
                  </Box>
               </Paper>
            </Grid>
@@ -276,7 +276,7 @@ function SectionHeader({ icon, title }: any) {
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
       <Box sx={{ color: '#00D1FF' }}>{icon}</Box>
-      <Typography variant="caption" sx={{ fontWeight: 950, letterSpacing: 1.5, color: 'slategray' }}>{title}</Typography>
+      <Typography variant="caption" sx={{ fontWeight: 950, letterSpacing: 1.5, color: '#708090' }}>{title}</Typography>
     </Stack>
   );
 }
@@ -284,7 +284,7 @@ function SectionHeader({ icon, title }: any) {
 function DataRow({ label, value, color, bold }: any) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.2, gap: 2 }}>
-      <Typography variant="caption" sx={{ fontWeight: 800, color: 'slategray', whiteSpace: 'nowrap' }}>{label}</Typography>
+      <Typography variant="caption" sx={{ fontWeight: 800, color: '#708090', whiteSpace: 'nowrap' }}>{label}</Typography>
       <Typography variant="body2" sx={{ fontWeight: bold ? 950 : 700, color: color || 'white', fontFamily: 'JetBrains Mono', textAlign: 'right', wordBreak: 'break-all' }}>
         {value || '--'}
       </Typography>

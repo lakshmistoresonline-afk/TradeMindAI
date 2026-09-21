@@ -15,7 +15,7 @@ export default function UserDashboard() {
   const [signals, setSignals] = useState<any[]>([]);
   const [tab, setTab] = useState(0);
 
-  const { connectionStatus, firestoreSignals, marketContext } = useTurboSync();
+  const { firestoreSignals, marketContext } = useTurboSync();
 
   const fetchData = async () => {
     setLoading(true);
@@ -44,22 +44,30 @@ export default function UserDashboard() {
     fetchData();
   }, []);
 
-  // Hybrid Sync: Merge Firestore data if API fails or is empty (V2.3)
+  // Hybrid Sync (V2.3): Authoritatively merges Cloud API and Local PC Mirror
   useEffect(() => {
-    if (connectionStatus !== 'ONLINE' || signals.length === 0) {
-      if (firestoreSignals.length > 0) {
-        const normalized = firestoreSignals.map(s => mapCanonicalSignal(s));
-        setSignals(normalized);
-      }
-      if (marketContext) {
-        setMarket(marketContext);
-      }
+    if (firestoreSignals.length > 0) {
+        const normalizedFS = firestoreSignals.map(s => mapCanonicalSignal(s));
+        setSignals(prev => {
+            const mergedMap = new Map();
+            prev.forEach(s => mergedMap.set(s.id, s));
+            normalizedFS.forEach(s => mergedMap.set(s.id, s));
+            return Array.from(mergedMap.values()).sort((a,b) =>
+                new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
+            );
+        });
     }
-  }, [firestoreSignals, marketContext, connectionStatus, signals.length]);
+    if (marketContext) {
+        setMarket(marketContext);
+    }
+  }, [firestoreSignals, marketContext]);
 
   const filteredSignals = useMemo(() => {
     const horizon = ['SWING', 'SHORT', 'LONG'][tab];
-    return signals.filter(s => s.decision.timeframe === horizon).slice(0, 3);
+    return signals.filter(s =>
+      s.decision.timeframe === horizon &&
+      ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision.status)
+    ).slice(0, 3);
   }, [signals, tab]);
 
   return (
@@ -67,21 +75,21 @@ export default function UserDashboard() {
       {/* 1. Welcom Header */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>Welcome to TradeMind AI</Typography>
-        <Typography variant="body1" sx={{ color: 'slategray', mt: 1 }}>Auditable intelligence for your institutional investing journey.</Typography>
+        <Typography variant="body1" sx={{ color: '#708090', mt: 1 }}>Auditable intelligence for your institutional investing journey.</Typography>
       </Box>
 
       {/* 2. Market Snapshot */}
-      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>MARKET SNAPSHOT</Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: '#708090', letterSpacing: 1 }}>MARKET SNAPSHOT</Typography>
       <Grid container spacing={3} sx={{ mb: 6 }}>
          <Grid item xs={12} md={3}>
-            <MarketMiniCard label="NIFTY 50" data={stats?.['NIFTY 50']} value={market?.nifty_price} />
+            <MarketMiniCard label="NIFTY 200" data={stats?.['NIFTY 200']} value={market?.nifty_price} />
          </Grid>
          <Grid item xs={12} md={3}>
             <MarketMiniCard label="INDIA VIX" value={market?.vix || (stats?.['India VIX']?.value)} />
          </Grid>
          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 2.5, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', height: '100%' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1, display: 'block' }}>REGIME</Typography>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 1, display: 'block' }}>REGIME</Typography>
                <Chip
                   label={market?.regime || 'SIDEWAYS'}
                   size="small"
@@ -95,9 +103,9 @@ export default function UserDashboard() {
          </Grid>
          <Grid item xs={12} md={3}>
             <Paper sx={{ p: 2.5, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', height: '100%' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1, display: 'block' }}>DATA FRESHNESS</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 800, color: (market?.status === 'HEALTHY' || (stats?.['NIFTY 50']?.value > 0)) ? '#10b981' : 'orange' }}>
-                  { (market?.status === 'HEALTHY' || (stats?.['NIFTY 50']?.value > 0)) ? '● LIVE FEED ACTIVE' : '● FEED DEGRADED' }
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 1, display: 'block' }}>DATA FRESHNESS</Typography>
+               <Typography variant="body2" sx={{ fontWeight: 800, color: (market?.status === 'HEALTHY' || (stats?.['NIFTY 200']?.value > 0)) ? '#10b981' : 'orange' }}>
+                  { (market?.status === 'HEALTHY' || (stats?.['NIFTY 200']?.value > 0)) ? '● LIVE FEED ACTIVE' : '● FEED DEGRADED' }
                </Typography>
             </Paper>
          </Grid>
@@ -116,7 +124,7 @@ export default function UserDashboard() {
             sx={{
                 mb: 4,
                 '& .MuiTabs-indicator': { bgcolor: '#00D1FF' },
-                '& .MuiTab-root': { color: 'slategray', fontWeight: 900, fontSize: '0.75rem', '&.Mui-selected': { color: 'white' } }
+                '& .MuiTab-root': { color: '#708090', fontWeight: 900, fontSize: '0.75rem', '&.Mui-selected': { color: 'white' } }
             }}
         >
             <Tab label="SWING" />
@@ -143,7 +151,7 @@ export default function UserDashboard() {
            {filteredSignals.length === 0 && (
               <Grid item xs={12}>
                  <Paper sx={{ py: 10, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.1)' }}>
-                    <Typography sx={{ color: 'slategray', fontWeight: 800 }}>No current {['SWING', 'SHORT', 'LONG'][tab]} signals meeting conviction threshold.</Typography>
+                    <Typography sx={{ color: '#708090', fontWeight: 800 }}>No current {['SWING', 'SHORT', 'LONG'][tab]} signals meeting conviction threshold.</Typography>
                  </Paper>
               </Grid>
            )}
@@ -152,7 +160,7 @@ export default function UserDashboard() {
 
       {/* 4. Market Insights Feed */}
       <Box sx={{ mt: 10 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>MARKET INSIGHTS</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: '#708090', letterSpacing: 1 }}>MARKET INSIGHTS</Typography>
         <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
                 <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -176,7 +184,7 @@ export default function UserDashboard() {
                     </Box>
                     <Box sx={{ p: 3, textAlign: 'center' }}>
                         <Zap size={40} color="#7C3AED" style={{ marginBottom: 16 }} />
-                        <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700, mb: 3 }}>
+                        <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700, mb: 3 }}>
                             Unlock algorithmic sector strength analysis and institutional order flow metrics.
                         </Typography>
                         <Button variant="outlined" color="secondary" onClick={() => navigate('/pricing')} sx={{ fontWeight: 900 }}>GO PRO</Button>
@@ -188,7 +196,7 @@ export default function UserDashboard() {
 
       {/* 5. Quick Links */}
       <Box sx={{ mt: 10 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>PRODUCT DIRECTORY</Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: '#708090', letterSpacing: 1 }}>PRODUCT DIRECTORY</Typography>
         <Grid container spacing={3}>
            <ToolCard
               icon={<ShieldCheck size={24} color="#10b981" />}
@@ -222,7 +230,7 @@ function MarketMiniCard({ label, data, value }: any) {
 
     return (
         <Paper sx={{ p: 2.5, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', height: '100%' }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1, display: 'block' }}>{label}</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 1, display: 'block' }}>{label}</Typography>
             <Stack direction="row" spacing={1.5} alignItems="baseline">
                 <Typography sx={{ fontWeight: 950, fontSize: '1.2rem', fontFamily: 'JetBrains Mono' }}>{typeof val === 'number' ? val.toLocaleString() : val}</Typography>
                 {data && rawVal !== 0 && (
@@ -251,7 +259,7 @@ function ToolCard({ icon, title, desc, onClick }: any) {
             >
                 <Box sx={{ mb: 2 }}>{icon}</Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 950, mb: 1 }}>{title}</Typography>
-                <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>{desc}</Typography>
+                <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700 }}>{desc}</Typography>
             </Paper>
         </Grid>
     );
@@ -261,7 +269,7 @@ function InsightItem({ title, desc }: any) {
     return (
         <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)' }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#00D1FF', mb: 0.5 }}>{title}</Typography>
-            <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 500 }}>{desc}</Typography>
+            <Typography variant="body2" sx={{ color: '#708090', fontWeight: 500 }}>{desc}</Typography>
         </Box>
     );
 }

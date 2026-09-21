@@ -48,7 +48,7 @@ export default function SignalLifecycleTimeline({ events, currentStatus }: Signa
               </Box>
             </StepLabel>
             <StepContent sx={{ borderLeft: '2px dashed rgba(255,255,255,0.1)', ml: '12px' }}>
-              <Typography variant="caption" sx={{ color: 'slategray', display: 'block', mb: 1, fontWeight: 700, fontSize: '0.7rem' }}>
+              <Typography variant="caption" sx={{ color: '#708090', display: 'block', mb: 1, fontWeight: 700, fontSize: '0.7rem' }}>
                 {event.message || `Signal state transitioned to ${event.type}.`}
               </Typography>
               {event.price && (
@@ -79,6 +79,6 @@ function getStatusColor(status: string) {
       case 'WAITING_FOR_ENTRY': return '#f59e0b';
       case 'TARGET_HIT': return '#10b981';
       case 'STOP_LOSS': return '#ef4444';
-      default: return 'slategray';
+      default: return '#708090';
     }
 }

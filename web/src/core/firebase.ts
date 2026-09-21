@@ -7,9 +7,9 @@ const firebaseConfig = {
   apiKey: "AIzaSyAV2mVlSuVSvM-FXVZtTsn06VsSP_mTr4k",
   authDomain: "com-webcraft-trademindai-c8f75.firebaseapp.com",
   projectId: "com-webcraft-trademindai-c8f75",
-  storageBucket: "com-webcraft-trademindai-c8f75.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
+  storageBucket: "com-webcraft-trademindai-c8f75.firebasestorage.app",
+  messagingSenderId: "595902577601",
+  appId: "1:595902577601:web:583597c42cd8b544583c4b" // Optimized V2.3 Canonical ID
 };
 
 console.log("[Firebase] Initializing production node...");

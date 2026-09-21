@@ -65,7 +65,7 @@ export default function CommandPalette() {
            <List>
               {results.map((item, idx) => (
                 <ListItem key={idx} onClick={() => handleSelect(item)} sx={{ borderRadius: 2, cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }}>
-                   <ListItemIcon sx={{ minWidth: 40, color: 'slategray' }}>{item.icon}</ListItemIcon>
+                   <ListItemIcon sx={{ minWidth: 40, color: '#708090' }}>{item.icon}</ListItemIcon>
                    <ListItemText primary={item.title} />
                    <Command size={14} className="opacity-20" />
                 </ListItem>

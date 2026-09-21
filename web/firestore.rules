@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Explicit public read for signals and metrics
+    match /signals/{signalId} {
+      allow read, list: if true;
+    }
+
+    match /system_metrics/{metricId} {
+      allow read, list: if true;
+    }
+
+    // Default catch-all
+    match /{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        (request.auth.token.email == 'lakshmistoresonline@gmail.com' ||
+         request.auth.token.email.matches('.*@trademind.ai'));
+    }
+  }
+}

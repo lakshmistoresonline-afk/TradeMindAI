@@ -305,6 +305,7 @@ class SignalEngine:
             instrument_id=stock.instrument_id if hasattr(stock, 'instrument_id') else f"NSE_{symbol}",
             instrument_type="EQUITY",
             direction=direction,
+            rating="BUY" if direction == "LONG" else "SELL",
             timeframe=timeframe,
             strategy_version="v2.2",
             signal_version="1.0",
@@ -379,7 +380,6 @@ class SignalEngine:
             deployment_sha=settings.GIT_SHA,
 
             # Legacy/Internal
-            rating="BUY" if direction == "LONG" else "SELL",
             conviction=float(calibrated_prob * 100),
             asset_class="EQUITY",
             underlying_symbol=None,

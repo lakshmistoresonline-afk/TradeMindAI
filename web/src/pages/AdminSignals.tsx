@@ -30,7 +30,7 @@ export default function AdminSignals() {
       <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
          <Table>
             <TableHead>
-               <TableRow sx={{ '& th': { color: 'slategray', fontWeight: 900, borderBottom: '1px solid rgba(255,255,255,0.05)' } }}>
+               <TableRow sx={{ '& th': { color: '#708090', fontWeight: 900, borderBottom: '1px solid rgba(255,255,255,0.05)' } }}>
                   <TableCell>SIGNAL ID</TableCell>
                   <TableCell>SYMBOL</TableCell>
                   <TableCell>DIRECTION</TableCell>
@@ -44,7 +44,7 @@ export default function AdminSignals() {
             <TableBody>
                {signals.map((s) => (
                   <TableRow key={s.id} hover sx={{ cursor: 'pointer' }}>
-                     <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: 'slategray' }}>{s.id}</TableCell>
+                     <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: '#708090' }}>{s.id}</TableCell>
                      <TableCell sx={{ fontWeight: 950 }}>{s.symbol}</TableCell>
                      <TableCell>
                         <Chip label={s.direction} size="small" sx={{ fontWeight: 950, height: 20, bgcolor: alpha(s.direction === 'LONG' ? '#10b981' : '#ef4444', 0.1), color: s.direction === 'LONG' ? '#10b981' : '#ef4444' }} />
@@ -52,7 +52,7 @@ export default function AdminSignals() {
                      <TableCell sx={{ fontWeight: 900, color: '#00D1FF' }}>{Math.round(s.conviction)}%</TableCell>
                      <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.entry_price?.toLocaleString()}</TableCell>
                      <TableCell>
-                        <Chip label={s.status} size="small" variant="outlined" sx={{ fontWeight: 900, fontSize: '0.5rem', height: 18, color: 'slategray' }} />
+                        <Chip label={s.status} size="small" variant="outlined" sx={{ fontWeight: 900, fontSize: '0.5rem', height: 18, color: '#708090' }} />
                      </TableCell>
                      <TableCell>
                         <Stack direction="row" spacing={1} alignItems="center">

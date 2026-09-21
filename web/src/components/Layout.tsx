@@ -137,7 +137,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
               {!isMobile && (
                 <Stack direction="row" spacing={1} sx={{ ml: 4 }}>
-                   <HeaderStatus label="SCAN" value="TOP 50 HARDENED" color="#10b981" />
+                   <HeaderStatus label="SCAN" value="NIFTY 200 CANONICAL" color="#10b981" />
                    <HeaderStatus label="MODE" value="SHADOW SIGNAL" color="#00D1FF" />
                 </Stack>
               )}
@@ -176,12 +176,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               >
                 <Box sx={{ px: 2, py: 2 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>{user?.email || 'TradeMind Pro'}</Typography>
-                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700 }}>Institutional Access</Typography>
+                  <Typography variant="caption" sx={{ color: '#708090', fontWeight: 700 }}>Institutional Access</Typography>
                 </Box>
                 <Divider sx={{ opacity: 0.05 }} />
                 <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.5 }}>
-                  <ListItemIcon><Activity size={18} color="slategray" /></ListItemIcon>
-                  <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: 'slategray' }} />
+                  <ListItemIcon><Activity size={18} color="#708090" /></ListItemIcon>
+                  <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: '#708090' }} />
                 </MenuItem>
                 <Divider sx={{ opacity: 0.05 }} />
                 <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: '#ef4444', py: 1.5 }}>
@@ -213,7 +213,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Toolbar sx={{ minHeight: 80 }} />
           <Box sx={{ overflow: 'auto', mt: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <List sx={{ px: 2 }}>
-               <Typography variant="caption" sx={{ px: 2, mb: 2, display: 'block', fontWeight: 900, color: 'slategray', letterSpacing: 2 }}>PRIMARY COMMANDS</Typography>
+               <Typography variant="caption" sx={{ px: 2, mb: 2, display: 'block', fontWeight: 900, color: '#708090', letterSpacing: 2 }}>PRIMARY COMMANDS</Typography>
                {userMenuItems.map((item) => (
                  <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                     <ListItemButton
@@ -231,7 +231,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         '&:hover': { backgroundColor: alpha('#fff', 0.03) }
                       }}
                     >
-                      <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
+                      <ListItemIcon sx={{ color: '#708090', minWidth: 40 }}>
                         {item.icon}
                       </ListItemIcon>
                       <ListItemText
@@ -267,7 +267,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             '&:hover': { backgroundColor: alpha('#fff', 0.03) }
                           }}
                         >
-                          <ListItemIcon sx={{ color: 'slategray', minWidth: 40 }}>
+                          <ListItemIcon sx={{ color: '#708090', minWidth: 40 }}>
                             {item.icon}
                           </ListItemIcon>
                           <ListItemText
@@ -287,7 +287,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </List>
 
             <Box sx={{ mt: 'auto', p: 3, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, fontSize: '0.6rem' }}>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.6rem' }}>
                   © 2026 TRADEMIND AI • STRATEGY V2.2
                </Typography>
             </Box>
@@ -315,7 +315,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 function HeaderStatus({ label, value, color }: any) {
    return (
       <Box sx={{ px: 1.5, py: 0.5, border: '1px solid rgba(255,255,255,0.05)', borderRadius: 0.5, bgcolor: 'rgba(255,255,255,0.02)' }}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.55rem', mr: 1 }}>{label}:</Typography>
+         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, fontSize: '0.55rem', mr: 1 }}>{label}:</Typography>
          <Typography variant="caption" sx={{ color: color, fontWeight: 950, fontSize: '0.55rem' }}>{value}</Typography>
       </Box>
    );

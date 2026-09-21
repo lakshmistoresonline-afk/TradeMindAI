@@ -33,7 +33,7 @@ export default function Account() {
     <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>ACCOUNT SETTINGS</Typography>
-        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
+        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, letterSpacing: 1.5 }}>
            MANAGE YOUR INSTITUTIONAL TERMINAL ACCESS
         </Typography>
       </Box>
@@ -48,7 +48,7 @@ export default function Account() {
                   </Box>
                   <Box>
                      <Typography variant="h6" sx={{ fontWeight: 900 }}>{user?.email}</Typography>
-                     <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>MEMBER SINCE SEP 2026</Typography>
+                     <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>MEMBER SINCE SEP 2026</Typography>
                   </Box>
                </Stack>
                <Divider sx={{ opacity: 0.05, mb: 4 }} />
@@ -64,9 +64,9 @@ export default function Account() {
          <Grid item xs={12} md={6}>
             <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
                <Box sx={{ position: 'absolute', top: 10, right: 10, opacity: 0.05 }}><Zap size={120} color="#00D1FF" /></Box>
-               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: 'slategray', mb: 3, letterSpacing: 1 }}>CURRENT PLAN</Typography>
+               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#708090', mb: 3, letterSpacing: 1 }}>CURRENT PLAN</Typography>
                <Typography variant="h3" sx={{ fontWeight: 950, color: '#00D1FF', mb: 1 }}>FREE TIER</Typography>
-               <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700, mb: 4 }}>Standard research access enabled.</Typography>
+               <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700, mb: 4 }}>Standard research access enabled.</Typography>
 
                <Button
                   fullWidth
@@ -98,16 +98,16 @@ export default function Account() {
                   <Button variant="contained" color="secondary" onClick={handleSendReferral}><Send size={16} /></Button>
                </Stack>
 
-               <Typography variant="caption" sx={{ color: 'slategray', display: 'block', mb: 3 }}>
+               <Typography variant="caption" sx={{ color: '#708090', display: 'block', mb: 3 }}>
                   Refer a friend and receive 15% credit on their first subscription month.
                </Typography>
                <Grid container spacing={2}>
                   <Grid item xs={6}>
-                     <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>REFERRED</Typography>
+                     <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>REFERRED</Typography>
                      <Typography variant="h6" sx={{ fontWeight: 950 }}>{referrals.length}</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                     <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>EARNED</Typography>
+                     <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>EARNED</Typography>
                      <Typography variant="h6" sx={{ fontWeight: 950, color: '#10b981' }}>₹{referrals.reduce((sum, r) => sum + r.reward_earned, 0)}</Typography>
                   </Grid>
                </Grid>
@@ -124,12 +124,12 @@ export default function Account() {
 
                {referrals.length > 0 && (
                   <Box sx={{ mb: 6 }}>
-                     <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 950, mb: 2, display: 'block' }}>REFERRAL ACTIVITY</Typography>
+                     <Typography variant="caption" sx={{ color: '#708090', fontWeight: 950, mb: 2, display: 'block' }}>REFERRAL ACTIVITY</Typography>
                      {referrals.map((r, i) => (
                         <Box key={i} sx={{ py: 1.5, display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
                            <Typography variant="caption" sx={{ fontWeight: 800 }}>{r.referred_email}</Typography>
                            <Stack direction="row" spacing={2}>
-                              <Typography variant="caption" sx={{ color: r.status === 'CONVERTED' ? '#10b981' : 'slategray', fontWeight: 900 }}>{r.status}</Typography>
+                              <Typography variant="caption" sx={{ color: r.status === 'CONVERTED' ? '#10b981' : '#708090', fontWeight: 900 }}>{r.status}</Typography>
                               {r.reward_earned > 0 && <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 900 }}>+₹{r.reward_earned}</Typography>}
                            </Stack>
                         </Box>
@@ -138,7 +138,7 @@ export default function Account() {
                )}
 
                <Box sx={{ py: 6, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.01)', borderRadius: 1, border: '1px dashed rgba(255,255,255,0.05)' }}>
-                  <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>NO RECENT BILLING TRANSACTIONS FOUND</Typography>
+                  <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700 }}>NO RECENT BILLING TRANSACTIONS FOUND</Typography>
                </Box>
             </Paper>
          </Grid>
@@ -150,7 +150,7 @@ export default function Account() {
 function DetailItem({ label, val, color = '#fff', isMono = false }: any) {
     return (
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>{label}</Typography>
             <Typography variant="caption" sx={{ color, fontWeight: 950, fontFamily: isMono ? 'JetBrains Mono' : 'inherit' }}>{val}</Typography>
         </Box>
     );

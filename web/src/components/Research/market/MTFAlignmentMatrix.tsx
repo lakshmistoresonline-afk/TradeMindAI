@@ -78,7 +78,7 @@ export default function MTFAlignmentMatrix({ symbol }: { symbol: string }) {
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
                 {alignment.summary}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'slategray', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Typography variant="caption" sx={{ color: '#708090', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 Verified via Fractal Momentum Analysis <Tooltip title="Institutional order flow is highest when multiple timeframes align in direction."><HelpCircle size={10} /></Tooltip>
               </Typography>
            </Box>

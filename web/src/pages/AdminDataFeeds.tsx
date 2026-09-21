@@ -37,12 +37,12 @@ export default function AdminDataFeeds() {
             <Paper sx={{ p: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 4 }}>INGESTION HEALTH</Typography>
                <Box sx={{ mb: 4 }}>
-                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, mb: 1, display: 'block' }}>UNIVERSE SYNC</Typography>
+                  <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, mb: 1, display: 'block' }}>UNIVERSE SYNC</Typography>
                   <LinearProgress variant="determinate" value={98} color="success" sx={{ height: 6, borderRadius: 3 }} />
                   <Typography variant="caption" sx={{ mt: 1, display: 'block', fontWeight: 900 }}>202 / 202 CONSTITUENTS</Typography>
                </Box>
                <Box sx={{ mb: 4 }}>
-                  <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, mb: 1, display: 'block' }}>MISSING INTERVALS</Typography>
+                  <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, mb: 1, display: 'block' }}>MISSING INTERVALS</Typography>
                   <LinearProgress variant="determinate" value={2} color="error" sx={{ height: 6, borderRadius: 3 }} />
                   <Typography variant="caption" sx={{ mt: 1, display: 'block', fontWeight: 900 }}>4 SYMBOLS (DATA LIMITED)</Typography>
                </Box>
@@ -65,15 +65,15 @@ function ProviderRow({ name, status, latency, lastSync }: any) {
     return (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" spacing={2} alignItems="center">
-                <Database size={20} color={isOnline ? '#10b981' : 'slategray'} />
+                <Database size={20} color={isOnline ? '#10b981' : '#708090'} />
                 <Box>
                     <Typography variant="body2" sx={{ fontWeight: 900 }}>{name}</Typography>
-                    <Typography variant="caption" sx={{ color: 'slategray' }}>Last Sync: {lastSync}</Typography>
+                    <Typography variant="caption" sx={{ color: '#708090' }}>Last Sync: {lastSync}</Typography>
                 </Box>
             </Stack>
             <Stack direction="row" spacing={3} alignItems="center">
-                <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: 'slategray' }}>{latency}</Typography>
-                <Chip label={status} size="small" sx={{ fontWeight: 950, fontSize: '0.6rem', bgcolor: alpha(isOnline ? '#10b981' : 'slategray', 0.1), color: isOnline ? '#10b981' : 'slategray' }} />
+                <Typography variant="caption" sx={{ fontFamily: 'JetBrains Mono', color: '#708090' }}>{latency}</Typography>
+                <Chip label={status} size="small" sx={{ fontWeight: 950, fontSize: '0.6rem', bgcolor: alpha(isOnline ? '#10b981' : '#708090', 0.1), color: isOnline ? '#10b981' : '#708090' }} />
             </Stack>
         </Box>
     );

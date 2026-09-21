@@ -19,8 +19,8 @@ class EquitySignalGenerationService:
         print("=== [EQUITY] Multi-Horizon Production Scan Started ===")
         start_time = datetime.datetime.utcnow()
 
-        # 1. Load NIFTY-200 universe (Top 50 Hardened for Production)
-        symbols = container.universe_service.NIFTY_200_CONSTITUENTS[:50]
+        # 1. Load NIFTY-200 universe (Full Canonical Universe)
+        symbols = container.universe_service.NIFTY_200_CONSTITUENTS
         horizons = ["SHORT", "SWING", "LONG"]
 
         print(f"   [DEBUG] Symbols to scan: {len(symbols)}")

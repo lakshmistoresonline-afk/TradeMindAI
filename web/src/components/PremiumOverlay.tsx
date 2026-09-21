@@ -33,7 +33,7 @@ export default function PremiumOverlay({ title = "PREMIUM ANALYSIS", blur = true
       <Box sx={{ zIndex: 2, textAlign: 'center', p: 4 }}>
          <Lock size={32} color="#00D1FF" style={{ marginBottom: 16 }} />
          <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1 }}>{title}</Typography>
-         <Typography variant="body2" sx={{ color: 'slategray', mb: 4, maxWidth: 300, mx: 'auto' }}>
+         <Typography variant="body2" sx={{ color: '#708090', mb: 4, maxWidth: 300, mx: 'auto' }}>
             Institutional-grade evidence and machine-learning thesis are reserved for PRO members.
          </Typography>
          <Button

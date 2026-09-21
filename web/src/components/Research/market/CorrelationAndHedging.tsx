@@ -75,7 +75,7 @@ export default function CorrelationEngine({ symbol }: { symbol: string }) {
                   This suggests it acts as a {correlations[0].value > 0.8 ? 'beta leader' : 'market follower'} in current session.
                </Typography>
              ) : (
-               <Typography variant="body2" sx={{ mt: 2, color: 'slategray' }}>Gathering cross-asset covariance data...</Typography>
+               <Typography variant="body2" sx={{ mt: 2, color: '#708090' }}>Gathering cross-asset covariance data...</Typography>
              )}
 
              {hedge && hedge.recommendation !== "NONE" ? (

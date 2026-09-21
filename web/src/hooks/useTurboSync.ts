@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../api/client';
 import { db } from '../core/firebase';
-import { collection, query, limit, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, limit, onSnapshot, doc } from 'firebase/firestore';
 
 export function useTurboSync() {
   const [updates, setUpdates] = useState<any[]>([]);
@@ -19,7 +19,7 @@ export function useTurboSync() {
       console.log("[Turbo-Sync] SSE Connection Established");
     };
 
-    eventSource.onerror = (e) => {
+    eventSource.onerror = () => {
       setConnectionStatus('ERROR');
       console.warn("[Turbo-Sync] SSE Unavailable. Using Firestore Mirror fallback.");
       eventSource.close();
@@ -37,13 +37,18 @@ export function useTurboSync() {
     // 2. Firestore Mirror Fallback (V2.3 Hybrid Support)
     // This ensures local signals mirrored to Firestore are visible even if Render is down.
     const signalsRef = collection(db, "signals");
-    const q = query(signalsRef, orderBy("mirrored_at", "desc"), limit(20));
+    const q = query(signalsRef, limit(1000)); // Increased limit to support full NIFTY 200 universe
 
     const unsubscribeSignals = onSnapshot(q, (snapshot) => {
       const signals = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })).sort((a: any, b: any) => {
+        // V2.3 Sorting: Use mirrored_at (server time) first, then fallback to signal creation time
+        const timeA = (a.mirrored_at?.seconds || 0) * 1000 || new Date(a.created_at || 0).getTime();
+        const timeB = (b.mirrored_at?.seconds || 0) * 1000 || new Date(b.created_at || 0).getTime();
+        return timeB - timeA;
+      });
       console.log(`[Turbo-Sync] Firestore Mirror Sync: ${signals.length} signals`);
       setFirestoreSignals(signals);
     }, (err) => {
@@ -51,7 +56,7 @@ export function useTurboSync() {
     });
 
     // 3. Listen to Local Master Heartbeat for Market Context
-    const unsubscribeMarket = onSnapshot(doc(db, "system_metrics", "local_master"), (snapshot) => {
+    const unsubscribeMarket = onSnapshot(doc(db, "system_metrics", "local_master"), (snapshot: any) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
         console.log("[Turbo-Sync] Market Context received from local master.");

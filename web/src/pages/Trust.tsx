@@ -52,7 +52,7 @@ export default function Trust() {
       </Box>
 
       <Box sx={{ mt: 10, p: 4, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px dashed rgba(255,255,255,0.1)' }}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontStyle: 'italic', lineHeight: 1.6, display: 'block' }}>
+         <Typography variant="caption" sx={{ color: '#708090', fontStyle: 'italic', lineHeight: 1.6, display: 'block' }}>
             TradeMind AI is a research and signal intelligence platform.
             All metrics are derived from observed shadow execution on historical and live market data.
             Investing in equities involves significant risk of loss.
@@ -67,7 +67,7 @@ function TrustCard({ icon, title, text }: any) {
         <Paper sx={{ p: 4, height: '100%', bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
             <Box sx={{ mb: 3 }}>{icon}</Box>
             <Typography variant="h6" sx={{ fontWeight: 900, mb: 2 }}>{title}</Typography>
-            <Typography variant="body2" sx={{ color: 'slategray', lineHeight: 1.8 }}>{text}</Typography>
+            <Typography variant="body2" sx={{ color: '#708090', lineHeight: 1.8 }}>{text}</Typography>
         </Paper>
     );
 }
@@ -82,7 +82,7 @@ function ReliabilityItem({ label, status, text }: any) {
                     <Typography variant="caption" sx={{ fontWeight: 900, fontSize: '0.6rem', color: '#10b981' }}>{status}</Typography>
                 </Box>
             </Box>
-            <Typography variant="body2" sx={{ color: 'slategray' }}>{text}</Typography>
+            <Typography variant="body2" sx={{ color: '#708090' }}>{text}</Typography>
         </Box>
     );
 }

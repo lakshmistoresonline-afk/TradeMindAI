@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Button, Skeleton, Divider, alpha, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
-import { ShieldCheck, RefreshCw, Database, Cloud } from 'lucide-react';
+import { ShieldCheck, RefreshCw } from 'lucide-react';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useNavigate } from 'react-router-dom';
 import { getEquitySignals, getEquityPerformance, getEquityMarketState, getMarketStats, getEquityHistory, getDataHealth, getShadowAnalytics } from '../api/client';
@@ -132,17 +132,17 @@ export default function AdminDashboard() {
                         <SummaryStat label="LONG" value={counts.longSelective} sub="ACTIVE" color="#00D1FF" />
                     </Grid>
                     <Grid item xs={6} md={4}>
-                        <SummaryStat label="SHORT" value={counts.shortExperimental} sub="ACTIVE" color="slategray" />
+                        <SummaryStat label="SHORT" value={counts.shortExperimental} sub="ACTIVE" color="#708090" />
                     </Grid>
                  </Grid>
                  <Divider sx={{ my: 3, opacity: 0.05 }} />
                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
-                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
+                       <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>STRATEGY: V2.2 (FROZEN)</Typography>
                        <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900 }}>RELIABILITY: AUDITED</Typography>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
-                       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>AUDIT STATUS: HARDENED</Typography>
+                       <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>AUDIT STATUS: HARDENED</Typography>
                        <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900 }}>REAL-TIME FEED: ACTIVE</Typography>
                     </Box>
                  </Box>
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
               <Paper sx={{ p: 3, height: '100%', bgcolor: alpha('#00D1FF', 0.03), border: '1px solid rgba(0, 209, 255, 0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                  <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, letterSpacing: 2, mb: 1 }}>BASELINE IDENTITY</Typography>
                  <Typography variant="h4" sx={{ fontWeight: 950, color: '#fff' }}>V2.2 FROZEN</Typography>
-                 <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                 <Typography variant="caption" sx={{ color: '#708090', fontWeight: 700, mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                     TRADING EXECUTION: LOCKED <ShieldCheck size={12} color="#ef4444" />
                  </Typography>
                  <Button
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
       </Box>
 
       {/* 2. Operational Health Ribbon */}
-      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: 'slategray', letterSpacing: 1 }}>OPERATIONAL HEALTH</Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: '#708090', letterSpacing: 1 }}>OPERATIONAL HEALTH</Typography>
       <Stack direction="row" spacing={2} sx={{ mb: 6, overflowX: 'auto', pb: 1 }}>
          <HealthBadge label="API" status={displayHealth?.components?.API} />
          <HealthBadge label="DB" status={displayHealth?.components?.Database} />
@@ -179,11 +179,10 @@ export default function AdminDashboard() {
          <HealthBadge label="UNIVERSE" status={`${displayHealth?.universe?.fresh || 0}/${displayHealth?.universe?.total || 200}`} />
       </Stack>
 
-      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: 'slategray', letterSpacing: 1 }}>MARKET OVERVIEW</Typography>
+      <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 2, color: '#708090', letterSpacing: 1 }}>MARKET OVERVIEW</Typography>
       <Stack direction="row" spacing={4} sx={{ mb: 6, overflowX: 'auto', pb: 1 }}>
-         <MarketTickerItem label="NIFTY 50" data={marketStats?.['NIFTY 50']} />
-         <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} />
          <MarketTickerItem label="NIFTY 200" data={marketStats?.['NIFTY 200']} />
+         <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} />
          <MarketTickerItem label="INDIA VIX" data={(marketState?.vix && marketState.vix > 0) ? { value: marketState.vix, change: 0 } : (marketStats?.['India VIX'] || null)} />
       </Stack>
 
@@ -195,14 +194,14 @@ export default function AdminDashboard() {
                   <Typography variant="h6" sx={{ fontWeight: 950, color: 'white' }}>SIGNAL OPERATIONS</Typography>
                   <Stack direction="row" spacing={1}>
                      <Chip label="AUTO-SYNC ACTIVE" size="small" sx={{ bgcolor: alpha('#10b981', 0.1), color: '#10b981', fontWeight: 900 }} />
-                     <IconButton onClick={fetchData} size="small" sx={{ color: 'slategray' }}><RefreshCw size={16} /></IconButton>
+                     <IconButton onClick={fetchData} size="small" sx={{ color: '#708090' }}><RefreshCw size={16} /></IconButton>
                   </Stack>
                </Box>
 
                <TableContainer>
                   <Table size="small">
                      <TableHead>
-                        <TableRow sx={{ '& th': { borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'slategray', fontWeight: 800, py: 2 } }}>
+                        <TableRow sx={{ '& th': { borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#708090', fontWeight: 800, py: 2 } }}>
                            <TableCell>SYMBOL</TableCell>
                            <TableCell>DIRECTION</TableCell>
                            <TableCell>STATUS</TableCell>
@@ -222,11 +221,11 @@ export default function AdminDashboard() {
                                  <Chip label={s.decision.rating} size="small" sx={{ height: 18, fontSize: '0.5rem', fontWeight: 950, bgcolor: alpha(s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444', 0.1), color: s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444' }} />
                               </TableCell>
                               <TableCell>
-                                 <Typography variant="caption" sx={{ fontWeight: 800, color: 'slategray' }}>{s.decision.status}</Typography>
+                                 <Typography variant="caption" sx={{ fontWeight: 800, color: '#708090' }}>{s.decision.status}</Typography>
                               </TableCell>
-                              <TableCell sx={{ fontFamily: 'JetBrains Mono', color: 'slategray' }}>{s.decision.entry?.toLocaleString()}</TableCell>
+                              <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#708090' }}>{s.decision.entry?.toLocaleString()}</TableCell>
                               <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#fff' }}>{s.decision.normalizedCurrentPrice?.toLocaleString()}</TableCell>
-                              <TableCell sx={{ color: 'slategray' }}>{s.decision.signalAgeHours?.toFixed(1)}h</TableCell>
+                              <TableCell sx={{ color: '#708090' }}>{s.decision.signalAgeHours?.toFixed(1)}h</TableCell>
                               <TableCell align="right">
                                  <Chip label="PASS" size="small" sx={{ height: 16, fontSize: '0.45rem', fontWeight: 950, bgcolor: alpha('#10b981', 0.1), color: '#10b981' }} />
                               </TableCell>
@@ -237,7 +236,7 @@ export default function AdminDashboard() {
                </TableContainer>
 
                <Box sx={{ mt: 4, textAlign: 'center' }}>
-                  <Button variant="text" size="small" onClick={() => navigate('/signals')} sx={{ color: 'slategray', fontWeight: 800 }}>OPEN FULL OPERATIONS TERMINAL →</Button>
+                  <Button variant="text" size="small" onClick={() => navigate('/signals')} sx={{ color: '#708090', fontWeight: 800 }}>OPEN FULL OPERATIONS TERMINAL →</Button>
                </Box>
             </Paper>
 
@@ -259,13 +258,13 @@ export default function AdminDashboard() {
                   </Grid>
                </Grid>
                <Divider sx={{ mb: 4, opacity: 0.05 }} />
-               <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic' }}>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 700, fontStyle: 'italic' }}>
                   * Shadow metrics represent candidate signals blocked by V2.3 Quality Gate (60% Prob floor) while still published by V2.2.
                </Typography>
             </Paper>
 
             <Box sx={{ mt: 6 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: 'slategray', letterSpacing: 1 }}>SYSTEM LOGS (FORENSIC)</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, mb: 3, color: '#708090', letterSpacing: 1 }}>SYSTEM LOGS (FORENSIC)</Typography>
                 <Paper sx={{ p: 0, bgcolor: '#070a0f', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1, maxHeight: 300, overflow: 'auto' }}>
                     <Box sx={{ p: 2, fontFamily: 'JetBrains Mono', fontSize: '0.7rem', color: '#10b981' }}>
                         {`[${new Date().toISOString()}] Signal Engine: Heartbeat OK.`}<br/>
@@ -307,7 +306,7 @@ export default function AdminDashboard() {
                      </Stack>
                      <Divider sx={{ my: 3, opacity: 0.05 }} />
                      <Box>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block', mb: 1 }}>GATE STATUS</Typography>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block', mb: 1 }}>GATE STATUS</Typography>
                         <Chip label="HARDENED" size="small" sx={{ height: 18, fontSize: '0.6rem', fontWeight: 950, bgcolor: alpha('#10b981', 0.1), color: '#10b981' }} />
                      </Box>
                   </Paper>
@@ -335,7 +334,7 @@ function HeroStat({ label, value, color = '#fff' }: any) {
    const displayValue = (value === 0 || value === '0') ? '---' : value;
    return (
       <Grid item xs={6} md={3}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, letterSpacing: 1, display: 'block', mb: 0.5 }}>{label}</Typography>
+         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, letterSpacing: 1, display: 'block', mb: 0.5 }}>{label}</Typography>
          <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{displayValue}</Typography>
       </Grid>
    );
@@ -345,10 +344,10 @@ function SummaryStat({ label, value, sub, color }: any) {
    return (
       <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)', height: '100%' }}>
          <Stack direction="row" spacing={1} alignItems="baseline">
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}:</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>{label}:</Typography>
             <Typography sx={{ fontWeight: 900, color, fontSize: '1.2rem', fontFamily: 'JetBrains Mono' }}>{value}</Typography>
          </Stack>
-         <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.65rem', fontWeight: 700, mt: 0.5, display: 'block' }}>{sub}</Typography>
+         <Typography variant="caption" sx={{ color: '#708090', fontSize: '0.65rem', fontWeight: 700, mt: 0.5, display: 'block' }}>{sub}</Typography>
       </Box>
    );
 }
@@ -356,7 +355,7 @@ function SummaryStat({ label, value, sub, color }: any) {
 function SidebarStat({ label, value, color }: any) {
    return (
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}</Typography>
+         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>{label}</Typography>
          <Typography variant="body2" sx={{ color, fontWeight: 950, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
       </Box>
    );
@@ -370,7 +369,7 @@ function MarketTickerItem({ label, data, value }: any) {
   const isPositive = change >= 0;
   return (
     <Box sx={{ minWidth: 140 }}>
-       <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
+       <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
        <Stack direction="row" spacing={1.5} alignItems="baseline">
           <Typography sx={{ fontWeight: 900, fontSize: '1rem', fontFamily: 'JetBrains Mono', color: '#fff' }}>
              {typeof val === 'number' ? val.toLocaleString() : val}
@@ -395,7 +394,7 @@ function HealthBadge({ label, status }: any) {
             borderRadius: 0.5,
             minWidth: 100
         }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, fontSize: '0.55rem', display: 'block' }}>{label}</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, fontSize: '0.55rem', display: 'block' }}>{label}</Typography>
             <Typography variant="caption" sx={{ color: isHealthy ? '#10b981' : '#ef4444', fontWeight: 950 }}>{status || 'LOADING...'}</Typography>
         </Box>
     );

@@ -56,7 +56,7 @@ export default function SignalDetail() {
 
   if (!signal) return (
     <Box sx={{ p: 10, textAlign: 'center', bgcolor: '#020617', minHeight: '100vh' }}>
-        <Typography variant="h6" color="slategray">Signal not found in production ledger.</Typography>
+        <Typography variant="h6" color="#708090">Signal not found in production ledger.</Typography>
         <Button onClick={() => navigate('/signals')} sx={{ mt: 2 }}>Return to Terminal</Button>
     </Box>
   );
@@ -70,7 +70,7 @@ export default function SignalDetail() {
       <Button
         startIcon={<ArrowLeft size={16} />}
         onClick={() => navigate(-1)}
-        sx={{ color: 'slategray', fontWeight: 800, mb: 3, textTransform: 'none' }}
+        sx={{ color: '#708090', fontWeight: 800, mb: 3, textTransform: 'none' }}
       >
         Back to Terminal
       </Button>
@@ -94,12 +94,12 @@ export default function SignalDetail() {
                  variant="outlined"
                  sx={{
                    fontWeight: 950, height: 28, borderRadius: 0.5,
-                   borderColor: decision.qualityClass === 'PRIMARY' ? '#10b981' : decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : 'slategray',
-                   color: decision.qualityClass === 'PRIMARY' ? '#10b981' : decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : 'slategray'
+                   borderColor: decision.qualityClass === 'PRIMARY' ? '#10b981' : decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090',
+                   color: decision.qualityClass === 'PRIMARY' ? '#10b981' : decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090'
                  }}
                />
             </Stack>
-            <Typography variant="h6" sx={{ color: 'slategray', fontWeight: 700, mt: 0.5 }}>{signal.company_name || signal.name || 'INSTRUMENT'}</Typography>
+            <Typography variant="h6" sx={{ color: '#708090', fontWeight: 700, mt: 0.5 }}>{signal.company_name || signal.name || 'INSTRUMENT'}</Typography>
             <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, letterSpacing: 2, display: 'block', mt: 1 }}>
                {decision.rating} · {decision.timeframe} HORIZON · STRATEGY V2.2
             </Typography>
@@ -115,10 +115,10 @@ export default function SignalDetail() {
             )}
          </Box>
          <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, display: 'block' }}>SIGNAL ID</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>SIGNAL ID</Typography>
             <Typography variant="body2" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#fff' }}>{signal.id}</Typography>
             <Box sx={{ mt: 1 }}>
-                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>AGE</Typography>
+                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>AGE</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 900, color: (decision.signalAgeHours || 0) > 24 ? '#ef4444' : '#10b981' }}>
                     {(decision.signalAgeHours || 0).toFixed(1)} HOURS
                 </Typography>
@@ -156,7 +156,7 @@ export default function SignalDetail() {
             <SectionHeader icon={<BarChart2 size={18} />} title="SIGNAL EVIDENCE & FORENSICS" />
             {isPremium ? (
                 <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>WHY THIS SIGNAL EXISTS</Typography>
+                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 2, display: 'block' }}>WHY THIS SIGNAL EXISTS</Typography>
                 <Typography variant="body1" sx={{ color: '#e2e8f0', fontWeight: 500, lineHeight: 1.6, mb: 4 }}>
                     {decision.thesis || "Signal identified via V2.2 structural breakout logic combined with V2.3 ML classification. Forensic validation of institutional order flow confirmed at decision timestamp."}
                 </Typography>
@@ -170,10 +170,10 @@ export default function SignalDetail() {
 
                 {decision.drivers && decision.drivers.length > 0 && (
                     <Box sx={{ mt: 4 }}>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 2, display: 'block' }}>KEY DRIVERS</Typography>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 2, display: 'block' }}>KEY DRIVERS</Typography>
                         <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                             {decision.drivers.map((d: string, i: number) => (
-                            <MuiChip key={i} label={d.toUpperCase()} size="small" sx={{ fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)', color: 'slategray' }} />
+                            <MuiChip key={i} label={d.toUpperCase()} size="small" sx={{ fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)', color: '#708090' }} />
                             ))}
                         </Stack>
                     </Box>
@@ -208,7 +208,7 @@ export default function SignalDetail() {
             {isPremium ? (
                 <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <Box sx={{ mb: 4 }}>
-                        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, mb: 1.5, display: 'block' }}>CONSENSUS INTERPRETATION</Typography>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 1.5, display: 'block' }}>CONSENSUS INTERPRETATION</Typography>
                         <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500, lineHeight: 1.8 }}>
                             Our ensemble architecture identifies a **{decision.formattedThesis?.trend}** aligned with institutional positioning.
                             The structural breakout confirmed at ₹{decision.entry} demonstrates **{decision.formattedThesis?.momentum}**
@@ -222,7 +222,7 @@ export default function SignalDetail() {
                         <ThesisItem label="MARKET" value={decision.formattedThesis?.market} />
                     </Grid>
                     <Divider sx={{ my: 3, opacity: 0.05 }} />
-                    <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 700, fontStyle: 'italic' }}>
+                    <Typography variant="caption" sx={{ color: '#708090', fontWeight: 700, fontStyle: 'italic' }}>
                         Machine-generated deterministic synthesis of authoritative evidence.
                     </Typography>
                 </Paper>
@@ -236,7 +236,7 @@ export default function SignalDetail() {
                         <SignalLifecycleTimeline events={decision.lifecycleEvents} currentStatus={decision.status} />
                         <Divider sx={{ my: 3, opacity: 0.05 }} />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>REPLAY FIDELITY: HIGH</Typography>
+                            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>REPLAY FIDELITY: HIGH</Typography>
                             <MuiChip label="VERIFIED RECONSTRUCTION" size="small" variant="outlined" sx={{ height: 18, fontSize: '0.5rem', fontWeight: 950, color: '#00D1FF', borderColor: alpha('#00D1FF', 0.3) }} />
                         </Box>
                     </Paper>
@@ -326,10 +326,10 @@ function PlanItem({ label, value, color = '#fff', tooltip }: any) {
    return (
       <Grid item xs={6} md={3}>
          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.5 }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block' }}>{label}</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block' }}>{label}</Typography>
             {tooltip && (
                 <Tooltip title={tooltip}>
-                    <HelpCircle size={10} color="slategray" style={{ cursor: 'help' }} />
+                    <HelpCircle size={10} color="#708090" style={{ cursor: 'help' }} />
                 </Tooltip>
             )}
          </Stack>
@@ -342,8 +342,8 @@ function EvidenceItem({ label, value }: any) {
     return (
         <Grid item xs={6} md={3}>
             <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)' }}>
-                <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 0.5, fontSize: '0.6rem' }}>{label}</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 800, color: value === 'UNAVAILABLE' ? 'slategray' : '#fff' }}>{value}</Typography>
+                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block', mb: 0.5, fontSize: '0.6rem' }}>{label}</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 800, color: value === 'UNAVAILABLE' ? '#708090' : '#fff' }}>{value}</Typography>
             </Box>
         </Grid>
     );
@@ -352,7 +352,7 @@ function EvidenceItem({ label, value }: any) {
 function ThesisItem({ label, value }: any) {
     return (
         <Grid item xs={6} md={3}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 900, display: 'block', mb: 1 }}>{label}</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block', mb: 1 }}>{label}</Typography>
             <Typography variant="body2" sx={{ fontWeight: 950, color: '#fff' }}>{value || 'UNAVAILABLE'}</Typography>
         </Grid>
     );
@@ -361,7 +361,7 @@ function ThesisItem({ label, value }: any) {
 function TraceItem({ label, value, color = '#fff', small = false }: any) {
    return (
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-         <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>{label}</Typography>
+         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>{label}</Typography>
          <Typography variant="caption" sx={{ color, fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: small ? '0.6rem' : '0.75rem', maxWidth: '65%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography>
       </Box>
    );
@@ -374,7 +374,7 @@ function getStatusColor(status: string) {
       case 'WAITING_FOR_ENTRY': return '#f59e0b';
       case 'TARGET_HIT': return '#10b981';
       case 'STOP_LOSS': return '#ef4444';
-      default: return 'slategray';
+      default: return '#708090';
     }
 }
 

@@ -35,7 +35,7 @@ export default function Landing() {
           </Typography>
           <Typography variant="body1" sx={{
             fontSize: '1.25rem',
-            color: 'slategray',
+            color: '#708090',
             maxWidth: 800,
             mx: 'auto',
             mb: 6,
@@ -105,7 +105,7 @@ export default function Landing() {
       <Box sx={{ py: 15, bgcolor: '#070a0f', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <Container maxWidth="md" sx={{ textAlign: 'center' }}>
           <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -1, mb: 4 }}>DON'T JUST GET A SIGNAL.<br/>UNDERSTAND IT.</Typography>
-          <Typography variant="body1" sx={{ color: 'slategray', fontSize: '1.25rem', lineHeight: 2, mb: 8 }}>
+          <Typography variant="body1" sx={{ color: '#708090', fontSize: '1.25rem', lineHeight: 2, mb: 8 }}>
             TradeMind AI is not a stock tip service. It is a professional terminal for auditable signal intelligence.
             Every decision is backed by verifiable market data and a traceable machine-learning lifecycle.
           </Typography>
@@ -114,12 +114,12 @@ export default function Landing() {
             <Grid item xs={12} md={4}>
               <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>59.2%</Typography>
               <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>V2.2 BENCHMARK WIN RATE</Typography>
-              <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>Audit Population: N=49</Typography>
+              <Typography variant="caption" sx={{ display: 'block', color: '#708090', mt: 1 }}>Audit Population: N=49</Typography>
             </Grid>
             <Grid item xs={12} md={4}>
                <Typography variant="h5" sx={{ fontWeight: 950, color: '#00D1FF', mb: 2 }}>2.73</Typography>
                <Typography variant="caption" sx={{ fontWeight: 900, letterSpacing: 1, color: 'white' }}>CERTIFIED PROFIT FACTOR</Typography>
-               <Typography variant="caption" sx={{ display: 'block', color: 'slategray', mt: 1 }}>Forensic Accuracy Audit</Typography>
+               <Typography variant="caption" sx={{ display: 'block', color: '#708090', mt: 1 }}>Forensic Accuracy Audit</Typography>
             </Grid>
           </Grid>
         </Container>
@@ -130,21 +130,21 @@ export default function Landing() {
         <Grid container spacing={8}>
           <Grid item xs={12} md={6}>
             <Typography variant="h6" sx={{ fontWeight: 950, mb: 3 }}>TRADEMIND AI</Typography>
-            <Typography variant="body2" sx={{ color: 'slategray', maxWidth: 400, mb: 4 }}>
+            <Typography variant="body2" sx={{ color: '#708090', maxWidth: 400, mb: 4 }}>
               Institutional AI investment operating system for the next generation of professional investors.
             </Typography>
             <Stack direction="row" spacing={2}>
-              <Button size="small" sx={{ color: 'slategray', fontWeight: 800 }}>TRUST</Button>
-              <Button size="small" sx={{ color: 'slategray', fontWeight: 800 }}>METHODOLOGY</Button>
-              <Button size="small" sx={{ color: 'slategray', fontWeight: 800 }}>LEGAL</Button>
+              <Button size="small" sx={{ color: '#708090', fontWeight: 800 }}>TRUST</Button>
+              <Button size="small" sx={{ color: '#708090', fontWeight: 800 }}>METHODOLOGY</Button>
+              <Button size="small" sx={{ color: '#708090', fontWeight: 800 }}>LEGAL</Button>
             </Stack>
           </Grid>
           <Grid item xs={12} md={6} sx={{ textAlign: { md: 'right' } }}>
-             <Typography variant="caption" sx={{ color: 'slategray', display: 'block', mb: 2 }}>
+             <Typography variant="caption" sx={{ color: '#708090', display: 'block', mb: 2 }}>
                TradeMind AI uses machine-learning systems to process market information. <br/>
                Model outputs are estimates and are not guarantees of future outcomes.
              </Typography>
-             <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800 }}>
+             <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>
                © 2026 TRADEMIND AI • STRATEGY V2.2
              </Typography>
           </Grid>
@@ -159,7 +159,7 @@ function PillarItem({ icon, title, text }: any) {
     <Box>
       <Box sx={{ mb: 3 }}>{icon}</Box>
       <Typography variant="h6" sx={{ fontWeight: 950, letterSpacing: 1, mb: 1.5 }}>{title}</Typography>
-      <Typography variant="body2" sx={{ color: 'slategray', lineHeight: 1.8 }}>{text}</Typography>
+      <Typography variant="body2" sx={{ color: '#708090', lineHeight: 1.8 }}>{text}</Typography>
     </Box>
   );
 }

@@ -81,7 +81,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
             <Typography variant="subtitle1" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {isOptions ? `${signal.underlying_symbol || signal.symbol} ${signal.strike || ''} ${signal.option_type || ''}` : isFutures ? `${signal.underlying_symbol || signal.symbol} FUT` : signal.symbol}
             </Typography>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'slategray', display: 'block', mt: 0.2 }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: '#708090', display: 'block', mt: 0.2 }}>
                 {signal.timeframe} • {assetClass}
             </Typography>
          </Box>
@@ -89,7 +89,7 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
             <Typography variant="caption" sx={{ fontWeight: 900, color: profitPct >= 0 ? '#10b981' : '#ef4444', fontSize: '1rem', lineHeight: 1 }}>
                 {profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%
             </Typography>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'slategray', display: 'block', mt: 0.5 }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: '#708090', display: 'block', mt: 0.5 }}>
                 {signal.rating || 'BUY'}
             </Typography>
          </Box>
@@ -118,11 +118,11 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
       {/* Meta Audit Grid */}
       <Box sx={{ px: 2, py: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, bgcolor: 'rgba(255,255,255,0.01)' }}>
          <Box>
-            <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>GENERATED</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>GENERATED</Typography>
             <Typography variant="caption" sx={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.65rem' }}>{formatDate(createdDate)}</Typography>
          </Box>
          <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="caption" sx={{ color: 'slategray', fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>RESOLUTION</Typography>
+            <Typography variant="caption" sx={{ color: '#708090', fontSize: '0.55rem', fontWeight: 800, display: 'block' }}>RESOLUTION</Typography>
             <Typography variant="caption" sx={{ fontWeight: 700, color: '#e2e8f0', fontSize: '0.65rem' }}>{outcomeDate ? formatDate(outcomeDate) : '—'}</Typography>
          </Box>
       </Box>
@@ -130,19 +130,19 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
       <Box sx={{ p: 2, flexGrow: 1 }}>
          <Grid container spacing={2}>
             <Grid item xs={6}>
-               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: 'slategray', fontWeight: 800, display: 'block', mb: 0.5 }}>{isOptions ? 'ENTRY PREMIUM' : 'ENTRY PRICE'}</Typography>
+               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: '#708090', fontWeight: 800, display: 'block', mb: 0.5 }}>{isOptions ? 'ENTRY PREMIUM' : 'ENTRY PRICE'}</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono', color: '#fff' }}>₹{entry ? entry.toLocaleString() : '—'}</Typography>
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'right' }}>
-               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: 'slategray', fontWeight: 800, display: 'block', mb: 0.5 }}>{isOptions ? 'EXIT PREMIUM' : 'EXIT PRICE'}</Typography>
+               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: '#708090', fontWeight: 800, display: 'block', mb: 0.5 }}>{isOptions ? 'EXIT PREMIUM' : 'EXIT PRICE'}</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'JetBrains Mono', color: '#fff' }}>{outcomePrice ? `₹${outcomePrice.toLocaleString()}` : '—'}</Typography>
             </Grid>
             <Grid item xs={6}>
-               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: 'slategray', fontWeight: 800, display: 'block', mb: 0.5 }}>STOP LOSS</Typography>
+               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: '#708090', fontWeight: 800, display: 'block', mb: 0.5 }}>STOP LOSS</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, color: '#ef4444', fontFamily: 'JetBrains Mono', opacity: 0.7 }}>₹{stop ? stop.toLocaleString() : '—'}</Typography>
             </Grid>
             <Grid item xs={6} sx={{ textAlign: 'right' }}>
-               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: 'slategray', fontWeight: 800, display: 'block', mb: 0.5 }}>TARGET</Typography>
+               <Typography variant="caption" sx={{ fontSize: '0.55rem', color: '#708090', fontWeight: 800, display: 'block', mb: 0.5 }}>TARGET</Typography>
                <Typography variant="body2" sx={{ fontWeight: 700, color: '#10b981', fontFamily: 'JetBrains Mono', opacity: 0.7 }}>₹{target ? target.toLocaleString() : '—'}</Typography>
             </Grid>
          </Grid>
@@ -153,17 +153,17 @@ export default function HistoricalSignalCard({ signal }: HistoricalSignalCardPro
                 <AuditStep label="TRG" completed={!isExpired} />
                 <AuditStep label="RES" completed={true} color={getStatusColor()} />
             </Stack>
-            <IconButton size="small" onClick={() => setExpanded(!expanded)} sx={{ color: 'slategray', p: 0.5 }}>
+            <IconButton size="small" onClick={() => setExpanded(!expanded)} sx={{ color: '#708090', p: 0.5 }}>
                 {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </IconButton>
          </Box>
 
          <Collapse in={expanded}>
             <Box sx={{ mt: 1.5, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: 'slategray', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography variant="caption" sx={{ fontWeight: 800, color: '#708090', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                    <Info size={10} /> AUDIT METADATA
                 </Typography>
-                <Typography variant="body2" sx={{ fontSize: '0.7rem', color: 'slategray', mt: 0.5, lineHeight: 1.4, fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ fontSize: '0.7rem', color: '#708090', mt: 0.5, lineHeight: 1.4, fontWeight: 500 }}>
                     Signal record preserved from {formatDate(createdDate).split(' • ')[0]}.
                     Historical resolution confirmed by TradeMind Auditor at ₹{outcomePrice ? outcomePrice.toLocaleString() : '—'}.
                 </Typography>
@@ -185,7 +185,7 @@ function AuditStep({ label, completed, color = '#10b981' }: { label: string, com
                 mx: 'auto',
                 mb: 0.3
             }} />
-            <Typography variant="caption" sx={{ fontSize: '0.45rem', fontWeight: 900, color: completed ? 'white' : 'slategray' }}>{label}</Typography>
+            <Typography variant="caption" sx={{ fontSize: '0.45rem', fontWeight: 900, color: completed ? 'white' : '#708090' }}>{label}</Typography>
         </Box>
     );
 }

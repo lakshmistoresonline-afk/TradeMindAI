@@ -36,7 +36,7 @@ export const MetricRegistry: Record<string, MetricMetadata> = {
     label: 'Beta (1Y)',
     unit: '',
     provenance: 'CALCULATED',
-    description: 'Sensitivity of asset returns compared to Nifty 50.',
+    description: 'Sensitivity of asset returns compared to Nifty 200.',
     formula: 'Covariance(Asset, Market) / Variance(Market)',
     validation: (v) => typeof v === 'number',
     formatter: (v) => v !== null && v !== undefined && !isNaN(v) ? v.toFixed(2) : '---'

@@ -43,7 +43,7 @@ export default function Checkout() {
       <Box sx={{ py: 15, textAlign: 'center', maxWidth: 600, mx: 'auto' }}>
         <CheckCircle2 size={80} color="#10b981" style={{ margin: '0 auto 24px' }} />
         <Typography variant="h3" sx={{ fontWeight: 950, mb: 2 }}>PAYMENT SUCCESSFUL</Typography>
-        <Typography variant="body1" sx={{ color: 'slategray', mb: 6 }}>
+        <Typography variant="body1" sx={{ color: '#708090', mb: 6 }}>
           Your institutional access to {plan} intelligence is now active.
           The Signal Ledger has been updated with your entitlements.
         </Typography>
@@ -58,7 +58,7 @@ export default function Checkout() {
     <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>CHECKOUT</Typography>
-        <Typography variant="caption" sx={{ color: 'slategray', fontWeight: 800, letterSpacing: 1.5 }}>
+        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, letterSpacing: 1.5 }}>
            FINALIZE YOUR INSTITUTIONAL SUBSCRIPTION
         </Typography>
       </Box>
@@ -73,14 +73,14 @@ export default function Checkout() {
                         <CreditCard size={24} color="#00D1FF" />
                         <Box>
                            <Typography variant="body2" sx={{ fontWeight: 900 }}>UPI / CARD / NETBANKING</Typography>
-                           <Typography variant="caption" sx={{ color: 'slategray' }}>Secure Institutional Gateway</Typography>
+                           <Typography variant="caption" sx={{ color: '#708090' }}>Secure Institutional Gateway</Typography>
                         </Box>
                      </Stack>
                      <CheckCircle2 size={20} color="#00D1FF" />
                   </Box>
                </Stack>
                <Divider sx={{ my: 4, opacity: 0.05 }} />
-               <Typography variant="caption" sx={{ color: 'slategray', display: 'block', mb: 4 }}>
+               <Typography variant="caption" sx={{ color: '#708090', display: 'block', mb: 4 }}>
                   By clicking "Complete Payment", you agree to the TradeMind AI Terms of Service and Subscription Policy.
                   Subscription renews automatically at the end of the period.
                </Typography>
@@ -102,11 +102,11 @@ export default function Checkout() {
                <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 4, letterSpacing: 1 }}>ORDER SUMMARY</Typography>
                <Stack spacing={3}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                     <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>Plan</Typography>
+                     <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700 }}>Plan</Typography>
                      <Typography variant="body2" sx={{ fontWeight: 900 }}>TRADEMIND {plan}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                     <Typography variant="body2" sx={{ color: 'slategray', fontWeight: 700 }}>Period</Typography>
+                     <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700 }}>Period</Typography>
                      <Typography variant="body2" sx={{ fontWeight: 900 }}>Monthly</Typography>
                   </Box>
                   <Divider sx={{ opacity: 0.05 }} />
