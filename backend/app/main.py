@@ -184,6 +184,19 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+@app.get("/api/v1/system/identity")
+def get_identity():
+    """
+    Diagnostic endpoint for deployment verification.
+    """
+    from backend.core.version import get_version_metadata
+    from backend.core.config import settings
+    return {
+        "identity": get_version_metadata(),
+        "environment": settings.ENVIRONMENT,
+        "mode": "SHADOW_VALIDATION"
+    }
+
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.exception_handler(Exception)
