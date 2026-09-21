@@ -34,7 +34,7 @@ export default function EquitySignals() {
   const [hFilterStatus, setHFilterStatus] = useState('ALL');
   const [hFilterDirection, setHFilterDirection] = useState('ALL');
 
-  const { connectionStatus } = useTurboSync();
+  const { connectionStatus, firestoreSignals } = useTurboSync();
 
   // Canonical Signal Universes (V2.3)
   const universes = useMemo(() => [
@@ -93,6 +93,21 @@ export default function EquitySignals() {
   useEffect(() => {
     fetchData();
   }, [mode, page, rowsPerPage, hFilterHorizon, hFilterQuality, hFilterStatus, hFilterDirection]);
+
+  // Sync Firestore signals into local state for universal visibility (V2.3 Hybrid)
+  useEffect(() => {
+    if (firestoreSignals.length > 0 && mode === 'ACTIVE') {
+      const normalizedFirestore = firestoreSignals.map(s => mapCanonicalSignal(s));
+      setSignals(prev => {
+          // Merge based on ID to avoid duplicates
+          const existingIds = new Set(prev.map(p => p.id));
+          const newSignals = normalizedFirestore.filter(f => !existingIds.has(f.id));
+          return [...prev, ...newSignals].sort((a, b) =>
+            new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
+          );
+      });
+    }
+  }, [firestoreSignals, mode]);
 
   const counts = useMemo(() => {
     return {

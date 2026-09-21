@@ -53,13 +53,16 @@ async def startup():
                 settings.REDIS_URL,
                 encoding="utf8",
                 decode_responses=True,
-                socket_timeout=1,
-                socket_connect_timeout=1
+                socket_timeout=2,
+                socket_connect_timeout=2
             )
+            await redis.ping()
             FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
             print("[+] Redis Cache Standby.")
         except Exception as re:
-            print(f"[!] Redis Cache Initialization Error: {re}")
+            print(f"[!] Redis Unavailable: {re}. Falling back to InMemory Cache.")
+            from fastapi_cache.backends.inmemory import InMemoryBackend
+            FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
 
         # 2. Institutional Pulse Sync (Institutional 1.5)
         # Handles real-time signal retracement and outcome resolution.
