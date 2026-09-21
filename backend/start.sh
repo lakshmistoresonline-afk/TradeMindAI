@@ -40,10 +40,18 @@ fi
 # --- PRODUCTION SCHEMA MANAGEMENT (Phase 4 Hardening) ---
 if [ "$ENVIRONMENT" = "production" ]; then
     echo "[*] AUDIT: Executing Alembic migrations..."
+    echo "[*] DEBUG: Current Directory: $(pwd)"
+    echo "[*] DEBUG: Files in Root: $(ls -F)"
+
     # Config is now at the root (/app/alembic.ini)
-    alembic -c /app/alembic.ini upgrade head
-    if [ $? -ne 0 ]; then
-        echo "[!] CRITICAL ERROR: Alembic migration failed. Aborting startup."
+    if [ -f "/app/alembic.ini" ]; then
+        alembic -c /app/alembic.ini upgrade head
+        if [ $? -ne 0 ]; then
+            echo "[!] CRITICAL ERROR: Alembic migration failed. Aborting startup."
+            exit 1
+        fi
+    else
+        echo "[!] CRITICAL ERROR: /app/alembic.ini NOT FOUND. Build integrity failure."
         exit 1
     fi
     echo "[+] Database schema synchronized."

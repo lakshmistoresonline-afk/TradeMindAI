@@ -1,5 +1,5 @@
-# V2.3.1 Final Build (Buster Base for Resilience)
-FROM python:3.10-slim-buster
+# V2.3.2 Final Build (Python 3.11 for optimal compatibility)
+FROM python:3.11-slim
 
 # Set environment variables for non-interactive installs and memory safety
 ENV PYTHONUNBUFFERED=1 \
