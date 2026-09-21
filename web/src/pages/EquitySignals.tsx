@@ -54,14 +54,18 @@ export default function EquitySignals() {
         if (!signalsData || !Array.isArray(signalsData)) {
             throw new Error("Invalid response format from signal service.");
         }
-        const normalized = signalsData
-          .map((s: any) => mapCanonicalSignal(s))
-          .sort((a: any, b: any) => {
-            const timeA = new Date(a.decision?.generatedAt || 0).getTime();
-            const timeB = new Date(b.decision?.generatedAt || 0).getTime();
-            return timeB - timeA;
-          });
-        setSignals(normalized);
+        const normalized = signalsData.map((s: any) => mapCanonicalSignal(s));
+
+        setSignals(prev => {
+            const mergedMap = new Map();
+            prev.forEach((s: any) => mergedMap.set(s.id, s));
+            normalized.forEach((s: any) => mergedMap.set(s.id, s));
+            return Array.from(mergedMap.values()).sort((a: any, b: any) => {
+                const timeA = new Date(a.decision?.generatedAt || 0).getTime();
+                const timeB = new Date(b.decision?.generatedAt || 0).getTime();
+                return timeB - timeA;
+            });
+        });
       } else {
         const params: any = {
             page: mode === 'HISTORY' ? page + 1 : 1,
@@ -97,7 +101,10 @@ export default function EquitySignals() {
   // Hybrid Data Integration (V2.3)
   // Authoritatively merges REST API and Firestore Shadow Mirror
   useEffect(() => {
+    if (firestoreSignals.length === 0) return;
+
     const fsSignals = firestoreSignals.map(s => ({ ...mapCanonicalSignal(s), _isFirestore: true }));
+    console.log(`[Forensic] Merging ${fsSignals.length} Firestore signals into state...`);
 
     setSignals(prev => {
         const mergedMap = new Map();
@@ -105,13 +112,14 @@ export default function EquitySignals() {
         // Add existing signals to map
         prev.forEach(s => mergedMap.set(s.id, s));
 
-        // Overwrite/Add with Firestore signals (as they are usually fresher in Shadow Mode)
+        // Overwrite/Add with Firestore signals
         fsSignals.forEach(s => mergedMap.set(s.id, s));
 
-        // Return sorted array
-        return Array.from(mergedMap.values()).sort((a, b) =>
+        const merged = Array.from(mergedMap.values()).sort((a, b) =>
             new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
         );
+        console.log(`[Forensic] State now has ${merged.length} total signals.`);
+        return merged;
     });
   }, [firestoreSignals]);
 

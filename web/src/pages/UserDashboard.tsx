@@ -32,7 +32,16 @@ export default function UserDashboard() {
     // 3. Resolve signals and manage loading state
     try {
       const signalsData = await signalsPromise;
-      setSignals((signalsData || []).map((s: any) => mapCanonicalSignal(s)));
+      const normalized = (signalsData || []).map((s: any) => mapCanonicalSignal(s));
+
+      setSignals(prev => {
+          const mergedMap = new Map();
+          prev.forEach((s: any) => mergedMap.set(s.id, s));
+          normalized.forEach((s: any) => mergedMap.set(s.id, s));
+          return Array.from(mergedMap.values()).sort((a: any, b: any) =>
+              new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
+          );
+      });
     } catch (e) {
       console.error("Dashboard Signals Fetch Failed:", e);
     } finally {
@@ -46,17 +55,23 @@ export default function UserDashboard() {
 
   // Hybrid Sync (V2.3): Authoritatively merges Cloud API and Local PC Mirror
   useEffect(() => {
-    if (firestoreSignals.length > 0) {
-        const normalizedFS = firestoreSignals.map(s => mapCanonicalSignal(s));
-        setSignals(prev => {
-            const mergedMap = new Map();
-            prev.forEach(s => mergedMap.set(s.id, s));
-            normalizedFS.forEach(s => mergedMap.set(s.id, s));
-            return Array.from(mergedMap.values()).sort((a,b) =>
-                new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
-            );
-        });
-    }
+    if (firestoreSignals.length === 0) return;
+
+    const normalizedFS = firestoreSignals.map(s => ({ ...mapCanonicalSignal(s), _isFirestore: true }));
+    console.log(`[Forensic] Dashboard merging ${normalizedFS.length} Firestore signals...`);
+
+    setSignals(prev => {
+        const mergedMap = new Map();
+        prev.forEach(s => mergedMap.set(s.id, s));
+        normalizedFS.forEach(s => mergedMap.set(s.id, s));
+
+        const merged = Array.from(mergedMap.values()).sort((a,b) =>
+            new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
+        );
+        console.log(`[Forensic] Dashboard now has ${merged.length} total signals.`);
+        return merged;
+    });
+
     if (marketContext) {
         setMarket(marketContext);
     }
