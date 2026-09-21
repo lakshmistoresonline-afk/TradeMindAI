@@ -258,13 +258,18 @@ class SignalEngine:
 
         v22_valid = SignalValidatorService.validate_publication(LiveSignal(**signal_dict_pre))
 
-        # 10.5 V2.3 Shadow Gate
+        # 10.5 V2.3 Shadow Gate (Phase 1 Isolation)
         from backend.services.signal_quality_gate import SignalQualityGate
         from backend.services.signal_shadow_service import SignalShadowService
-        v23_gate_res = SignalQualityGate.evaluate_v23_gate(
-            LiveSignal(**signal_dict_pre),
-            last_features
-        )
+
+        v23_gate_res = {"decision": "NO_SIGNAL", "reasons": ["SHADOW_ERROR"], "metadata": {}}
+        try:
+            v23_gate_res = SignalQualityGate.evaluate_v23_gate(
+                LiveSignal(**signal_dict_pre),
+                last_features
+            )
+        except Exception as ge:
+            print(f"[Shadow] Gate Error: {ge}")
 
         candidate_data = {
             "candidate_id": candidate_id, "symbol": symbol, "price": price,
