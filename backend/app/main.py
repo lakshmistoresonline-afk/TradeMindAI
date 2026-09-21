@@ -17,6 +17,7 @@ import traceback
 import asyncio
 import uuid
 
+# TradeMind AI Institutional OS (V2.3.1-RELEASE)
 app = FastAPI(
     title="TradeMind AI Institutional OS",
     description="Deterministic Signal Intelligence & Forensic Verification API.",
