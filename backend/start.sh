@@ -40,12 +40,14 @@ fi
 # --- PRODUCTION SCHEMA MANAGEMENT (Phase 4 Hardening) ---
 if [ "$ENVIRONMENT" = "production" ]; then
     echo "[*] AUDIT: Executing Alembic migrations..."
-    # Explicitly upgrade to latest production-certified head using relative config path
-    alembic -c backend/alembic.ini upgrade head
+    # cd into backend to ensure config and script locations are resolved correctly
+    cd backend
+    alembic upgrade head
     if [ $? -ne 0 ]; then
         echo "[!] CRITICAL ERROR: Alembic migration failed. Aborting startup to prevent data corruption."
         exit 1
     fi
+    cd ..
     echo "[+] Database schema synchronized."
 fi
 
