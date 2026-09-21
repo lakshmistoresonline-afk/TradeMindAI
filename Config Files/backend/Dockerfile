@@ -1,5 +1,5 @@
-# V2.3.0 Final Release Build
-FROM python:3.12-slim
+# V2.3.1 Final Release Build
+FROM python:3.10-slim
 
 # Set environment variables for non-interactive installs and memory safety
 ENV PYTHONUNBUFFERED=1 \
