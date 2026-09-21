@@ -1,5 +1,5 @@
 services:
-  # 1. The API Server (V2.3.0 Release Force Sync)
+  # 1. The API Server (V2.3.1 Release Final Sync)
   - type: web
     name: trademind-api
     env: docker
