@@ -30,8 +30,8 @@ RUN pip install pandas-ta --no-deps
 # Copy entire backend source explicitly
 COPY backend/ backend/
 
-# Ensure alembic.ini is at the root for easier discovery
-RUN cp backend/alembic.ini ./alembic.ini
+# Copy alembic.ini from root
+COPY alembic.ini ./alembic.ini
 
 # Copy scripts for universe and other shared modules
 COPY scripts/ scripts/

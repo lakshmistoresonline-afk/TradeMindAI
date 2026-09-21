@@ -28,8 +28,10 @@ RUN pip install -r requirements.txt
 RUN pip install pandas-ta --no-deps
 
 # Copy entire backend source explicitly
-# This ensures /app/backend/ exists for imports to work
 COPY backend/ backend/
+
+# Copy alembic.ini from root
+COPY alembic.ini ./alembic.ini
 
 # Copy scripts for universe and other shared modules
 COPY scripts/ scripts/

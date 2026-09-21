@@ -4,8 +4,8 @@ from backend.core.config import settings
 
 
 # Canonical Version Identity (Phase 4 Final Production Completion)
-APP_VERSION = "2.3.1-RELEASE"
-RELEASE_ID = "TRADEMIND_GOLD_LOCK_20260921"
+APP_VERSION = "2.3.2-RELEASE"
+RELEASE_ID = "TRADEMIND_GOLD_LOCK_20260921_V2"
 GIT_SHA = settings.GIT_SHA
 BUILD_TIMESTAMP = datetime.datetime.now(timezone.utc).isoformat()
 ENVIRONMENT = settings.ENVIRONMENT

@@ -40,8 +40,8 @@ fi
 # --- PRODUCTION SCHEMA MANAGEMENT (Phase 4 Hardening) ---
 if [ "$ENVIRONMENT" = "production" ]; then
     echo "[*] AUDIT: Executing Alembic migrations..."
-    # Config is now at the root
-    alembic upgrade head
+    # Config is now at the root (/app/alembic.ini)
+    alembic -c /app/alembic.ini upgrade head
     if [ $? -ne 0 ]; then
         echo "[!] CRITICAL ERROR: Alembic migration failed. Aborting startup."
         exit 1
