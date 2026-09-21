@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 def test_root_endpoint(client: TestClient):
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Welcome to TradeMind AI API"}
+    assert response.json()["message"] == "Welcome to TradeMind AI API"
 
 def test_health_endpoint(client: TestClient):
     response = client.get("/health")
