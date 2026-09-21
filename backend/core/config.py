@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
     POSTGRES_URL: str = "sqlite:///./local_operational.db"
-    ENVIRONMENT: str = "production" # production, development, test
+    ENVIRONMENT: str = "development" # production, development, test
     DEBUG: bool = False
 
     @field_validator("POSTGRES_URL", mode="before")

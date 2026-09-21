@@ -22,6 +22,9 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db/trademind
       - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+      - SECRET_KEY=local-dev-secret-key-32-chars-long
+      - MARKET_DATA_INGEST_KEY=local-dev-ingest-key
     depends_on:
       - db
       - redis
