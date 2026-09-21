@@ -37,17 +37,10 @@ fi
 # Note: Celery worker/beat branches removed to prevent accidental cloud execution.
 # Background tasks are preserved in the codebase for local manual execution only.
 
-# --- PRODUCTION SCHEMA MANAGEMENT (Phase 4 Hardening) ---
-if [ "$ENVIRONMENT" = "production" ]; then
-    echo "[*] AUDIT: Executing Alembic migrations..."
-    # Config is now at the root
-    alembic upgrade head
-    if [ $? -ne 0 ]; then
-        echo "[!] CRITICAL ERROR: Alembic migration failed. Aborting startup."
-        exit 1
-    fi
-    echo "[+] Database schema synchronized."
-fi
+# --- PRODUCTION SCHEMA MANAGEMENT (TEMPORARILY DISABLED) ---
+# if [ "$ENVIRONMENT" = "production" ]; then
+#    echo "[*] AUDIT: Skipping Alembic migrations for diagnostic deployment..."
+# fi
 
 echo "Starting FastAPI API..."
 
