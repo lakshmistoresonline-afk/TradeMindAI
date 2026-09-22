@@ -10,16 +10,18 @@ class RiskEngine:
         direction: str,
         atr: float,
         horizon: str = "SWING",
+        regime: str = "BULL",
         risk_per_trade: float = 0.02, # 2% of capital
         capital: float = 1000000.0    # 10 Lakhs baseline
     ) -> Dict[str, Any]:
         """
-        Calculates Stop Loss, Target, and Position Sizing using ATR and Portfolio Risk rules.
+        Calculates Stop Loss, Target, and Position Sizing using Regime-Aware Adaptive ATR
+        and Portfolio Risk rules.
         """
         if price <= 0 or atr <= 0:
             return {}
 
-        # 1. Horizon-Specific Multipliers
+        # 1. Horizon & Regime Specific Multipliers
         horizon_configs = {
             "SHORT": {"stop_mult": 1.5, "rr": 2.0},
             "SWING": {"stop_mult": 2.0, "rr": 2.5},
@@ -27,8 +29,18 @@ class RiskEngine:
         }
         config = horizon_configs.get(horizon, horizon_configs["SWING"])
 
-        stop_mult = config["stop_mult"]
-        rr_ratio = config["rr"]
+        regime_adjustments = {
+            "BULL": {"stop_factor": 1.0, "target_factor": 1.0},
+            "BEAR": {"stop_factor": 1.0, "target_factor": 1.0},
+            "SIDEWAYS": {"stop_factor": 0.9, "target_factor": 0.8},        # Tighter stop & target for chop
+            "HIGH_VOLATILITY": {"stop_factor": 1.4, "target_factor": 1.3}, # Wider stop buffer to prevent noise stop
+            "LOW_VOLATILITY": {"stop_factor": 0.85, "target_factor": 0.9},
+            "TRANSITION": {"stop_factor": 1.1, "target_factor": 1.1}
+        }
+        adj = regime_adjustments.get(regime.upper() if regime else "BULL", {"stop_factor": 1.0, "target_factor": 1.0})
+
+        stop_mult = config["stop_mult"] * adj["stop_factor"]
+        rr_ratio = round(config["rr"] * (adj["target_factor"] / adj["stop_factor"]), 2)
 
         risk_amt = atr * stop_mult
 
@@ -40,14 +52,11 @@ class RiskEngine:
             target = price - (risk_amt * rr_ratio)
 
         # 2. Position Sizing (Fixed Fractional)
-        # amt_to_risk = 1,000,000 * 0.02 = 20,000
         total_risk_cap = capital * risk_per_trade
 
-        # shares = risk_cap / risk_per_share
         shares = total_risk_cap / risk_amt if risk_amt > 0 else 0
 
         # 3. Liquidity/Volatility Constraint
-        # Limit exposure to 10% of total capital per trade
         max_notional = capital * 0.10
         shares_limit = max_notional / price
 
@@ -61,7 +70,8 @@ class RiskEngine:
             "shares": final_shares,
             "notional_value": round(final_shares * price, 2),
             "risk_amount": round(final_shares * (abs(price - stop_loss)), 2),
-            "risk_pct": round((abs(price - stop_loss) / price) * 100, 2)
+            "risk_pct": round((abs(price - stop_loss) / price) * 100, 2),
+            "regime_applied": regime
         }
 
     @staticmethod

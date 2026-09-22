@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 import datetime
 import pandas as pd
 import numpy as np
@@ -141,12 +141,13 @@ class OutcomeEngine:
         if exit_price <= 0: return False
 
         # 2. Target/Stop Validation
-        if status == "TARGET_HIT":
+        if status in ["TARGET_HIT"]:
             if signal.direction == "LONG" and exit_price < signal.target_price: return False
             if signal.direction == "SHORT" and exit_price > signal.target_price: return False
-        elif status == "STOP_LOSS":
-            if signal.direction == "LONG" and exit_price > signal.stop_price: return False
-            if signal.direction == "SHORT" and exit_price < signal.stop_price: return False
+        elif status in ["STOP_LOSS", "BREAKEVEN_HIT", "TRAILING_STOP_HIT"]:
+            # Flexible validation for dynamic stops
+            if signal.direction == "LONG" and exit_price > signal.target_price: return False
+            if signal.direction == "SHORT" and exit_price < signal.target_price: return False
 
         # 3. Instrument Validation
         if not signal.instrument_id: return False
@@ -154,10 +155,55 @@ class OutcomeEngine:
         return True
 
     @staticmethod
+    def calculate_dynamic_stop_loss(
+        entry: float,
+        current_stop: float,
+        direction: str,
+        high: float,
+        low: float,
+        atr: float
+    ) -> Tuple[float, Optional[str]]:
+        """
+        Calculates dynamic stop loss updates based on MFE (Maximum Favorable Excursion):
+        1. Move to Break-Even (Entry + 0.1 ATR) when price reaches >= 1.5 ATR MFE.
+        2. Trail Stop Loss at 1.5 ATR behind peak when price reaches >= 2.0 ATR MFE.
+        """
+        if not entry or not current_stop or not atr or atr <= 0:
+            return current_stop, None
+
+        mfe_abs = (high - entry) if direction == "LONG" else (entry - low)
+        mfe_atr = mfe_abs / atr
+
+        updated_stop = current_stop
+        event_type = None
+
+        # 1. Break-Even Trigger (at >= 1.5 ATR MFE)
+        if mfe_atr >= 1.5:
+            be_stop = (entry + 0.1 * atr) if direction == "LONG" else (entry - 0.1 * atr)
+            if direction == "LONG" and be_stop > updated_stop:
+                updated_stop = be_stop
+                event_type = "MOVED_TO_BREAKEVEN"
+            elif direction == "SHORT" and be_stop < updated_stop:
+                updated_stop = be_stop
+                event_type = "MOVED_TO_BREAKEVEN"
+
+        # 2. Trailing Stop Trigger (at >= 2.0 ATR MFE)
+        if mfe_atr >= 2.0:
+            trail_stop = (high - 1.5 * atr) if direction == "LONG" else (low + 1.5 * atr)
+            if direction == "LONG" and trail_stop > updated_stop:
+                updated_stop = trail_stop
+                event_type = "TRAILING_STOP_UPDATED"
+            elif direction == "SHORT" and trail_stop < updated_stop:
+                updated_stop = trail_stop
+                event_type = "TRAILING_STOP_UPDATED"
+
+        return round(updated_stop, 2), event_type
+
+    @staticmethod
     def evaluate_outcome(signal: LiveSignal, future_data: pd.DataFrame) -> Dict[str, Any]:
         """
-        Generic Outcome Evaluation with High/Low support.
-        Processes terminal states chronologically.
+        Generic Outcome Evaluation with High/Low & Dynamic Exit Support.
+        Processes terminal states chronologically with Break-Even & Trailing Stop Loss triggers.
         """
         if future_data.empty:
             return {"status": "ACTIVE", "outcome_date": None, "outcome_price": None, "profit_pct": 0.0, "events": []}
@@ -167,6 +213,9 @@ class OutcomeEngine:
         target = signal.target_price
         stop = signal.stop_price
         direction = signal.direction # LONG or SHORT
+
+        # Estimate ATR if not available directly
+        atr_est = abs(entry_limit - stop) / 2.0 if (entry_limit and stop and entry_limit != stop) else (entry_limit * 0.015)
 
         # Timezone Alignment
         import pytz
@@ -194,7 +243,6 @@ class OutcomeEngine:
             return {"status": "ACTIVE", "outcome_date": None, "outcome_price": None, "profit_pct": 0.0, "events": []}
 
         # 2. State Machine (Assumes signal is already ACTIVE/Triggered for Shadow Audit)
-        # For Shadow monitoring, we mostly care about signals already in progress.
         current_status = "ACTIVE"
         actual_entry_price = signal.entry_price
 
@@ -205,11 +253,12 @@ class OutcomeEngine:
         mae = 0.0
         events = []
 
-        # Horizons check (Time-based instead of Bar-based for robustness)
-        # SWING: 30 days | INTRADAY: 1 day | SHORT_TERM: 7 days | POSITIONAL: 365 days
+        # Horizons check
         horizon_days = {"INTRADAY": 1, "SHORT_TERM": 7, "SWING": 30, "POSITIONAL": 365}
         max_days = horizon_days.get(signal.timeframe, 30)
         expiry_ts = sig_ts + datetime.timedelta(days=max_days)
+
+        active_stop = stop
 
         for ts, row in eval_data.iterrows():
             high = row["High"]
@@ -217,7 +266,7 @@ class OutcomeEngine:
             open_price = row["Open"]
             close = row["Close"]
 
-            # Update MFE/MAE first to ensure exit candle is captured (Workstream 9/10)
+            # Update MFE/MAE first
             if direction == "LONG":
                 mfe = max(mfe, ((high - actual_entry_price) / actual_entry_price) * 100)
                 mae = min(mae, ((low - actual_entry_price) / actual_entry_price) * 100)
@@ -225,55 +274,64 @@ class OutcomeEngine:
                 mfe = max(mfe, ((actual_entry_price - low) / actual_entry_price) * 100)
                 mae = min(mae, ((actual_entry_price - high) / actual_entry_price) * 100)
 
-            # Expiry Check (Part 15)
+            # Evaluate Dynamic Exit Adjustment
+            new_stop, stop_event = OutcomeEngine.calculate_dynamic_stop_loss(
+                actual_entry_price, active_stop, direction, high, low, atr_est
+            )
+            if stop_event and new_stop != active_stop:
+                active_stop = new_stop
+                events.append(SignalEvent(type=stop_event, timestamp=ts.to_pydatetime(), price=active_stop, message=f"Dynamic stop updated to ₹{active_stop} ({stop_event})"))
+
+            # Expiry Check
             if ts > expiry_ts:
                 current_status = "EXPIRED"
                 outcome_ts = ts.to_pydatetime()
-                exit_price = open_price # Close at start of expiration window
+                exit_price = open_price
                 events.append(SignalEvent(type="EXPIRED", timestamp=outcome_ts, price=exit_price, message="Signal horizon timeout reached."))
                 break
 
             target_hit = False
             stop_hit = False
 
-            # Evaluate chronologically (Part 10, 11, 12)
+            # Evaluate chronologically with active dynamic stop
             if direction == "LONG":
-                # Priority 1: Gap down through stop on Open
-                if open_price <= stop:
+                if open_price <= active_stop:
                     stop_hit = True
                     exit_price = open_price
-                # Priority 2: Gap up through target on Open
                 elif open_price >= target:
                     target_hit = True
                     exit_price = open_price
-                # Priority 3: Intrabar touch
                 else:
-                    # Part 12: Same-candle rule. If both hit, STOP_LOSS wins.
-                    if low <= stop:
+                    if low <= active_stop:
                         stop_hit = True
-                        exit_price = stop
+                        exit_price = active_stop
                     elif high >= target:
                         target_hit = True
                         exit_price = target
             else: # SHORT
-                if open_price >= stop:
+                if open_price >= active_stop:
                     stop_hit = True
                     exit_price = open_price
                 elif open_price <= target:
                     target_hit = True
                     exit_price = open_price
                 else:
-                    if high >= stop:
+                    if high >= active_stop:
                         stop_hit = True
-                        exit_price = stop
+                        exit_price = active_stop
                     elif low <= target:
                         target_hit = True
                         exit_price = target
 
             if stop_hit:
-                current_status = "STOP_LOSS"
+                # Classify stop loss type
+                if active_stop > stop if direction == "LONG" else active_stop < stop:
+                    current_status = "TRAILING_STOP_HIT" if mfe >= 2.0 else "BREAKEVEN_HIT"
+                else:
+                    current_status = "STOP_LOSS"
+
                 outcome_ts = ts.to_pydatetime()
-                events.append(SignalEvent(type="STOP_LOSS", timestamp=outcome_ts, price=exit_price, message="Stop loss triggered intrabar."))
+                events.append(SignalEvent(type=current_status, timestamp=outcome_ts, price=exit_price, message=f"Exit triggered intrabar at ₹{exit_price} ({current_status})."))
                 break
 
             if target_hit:

@@ -1,3 +1,2 @@
-Force deploy at 12:45 IST to fix dashboard visibility.
-New Columns: Target, Stop-Loss, Current, P&L
-Version: RC5.7
+Force deploy at 13:50 IST for V2.3 Ensemble Signal Pipeline & Resilient Accuracy Forensics.
+Version: RC5.8-V23-ENSEMBLE

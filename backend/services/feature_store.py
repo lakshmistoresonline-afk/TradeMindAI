@@ -149,6 +149,63 @@ class FeatureStoreService:
             if not math.isnan(features["sma_20"]):
                 features["dist_sma_20"] = (close - features["sma_20"]) / features["sma_20"]
 
+        # Smart Money Concepts (SMC / ICT) Features
+        try:
+            from backend.analysis.smc import SMCAnalysis
+            obs = SMCAnalysis.detect_order_blocks(df_ta)
+            fvgs = SMCAnalysis.detect_fvg(df_ta)
+            bos = SMCAnalysis.detect_structure_change(df_ta)
+
+            last_idx = len(df_ta) - 1
+            has_bull_ob = any(ob["type"] == "bullish" and (last_idx - ob.get("index", 0)) <= 10 for ob in obs)
+            has_bear_ob = any(ob["type"] == "bearish" and (last_idx - ob.get("index", 0)) <= 10 for ob in obs)
+            has_fvg = any((last_idx - fvg.get("index", 0)) <= 5 for fvg in fvgs)
+
+            features["smc_bullish_ob"] = 1.0 if has_bull_ob else 0.0
+            features["smc_bearish_ob"] = 1.0 if has_bear_ob else 0.0
+            features["ict_liquidity_void"] = 1.0 if has_fvg else 0.0
+            features["smc_bos_bullish"] = 1.0 if bos.get("bias") == "BULLISH" else 0.0
+        except Exception:
+            features["smc_bullish_ob"] = 0.0
+            features["smc_bearish_ob"] = 0.0
+            features["ict_liquidity_void"] = 0.0
+            features["smc_bos_bullish"] = 0.0
+
+        # 20-Day Volume Profile & Point of Control (POC) Anchor Calculation
+        try:
+            window_20 = df_ta.iloc[-20:]
+            if len(window_20) >= 10:
+                price_min = window_20["Low"].min()
+                price_max = window_20["High"].max()
+                if price_max > price_min:
+                    bins = np.linspace(price_min, price_max, 10)
+                    digitized = np.digitize(window_20["Close"], bins)
+                    vol_by_bin = [window_20["Volume"][digitized == b].sum() for b in range(1, 10)]
+                    poc_bin = np.argmax(vol_by_bin)
+                    poc_price = (bins[poc_bin] + bins[poc_bin + 1]) / 2.0
+
+                    features["vp_poc_price"] = float(poc_price)
+                    features["dist_vp_poc"] = float((close - poc_price) / poc_price)
+        except Exception:
+            pass
+
+        # Order Flow Imbalance (OFI) Calculation (Estimates buy vs sell volume pressure)
+        try:
+            if "Open" in last_row and "High" in last_row and "Low" in last_row and "Close" in last_row:
+                open_p = float(last_row["Open"])
+                high_p = float(last_row["High"])
+                low_p = float(last_row["Low"])
+                close_p = float(last_row["Close"])
+                tot_vol = float(last_row.get("Volume", 1.0))
+
+                rng = high_p - low_p
+                if rng > 0 and tot_vol > 0:
+                    clv = ((close_p - low_p) - (high_p - close_p)) / rng
+                    ofi = float(np.clip(clv, -1.0, 1.0))
+                    features["order_flow_imbalance"] = ofi
+        except Exception:
+            features["order_flow_imbalance"] = 0.0
+
         return features
 
     async def find_similar_patterns(self, symbol: str) -> List[Dict[str, Any]]:

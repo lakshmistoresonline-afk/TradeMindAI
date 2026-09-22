@@ -123,36 +123,74 @@ export default function EquitySignals() {
     });
   }, [firestoreSignals]);
 
+  const allActiveSignalsList = useMemo(() => {
+    // 1. Filter for active status, LONG trade direction, and freshness matching trade horizon
+    const rawActive = signals.filter(s => {
+      const status = (s.decision?.status || s.status || '').toUpperCase();
+      const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(status);
+      if (!isActive) return false;
+
+      // User Preference: Showcase ONLY LONG trade directed signals on dashboard
+      const rating = (s.decision?.rating || s.rating || '').toUpperCase();
+      const direction = (s.decision?.direction || s.direction || '').toUpperCase();
+      const isLongTrade = direction === 'LONG' || rating.includes('BUY');
+      if (!isLongTrade) return false;
+
+      const genTime = new Date(s.decision?.generatedAt || s.created_at || s.timestamp || 0).getTime();
+      if (genTime > 0) {
+        const horizon = (s.decision?.timeframe || s.timeframe || 'SWING').toUpperCase();
+        const maxAgeHours = horizon === 'SHORT' ? 168 : horizon === 'SWING' ? 720 : 8760; // 7d / 30d / 365d
+        const ageHours = (Date.now() - genTime) / (1000 * 60 * 60);
+        if (ageHours > maxAgeHours) return false; // Exclude signals past their horizon limit
+      }
+      return true;
+    });
+
+    // 2. Sort newest first
+    rawActive.sort((a, b) => {
+      const timeA = new Date(a.decision?.generatedAt || a.created_at || 0).getTime();
+      const timeB = new Date(b.decision?.generatedAt || b.created_at || 0).getTime();
+      return timeB - timeA;
+    });
+
+    // 3. Deduplicate by symbol + timeframe (keep newest per stock & horizon)
+    const dedupMap = new Map<string, any>();
+    rawActive.forEach(s => {
+      const key = `${s.symbol.toUpperCase()}_${s.decision?.timeframe || s.timeframe || 'SWING'}`;
+      if (!dedupMap.has(key)) {
+        dedupMap.set(key, s);
+      }
+    });
+
+    return Array.from(dedupMap.values());
+  }, [signals]);
+
   const counts = useMemo(() => {
     return {
-      all: signals.length,
-      swing: signals.filter(s => s.decision.timeframe === 'SWING').length,
-      short: signals.filter(s => s.decision.timeframe === 'SHORT').length,
-      long: signals.filter(s => s.decision.timeframe === 'LONG').length
+      all: allActiveSignalsList.length,
+      swing: allActiveSignalsList.filter(s => (s.decision?.timeframe || s.timeframe) === 'SWING').length,
+      short: allActiveSignalsList.filter(s => (s.decision?.timeframe || s.timeframe) === 'SHORT').length,
+      long: allActiveSignalsList.filter(s => (s.decision?.timeframe || s.timeframe) === 'LONG').length
     };
-  }, [signals]);
+  }, [allActiveSignalsList]);
 
   const filteredActiveSignals = useMemo(() => {
     const universe = universes[activeTab].value;
 
-    return signals.filter(s => {
-        // V2.3 Hybrid: Ensure we only show truly ACTIVE signals in this mode
-        const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision.status);
-        if (!isActive) return false;
-
+    return allActiveSignalsList.filter(s => {
         const matchesSearch = s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
                              (s.company_name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
         if (!matchesSearch) return false;
 
         if (universe === 'ALL') return true;
-        if (universe === 'SWING') return s.decision.timeframe === 'SWING';
-        if (universe === 'SHORT') return s.decision.timeframe === 'SHORT';
-        if (universe === 'LONG') return s.decision.timeframe === 'LONG';
+        if (universe === 'SWING') return (s.decision?.timeframe || s.timeframe) === 'SWING';
+        if (universe === 'SHORT') return (s.decision?.timeframe || s.timeframe) === 'SHORT';
+        if (universe === 'LONG') return (s.decision?.timeframe || s.timeframe) === 'LONG';
 
         return false;
     });
-  }, [signals, activeTab, searchQuery, universes]);
+  }, [allActiveSignalsList, activeTab, searchQuery, universes]);
 
   const toggleCompare = (id: string) => {
     setSelectedForCompare(prev =>

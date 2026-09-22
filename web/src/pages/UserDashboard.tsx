@@ -79,10 +79,12 @@ export default function UserDashboard() {
 
   const filteredSignals = useMemo(() => {
     const horizon = ['SWING', 'SHORT', 'LONG'][tab];
-    return signals.filter(s =>
-      s.decision.timeframe === horizon &&
-      ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision.status)
-    ).slice(0, 3);
+    return signals.filter(s => {
+      const isLongTrade = s.decision?.direction === 'LONG' || s.decision?.rating?.includes('BUY');
+      return isLongTrade &&
+        s.decision?.timeframe === horizon &&
+        ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision?.status);
+    }).slice(0, 3);
   }, [signals, tab]);
 
   return (

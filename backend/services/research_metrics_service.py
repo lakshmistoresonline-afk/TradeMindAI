@@ -23,11 +23,15 @@ class ResearchMetricsService:
             }
 
         df = pd.DataFrame(signals)
+        if 'net_pnl' in df.columns:
+            df['net_pnl'] = pd.to_numeric(df['net_pnl'], errors='coerce').fillna(0.0)
+        else:
+            df['net_pnl'] = 0.0
 
         # 1. Trade Outcomes
         trade_count = len(df)
-        wins = len(df[df['net_pnl'] > 0])
-        losses = len(df[df['net_pnl'] <= 0])
+        wins = int((df['net_pnl'] > 0).sum())
+        losses = int((df['net_pnl'] <= 0).sum())
         win_rate = (wins / trade_count) * 100 if trade_count > 0 else 0.0
 
         gross_profit = df[df['net_pnl'] > 0]['net_pnl'].sum()

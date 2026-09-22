@@ -25,10 +25,21 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   else if (rawRating.includes('SELL')) rating = 'SELL';
 
   // 2. Normalize Conviction (0-100)
-  const conviction = Math.round(
-    (structured.conviction !== undefined && structured.conviction !== null)
-    ? structured.conviction : (signal.conviction || signal.ai_investment_score || 0)
-  );
+  let rawConv = structured.conviction;
+  if (rawConv === undefined || rawConv === null) {
+    if (signal.calibrated_probability !== undefined && signal.calibrated_probability !== null) {
+      rawConv = signal.calibrated_probability <= 1.0 ? signal.calibrated_probability * 100 : signal.calibrated_probability;
+    } else if (signal.raw_probability !== undefined && signal.raw_probability !== null) {
+      rawConv = signal.raw_probability <= 1.0 ? signal.raw_probability * 100 : signal.raw_probability;
+    } else if (signal.conviction !== undefined && signal.conviction !== null) {
+      rawConv = signal.conviction;
+    } else if (signal.confidence !== undefined && signal.confidence !== null) {
+      rawConv = signal.confidence <= 1.0 ? signal.confidence * 100 : signal.confidence;
+    } else {
+      rawConv = signal.ai_investment_score || 0;
+    }
+  }
+  const conviction = Math.round(Number(rawConv) || 0);
 
   // 3. Normalize Risk Level
   let riskLevel: RiskLevel = 'MODERATE';
@@ -57,15 +68,15 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
 
   // 6. Entry/Price Logic
   const parseNum = (val: any) => {
-    if (val === null || val === undefined || val === 'Unknown' || val === 'N/A') return undefined;
+    if (val === null || val === undefined || val === 'Unknown' || val === 'N/A' || val === '') return undefined;
     const num = Number(val);
     return isNaN(num) ? undefined : num;
   };
 
-  const entry = parseNum(structured.entry) || parseNum(signal.entry_price) || 0;
-  const target = parseNum(structured.target) || parseNum(signal.target_price);
-  const stopLoss = parseNum(structured.stop_loss) || parseNum(signal.stop_price);
-  const current = parseNum(signal.current_price);
+  const entry = parseNum(structured.entry) ?? parseNum(signal.entry_price) ?? parseNum(signal.entry) ?? 0;
+  const target = parseNum(structured.target) ?? parseNum(signal.target_price) ?? parseNum(signal.target);
+  const stopLoss = parseNum(structured.stop_loss) ?? parseNum(signal.stop_price) ?? parseNum(signal.stop_loss_price) ?? parseNum(signal.stop);
+  const current = parseNum(signal.current_price) ?? parseNum(signal.price) ?? entry;
 
   // 7. Drivers
   let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];

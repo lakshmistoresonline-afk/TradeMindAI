@@ -8,11 +8,14 @@ import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecyc
 import PremiumOverlay from '../components/PremiumOverlay';
 import { useAuth } from '../hooks/useAuth';
 
+import { useTurboSync } from '../hooks/useTurboSync';
+
 export default function SignalDetail() {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { isPremium } = useAuth();
+  const { firestoreSignals } = useTurboSync();
   const [signal, setSignal] = useState<any>(null);
   const [forensics, setForensics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -20,16 +23,31 @@ export default function SignalDetail() {
   useEffect(() => {
     if (id) {
        const loadData = async () => {
+           setLoading(true);
            try {
-               const data = await getEquitySignalDetail(id);
-               setSignal(mapCanonicalSignal(data));
+               // 1. Check passed location state
+               let rawData = location.state?.signal;
 
-               if (isPremium) {
+               // 2. Try REST API if location state is missing
+               if (!rawData) {
+                   rawData = await getEquitySignalDetail(id);
+               }
+
+               // 3. Fallback to Firestore Mirror if API is offline / 404
+               if (!rawData && firestoreSignals.length > 0) {
+                   rawData = firestoreSignals.find((s: any) => s.id === id);
+               }
+
+               if (rawData) {
+                   setSignal(mapCanonicalSignal(rawData));
+               }
+
+               if (isPremium && id) {
                    const forens = await getEquitySignalForensics(id);
                    setForensics(forens);
                }
            } catch (e) {
-               console.error("Forensic Load Failed:", e);
+               console.error("Forensic Load Error:", e);
            } finally {
                setLoading(false);
            }
@@ -42,7 +60,7 @@ export default function SignalDetail() {
            }, 500);
        }
     }
-  }, [id, isPremium]);
+  }, [id, isPremium, firestoreSignals, location.state]);
 
   if (loading) return (
      <Box sx={{ p: 4, bgcolor: '#020617', minHeight: '100vh' }}>
@@ -133,10 +151,10 @@ export default function SignalDetail() {
             <SectionHeader icon={<Target size={18} />} title="AUTHORITATIVE TRADE PLAN" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Grid container spacing={4}>
-                  <PlanItem label="ENTRY PRICE" value={`₹${decision.entry?.toLocaleString()}`} />
-                  <PlanItem label="TARGET PRICE" value={`₹${decision.target?.toLocaleString()}`} color="#10b981" />
-                  <PlanItem label="STOP LOSS" value={`₹${decision.stopLoss?.toLocaleString()}`} color="#ef4444" />
-                  <PlanItem label="RISK / REWARD" value={decision.riskReward} color="#00D1FF" />
+                  <PlanItem label="ENTRY PRICE" value={decision.entry ? `₹${decision.entry.toLocaleString()}` : '—'} />
+                  <PlanItem label="TARGET PRICE" value={decision.target ? `₹${decision.target.toLocaleString()}` : '—'} color="#10b981" />
+                  <PlanItem label="STOP LOSS" value={decision.stopLoss ? `₹${decision.stopLoss.toLocaleString()}` : '—'} color="#ef4444" />
+                  <PlanItem label="RISK / REWARD" value={decision.riskReward || '1:2.5'} color="#00D1FF" />
                </Grid>
                <Divider sx={{ my: 4, opacity: 0.05 }} />
                <Grid container spacing={4}>

@@ -86,12 +86,47 @@ export default function AdminDashboard() {
   }, []);
 
   const counts = useMemo(() => {
+    const rawActive = signals.filter(s => {
+      const status = (s.decision?.status || s.status || '').toUpperCase();
+      const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(status);
+      if (!isActive) return false;
+
+      // User Preference: Showcase ONLY LONG trade directed signals on dashboard
+      const rating = (s.decision?.rating || s.rating || '').toUpperCase();
+      const direction = (s.decision?.direction || s.direction || '').toUpperCase();
+      const isLongTrade = direction === 'LONG' || rating.includes('BUY');
+      if (!isLongTrade) return false;
+
+      const genTime = new Date(s.decision?.generatedAt || s.created_at || s.timestamp || 0).getTime();
+      if (genTime > 0) {
+        const horizon = (s.decision?.timeframe || s.timeframe || 'SWING').toUpperCase();
+        const maxAgeHours = horizon === 'SHORT' ? 168 : horizon === 'SWING' ? 720 : 8760; // 7d / 30d / 365d
+        const ageHours = (Date.now() - genTime) / (1000 * 60 * 60);
+        if (ageHours > maxAgeHours) return false;
+      }
+      return true;
+    });
+
+    rawActive.sort((a, b) => {
+      const timeA = new Date(a.decision?.generatedAt || a.created_at || 0).getTime();
+      const timeB = new Date(b.decision?.generatedAt || b.created_at || 0).getTime();
+      return timeB - timeA;
+    });
+
+    const dedupMap = new Map<string, any>();
+    rawActive.forEach(s => {
+      const key = `${s.symbol.toUpperCase()}_${s.decision?.timeframe || s.timeframe || 'SWING'}`;
+      if (!dedupMap.has(key)) dedupMap.set(key, s);
+    });
+
+    const activeList = Array.from(dedupMap.values());
+
     return {
-      swingPrimary: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'PRIMARY').length,
-      swingSelective: signals.filter(s => s.decision.timeframe === 'SWING' && s.decision.qualityClass === 'SELECTIVE').length,
-      longSelective: signals.filter(s => s.decision.timeframe === 'LONG' && s.decision.qualityClass === 'SELECTIVE').length,
-      shortExperimental: signals.filter(s => s.decision.timeframe === 'SHORT').length,
-      total: signals.length
+      swingPrimary: activeList.filter(s => (s.decision?.timeframe || s.timeframe) === 'SWING' && s.decision?.qualityClass === 'PRIMARY').length,
+      swingSelective: activeList.filter(s => (s.decision?.timeframe || s.timeframe) === 'SWING' && s.decision?.qualityClass === 'SELECTIVE').length,
+      longSelective: activeList.filter(s => (s.decision?.timeframe || s.timeframe) === 'LONG' && s.decision?.qualityClass === 'SELECTIVE').length,
+      shortExperimental: activeList.filter(s => (s.decision?.timeframe || s.timeframe) === 'SHORT').length,
+      total: activeList.length
     };
   }, [signals]);
 

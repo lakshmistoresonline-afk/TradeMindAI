@@ -75,7 +75,16 @@ class SignalEngine:
         calibrated_prob = CalibrationService.get_direction_probability(prob_up, direction)
         raw_prob = CalibrationService.get_direction_probability(raw_prob_up, direction)
 
-        # 5. Risk Calculation (Master Node)
+        # 5. REGIME ANALYSIS (Passed to Risk Engine & Gates)
+        regime_obj = await container.ios_repo.get_latest_regime()
+        if not regime_obj:
+            print(f"   [FORENSIC_FAIL] {symbol} Aborting: Missing Market Regime context.")
+            return None
+
+        regime_label = regime_obj.regime
+        regime_prob = regime_obj.sentiment_score
+
+        # 6. Risk Calculation (Master Node - Regime Aware)
         price = last_features.get("Close") or last_features.get("close") or (stock.last_price if not evaluation_timestamp else 0.0)
 
         import math
@@ -92,12 +101,13 @@ class SignalEngine:
             symbol, price,
             direction,
             atr,
-            horizon=timeframe
+            horizon=timeframe,
+            regime=regime_label
         )
 
         if not risk_params: return None
 
-        # 6. EXPECTED VALUE
+        # 7. EXPECTED VALUE
         reward_amt = abs(risk_params["target"] - price)
         risk_amt = abs(price - risk_params["stop_loss"])
 
@@ -110,15 +120,6 @@ class SignalEngine:
 
         if not math.isfinite(expected_val):
             expected_val = 0.0
-
-        # 7. REGIME ANALYSIS
-        regime_obj = await container.ios_repo.get_latest_regime()
-        if not regime_obj:
-            print(f"   [FORENSIC_FAIL] {symbol} Aborting: Missing Market Regime context.")
-            return None
-
-        regime_label = regime_obj.regime
-        regime_prob = regime_obj.sentiment_score
 
         # 8. PRODUCTION RISK GATES (V2.2)
         rejection_reason = None
@@ -137,6 +138,12 @@ class SignalEngine:
         # C. Liquidity Gate
         if stock.avg_volume and stock.avg_volume < 10_000_000:
             rejection_reason = "INSUFFICIENT_LIQUIDITY"
+
+        # Attach sector bias context
+        from backend.services.sector_rotation_service import SectorRotationService
+        sec_info = SectorRotationService.get_stock_sector_bias(getattr(stock, "sector", None))
+        last_features["sector_bias"] = sec_info.get("bias", "NEUTRAL")
+        last_features["sector_rank"] = sec_info.get("rank", 5)
 
         # D. Trend Alignment Filter
         ema200 = last_features.get("ema_200", price)

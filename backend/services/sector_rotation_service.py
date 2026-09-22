@@ -68,3 +68,35 @@ class SectorRotationService:
 
             res = session.query(SectorMetricDB).filter(SectorMetricDB.date == latest_date).order_by(SectorMetricDB.rank.asc()).all()
             return [{c.name: getattr(r, c.name) for c in r.__table__.columns} for r in res]
+
+    @staticmethod
+    def get_stock_sector_bias(sector: Optional[str]) -> Dict[str, Any]:
+        """
+        Retrieves sector rank, trend, and relative strength bias for a given sector name.
+        """
+        if not sector:
+            return {"rank": 5, "total_sectors": 10, "trend": "NEUTRAL", "bias": "NEUTRAL"}
+
+        try:
+            rankings = SectorRotationService.get_latest_sector_rankings()
+            if not rankings:
+                return {"rank": 5, "total_sectors": 10, "trend": "NEUTRAL", "bias": "NEUTRAL"}
+
+            total = len(rankings)
+            for item in rankings:
+                if item.get("sector", "").lower() == sector.lower():
+                    rank = item.get("rank", 5)
+                    trend = item.get("trend", "NEUTRAL")
+                    bias = "STRONG" if rank <= 3 else "WEAK" if rank >= (total - 2) else "NEUTRAL"
+                    return {
+                        "sector": sector,
+                        "rank": rank,
+                        "total_sectors": total,
+                        "trend": trend,
+                        "bias": bias,
+                        "momentum": item.get("momentum", 0.0)
+                    }
+        except Exception:
+            pass
+
+        return {"sector": sector, "rank": 5, "total_sectors": 10, "trend": "NEUTRAL", "bias": "NEUTRAL"}

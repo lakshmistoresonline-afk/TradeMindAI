@@ -96,3 +96,25 @@ class MarketRegimeEngine:
             volatility_index=float(vix_val),
             description=description
         )
+
+    @staticmethod
+    def calculate_iv_rv_spillover_ratio(vix_val: float, index_returns: np.ndarray) -> float:
+        """
+        Calculates Implied Volatility (India VIX) to Realized Volatility ratio:
+        Ratio = VIX / (Realized_Vol_20d * sqrt(252) * 100)
+        When ratio > 1.5, options are pricing extreme tail risk relative to price movement.
+        """
+        if len(index_returns) < 10 or vix_val <= 0:
+            return 1.0
+
+        try:
+            realized_vol_daily = float(np.std(index_returns))
+            realized_vol_annualized = realized_vol_daily * np.sqrt(252) * 100.0
+
+            if realized_vol_annualized <= 0:
+                return 1.0
+
+            ratio = vix_val / realized_vol_annualized
+            return round(float(np.clip(ratio, 0.5, 4.0)), 2)
+        except Exception:
+            return 1.0

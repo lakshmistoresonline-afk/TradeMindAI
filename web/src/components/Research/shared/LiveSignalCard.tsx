@@ -198,7 +198,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
       <Button
         fullWidth
         variant="text"
-        onClick={() => navigate(`/signals/${decision.id}`)}
+        onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: stock, decision } })}
         sx={{
            py: 1.5,
            borderRadius: 0,
