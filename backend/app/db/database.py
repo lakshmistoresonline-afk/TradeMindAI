@@ -63,6 +63,24 @@ def create_db_engine_with_retry(retries: int = 3, delay: int = 2):
                 return create_engine(fallback_url, connect_args={"check_same_thread": False})
 
 engine = create_db_engine_with_retry()
+
+from sqlalchemy import event
+
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    """
+    Enables SQLite Write-Ahead Logging (WAL) mode to eliminate "database is locked" errors
+    during concurrent local read/write operations.
+    """
+    if "sqlite" in DATABASE_URL.lower():
+        try:
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA journal_mode=WAL;")
+            cursor.execute("PRAGMA synchronous=NORMAL;")
+            cursor.close()
+        except Exception as e:
+            logger.warning(f"[Local DB] WAL PRAGMA setup notice: {e}")
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

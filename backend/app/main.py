@@ -23,10 +23,16 @@ app = FastAPI(
     description="100% Offline Local Quantitative Signal & TA Engine"
 )
 
-# Enable CORS for local frontend execution
+# Enable CORS for local and production deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8000",
+        "https://com-webcraft-trademindai-c8f75.web.app",
+        "*"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
