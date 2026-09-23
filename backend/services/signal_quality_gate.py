@@ -127,13 +127,23 @@ class SignalQualityGate:
         if promoter_change is not None and signal.direction == "LONG" and promoter_change < -2.0:
             reasons.append(f"PROMOTER_SELLING_DIVERGENCE: Net promoter stake reduction {promoter_change:.1f}%")
 
+        # 16. Cumulative Volume Delta (CVD) Filter
+        cvd_val = features.get("cumulative_volume_delta")
+        if cvd_val is not None and signal.direction == "LONG" and cvd_val < -0.20:
+            reasons.append(f"CVD_BEARISH_DIVERGENCE: Negative Cumulative Volume Delta {cvd_val:.2f}")
+
+        # 17. India VIX / Realized Volatility Spillover Threshold Adjustment
+        iv_rv_ratio = features.get("iv_rv_spillover_ratio", 1.0)
+        if iv_rv_ratio > 1.5 and prob < (min_prob + 0.10):
+            reasons.append(f"HIGH_VOLATILITY_SPILLOVER: IV/RV ratio {iv_rv_ratio:.2f} > 1.5 requires prob >= {min_prob+0.10:.2f}")
+
         decision = "PUBLISH" if not reasons else "BLOCK"
 
         return {
             "decision": decision,
             "reasons": reasons,
             "metadata": {
-                "gate_version": "v2.3.6",
+                "gate_version": "v2.3.7",
                 "prob_threshold": min_prob,
                 "rsi_enabled": rsi_enabled,
                 "rsi_value": rsi,
@@ -148,6 +158,8 @@ class SignalQualityGate:
                 "days_to_earnings": days_to_earnings,
                 "fii_net_bias": fii_flow,
                 "index_pcr": index_pcr,
-                "promoter_change": promoter_change
+                "promoter_change": promoter_change,
+                "cvd": cvd_val,
+                "iv_rv_ratio": iv_rv_ratio
             }
         }

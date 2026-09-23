@@ -206,6 +206,24 @@ class FeatureStoreService:
         except Exception:
             features["order_flow_imbalance"] = 0.0
 
+        # Cumulative Volume Delta (CVD) Calculation over 15 bars
+        try:
+            window_15 = df_ta.iloc[-15:]
+            if len(window_15) >= 5:
+                cvd = 0.0
+                for _, row in window_15.iterrows():
+                    c_p, o_p = float(row["Close"]), float(row["Open"])
+                    v = float(row.get("Volume", 1.0))
+                    if c_p >= o_p:
+                        cvd += v
+                    else:
+                        cvd -= v
+                tot_window_vol = float(window_15["Volume"].sum())
+                cvd_ratio = cvd / tot_window_vol if tot_window_vol > 0 else 0.0
+                features["cumulative_volume_delta"] = round(float(np.clip(cvd_ratio, -1.0, 1.0)), 4)
+        except Exception:
+            features["cumulative_volume_delta"] = 0.0
+
         return features
 
     async def find_similar_patterns(self, symbol: str) -> List[Dict[str, Any]]:

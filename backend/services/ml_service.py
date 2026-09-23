@@ -328,6 +328,38 @@ class MLService:
             search.fit(X, y)
             return search.best_params_
 
+    @staticmethod
+    def select_orthogonal_cluster_features(X: pd.DataFrame, y: pd.Series) -> List[str]:
+        """
+        Pillar 3: Hierarchical Clustered Feature Selection (HCFS).
+        Groups features into 5 orthogonal clusters (Trend, Momentum, Volatility, Volume, SMC)
+        and selects the single highest TreeSHAP/feature_importance feature per cluster.
+        """
+        cluster_defs = {
+            "TREND": ["ema_20", "ema_50", "ema_200", "dist_ema_200", "sma_20", "ema_20_slope"],
+            "MOMENTUM": ["momentum_rsi", "momentum_roc", "macd", "macd_hist", "stoch_k", "momentum_cci"],
+            "VOLATILITY": ["ATR", "volatility_bb_width", "hist_vol", "market_volatility_z"],
+            "VOLUME": ["volume_relative", "obv", "mfi", "order_flow_imbalance", "cumulative_volume_delta"],
+            "SMC_STRUCTURE": ["smc_bullish_ob", "smc_bearish_ob", "ict_liquidity_void", "smc_bos_bullish", "dist_vp_poc"]
+        }
+
+        try:
+            from sklearn.ensemble import GradientBoostingClassifier
+            model = GradientBoostingClassifier(n_estimators=30, random_state=42)
+            model.fit(X.fillna(0), y)
+            importances = dict(zip(X.columns, model.feature_importances_))
+
+            selected_features = []
+            for c_name, c_feats in cluster_defs.items():
+                avail_feats = [f for f in c_feats if f in X.columns]
+                if avail_feats:
+                    best_feat = max(avail_feats, key=lambda f: importances.get(f, 0.0))
+                    selected_features.append(best_feat)
+
+            return selected_features if selected_features else list(X.columns[:5])
+        except Exception:
+            return list(X.columns[:5])
+
     def _generate_mock_prediction(self, symbol: str, horizon: str, version: str = "v2.2-local-mock") -> Dict[str, Any]:
         """
         Generates a stable, high-conviction BUY signal for local testing and population.
