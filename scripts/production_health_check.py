@@ -2,7 +2,7 @@ import httpx
 import json
 
 def check():
-    base_url = "https://trademind-api-m8jg.onrender.com/api/v1"
+    base_url = "http://localhost:8000/api/v1"
     print("\n--- PRODUCTION API DATA AUDIT ---\n")
 
     endpoints = {

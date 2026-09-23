@@ -35,7 +35,7 @@ object NetworkModule {
     @Singleton
     fun provideApiService(okHttpClient: OkHttpClient): ApiService {
         return Retrofit.Builder()
-            .baseUrl("https://trademind-api-m8jg.onrender.com/api/v1/")
+            .baseUrl("https://com-webcraft-trademindai-c8f75.web.app/api/v1/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -455,6 +455,7 @@ class ShadowSignalDB(Base):
     pnl_percentage = Column(Float)
     fees = Column(Float)
     net_pnl = Column(Float)
+    holding_period_days = Column(Float)
     quality_class = Column(String) # PRIMARY, SELECTIVE, EXPERIMENTAL
     prediction_id = Column(String, index=True)
     provenance_id = Column(String, index=True)

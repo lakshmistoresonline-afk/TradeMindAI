@@ -150,11 +150,11 @@ async def get_equity_history(
     status: Optional[str] = None,
     direction: Optional[str] = None,
     page: int = 1,
-    limit: int = 50,
+    limit: int = 500,
     user: dict = Depends(get_current_user)
 ):
     """
-    Returns historical signal records from the shadow_signals ledger.
+    Returns 1-Year historical signal records from the shadow_signals ledger.
     """
     from backend.core.postgres import SessionLocal, ShadowSignalDB
     with SessionLocal() as session:
@@ -176,15 +176,23 @@ async def get_equity_history(
         else:
             query = query.filter(ShadowSignalDB.status != "ACTIVE")
 
+        # User Requirement: Database retains full 10Y history, UI showcases ONLY Last 1 Year (\le 365 days)
+        one_year_ago = datetime.datetime.utcnow() - datetime.timedelta(days=365)
+        query = query.filter(ShadowSignalDB.created_at >= one_year_ago)
+        base_query = session.query(ShadowSignalDB).filter(
+            ShadowSignalDB.status != "ACTIVE",
+            ShadowSignalDB.created_at >= one_year_ago
+        )
+
         total = query.count()
-        base_query = session.query(ShadowSignalDB).filter(ShadowSignalDB.status != "ACTIVE")
 
         # Summary for filtered set
         target_hits = base_query.filter(ShadowSignalDB.status == "TARGET_HIT").count()
         stop_losses = base_query.filter(ShadowSignalDB.status == "STOP_LOSS").count()
         expired = base_query.filter(ShadowSignalDB.status == "EXPIRED").count()
+        total_1y = base_query.count()
 
-        db_signals = query.order_by(ShadowSignalDB.timestamp.desc()).offset((page-1)*limit).limit(limit).all()
+        db_signals = query.order_by(ShadowSignalDB.created_at.desc()).offset((page-1)*limit).limit(limit).all()
 
         results = []
         for s in db_signals:
@@ -197,9 +205,9 @@ async def get_equity_history(
 
         return {
             "records": results,
-            "total": total,
+            "total": total_1y,
             "summary": {
-                "total": base_query.count(),
+                "total": total_1y,
                 "target_hits": target_hits,
                 "stop_losses": stop_losses,
                 "expired": expired

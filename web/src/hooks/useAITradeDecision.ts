@@ -101,11 +101,16 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   // Backend quality_class is the authority. Fallback is deterministic based on horizon.
   const qualityClass = signal.quality_class || (timeframe === 'SWING' ? 'PRIMARY' : timeframe === 'LONG' ? 'SELECTIVE' : 'EXPERIMENTAL');
 
-  // 10. Timing (UTC Enforcement)
+  // 10. Timing (UTC & ISO Enforcement)
   const ensureUTC = (ts: any) => {
     if (!ts) return undefined;
-    if (typeof ts !== 'string') return ts;
-    return ts.includes('Z') || ts.includes('+') || ts.includes('-') ? ts : `${ts}Z`;
+    if (typeof ts !== 'string') {
+      if (ts instanceof Date) return ts.toISOString();
+      return ts;
+    }
+    // Check if Z or explicit timezone offset (+HH:MM or -HH:MM after T) is present
+    const hasTZ = ts.endsWith('Z') || ts.includes('+') || (ts.includes('T') && ts.substring(ts.indexOf('T')).includes('-'));
+    return hasTZ ? ts : `${ts}Z`;
   };
 
   return {
@@ -157,6 +162,8 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     marketContext: signal.market_context || signal.regime_metadata,
     technicalEvidence: signal.technical_evidence || signal.indicators,
     modelEvidence: signal.model_evidence,
+    triggeredAt: ensureUTC(signal.triggered_at || signal.activated_at || signal.entry_timestamp || (status === 'ENTRY_TRIGGERED' || status === 'ACTIVE' ? (signal.created_at || signal.timestamp) : undefined)),
+    isin: signal.isin || 'NSE_CASH',
     lifecycleEvents: (signal.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) })),
     signalAgeHours: signal.signal_age_hours || (signal.created_at ? (Date.now() - new Date(signal.created_at).getTime()) / (1000 * 60 * 60) : undefined),
     dataAgeHours: (signal.data_timestamp || signal.timestamp) ? (Date.now() - new Date(signal.data_timestamp || signal.timestamp).getTime()) / (1000 * 60 * 60) : undefined

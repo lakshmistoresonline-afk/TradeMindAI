@@ -129,8 +129,38 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
          )}
       </Box>
 
-      {/* 3. Status & Timing Area */}
+      {/* 3. Execution Guidance & Timing Area */}
       <Box sx={{ px: 2.5, py: 2, bgcolor: 'rgba(255,255,255,0.01)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+         {/* Trade Execution Status Guidance Banner */}
+         {decision.status === 'ENTRY_TRIGGERED' ? (
+            <Box sx={{ p: 1.2, mb: 2, bgcolor: alpha('#10b981', 0.12), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                  🟢 ENTRY TRIGGERED — BUY NOW
+               </Typography>
+               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.55rem', display: 'block', mt: 0.3 }}>
+                  Price reached entry level ₹{entry ? entry.toLocaleString() : '—'}. Trade is active for execution!
+               </Typography>
+            </Box>
+         ) : decision.status === 'WAITING_FOR_ENTRY' ? (
+            <Box sx={{ p: 1.2, mb: 2, bgcolor: alpha('#f59e0b', 0.12), borderRadius: 1, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+               <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                  🟡 WAITING FOR ENTRY — DO NOT BUY YET
+               </Typography>
+               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.55rem', display: 'block', mt: 0.3 }}>
+                  Current price ₹{current ? current.toLocaleString() : '—'} is below trigger ₹{entry ? entry.toLocaleString() : '—'}. Wait for breakout.
+               </Typography>
+            </Box>
+         ) : (
+            <Box sx={{ p: 1.2, mb: 2, bgcolor: alpha('#3b82f6', 0.12), borderRadius: 1, border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+               <Typography variant="caption" sx={{ color: '#3b82f6', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                  🔵 TRADE IN PROGRESS — ACTIVE
+               </Typography>
+               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.55rem', display: 'block', mt: 0.3 }}>
+                  Position entered at ₹{entry ? entry.toLocaleString() : '—'}, currently hovering at ₹{current ? current.toLocaleString() : '—'}.
+               </Typography>
+            </Box>
+         )}
+
          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Chip
                label={decision.status?.replace(/_/g, ' ')}
@@ -165,13 +195,19 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
             </Typography>
          </Box>
 
-         <Stack spacing={1.5}>
+         <Stack spacing={1.2}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>CREATED AT</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(decision.generatedAt)}</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME</Typography>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>TRIGGERED AT</Typography>
+               <Typography variant="caption" sx={{ color: decision.triggeredAt ? '#10b981' : '#f59e0b', fontWeight: 800, fontSize: '0.5rem' }}>
+                  {decision.triggeredAt ? formatDate(decision.triggeredAt) : 'PENDING BREAKOUT'}
+               </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME (NSE)</Typography>
                <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(stock.data_timestamp || stock.timestamp)}</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>

@@ -61,6 +61,7 @@ export interface AITradeDecision {
   // F&O Support (RC-5)
   assetClass?: 'EQUITY' | 'FUTURES' | 'OPTIONS';
   underlyingSymbol?: string;
+  isin?: string;
   strike?: number;
   optionType?: 'CE' | 'PE';
   expiry?: string;

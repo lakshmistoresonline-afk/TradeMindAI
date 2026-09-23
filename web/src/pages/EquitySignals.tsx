@@ -34,7 +34,7 @@ export default function EquitySignals() {
   const [hFilterStatus, setHFilterStatus] = useState('ALL');
   const [hFilterDirection, setHFilterDirection] = useState('ALL');
 
-  const { connectionStatus, firestoreSignals } = useTurboSync();
+  const { connectionStatus, firestoreSignals, firestoreHistory } = useTurboSync();
 
   // Canonical Signal Universes (V2.3)
   const universes = useMemo(() => [
@@ -122,6 +122,37 @@ export default function EquitySignals() {
         return merged;
     });
   }, [firestoreSignals]);
+
+  // Hybrid History Integration (V2.3)
+  // Merges 1-Year Historical Shadow Signals from Firestore Mirror
+  useEffect(() => {
+    if (firestoreHistory.length === 0) return;
+
+    // Filter for last 1 year (<= 365 days old)
+    const oneYearAgo = Date.now() - (365 * 24 * 60 * 60 * 1000);
+    const fsHistory = firestoreHistory
+      .filter((s: any) => {
+        const genTime = new Date(s.created_at || s.timestamp || 0).getTime();
+        return genTime >= oneYearAgo;
+      })
+      .map((s: any) => mapCanonicalSignal(s));
+
+    setHistory(fsHistory);
+    setTotalHistory(fsHistory.length);
+
+    // Compute exact summary stats for 1-year history
+    const targetHits = fsHistory.filter((s: any) => s.decision?.status === 'TARGET_HIT' || s.status === 'TARGET_HIT').length;
+    const stopLosses = fsHistory.filter((s: any) => s.decision?.status === 'STOP_LOSS' || s.status === 'STOP_LOSS').length;
+    const expired = fsHistory.filter((s: any) => s.decision?.status === 'EXPIRED' || s.status === 'EXPIRED').length;
+
+    setHistorySummary({
+      total: fsHistory.length,
+      target_hits: targetHits,
+      stop_losses: stopLosses,
+      expired: expired,
+      other: Math.max(0, fsHistory.length - (targetHits + stopLosses + expired))
+    });
+  }, [firestoreHistory]);
 
   const allActiveSignalsList = useMemo(() => {
     // 1. Filter for active status, LONG trade direction, and freshness matching trade horizon

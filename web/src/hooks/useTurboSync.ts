@@ -6,6 +6,7 @@ import { collection, query, limit, onSnapshot, doc } from 'firebase/firestore';
 export function useTurboSync() {
   const [updates, setUpdates] = useState<any[]>([]);
   const [firestoreSignals, setFirestoreSignals] = useState<any[]>([]);
+  const [firestoreHistory, setFirestoreHistory] = useState<any[]>([]);
   const [marketContext, setMarketContext] = useState<any>(null);
   const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'ERROR'>('CONNECTING');
 
@@ -55,7 +56,19 @@ export function useTurboSync() {
       console.error("[Turbo-Sync] Firestore Mirror Error:", err);
     });
 
-    // 3. Listen to Local Master Heartbeat for Market Context
+    // 3. Firestore History Mirror Sync (1-Year Historical Shadow Signals)
+    const historyRef = collection(db, "signals_history");
+    const qHist = query(historyRef, limit(1000));
+    const unsubscribeHistory = onSnapshot(qHist, (snapshot) => {
+      const hist = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      console.log(`[Turbo-Sync] Firestore History Sync: ${hist.length} historical signals`);
+      setFirestoreHistory(hist);
+    });
+
+    // 4. Listen to Local Master Heartbeat for Market Context
     const unsubscribeMarket = onSnapshot(doc(db, "system_metrics", "local_master"), (snapshot: any) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
@@ -67,6 +80,7 @@ export function useTurboSync() {
     return () => {
       eventSource.close();
       unsubscribeSignals();
+      unsubscribeHistory();
       unsubscribeMarket();
       console.log("[Turbo-Sync] SSE & Firestore Connections Closed");
     };
@@ -76,5 +90,5 @@ export function useTurboSync() {
   // Logic: Prefer SSE if ONLINE, otherwise use Firestore.
   const mergedSignals = connectionStatus === 'ONLINE' && updates.length > 0 ? updates : firestoreSignals;
 
-  return { updates: mergedSignals, connectionStatus, firestoreSignals, marketContext };
+  return { updates: mergedSignals, connectionStatus, firestoreSignals, firestoreHistory, marketContext };
 }

@@ -147,6 +147,36 @@ export default function SignalDetail() {
       <Grid container spacing={4}>
          {/* LEFT COLUMN: Intelligence & Execution */}
          <Grid item xs={12} md={8}>
+            {/* Trade Execution Guidance Banner */}
+            {decision.status === 'ENTRY_TRIGGERED' ? (
+                <Box sx={{ p: 2, mb: 3, bgcolor: alpha('#10b981', 0.12), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                   <Typography variant="subtitle2" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      🟢 ENTRY TRIGGERED — BUY NOW
+                   </Typography>
+                   <Typography variant="body2" sx={{ color: '#e2e8f0', fontWeight: 600, mt: 0.5 }}>
+                      Price reached entry level ₹{decision.entry ? decision.entry.toLocaleString() : '—'}. Trade is active for execution!
+                   </Typography>
+                </Box>
+            ) : decision.status === 'WAITING_FOR_ENTRY' ? (
+                <Box sx={{ p: 2, mb: 3, bgcolor: alpha('#f59e0b', 0.12), borderRadius: 1, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                   <Typography variant="subtitle2" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      🟡 WAITING FOR ENTRY — DO NOT BUY YET
+                   </Typography>
+                   <Typography variant="body2" sx={{ color: '#e2e8f0', fontWeight: 600, mt: 0.5 }}>
+                      Current price ₹{decision.normalizedCurrentPrice ? decision.normalizedCurrentPrice.toLocaleString() : '—'} is below trigger level ₹{decision.entry ? decision.entry.toLocaleString() : '—'}. Wait for price breakout.
+                   </Typography>
+                </Box>
+            ) : (
+                <Box sx={{ p: 2, mb: 3, bgcolor: alpha('#3b82f6', 0.12), borderRadius: 1, border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                   <Typography variant="subtitle2" sx={{ color: '#3b82f6', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      🔵 TRADE IN PROGRESS — ACTIVE
+                   </Typography>
+                   <Typography variant="body2" sx={{ color: '#e2e8f0', fontWeight: 600, mt: 0.5 }}>
+                      Position entered at ₹{decision.entry ? decision.entry.toLocaleString() : '—'}, currently hovering at ₹{decision.normalizedCurrentPrice ? decision.normalizedCurrentPrice.toLocaleString() : '—'}.
+                   </Typography>
+                </Box>
+            )}
+
             {/* 2. Trade Plan Section */}
             <SectionHeader icon={<Target size={18} />} title="AUTHORITATIVE TRADE PLAN" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -298,15 +328,17 @@ export default function SignalDetail() {
             </Paper>
 
             {/* 7. Signal Provenance */}
-            <SectionHeader icon={<Briefcase size={18} />} title="PROVENANCE" />
+            <SectionHeader icon={<Briefcase size={18} />} title="PROVENANCE & NSE VERIFICATION" />
             <Paper sx={{ p: 3, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Stack spacing={2}>
+                  <TraceItem label="NSE Symbol" value={`NSE:${signal.symbol}`} />
+                  <TraceItem label="ISIN Code" value={decision.isin || 'INE_CASH'} small />
                   <TraceItem label="Prediction ID" value={decision.predictionId || 'N/A'} small />
-                  <TraceItem label="Model Version" value={signal.model_version || 'TradeMind Core v2.2'} />
-                  <TraceItem label="Deployment SHA" value={signal.deployment_sha || 'N/A'} small />
+                  <TraceItem label="Model Version" value={signal.model_version || 'TradeMind Core v2.3-Ensemble'} />
                   <TraceItem label="Universe" value={signal.universe_version || 'NIFTY_200'} />
                   <Divider sx={{ my: 1, opacity: 0.05 }} />
-                  <TraceItem label="Created At" value={new Date(decision.generatedAt).toLocaleString()} small />
+                  <TraceItem label="Created At" value={decision.generatedAt ? new Date(decision.generatedAt).toLocaleString() : '—'} small />
+                  <TraceItem label="Triggered At" value={decision.triggeredAt ? new Date(decision.triggeredAt).toLocaleString() : 'PENDING BREAKOUT'} color={decision.triggeredAt ? '#10b981' : '#f59e0b'} small />
                   <TraceItem label="Data Timestamp" value={new Date(signal.data_timestamp || signal.timestamp).toLocaleString()} small />
                </Stack>
             </Paper>
