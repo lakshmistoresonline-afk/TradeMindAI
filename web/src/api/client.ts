@@ -36,10 +36,10 @@ export const getDataHealth = async () => {
 // Canonical Equity Intelligence API (Phase 35)
 export const getEquitySignals = async (params: any = {}) => {
   try {
-    const response = await apiClient.get('/equity/signals', { params, timeout: 15000 });
-    return response.data;
+    const response = await apiClient.get('/equity/signals', { params, timeout: 10000 });
+    return Array.isArray(response.data) ? response.data : [];
   } catch (err) {
-    console.warn('Equity signals fetch error/fallback:', err);
+    console.warn('Equity signals REST API fallback (using Firestore Mirror):', err);
     return [];
   }
 };

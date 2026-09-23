@@ -50,22 +50,19 @@ export default function EquitySignals() {
     try {
       if (mode === 'ACTIVE') {
         const signalsData = await getEquitySignals({ limit: 100 });
-        console.log(`[Forensic] Received Active Signals: ${signalsData?.length || 0}`);
-        if (!signalsData || !Array.isArray(signalsData)) {
-            throw new Error("Invalid response format from signal service.");
-        }
-        const normalized = signalsData.map((s: any) => mapCanonicalSignal(s));
-
-        setSignals(prev => {
-            const mergedMap = new Map();
-            prev.forEach((s: any) => mergedMap.set(s.id, s));
-            normalized.forEach((s: any) => mergedMap.set(s.id, s));
-            return Array.from(mergedMap.values()).sort((a: any, b: any) => {
-                const timeA = new Date(a.decision?.generatedAt || 0).getTime();
-                const timeB = new Date(b.decision?.generatedAt || 0).getTime();
-                return timeB - timeA;
+        const normalized = (Array.isArray(signalsData) ? signalsData : []).map((s: any) => mapCanonicalSignal(s));
+        if (normalized.length > 0) {
+            setSignals(prev => {
+                const mergedMap = new Map();
+                prev.forEach((s: any) => mergedMap.set(s.id, s));
+                normalized.forEach((s: any) => mergedMap.set(s.id, s));
+                return Array.from(mergedMap.values()).sort((a: any, b: any) => {
+                    const timeA = new Date(a.decision?.generatedAt || 0).getTime();
+                    const timeB = new Date(b.decision?.generatedAt || 0).getTime();
+                    return timeB - timeA;
+                });
             });
-        });
+        }
       } else {
         const params: any = {
             page: mode === 'HISTORY' ? page + 1 : 1,
@@ -77,20 +74,17 @@ export default function EquitySignals() {
             direction: hFilterDirection !== 'ALL' ? hFilterDirection : undefined
         };
         const historyData = await getEquityHistory(params);
-        if (!historyData || !historyData.records) {
-            throw new Error("Invalid response format from history service.");
+        if (historyData && Array.isArray(historyData.records) && historyData.records.length > 0) {
+            const records = historyData.records.map((r: any) => mapCanonicalSignal(r));
+            setHistory(records);
+            setTotalHistory(historyData.total || 0);
+            setHistorySummary(historyData.summary || null);
         }
-        const records = (historyData.records || []).map((r: any) => mapCanonicalSignal(r));
-        setHistory(records);
-        setTotalHistory(historyData.total || 0);
-        setHistorySummary(historyData.summary || null);
       }
     } catch (e: any) {
-      console.error("Failed to sync equity data:", e);
-      setError(e.message || "Failed to synchronize with authoritative signal ledger.");
+      console.warn("REST API sync notice (using Firestore Mirror fallback):", e);
     } finally {
       setLoading(false);
-      console.log(`[Forensic] Sync Complete. Mode: ${mode}, Signals: ${signals.length}, Tab: ${activeTab}`);
     }
   };
 
@@ -103,23 +97,17 @@ export default function EquitySignals() {
   useEffect(() => {
     if (firestoreSignals.length === 0) return;
 
+    setError(null); // Clear error since Firestore Mirror is streaming live signals
     const fsSignals = firestoreSignals.map(s => ({ ...mapCanonicalSignal(s), _isFirestore: true }));
-    console.log(`[Forensic] Merging ${fsSignals.length} Firestore signals into state...`);
 
     setSignals(prev => {
         const mergedMap = new Map();
-
-        // Add existing signals to map
         prev.forEach(s => mergedMap.set(s.id, s));
-
-        // Overwrite/Add with Firestore signals
         fsSignals.forEach(s => mergedMap.set(s.id, s));
 
-        const merged = Array.from(mergedMap.values()).sort((a, b) =>
+        return Array.from(mergedMap.values()).sort((a, b) =>
             new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
         );
-        console.log(`[Forensic] State now has ${merged.length} total signals.`);
-        return merged;
     });
   }, [firestoreSignals]);
 
