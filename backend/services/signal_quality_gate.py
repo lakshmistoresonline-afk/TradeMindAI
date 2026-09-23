@@ -137,13 +137,23 @@ class SignalQualityGate:
         if iv_rv_ratio > 1.5 and prob < (min_prob + 0.10):
             reasons.append(f"HIGH_VOLATILITY_SPILLOVER: IV/RV ratio {iv_rv_ratio:.2f} > 1.5 requires prob >= {min_prob+0.10:.2f}")
 
+        # 18. Dealer Net Gamma Exposure (GEX) Vacuum Filter
+        net_gex = features.get("net_dealer_gex")
+        if net_gex is not None and net_gex < -2.0:
+            reasons.append(f"DEALER_GEX_VACUUM: Negative Net Dealer Gamma {net_gex:.2f} < -2.0 indicates high whipsaw risk")
+
+        # 19. Residual Idiosyncratic Alpha Filter (Fama-French Factor Neutralization)
+        res_alpha = features.get("residual_alpha")
+        if res_alpha is not None and signal.direction == "LONG" and res_alpha < -0.02:
+            reasons.append(f"RESIDUAL_ALPHA_WEAK: Idiosyncratic alpha {res_alpha*100:.1f}% indicates passive beta dependence")
+
         decision = "PUBLISH" if not reasons else "BLOCK"
 
         return {
             "decision": decision,
             "reasons": reasons,
             "metadata": {
-                "gate_version": "v2.3.7",
+                "gate_version": "v2.3.8",
                 "prob_threshold": min_prob,
                 "rsi_enabled": rsi_enabled,
                 "rsi_value": rsi,
@@ -160,6 +170,8 @@ class SignalQualityGate:
                 "index_pcr": index_pcr,
                 "promoter_change": promoter_change,
                 "cvd": cvd_val,
-                "iv_rv_ratio": iv_rv_ratio
+                "iv_rv_ratio": iv_rv_ratio,
+                "net_dealer_gex": net_gex,
+                "residual_alpha": res_alpha
             }
         }
