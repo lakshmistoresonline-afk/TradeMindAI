@@ -70,3 +70,20 @@ class SentimentLog(Base):
     sentiment_label = Column(String(20), nullable=False) # BULLISH, BEARISH, NEUTRAL
     score = Column(Float, nullable=False)
     logged_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class SignalCache(Base):
+    __tablename__ = "app_signal_cache"
+    __table_args__ = (
+        Index("idx_signal_cache_sym", "symbol"),
+        {"extend_existing": True}
+    )
+
+    symbol = Column(String(20), primary_key=True, index=True)
+    last_updated = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    signal_type = Column(String(20), nullable=False)
+    confidence = Column(Float, nullable=False)
+    rsi_14 = Column(Float, default=50.0)
+    macd_val = Column(Float, default=0.0)
+    macd_signal = Column(Float, default=0.0)
+    ema_20 = Column(Float, default=0.0)
+    ema_50 = Column(Float, default=0.0)
