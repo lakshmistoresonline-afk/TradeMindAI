@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Box, Typography, Paper, Grid, Stack, Chip, alpha, LinearProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, Divider } from '@mui/material';
-import { ArrowUpRight, ArrowDownRight, Clock, Calculator } from 'lucide-react';
+import { Box, Typography, Paper, Grid, Stack, Chip, alpha, LinearProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, Divider, IconButton, Tooltip } from '@mui/material';
+import { ArrowUpRight, ArrowDownRight, Clock, Calculator, Share2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
 
@@ -12,8 +12,16 @@ interface SignalCardProps {
 export default function SignalCard({ stock, decision }: SignalCardProps) {
   const navigate = useNavigate();
   const [isCalcOpen, setIsCalcOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [accountCapital, setAccountCapital] = useState<number>(100000);
   const [riskPct, setRiskPct] = useState<number>(1.0);
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/signals/${decision.id}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (!decision) return null;
 
@@ -161,6 +169,11 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         </Stack>
 
         <Stack direction="row" spacing={1.5} alignItems="center">
+          <Tooltip title={copied ? "Signal Link Copied!" : "Copy Signal Link"}>
+            <IconButton size="small" onClick={handleCopyLink} sx={{ color: copied ? '#10b981' : '#708090', p: 0.5, '&:hover': { color: '#00D1FF' } }}>
+              {copied ? <Check size={13} /> : <Share2 size={13} />}
+            </IconButton>
+          </Tooltip>
           <Button
             size="small"
             startIcon={<Calculator size={12} color="#00D1FF" />}
