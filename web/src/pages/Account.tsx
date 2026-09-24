@@ -37,7 +37,7 @@ export default function Account() {
   };
 
   return (
-    <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
+    <Box sx={{ pb: 10, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white' }}>
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>ACCOUNT SETTINGS</Typography>
         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, letterSpacing: 1.5 }}>
