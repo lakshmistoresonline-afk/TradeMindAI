@@ -6,7 +6,7 @@ export default function Pricing() {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
+    <Box sx={{ pb: 10, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white' }}>
       <Box sx={{ mb: 10, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, mb: 2 }}>PRICING</Typography>
         <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800 }}>CHOOSE YOUR INTELLIGENCE TIER</Typography>
