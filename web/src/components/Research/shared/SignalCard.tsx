@@ -38,14 +38,24 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         overflow: 'hidden',
         transition: 'all 0.2s ease-in-out',
         backdropFilter: 'blur(12px)',
+        position: 'relative',
         '&:hover': {
           borderColor: isBuy ? '#10b981' : '#f43f5e',
           bgcolor: 'rgba(15, 23, 42, 0.98)',
           transform: 'translateY(-2px)',
-          boxShadow: isBuy ? '0 10px 25px -5px rgba(16, 185, 129, 0.1)' : '0 10px 25px -5px rgba(244, 63, 94, 0.1)'
+          boxShadow: isBuy ? '0 10px 25px -5px rgba(16, 185, 129, 0.15)' : '0 10px 25px -5px rgba(244, 63, 94, 0.15)'
         }
       }}
     >
+      {/* Top Accent Gradient Bar */}
+      <Box sx={{
+        height: 3,
+        width: '100%',
+        background: isBuy
+          ? 'linear-gradient(90deg, #10b981, #00D1FF)'
+          : 'linear-gradient(90deg, #f43f5e, #f59e0b)'
+      }} />
+
       {/* 1. Header Zone */}
       <Box sx={{ p: 2.5, borderBottom: '1px solid rgba(255,255,255,0.05)', bgcolor: alpha(isBuy ? '#10b981' : '#f43f5e', 0.03) }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
