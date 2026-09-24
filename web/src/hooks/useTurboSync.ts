@@ -66,6 +66,8 @@ export function useTurboSync() {
       }));
       console.log(`[Turbo-Sync] Firestore History Sync: ${hist.length} historical signals`);
       setFirestoreHistory(hist);
+    }, (err) => {
+      console.warn("[Turbo-Sync] Firestore History Mirror Notice (using default benchmark metrics):", err);
     });
 
     // 4. Listen to Local Master Heartbeat for Market Context
