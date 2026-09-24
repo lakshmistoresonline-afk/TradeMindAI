@@ -51,21 +51,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
-    const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
-    const socket = new WebSocket(wsUrl);
+    try {
+      const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
+      const socket = new WebSocket(wsUrl);
 
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'AI_COMPLETED') {
-          showNotification(data.message, 'success');
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'AI_COMPLETED') {
+            showNotification(data.message, 'success');
+          }
+        } catch (e) {
+          console.error("WS Error:", e);
         }
-      } catch (e) {
-        console.error("WS Error:", e);
-      }
-    };
+      };
 
-    return () => socket.close();
+      socket.onerror = () => {
+        // Quietly close WS on static hosting fallback
+        try { socket.close(); } catch {}
+      };
+
+      return () => {
+        try { socket.close(); } catch {}
+      };
+    } catch {
+      // Ignore WS setup on static hosting
+    }
   }, []);
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
