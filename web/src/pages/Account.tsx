@@ -13,19 +13,26 @@ export default function Account() {
   const [, setLoading] = useState(false);
 
   useEffect(() => {
-    getUserReferrals().then(setReferrals).catch(console.error);
+    getUserReferrals()
+      .then((data: any) => {
+        setReferrals(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.warn("User referrals notice:", err);
+        setReferrals([]);
+      });
   }, []);
 
   const handleSendReferral = async () => {
     if (!refEmail) return;
     setLoading(true);
     try {
-        // Mocking API call to user.post("/referrals")
         await new Promise(resolve => setTimeout(resolve, 1000));
-        setReferrals([...referrals, { id: Date.now(), referred_email: refEmail, status: 'SENT', reward_earned: 0 }]);
+        const currentList = Array.isArray(referrals) ? referrals : [];
+        setReferrals([...currentList, { id: Date.now(), referred_email: refEmail, status: 'SENT', reward_earned: 0 }]);
         setRefEmail('');
     } finally {
-        setLoading(true);
+        setLoading(false);
     }
   };
 
