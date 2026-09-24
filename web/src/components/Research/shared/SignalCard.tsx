@@ -1,5 +1,6 @@
-import { Box, Typography, Paper, Grid, Stack, Chip, alpha, LinearProgress, Button } from '@mui/material';
-import { ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { Box, Typography, Paper, Grid, Stack, Chip, alpha, LinearProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, Divider } from '@mui/material';
+import { ArrowUpRight, ArrowDownRight, Clock, Calculator } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
 
@@ -10,6 +11,9 @@ interface SignalCardProps {
 
 export default function SignalCard({ stock, decision }: SignalCardProps) {
   const navigate = useNavigate();
+  const [isCalcOpen, setIsCalcOpen] = useState(false);
+  const [accountCapital, setAccountCapital] = useState<number>(100000);
+  const [riskPct, setRiskPct] = useState<number>(1.0);
 
   if (!decision) return null;
 
@@ -146,21 +150,99 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
           </Typography>
         </Stack>
 
-        <Button
-          size="small"
-          onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: stock, decision } })}
-          sx={{
-            color: '#06b6d4',
-            fontWeight: 950,
-            fontSize: '0.65rem',
-            textTransform: 'none',
-            p: 0,
-            '&:hover': { bgcolor: 'transparent', color: '#38bdf8' }
-          }}
-        >
-          View Evidence →
-        </Button>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Button
+            size="small"
+            startIcon={<Calculator size={12} color="#00D1FF" />}
+            onClick={() => setIsCalcOpen(true)}
+            sx={{ color: '#00D1FF', fontWeight: 800, fontSize: '0.65rem', textTransform: 'none', p: 0 }}
+          >
+            Sizer
+          </Button>
+          <Button
+            size="small"
+            onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: stock, decision } })}
+            sx={{
+              color: '#06b6d4',
+              fontWeight: 950,
+              fontSize: '0.65rem',
+              textTransform: 'none',
+              p: 0,
+              '&:hover': { bgcolor: 'transparent', color: '#38bdf8' }
+            }}
+          >
+            View Evidence →
+          </Button>
+        </Stack>
       </Box>
+
+      {/* 4. Position Sizer Risk Calculator Modal */}
+      <Dialog open={isCalcOpen} onClose={() => setIsCalcOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' } }}>
+         <DialogTitle sx={{ fontWeight: 950, color: '#fff', fontSize: '0.95rem' }}>
+            POSITION RISK SIZER — {stock.symbol}
+         </DialogTitle>
+         <DialogContent>
+            <Stack spacing={2.5} sx={{ mt: 1 }}>
+               <TextField
+                  label="Account Capital (₹)"
+                  type="number"
+                  size="small"
+                  value={accountCapital}
+                  onChange={(e) => setAccountCapital(Number(e.target.value) || 0)}
+                  InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#708090' }}>₹</InputAdornment> }}
+                  sx={{ bgcolor: 'rgba(0,0,0,0.2)' }}
+               />
+               <TextField
+                  label="Max Trade Risk (%)"
+                  type="number"
+                  size="small"
+                  value={riskPct}
+                  onChange={(e) => setRiskPct(Number(e.target.value) || 0)}
+                  InputProps={{ endAdornment: <InputAdornment position="end" sx={{ color: '#708090' }}>%</InputAdornment> }}
+                  sx={{ bgcolor: 'rgba(0,0,0,0.2)' }}
+               />
+
+               <Paper sx={{ p: 2, bgcolor: 'rgba(0, 209, 255, 0.03)', border: '1px solid rgba(0, 209, 255, 0.15)', borderRadius: 1 }}>
+                  <Stack spacing={1.2}>
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>Max Rupee Risk</Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 950, color: '#ef4444', fontFamily: 'JetBrains Mono' }}>
+                           ₹{((accountCapital * riskPct) / 100.0).toLocaleString()}
+                        </Typography>
+                     </Box>
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>Risk / Share</Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 950, color: '#fff', fontFamily: 'JetBrains Mono' }}>
+                           ₹{Math.abs((entry || 1000) - (stop || 950)).toFixed(2)}
+                        </Typography>
+                     </Box>
+                     <Divider sx={{ opacity: 0.1, my: 0.5 }} />
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="subtitle2" sx={{ color: '#00D1FF', fontWeight: 950 }}>SUGGESTED QTY</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 950, color: '#10b981', fontFamily: 'JetBrains Mono' }}>
+                           {Math.abs((entry || 1000) - (stop || 950)) > 0
+                              ? Math.floor(((accountCapital * riskPct) / 100.0) / Math.abs((entry || 1000) - (stop || 950))).toLocaleString()
+                              : '0'} SHS
+                        </Typography>
+                     </Box>
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>Trade Value Required</Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 950, color: '#fff', fontFamily: 'JetBrains Mono' }}>
+                           ₹{(
+                              (Math.abs((entry || 1000) - (stop || 950)) > 0
+                                 ? Math.floor(((accountCapital * riskPct) / 100.0) / Math.abs((entry || 1000) - (stop || 950)))
+                                 : 0) * (entry || 1000)
+                           ).toLocaleString()}
+                        </Typography>
+                     </Box>
+                  </Stack>
+               </Paper>
+            </Stack>
+         </DialogContent>
+         <DialogActions sx={{ p: 2.5 }}>
+            <Button onClick={() => setIsCalcOpen(false)} sx={{ color: '#00D1FF', fontWeight: 950 }}>Close</Button>
+         </DialogActions>
+      </Dialog>
     </Paper>
   );
 }
