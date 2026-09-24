@@ -96,31 +96,31 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* PUBLIC MARKETING ROUTES */}
+            {/* PUBLIC MARKETING ROUTES (Unauthenticated Standalone) */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/methodology" element={<Methodology />} />
-            <Route path="/trust" element={<Trust />} />
-            <Route path="/evidence" element={<Evidence />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/performance" element={<Performance />} />
 
-            {/* Placeholders for legal/info */}
+            {/* Placeholders for legal/info (Public Standalone) */}
             <Route path="/how-it-works" element={<Methodology />} />
             <Route path="/faq" element={<Pricing />} />
             <Route path="/risk-disclosure" element={<RiskDisclosure />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
 
-            {/* PROTECTED APPLICATION ROUTES */}
+            {/* PROTECTED APPLICATION ROUTES (Wrapped inside Navigation Layout) */}
             <Route path="/*" element={
               <AuthGuard>
                 <Layout>
                   <Routes>
-                    {/* User Experience (Consumer Signals) */}
+                    {/* User Experience (Consumer Signals & Application Pages) */}
                     <Route path="/dashboard" element={<UserDashboard />} />
                     <Route path="/signals" element={<EquitySignals />} />
                     <Route path="/signals/:id" element={<SignalDetail />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/performance" element={<Performance />} />
+                    <Route path="/evidence" element={<Evidence />} />
+                    <Route path="/methodology" element={<Methodology />} />
+                    <Route path="/trust" element={<Trust />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/checkout/:planId" element={<Checkout />} />
 
