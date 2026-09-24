@@ -107,8 +107,23 @@ export const getEquityHistory = async (params: any = {}) => {
   }
 };
 
-export const getUserSubscription = async () => (await apiClient.get('/user/subscription')).data;
-export const getUserReferrals = async () => (await apiClient.get('/user/referrals')).data;
+export const getUserSubscription = async () => {
+  try {
+    const response = await apiClient.get('/user/subscription');
+    return response.data;
+  } catch (err) {
+    return { plan_id: 'FREE', status: 'ACTIVE' };
+  }
+};
+
+export const getUserReferrals = async () => {
+  try {
+    const response = await apiClient.get('/user/referrals');
+    return Array.isArray(response.data) ? response.data : [];
+  } catch (err) {
+    return [];
+  }
+};
 
 // --- OBSOLETE / DEPRECATED ENDPOINTS (Satisfying legacy components) ---
 export const getPortfolioOptimizations = async (..._args: any[]) => ([]);

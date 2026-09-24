@@ -104,11 +104,11 @@ export default function Account() {
                <Grid container spacing={2}>
                   <Grid item xs={6}>
                      <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>REFERRED</Typography>
-                     <Typography variant="h6" sx={{ fontWeight: 950 }}>{referrals.length}</Typography>
+                     <Typography variant="h6" sx={{ fontWeight: 950 }}>{Array.isArray(referrals) ? referrals.length : 0}</Typography>
                   </Grid>
                   <Grid item xs={6}>
                      <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, display: 'block' }}>EARNED</Typography>
-                     <Typography variant="h6" sx={{ fontWeight: 950, color: '#10b981' }}>₹{referrals.reduce((sum, r) => sum + r.reward_earned, 0)}</Typography>
+                     <Typography variant="h6" sx={{ fontWeight: 950, color: '#10b981' }}>₹{Array.isArray(referrals) ? referrals.reduce((sum, r) => sum + (r.reward_earned || 0), 0) : 0}</Typography>
                   </Grid>
                </Grid>
             </Paper>
@@ -122,7 +122,7 @@ export default function Account() {
                   <Typography variant="subtitle2" sx={{ fontWeight: 950, letterSpacing: 1 }}>TRANSACTION LEDGER</Typography>
                </Stack>
 
-               {referrals.length > 0 && (
+               {Array.isArray(referrals) && referrals.length > 0 && (
                   <Box sx={{ mb: 6 }}>
                      <Typography variant="caption" sx={{ color: '#708090', fontWeight: 950, mb: 2, display: 'block' }}>REFERRAL ACTIVITY</Typography>
                      {referrals.map((r, i) => (
