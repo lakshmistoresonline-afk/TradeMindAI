@@ -4,7 +4,7 @@ import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCi
 import { getEquitySignals, getEquityHistory } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
-import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
+import SignalCard from '../components/Research/shared/SignalCard';
 import { useNavigate } from 'react-router-dom';
 
 export default function EquitySignals() {
@@ -432,7 +432,7 @@ export default function EquitySignals() {
                                 {finalDisplaySignals.map((s) => (
                                     <Grid item xs={12} md={6} lg={4} key={s.id}>
                                         <Box sx={{ position: 'relative', height: '100%' }}>
-                                            <LiveSignalCard stock={s} decision={s.decision} variant="SIMPLE" />
+                                            <SignalCard stock={s} decision={s.decision} />
                                             <MuiChip
                                                 label={selectedForCompare.includes(s.id) ? "SELECTED" : "COMPARE"}
                                                 onClick={() => toggleCompare(s.id)}
