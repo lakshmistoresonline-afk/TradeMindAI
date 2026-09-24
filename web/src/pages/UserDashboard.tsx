@@ -4,7 +4,8 @@ import { Zap, ShieldCheck, ArrowRight, PieChart } from 'lucide-react';
 import { getMarketStats, getEquitySignals, getEquityMarketState } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
-import LiveSignalCard from '../components/Research/shared/LiveSignalCard';
+import { useBackendHealth } from '../hooks/useBackendHealth';
+import SignalCard from '../components/Research/shared/SignalCard';
 import { useNavigate } from 'react-router-dom';
 
 export default function UserDashboard() {
@@ -15,6 +16,7 @@ export default function UserDashboard() {
   const [signals, setSignals] = useState<any[]>([]);
   const [tab, setTab] = useState(0);
 
+  const { isOnline } = useBackendHealth();
   const { firestoreSignals, marketContext } = useTurboSync();
 
   const fetchData = async () => {
@@ -89,10 +91,23 @@ export default function UserDashboard() {
 
   return (
     <Box sx={{ pb: 8, color: 'white' }}>
-      {/* 1. Welcom Header */}
-      <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>Welcome to TradeMind AI</Typography>
-        <Typography variant="body1" sx={{ color: '#708090', mt: 1 }}>Auditable intelligence for your institutional investing journey.</Typography>
+      {/* 1. Welcome Header */}
+      <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>Welcome to TradeMind AI</Typography>
+          <Typography variant="body1" sx={{ color: '#708090', mt: 1 }}>Auditable intelligence for your institutional investing journey.</Typography>
+        </Box>
+        <Chip
+          label={isOnline ? '🟢 Local Server Connected' : '🟡 Offline Client Mode'}
+          size="small"
+          sx={{
+            fontWeight: 950,
+            fontSize: '0.65rem',
+            bgcolor: isOnline ? alpha('#10b981', 0.1) : alpha('#f59e0b', 0.1),
+            color: isOnline ? '#10b981' : '#f59e0b',
+            border: `1px solid ${isOnline ? alpha('#10b981', 0.3) : alpha('#f59e0b', 0.3)}`
+          }}
+        />
       </Box>
 
       {/* 2. Market Snapshot */}
@@ -162,7 +177,7 @@ export default function UserDashboard() {
         <Grid container spacing={3}>
            {filteredSignals.map(s => (
               <Grid item xs={12} md={4} key={s.id}>
-                 <LiveSignalCard stock={s} decision={s.decision} variant="SIMPLE" />
+                 <SignalCard stock={s} decision={s.decision} />
               </Grid>
            ))}
            {filteredSignals.length === 0 && (
