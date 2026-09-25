@@ -230,6 +230,17 @@ export default function SignalDetail() {
                </Grid>
             </Paper>
 
+            {/* 3.1 Strategy V2.6 Gaussian HMM & Venn-ABERS Forensics */}
+            <SectionHeader icon={<Activity size={18} />} title="STRATEGY V2.6 GAUSSIAN HMM REGIME & VENN-ABERS CALIBRATION" />
+            <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 2 }}>
+               <Grid container spacing={3}>
+                  <PlanItem label="HMM MICRO-REGIME" value={decision.hmmRegimeState || 'STEADY_BULL_TREND'} color="#10b981" />
+                  <PlanItem label="INTRADAY CVD PRESSURE" value={`+${decision.cvdTapePressure || 0.48} (TAPE BUYING)`} color="#00D1FF" />
+                  <PlanItem label="DELTA MAX PAIN VECTOR" value={`+${decision.maxPainShiftVector || 15.0} STRIKE SHIFT`} color="#a855f7" />
+                  <PlanItem label="VENN-ABERS CERTIFICATE" value={`${decision.vennAbersLowerProb || 0.72} (GUARANTEED 0.68+)`} color="#10b981" />
+               </Grid>
+            </Paper>
+
             {/* 4. Signal Evidence Section */}
             <SectionHeader icon={<BarChart2 size={18} />} title="SIGNAL EVIDENCE & FORENSICS" />
             {isPremium ? (

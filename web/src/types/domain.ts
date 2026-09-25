@@ -36,13 +36,20 @@ export interface AITradeDecision {
   stopRange?: [number, number];
   riskReward?: string;
 
-  // Strategy V2.5 Accuracy Upgrades
+  // Strategy V2.5 & V2.6 Accuracy Upgrades
   gexRegime?: string;                  // -GEX Momentum Acceleration
   netDealerGex?: number;               // Net Dealer Gamma Exposure (e.g. -1.8)
   sectorRrgQuadrant?: string;          // LEADING, IMPROVING, WEAKENING, LAGGING
   conformalCoverage?: number;          // Certified Conformal Prediction Coverage (e.g. 92.5%)
   orderBookImbalance?: number;         // Top 5 BBO Bid/Ask Volume Imbalance (e.g. +0.52)
   shapDrivers?: Record<string, number>; // SHAP Feature Attribution Percentages
+
+  // V2.6 Quantitative Upgrades
+  hmmRegimeState?: string;             // STEADY_BULL_TREND, MEAN_REVERSION_CHOP, VOLATILE_CORRECTION, LIQUIDATION_CRASH
+  cvdTapePressure?: number;            // Intraday Cumulative Volume Delta Tape Pressure (e.g. +0.48)
+  maxPainShiftVector?: number;         // Options Max Pain Strike Displacement Velocity (e.g. +15.0)
+  vennAbersLowerProb?: number;         // Venn-ABERS Lower-Bound Probability Certificate (e.g. 0.72)
+  betaAdjustedTargets?: Record<string, number>; // Beta-Scaled Target Geometry
 
   primaryCatalyst?: string;
   thesis?: string;

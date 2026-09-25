@@ -40,7 +40,7 @@ class LiveSignal(BaseModel):
     direction: str # LONG or SHORT
     rating: Optional[str] = None # BUY, SELL, HOLD
     timeframe: Optional[str] = None
-    strategy_version: str = "v2.5"
+    strategy_version: str = "v2.6"
     signal_version: str = "1.0"
 
     # Timing
@@ -66,7 +66,7 @@ class LiveSignal(BaseModel):
     current_price: Optional[float] = None
     risk_reward_ratio: Optional[float] = None
 
-    # Intelligence & Strategy V2.5 Accuracy Upgrades
+    # Intelligence & Strategy V2.5/V2.6 Accuracy Upgrades
     raw_probability: Optional[float] = None
     calibrated_probability: Optional[float] = None
     expected_value: Optional[float] = None
@@ -74,19 +74,26 @@ class LiveSignal(BaseModel):
     confidence: Optional[float] = None
     signal_score: Optional[float] = None
 
-    # V2.5 Accuracy Features
+    # V2.5 & V2.6 Accuracy Features
     net_dealer_gex: Optional[float] = None          # Options Surface Gamma Exposure
     sector_rrg_quadrant: Optional[str] = None      # LEADING, IMPROVING, WEAKENING, LAGGING
     conformal_coverage_pct: Optional[float] = None # Certified Conformal Coverage (e.g. 92.5%)
     order_book_imbalance: Optional[float] = None   # Top 5 BBO Bid/Ask Imbalance Ratio
     shap_drivers: Dict[str, float] = Field(default_factory=dict) # SHAP Feature Weighting
 
+    # V2.6 Quantitative Upgrades
+    hmm_regime_state: Optional[str] = None          # STEADY_BULL_TREND, MEAN_REVERSION_CHOP, VOLATILE_CORRECTION, LIQUIDATION_CRASH
+    cvd_tape_pressure: Optional[float] = None       # Intraday Cumulative Volume Delta Tape Pressure (+0.48)
+    max_pain_shift_vector: Optional[float] = None   # Options Max Pain Strike Displacement Velocity (+15.0)
+    venn_abers_lower_prob: Optional[float] = None   # Venn-ABERS Lower-Bound Probability Certificate (0.72)
+    beta_adjusted_targets: Dict[str, float] = Field(default_factory=dict) # Beta-Scaled Target Geometry
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
     # Lineage
     model_id: Optional[str] = None
-    model_version: str = "TradeMind Core v2.5-Ensemble"
+    model_version: str = "TradeMind Core v2.6-HMM Ensemble"
     model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
 
