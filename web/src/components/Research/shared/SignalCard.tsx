@@ -4,6 +4,7 @@ import { ArrowUpRight, ArrowDownRight, Clock, Calendar, Calculator, Share2, Chec
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
 import { formatNSEDateTime, getSignalStatusMeta } from '../../../utils/nseDateUtils';
+import { getCompanyName } from '../../../utils/companyNames';
 
 interface SignalCardProps {
   stock: any;
@@ -77,7 +78,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
               {stock.symbol}
             </Typography>
             <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, display: 'block', mt: 0.2 }}>
-              {stock.company_name || stock.name || 'INSTRUMENT'}
+              {stock.company_name || stock.name || getCompanyName(stock.symbol)}
             </Typography>
           </Box>
           <Chip
@@ -121,7 +122,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         </Box>
       </Box>
 
-      {/* 2. Metric Price Grid Zone (3-Target Profit Geometry) */}
+      {/* 2. Metric Price Grid Zone (3-Target Profit Geometry & Stop Loss) */}
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
         <Grid container spacing={1.5}>
           <PriceTile label="ENTRY" value={entry} xs={6} />
