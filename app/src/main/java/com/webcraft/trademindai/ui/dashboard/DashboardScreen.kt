@@ -273,8 +273,10 @@ fun LiveSignalCard(signal: com.webcraft.trademindai.domain.model.LiveSignal) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 PriceMetric(label = "ENTRY", value = "₹${signal.entry_price.toInt()}", color = MaterialTheme.colorScheme.onSurface)
-                PriceMetric(label = "TARGET", value = "₹${(signal.target_price ?: 0.0).toInt()}", color = Color(0xFF10b981))
-                PriceMetric(label = "STOP LOSS", value = "₹${(signal.stop_loss_price ?: 0.0).toInt()}", color = Color.Red)
+                PriceMetric(label = "T1", value = "₹${(signal.target_price_1 ?: signal.target_price ?: 0.0).toInt()}", color = Color(0xFF10b981))
+                PriceMetric(label = "T2", value = "₹${(signal.target_price_2 ?: signal.target_price ?: 0.0).toInt()}", color = Color(0xFF00D1FF))
+                PriceMetric(label = "T3", value = "₹${(signal.target_price_3 ?: signal.target_price ?: 0.0).toInt()}", color = Color(0xFFA855F7))
+                PriceMetric(label = "STOP", value = "₹${(signal.stop_loss_price ?: 0.0).toInt()}", color = Color.Red)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -307,7 +309,7 @@ fun MarketRegimeSection(regime: String, description: String) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Institutional Market Regime", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.tertiary)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(regime.uppercase(), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
+            Text(regime.uppercase(), style = MaterialTheme.typography.headlineMedium, fontWeight: FontWeight.Bold, color = Color(0xFF10b981))
             Text(description, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         }
     }

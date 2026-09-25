@@ -93,10 +93,12 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 
       {/* 2. Trade Levels Area */}
       <Box sx={{ p: variant === 'SIMPLE' ? 2 : 2.5, flexGrow: 1 }}>
-         <Grid container spacing={variant === 'SIMPLE' ? 2 : 3}>
+         <Grid container spacing={variant === 'SIMPLE' ? 1.5 : 2}>
             <LevelItem label="ENTRY" value={entry} simple={variant === 'SIMPLE'} />
             <LevelItem label="CURRENT" value={current} color={(current && entry) ? (isBuy ? (current >= entry ? '#10b981' : '#ef4444') : (current <= entry ? '#10b981' : '#ef4444')) : '#fff'} simple={variant === 'SIMPLE'} />
-            <LevelItem label="TARGET" value={target} color="#10b981" simple={variant === 'SIMPLE'} />
+            <LevelItem label="T1 (CONSERVATIVE)" value={decision.target1 || target} color="#10b981" simple={variant === 'SIMPLE'} />
+            <LevelItem label="T2 (MAIN BASE)" value={decision.target2 || target} color="#00D1FF" simple={variant === 'SIMPLE'} />
+            <LevelItem label="T3 (RUNNER)" value={decision.target3 || target} color="#a855f7" simple={variant === 'SIMPLE'} />
             <LevelItem label="STOP LOSS" value={stop} color="#ef4444" simple={variant === 'SIMPLE'} />
          </Grid>
 

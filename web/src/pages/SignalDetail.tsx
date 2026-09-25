@@ -80,7 +80,6 @@ export default function SignalDetail() {
   );
 
   const decision = signal.decision;
-  const isBuy = decision.rating?.includes('BUY');
 
   return (
     <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
@@ -178,25 +177,25 @@ export default function SignalDetail() {
             )}
 
             {/* 2. Trade Plan Section */}
-            <SectionHeader icon={<Target size={18} />} title="AUTHORITATIVE TRADE PLAN" />
+            <SectionHeader icon={<Target size={18} />} title="AUTHORITATIVE 3-TARGET TRADE PLAN" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-               <Grid container spacing={4}>
+               <Grid container spacing={3}>
                   <PlanItem label="ENTRY PRICE" value={decision.entry ? `₹${decision.entry.toLocaleString()}` : '—'} />
-                  <PlanItem label="TARGET PRICE" value={decision.target ? `₹${decision.target.toLocaleString()}` : '—'} color="#10b981" />
+                  <PlanItem label="TARGET 1 (T1 CONSERVATIVE)" value={decision.target1 ? `₹${decision.target1.toLocaleString()}` : '—'} color="#10b981" />
+                  <PlanItem label="TARGET 2 (T2 MAIN BASE)" value={decision.target2 ? `₹${decision.target2.toLocaleString()}` : '—'} color="#00D1FF" />
+                  <PlanItem label="TARGET 3 (T3 EXTENDED RUNNER)" value={decision.target3 ? `₹${decision.target3.toLocaleString()}` : '—'} color="#a855f7" />
+               </Grid>
+               <Divider sx={{ my: 3, opacity: 0.05 }} />
+               <Grid container spacing={3}>
                   <PlanItem label="STOP LOSS" value={decision.stopLoss ? `₹${decision.stopLoss.toLocaleString()}` : '—'} color="#ef4444" />
                   <PlanItem label="RISK / REWARD" value={decision.riskReward || '1:2.5'} color="#00D1FF" />
-               </Grid>
-               <Divider sx={{ my: 4, opacity: 0.05 }} />
-               <Grid container spacing={4}>
                   <PlanItem
                     label="MODEL PROBABILITY"
                     value={`${decision.conviction}%`}
                     color="#00D1FF"
-                    tooltip="Model-derived probability estimate based on the current model and evidence. It is not a guarantee of outcome."
+                    tooltip="Model-derived probability estimate based on the current model and evidence."
                   />
                   <PlanItem label="EXPECTED VALUE" value={`₹${(decision.expectedValue || 0).toFixed(2)}`} color="#10b981" />
-                  <PlanItem label="DIRECTION" value={isBuy ? 'LONG ▲' : 'SHORT ▼'} color={isBuy ? '#10b981' : '#ef4444'} />
-                  <PlanItem label="ASSET CLASS" value={decision.assetClass || 'EQUITY'} />
                </Grid>
             </Paper>
 

@@ -24,7 +24,13 @@ export interface AITradeDecision {
   entryLow?: number;
   entryHigh?: number;
   entry?: number;
-  target?: number;
+
+  // 3-Target Profit Geometry
+  target?: number;        // Fallback/Main Target
+  target1?: number;       // T1 (Conservative 1.5x ATR)
+  target2?: number;       // T2 (Main Structural 2.8x ATR)
+  target3?: number;       // T3 (Extended Runner 4.2x ATR)
+
   targetRange?: [number, number];
   stopLoss?: number;
   stopRange?: [number, number];
@@ -72,7 +78,7 @@ export interface AITradeDecision {
   priceStatus?: string;
   qualityClass?: 'PRIMARY' | 'SELECTIVE' | 'EXPERIMENTAL' | 'UNCLASSIFIED';
 
-  // Historical Outcomes (Consolidated with Legacy mae/mfe)
+  // Historical Outcomes
   exitPrice?: number;
   exitReason?: string;
   realizedReturn?: number;

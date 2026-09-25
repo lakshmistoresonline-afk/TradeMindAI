@@ -28,7 +28,9 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
 
   const isBuy = decision.rating?.includes('BUY');
   const entry = decision.entry;
-  const target = decision.target;
+  const target1 = decision.target1 || decision.target;
+  const target2 = decision.target2 || decision.target;
+  const target3 = decision.target3 || decision.target;
   const stop = decision.stopLoss;
   const current = decision.normalizedCurrentPrice;
   const conviction = decision.conviction || 75;
@@ -63,7 +65,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         height: 3,
         width: '100%',
         background: isBuy
-          ? 'linear-gradient(90deg, #10b981, #00D1FF)'
+          ? 'linear-gradient(90deg, #10b981, #00D1FF, #a855f7)'
           : 'linear-gradient(90deg, #f43f5e, #f59e0b)'
       }} />
 
@@ -119,17 +121,19 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         </Box>
       </Box>
 
-      {/* 2. Metric Price 2x2 Grid Zone */}
+      {/* 2. Metric Price Grid Zone (3-Target Profit Geometry) */}
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
-        <Grid container spacing={2}>
-          <PriceTile label="ENTRY" value={entry} />
-          <PriceTile label="CURRENT" value={current} color={(current && entry) ? (current >= entry ? '#10b981' : '#f43f5e') : '#f8fafc'} />
-          <PriceTile label="TARGET" value={target} color="#10b981" />
-          <PriceTile label="STOP LOSS" value={stop} color="#f43f5e" />
+        <Grid container spacing={1.5}>
+          <PriceTile label="ENTRY" value={entry} xs={6} />
+          <PriceTile label="CURRENT" value={current} color={(current && entry) ? (current >= entry ? '#10b981' : '#f43f5e') : '#f8fafc'} xs={6} />
+          <PriceTile label="T1 (CONSERVATIVE)" value={target1} color="#10b981" xs={4} />
+          <PriceTile label="T2 (MAIN BASE)" value={target2} color="#00D1FF" xs={4} />
+          <PriceTile label="T3 (RUNNER)" value={target3} color="#a855f7" xs={4} />
+          <PriceTile label="STOP LOSS" value={stop} color="#f43f5e" xs={12} />
         </Grid>
 
         {/* Execution Guidance Banner */}
-        <Box sx={{ mt: 2.5 }}>
+        <Box sx={{ mt: 2 }}>
           {decision.status === 'ENTRY_TRIGGERED' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.1), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.25)' }}>
               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
@@ -152,11 +156,11 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         </Box>
 
         {/* Evidence Summary Clamped Text Block */}
-        <Box sx={{ mt: 2, p: 1.8, bgcolor: 'rgba(2, 6, 23, 0.6)', borderRadius: 1, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <Box sx={{ mt: 1.5, p: 1.5, bgcolor: 'rgba(2, 6, 23, 0.6)', borderRadius: 1, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 800, display: 'block', mb: 0.5, fontSize: '0.6rem', letterSpacing: 0.5 }}>
             EVIDENCE SUMMARY
           </Typography>
-          <Typography variant="caption" sx={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.7rem', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'orient', overflow: 'hidden' }}>
+          <Typography variant="caption" sx={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.68rem', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'orient', overflow: 'hidden' }}>
             {decision.formattedThesis?.trend || 'Bullish structure detected'} · {decision.formattedThesis?.momentum || 'Strong directional momentum'}
           </Typography>
         </Box>
@@ -288,14 +292,14 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
   );
 }
 
-function PriceTile({ label, value, color = '#f8fafc' }: { label: string; value?: number; color?: string }) {
+function PriceTile({ label, value, color = '#f8fafc', xs = 6 }: { label: string; value?: number; color?: string; xs?: number }) {
   return (
-    <Grid item xs={6}>
-      <Box sx={{ p: 1.5, bgcolor: 'rgba(2, 6, 23, 0.5)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)' }}>
-        <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.6rem', display: 'block', mb: 0.3, letterSpacing: 0.5 }}>
+    <Grid item xs={xs}>
+      <Box sx={{ p: 1.2, bgcolor: 'rgba(2, 6, 23, 0.5)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.03)' }}>
+        <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.55rem', display: 'block', mb: 0.2, letterSpacing: 0.5 }}>
           {label}
         </Typography>
-        <Typography variant="body2" sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono, monospace', color, fontSize: '0.85rem' }}>
+        <Typography variant="body2" sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono, monospace', color, fontSize: '0.8rem' }}>
           {value ? `₹${value.toLocaleString()}` : '—'}
         </Typography>
       </Box>

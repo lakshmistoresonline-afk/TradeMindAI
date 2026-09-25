@@ -2,7 +2,7 @@ import { AITradeDecision, AIRating, RiskLevel, TimeHorizon, DecisionStatus } fro
 import { LIVE_MARKET_PRICES } from '../utils/livePrices';
 
 /**
- * Canonical Signal Normalizer (V2.3)
+ * Canonical Signal Normalizer (V2.3 - 3-Target Profit Geometry)
  * Ensures consistent interpretation of backend signals across all pages.
  */
 export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
@@ -67,15 +67,21 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   if (structured.status) status = structured.status as DecisionStatus;
   else if (!signal.analysis && !signal.status) status = 'UNAVAILABLE';
 
-  // 6. Entry/Price Logic
+  // 6. Entry/Price & 3-Target Profit Geometry Logic
   const parseNum = (val: any) => {
     if (val === null || val === undefined || val === 'Unknown' || val === 'N/A' || val === '') return undefined;
     const num = Number(val);
     return isNaN(num) ? undefined : num;
   };
 
+  const roundTwo = (n: number) => Math.round(n * 100) / 100;
+
   const entry = parseNum(structured.entry) ?? parseNum(signal.entry_price) ?? parseNum(signal.entry) ?? 0;
-  const target = parseNum(structured.target) ?? parseNum(signal.target_price) ?? parseNum(signal.target);
+
+  // 3 Take-Profit Targets
+  const target1 = parseNum(signal.target_price_1) ?? parseNum(structured.target1) ?? (entry > 0 ? roundTwo(entry * 1.05) : undefined);
+  const target2 = parseNum(signal.target_price_2) ?? parseNum(signal.target_price) ?? parseNum(structured.target) ?? (entry > 0 ? roundTwo(entry * 1.08) : undefined);
+  const target3 = parseNum(signal.target_price_3) ?? parseNum(structured.target3) ?? (entry > 0 ? roundTwo(entry * 1.13) : undefined);
   const stopLoss = parseNum(structured.stop_loss) ?? parseNum(signal.stop_price) ?? parseNum(signal.stop_loss_price) ?? parseNum(signal.stop);
 
   const symKey = String(signal.symbol || signal.underlyingSymbol || '').toUpperCase();
@@ -95,13 +101,13 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   drivers = (drivers as any[]).filter(d => typeof d === 'string' && !d.includes('{'));
 
   // 8. Thesis & Deterministic Explanation (Signal Intelligence 4.0)
-  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V2.2 breakout logic.';
+  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V2.3 breakout logic.';
   if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
 
   const formattedThesis = {
       trend: rawRating.includes('BUY') ? 'Bullish structure detected' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
       momentum: conviction > 70 ? 'Strong directional momentum' : 'Consolidating / Neutral',
-      volume: 'Volume data verified', // Authoritative check on OHLCV availability
+      volume: 'Volume data verified',
       market: `${signal.regime || 'SIDEWAYS'} regime`,
       probability: `${conviction}% model probability`
   };
@@ -128,7 +134,10 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     timeframe,
     status,
     entry,
-    target,
+    target: target2,  // Fallback to T2
+    target1,
+    target2,
+    target3,
     stopLoss,
     riskReward: signal.risk_reward_ratio ? `1:${signal.risk_reward_ratio.toFixed(1)}` : '1:2.5',
     expectedValue: parseNum(signal.expected_value),

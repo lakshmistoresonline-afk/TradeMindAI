@@ -9,6 +9,9 @@ data class LiveSignal(
     val conviction: Double,
     val entry_price: Double,
     val target_price: Double?,
+    val target_price_1: Double? = null,
+    val target_price_2: Double? = null,
+    val target_price_3: Double? = null,
     val stop_loss_price: Double?,
     val timeframe: String,
     val status: String, // WAITING_FOR_ENTRY, ENTRY_TRIGGERED, ACTIVE, TARGET_HIT, STOP_LOSS, EXPIRED, CANCELLED
@@ -20,7 +23,7 @@ data class LiveSignal(
     val profit_pct: Double?,
     val mfe: Double = 0.0,
     val mae: Double = 0.0,
-    val model_version: String = "TradeMind Core v2.2",
+    val model_version: String = "TradeMind Core v2.3",
     val events: List<SignalEvent> = emptyList()
 )
 

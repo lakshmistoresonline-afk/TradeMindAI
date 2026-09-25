@@ -15,8 +15,11 @@ class RiskEngine:
         capital: float = 1000000.0    # 10 Lakhs baseline
     ) -> Dict[str, Any]:
         """
-        Calculates Stop Loss, Target, and Position Sizing using Regime-Aware Adaptive ATR
+        Calculates Stop Loss, 3 Targets (T1, T2, T3), and Position Sizing using Regime-Aware Adaptive ATR
         and Portfolio Risk rules.
+        - Target 1 (T1): Conservative 1.5x ATR (1:1.5 Risk/Reward)
+        - Target 2 (T2): Main Structural 2.8x ATR (1:2.5 Risk/Reward)
+        - Target 3 (T3): Extended Runner 4.2x ATR (1:4.0 Risk/Reward)
         """
         if price <= 0 or atr <= 0:
             return {}
@@ -46,26 +49,31 @@ class RiskEngine:
 
         if direction == "LONG":
             stop_loss = price - risk_amt
-            target = price + (risk_amt * rr_ratio)
+            target_1 = price + (risk_amt * 1.5)
+            target_2 = price + (risk_amt * 2.8)
+            target_3 = price + (risk_amt * 4.2)
         else:
             stop_loss = price + risk_amt
-            target = price - (risk_amt * rr_ratio)
+            target_1 = price - (risk_amt * 1.5)
+            target_2 = price - (risk_amt * 2.8)
+            target_3 = price - (risk_amt * 4.2)
 
         # 2. Position Sizing (Fixed Fractional)
         total_risk_cap = capital * risk_per_trade
-
         shares = total_risk_cap / risk_amt if risk_amt > 0 else 0
 
         # 3. Liquidity/Volatility Constraint
         max_notional = capital * 0.10
         shares_limit = max_notional / price
-
         final_shares = int(min(shares, shares_limit))
 
         return {
             "entry": float(price),
             "stop_loss": round(float(stop_loss), 2),
-            "target": round(float(target), 2),
+            "target": round(float(target_2), 2),     # Main Target 2 fallback
+            "target_1": round(float(target_1), 2),   # T1 Conservative (1:1.5)
+            "target_2": round(float(target_2), 2),   # T2 Main Structural (1:2.5)
+            "target_3": round(float(target_3), 2),   # T3 Extended Runner (1:4.0)
             "risk_reward": rr_ratio,
             "shares": final_shares,
             "notional_value": round(final_shares * price, 2),

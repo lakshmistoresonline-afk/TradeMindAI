@@ -54,11 +54,14 @@ class LiveSignal(BaseModel):
     timezone: str = "UTC"
     timestamp: Optional[datetime] = None # Legacy alias
 
-    # Price
+    # Price & 3-Target Profit Geometry
     entry_price: Optional[float] = None
     entry_zone_low: Optional[float] = None
     entry_zone_high: Optional[float] = None
-    target_price: Optional[float] = None
+    target_price: Optional[float] = None     # Legacy/Default Target
+    target_price_1: Optional[float] = None   # Target 1 (Conservative 1.5x ATR)
+    target_price_2: Optional[float] = None   # Target 2 (Base Structural 2.8x ATR)
+    target_price_3: Optional[float] = None   # Target 3 (Extended Runner 4.2x ATR)
     stop_price: Optional[float] = None
     current_price: Optional[float] = None
     risk_reward_ratio: Optional[float] = None
@@ -124,7 +127,7 @@ class LiveSignal(BaseModel):
     last_reconciled_at: Optional[datetime] = None
     record_hash: Optional[str] = None
     data_quality_score: Optional[float] = None
-    deployment_sha: Optional[str] = None # Phase 3: Forensic Reconstruction
+    deployment_sha: Optional[str] = None
 
     # Phase 8: Entry Instrumentation
     candidate_timestamp: Optional[datetime] = None
@@ -138,7 +141,6 @@ class LiveSignal(BaseModel):
     regime_source: Optional[str] = None
     regime_confidence: Optional[float] = None
     regime_available: bool = False
-
 
     # Legacy/Internal Compatibility
     rating: Optional[str] = None
@@ -154,7 +156,7 @@ class LiveSignal(BaseModel):
     signal_eligibility: Optional[str] = None
     evaluation_mode: str = "LIVE_SHADOW"
     universe_version: str = "NIFTY_200_AUG2026"
-    data_timestamp_legacy: Optional[datetime] = None # Field rename safety
+    data_timestamp_legacy: Optional[datetime] = None
     market_timestamp: Optional[datetime] = None
     outcome_verified: bool = False
     events: List[SignalEvent] = []
@@ -164,11 +166,10 @@ class LiveSignal(BaseModel):
 
 class MarketIntelligenceReport(BaseModel):
     id: str
-    type: str # MORNING, CLOSING, WEEKLY
+    type: str
     date: datetime
     summary: str
     key_events: List[str]
     top_movers: List[Dict[str, Any]]
     sector_performance: Dict[str, float]
     ai_bias: str
-
