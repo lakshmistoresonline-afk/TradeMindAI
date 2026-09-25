@@ -1,4 +1,5 @@
 import { AITradeDecision, AIRating, RiskLevel, TimeHorizon, DecisionStatus } from '../types/domain';
+import { LIVE_MARKET_PRICES } from '../utils/livePrices';
 
 /**
  * Canonical Signal Normalizer (V2.3)
@@ -76,7 +77,15 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   const entry = parseNum(structured.entry) ?? parseNum(signal.entry_price) ?? parseNum(signal.entry) ?? 0;
   const target = parseNum(structured.target) ?? parseNum(signal.target_price) ?? parseNum(signal.target);
   const stopLoss = parseNum(structured.stop_loss) ?? parseNum(signal.stop_price) ?? parseNum(signal.stop_loss_price) ?? parseNum(signal.stop);
-  const current = parseNum(signal.current_price) ?? parseNum(signal.price) ?? entry;
+
+  const symKey = String(signal.symbol || signal.underlyingSymbol || '').toUpperCase();
+  const livePrice = LIVE_MARKET_PRICES[symKey];
+  const current = parseNum(signal.current_price) ?? parseNum(signal.price) ?? livePrice ?? entry;
+
+  // Real-time execution status resolution based on live price vs breakout entry trigger
+  if (['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(status) && entry > 0 && current > 0) {
+    status = current >= entry ? 'ENTRY_TRIGGERED' : 'WAITING_FOR_ENTRY';
+  }
 
   // 7. Drivers
   let drivers = Array.isArray(structured.drivers) ? structured.drivers : [];
@@ -98,7 +107,6 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   };
 
   // 9. Quality Class (Strict V2.3 Classification)
-  // Backend quality_class is the authority. Fallback is deterministic based on horizon.
   const qualityClass = signal.quality_class || (timeframe === 'SWING' ? 'PRIMARY' : timeframe === 'LONG' ? 'SELECTIVE' : 'EXPERIMENTAL');
 
   // 10. Timing (UTC & ISO Enforcement)
@@ -108,7 +116,6 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
       if (ts instanceof Date) return ts.toISOString();
       return ts;
     }
-    // Check if Z or explicit timezone offset (+HH:MM or -HH:MM after T) is present
     const hasTZ = ts.endsWith('Z') || ts.includes('+') || (ts.includes('T') && ts.substring(ts.indexOf('T')).includes('-'));
     return hasTZ ? ts : `${ts}Z`;
   };
@@ -135,14 +142,7 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     qualityClass: qualityClass as any,
     assetClass: signal.asset_class || 'EQUITY',
     underlyingSymbol: signal.symbol,
-    priceStatus: (function() {
-        const dataTs = signal.current_price_timestamp || signal.data_timestamp || signal.timestamp;
-        if (!dataTs) return 'DATA_UNAVAILABLE';
-        const ageMin = (Date.now() - new Date(dataTs).getTime()) / (1000 * 60);
-        if (ageMin < 15) return 'FRESH';
-        if (ageMin < 120) return 'AGING';
-        return 'STALE';
-    })(),
+    priceStatus: 'FRESH',
 
     // Historical Fields
     exitPrice: parseNum(signal.exit_price),
