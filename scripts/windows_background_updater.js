@@ -1,10 +1,11 @@
 /**
  * TradeMind AI: Automatic Windows Background Market Sync Service
- * Runs automatically on Windows in the background during NSE Trading Hours (09:15 AM - 03:30 PM IST, Mon-Fri):
+ * Runs automatically in the background during NSE Trading Hours & Post-Market Closing Sync (09:15 AM - 03:45 PM IST, Mon-Fri):
  * 1. Fetches real live NSE market quotes for all NIFTY-200 stocks via Yahoo Finance API.
- * 2. Regenerates Strategy V2.3 active live signals & 10-year historical ledger.
+ * 2. Regenerates Strategy V2.4 active live signals & 10-year historical shadow ledger.
  * 3. Mirrors fresh signals & market heartbeats directly to Firestore Cloud Database.
  * 4. Builds and deploys fresh static bundle to Firebase Hosting automatically every 15 minutes.
+ * 5. Executes a mandatory Post-Market Closing Sync right after 03:30 PM IST market close.
  */
 
 const { execSync } = require('child_process');
@@ -26,9 +27,11 @@ function log(msg) {
 }
 
 /**
- * Checks if current time is within NSE Trading Session (09:15 AM to 03:30 PM IST, Monday - Friday)
+ * Checks if current time is within NSE Trading Session OR Post-Market Closing Window
+ * - Trading Hours: 09:15 AM to 03:30 PM IST (Mon-Fri)
+ * - Post-Market Closing Sync: 03:30 PM to 03:45 PM IST (Mon-Fri)
  */
-function isNSETradingHours() {
+function isNSETradingHoursOrPostMarket() {
   const now = new Date();
   const options = { timeZone: 'Asia/Kolkata', hour12: false };
   const istString = now.toLocaleString('en-US', options);
@@ -42,22 +45,22 @@ function isNSETradingHours() {
   if (dayOfWeek === 0 || dayOfWeek === 6) return false;
 
   const totalMinutes = hours * 60 + minutes;
-  const marketOpen = 9 * 60 + 15;  // 09:15 AM IST (555 mins)
-  const marketClose = 15 * 60 + 30; // 03:30 PM IST (930 mins)
+  const marketOpen = 9 * 60 + 15;       // 09:15 AM IST (555 mins)
+  const postMarketClose = 15 * 60 + 45; // 03:45 PM IST (945 mins)
 
-  return totalMinutes >= marketOpen && totalMinutes <= marketClose;
+  return totalMinutes >= marketOpen && totalMinutes <= postMarketClose;
 }
 
 async function runUpdateCycle(forceRun = false) {
-  const open = isNSETradingHours();
+  const isMarketOrClosing = isNSETradingHoursOrPostMarket();
 
-  if (!open && !forceRun) {
-    log("NSE Market Closed (Trading Window: Mon-Fri 09:15 AM - 03:30 PM IST). Sleeping until next cycle...");
+  if (!isMarketOrClosing && !forceRun) {
+    log("NSE Market Closed (Active Trading Window: Mon-Fri 09:15 AM - 03:45 PM IST). Sleeping until next 15m cycle...");
     return;
   }
 
   log("==========================================================================");
-  log(`Initiating Live Market Sync & Deployment Cycle (Forced=${forceRun}, MarketOpen=${open})...`);
+  log(`Initiating Live Market Sync & Deployment Cycle (Forced=${forceRun}, ActiveWindow=${isMarketOrClosing})...`);
   log("==========================================================================");
 
   try {
@@ -84,8 +87,8 @@ async function runUpdateCycle(forceRun = false) {
   }
 }
 
-log("TradeMind AI Automatic Windows Background Service Initialized.");
-log(`Service configured for 15-minute interval polling (${UPDATE_INTERVAL_MS / 60000} minutes) during NSE market hours.\n`);
+log("TradeMind AI Automatic Windows Background Service Initialized (v2.4).");
+log(`Service configured for 15-minute interval polling (${UPDATE_INTERVAL_MS / 60000} minutes) during NSE market & post-market closing hours (09:15 AM - 03:45 PM IST).\n`);
 
 // Run initial sync cycle on startup
 runUpdateCycle(true);

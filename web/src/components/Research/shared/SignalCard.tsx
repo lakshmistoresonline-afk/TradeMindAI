@@ -33,15 +33,18 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
   const target2 = decision.target2 || decision.target || (entry > 0 ? Math.round(entry * 1.08 * 100) / 100 : undefined);
   const target3 = decision.target3 || decision.target || (entry > 0 ? Math.round(entry * 1.13 * 100) / 100 : undefined);
 
-  // Multi-tier fallback for Stop Loss (Guarantees Stop Loss level is never missing)
-  const stop = decision.stopLoss ??
-               (stock as any)?.stop_price ??
-               (stock as any)?.stop_loss ??
-               (stock as any)?.stopLoss ??
-               (stock as any)?.stop_loss_price ??
-               (entry > 0 ? Math.round(entry * 0.95 * 100) / 100 : undefined);
-
   const current = decision.normalizedCurrentPrice || stock.current_price || stock.price || entry;
+  const isT1Reached = target1 && current >= target1;
+
+  // Multi-tier fallback for Stop Loss (Guarantees Stop Loss level is never missing; ratchets to breakeven if T1 touched)
+  const baseStop = decision.stopLoss ??
+                   (stock as any)?.stop_price ??
+                   (stock as any)?.stop_loss ??
+                   (stock as any)?.stopLoss ??
+                   (stock as any)?.stop_loss_price ??
+                   (entry > 0 ? Math.round(entry * 0.95 * 100) / 100 : undefined);
+
+  const stop = isT1Reached ? Math.max(baseStop || 0, Math.round(entry * 1.002 * 100) / 100) : baseStop;
   const conviction = decision.conviction || stock.conviction || 75;
 
   const { createdAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
@@ -138,12 +141,18 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
           <PriceTile label="T1 (CONSERVATIVE)" value={target1} color="#10b981" xs={4} />
           <PriceTile label="T2 (MAIN BASE)" value={target2} color="#00D1FF" xs={4} />
           <PriceTile label="T3 (RUNNER)" value={target3} color="#a855f7" xs={4} />
-          <PriceTile label="STOP LOSS" value={stop} color="#f43f5e" xs={12} />
+          <PriceTile label={isT1Reached ? "STOP LOSS (BREAKEVEN LOCKED)" : "STOP LOSS"} value={stop} color={isT1Reached ? "#10b981" : "#f43f5e"} xs={12} />
         </Grid>
 
         {/* Execution Guidance Banner */}
         <Box sx={{ mt: 2 }}>
-          {decision.status === 'ENTRY_TRIGGERED' ? (
+          {isT1Reached ? (
+            <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                🟢 T1 TOUCHED — BREAKEVEN STOP LOCKED (RISK-FREE RUNNER)
+              </Typography>
+            </Box>
+          ) : decision.status === 'ENTRY_TRIGGERED' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.1), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.25)' }}>
               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 🟢 ENTRY TRIGGERED — BUY NOW

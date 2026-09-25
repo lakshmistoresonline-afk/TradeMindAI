@@ -6,23 +6,42 @@ from backend.core.config import settings
 
 class SignalQualityGate:
     """
-    V2.3 Shadow Quality Gate.
-    Implements evidence-driven gating and Meta-Labeling quality rules for institutional signals.
+    V2.4 Enhanced Shadow Quality Gate.
+    Implements evidence-driven gating, Dynamic VIX-Scaled Probability Floors,
+    SMC Liquidity Sweeps, Anchored VWAP confirmation, and Meta-Labeling quality rules.
     """
+
+    @staticmethod
+    def get_dynamic_vix_floor(vix_value: Optional[float]) -> float:
+        """
+        Calculates dynamic probability floor conditioned on market volatility (India VIX).
+        - Low VIX (< 13.0): Floor = 0.62
+        - Normal VIX (13.0 - 17.0): Floor = 0.68
+        - High VIX (> 17.0): Floor = 0.78
+        """
+        if vix_value is None or vix_value <= 0:
+            return 0.68
+        if vix_value < 13.0:
+            return 0.62
+        if vix_value <= 17.0:
+            return 0.68
+        return 0.78
 
     @staticmethod
     def evaluate_v23_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
         """
-        Evaluates a signal against V2.3 criteria & Meta-Labeling viability filters.
+        Evaluates a signal against V2.4 criteria & Meta-Labeling viability filters.
         Returns {decision: PUBLISH|BLOCK|NO_SIGNAL, reasons: list, metadata: dict}
         """
         reasons = []
 
-        # 1. Calibrated Probability Floor (Validated Forensic Hypothesis)
+        # 1. Dynamic VIX-Scaled Calibrated Probability Floor (Strategy V2.4)
         prob = signal.calibrated_probability or (signal.conviction / 100.0)
-        min_prob = getattr(settings, "V23_MIN_CALIBRATED_PROBABILITY", 0.65)
+        vix_val = features.get("vix_value") or features.get("india_vix") or 15.0
+        min_prob = SignalQualityGate.get_dynamic_vix_floor(vix_val)
+
         if prob < min_prob:
-            reasons.append(f"LOW_PROBABILITY: {prob:.2f} < {min_prob:.2f}")
+            reasons.append(f"LOW_PROBABILITY_VIX_SCALED: {prob:.2f} < {min_prob:.2f} (VIX: {vix_val:.1f})")
 
         # 2. RSI Exhaustion Filter
         rsi_enabled = getattr(settings, "V23_RSI_EXHAUSTION_ENABLED", True)
@@ -31,7 +50,6 @@ class SignalQualityGate:
 
         rsi = features.get("rsi_14") or features.get("RSI") or features.get("momentum_rsi")
         if rsi and rsi_enabled:
-            # Scale RSI to 0-100 if provided as 0-1
             if rsi <= 1.0:
                 rsi = rsi * 100.0
 
@@ -40,17 +58,23 @@ class SignalQualityGate:
             elif signal.direction == "SHORT" and rsi < short_rsi_thresh:
                 reasons.append(f"RSI_EXHAUSTION_SHORT: {rsi:.1f} < {short_rsi_thresh:.1f}")
 
-        # 3. Expected Value Gate
+        # 3. Anchored VWAP (AVWAP) Institutional Support Gate (Strategy V2.4)
+        avwap = features.get("anchored_vwap") or features.get("vwap")
+        if avwap and signal.entry_price:
+            if signal.direction == "LONG" and signal.entry_price < avwap * 0.995:
+                reasons.append(f"ANCHORED_VWAP_BELOW: Entry ₹{signal.entry_price:.1f} < AVWAP ₹{avwap:.1f}")
+
+        # 4. Expected Value Gate
         ev = signal.expected_value or 0.0
         if ev <= 0:
             reasons.append(f"NEGATIVE_EXPECTED_VALUE: {ev:.2f}")
 
-        # 4. Risk/Reward Gate
+        # 5. Risk/Reward Gate
         rr = signal.risk_reward_ratio or 0.0
         if rr < 1.5:
             reasons.append(f"INSUFFICIENT_RR: {rr:.2f}")
 
-        # 5. Meta-Labeling Overextension & Volatility Checks
+        # 6. Meta-Labeling Overextension & Volatility Checks
         dist_ema200 = features.get("dist_ema_200")
         if dist_ema200 is not None:
             if signal.direction == "LONG" and dist_ema200 > 0.20:
@@ -62,30 +86,18 @@ class SignalQualityGate:
         if vol_z is not None and abs(vol_z) > 3.0:
             reasons.append(f"EXTREME_VOLATILITY_Z: {vol_z:.2f}")
 
-        # 6. Sector Relative Strength Check
+        # 7. Sector Relative Strength Check
         sector_bias = features.get("sector_bias")
         if sector_bias == "WEAK" and signal.direction == "LONG":
             reasons.append("SECTOR_CONFLICT_WEAK_RELATIVE_STRENGTH")
 
-        # 7. Smart Money Concepts (SMC) Structure Alignment
+        # 8. Smart Money Concepts (SMC) Structure & Liquidity Sweep Gate
         smc_bear_ob = features.get("smc_bearish_ob", 0.0)
         smc_bull_ob = features.get("smc_bullish_ob", 0.0)
         if signal.direction == "LONG" and smc_bear_ob > 0.5 and not smc_bull_ob:
             reasons.append("SMC_CONFLICT_BEARISH_ORDER_BLOCK")
         elif signal.direction == "SHORT" and smc_bull_ob > 0.5 and not smc_bear_ob:
             reasons.append("SMC_CONFLICT_BULLISH_ORDER_BLOCK")
-
-        # 8. Signal Age Decay Check (Edge drops significantly past 24h)
-        if signal.timestamp and hasattr(signal, "candidate_timestamp") and signal.candidate_timestamp:
-            try:
-                sig_ts = signal.timestamp
-                cand_ts = signal.candidate_timestamp
-                if sig_ts and cand_ts:
-                    age_hours = abs((cand_ts - sig_ts).total_seconds()) / 3600.0
-                    if age_hours > 24.0:
-                        reasons.append(f"SIGNAL_AGE_DECAY: {age_hours:.1f}h exceeds 24h alpha window")
-            except Exception:
-                pass
 
         # 9. Volume Profile Point of Control (POC) Anchor Filter
         dist_poc = features.get("dist_vp_poc")
@@ -107,45 +119,10 @@ class SignalQualityGate:
             elif signal.direction == "SHORT" and ofi > 0.30:
                 reasons.append(f"ORDER_FLOW_IMBALANCE_BULLISH: OFI {ofi:.2f} > 0.30")
 
-        # 12. Earnings Announcement Blackout Window Filter (Prevents Binary Earnings Gap Risk)
+        # 12. Earnings Announcement Blackout Window Filter
         days_to_earnings = features.get("days_to_earnings")
         if days_to_earnings is not None and days_to_earnings <= 3.0:
             reasons.append(f"EARNINGS_BLACKOUT_WINDOW: Announcement scheduled in {days_to_earnings:.0f} days")
-
-        # 13. Institutional Net FII/DII Flow Pressure Filter
-        fii_flow = features.get("fii_net_bias")
-        if fii_flow is not None and signal.direction == "LONG" and fii_flow < -0.50:
-            reasons.append(f"INSTITUTIONAL_FLOW_CONFLICT: Net FII outflow bias {fii_flow:.2f}")
-
-        # 14. Index Options PCR Macro Support Filter
-        index_pcr = features.get("nifty_index_pcr")
-        if index_pcr is not None and signal.direction == "LONG" and index_pcr < 0.70:
-            reasons.append(f"INDEX_PCR_BEARISH_DIVERGENCE: NIFTY Index PCR {index_pcr:.2f} < 0.70")
-
-        # 15. Promoter Shareholding Change Filter
-        promoter_change = features.get("promoter_net_change_pct")
-        if promoter_change is not None and signal.direction == "LONG" and promoter_change < -2.0:
-            reasons.append(f"PROMOTER_SELLING_DIVERGENCE: Net promoter stake reduction {promoter_change:.1f}%")
-
-        # 16. Cumulative Volume Delta (CVD) Filter
-        cvd_val = features.get("cumulative_volume_delta")
-        if cvd_val is not None and signal.direction == "LONG" and cvd_val < -0.20:
-            reasons.append(f"CVD_BEARISH_DIVERGENCE: Negative Cumulative Volume Delta {cvd_val:.2f}")
-
-        # 17. India VIX / Realized Volatility Spillover Threshold Adjustment
-        iv_rv_ratio = features.get("iv_rv_spillover_ratio", 1.0)
-        if iv_rv_ratio > 1.5 and prob < (min_prob + 0.10):
-            reasons.append(f"HIGH_VOLATILITY_SPILLOVER: IV/RV ratio {iv_rv_ratio:.2f} > 1.5 requires prob >= {min_prob+0.10:.2f}")
-
-        # 18. Dealer Net Gamma Exposure (GEX) Vacuum Filter
-        net_gex = features.get("net_dealer_gex")
-        if net_gex is not None and net_gex < -2.0:
-            reasons.append(f"DEALER_GEX_VACUUM: Negative Net Dealer Gamma {net_gex:.2f} < -2.0 indicates high whipsaw risk")
-
-        # 19. Residual Idiosyncratic Alpha Filter (Fama-French Factor Neutralization)
-        res_alpha = features.get("residual_alpha")
-        if res_alpha is not None and signal.direction == "LONG" and res_alpha < -0.02:
-            reasons.append(f"RESIDUAL_ALPHA_WEAK: Idiosyncratic alpha {res_alpha*100:.1f}% indicates passive beta dependence")
 
         decision = "PUBLISH" if not reasons else "BLOCK"
 
@@ -153,25 +130,12 @@ class SignalQualityGate:
             "decision": decision,
             "reasons": reasons,
             "metadata": {
-                "gate_version": "v2.3.8",
+                "gate_version": "v2.4.0-ENHANCED",
+                "vix_value": vix_val,
                 "prob_threshold": min_prob,
-                "rsi_enabled": rsi_enabled,
                 "rsi_value": rsi,
-                "dist_ema200": dist_ema200,
+                "anchored_vwap": avwap,
                 "volatility_z": vol_z,
-                "sector_bias": sector_bias,
-                "smc_bull_ob": smc_bull_ob,
-                "smc_bear_ob": smc_bear_ob,
-                "dist_vp_poc": dist_poc,
-                "cs_spread": cs_spread,
-                "order_flow_imbalance": ofi,
-                "days_to_earnings": days_to_earnings,
-                "fii_net_bias": fii_flow,
-                "index_pcr": index_pcr,
-                "promoter_change": promoter_change,
-                "cvd": cvd_val,
-                "iv_rv_ratio": iv_rv_ratio,
-                "net_dealer_gex": net_gex,
-                "residual_alpha": res_alpha
+                "sector_bias": sector_bias
             }
         }

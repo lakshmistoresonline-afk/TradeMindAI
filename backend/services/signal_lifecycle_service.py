@@ -9,8 +9,8 @@ from backend.core.container import container
 
 class SignalLifecycleService:
     """
-    Manages the lifecycle state machine for signals.
-    Enforces valid transitions and performs automated auditing.
+    Manages the lifecycle state machine for signals (Strategy V2.4).
+    Enforces valid transitions, T1 Breakeven Trailing Stop Locks, and automated auditing.
     """
 
     ALLOWED_TRANSITIONS = {
@@ -25,6 +25,28 @@ class SignalLifecycleService:
         "TIMEOUT": [],
         "AMBIGUOUS": []
     }
+
+    @staticmethod
+    def evaluate_t1_breakeven_lock(signal: LiveSignal, current_price: float) -> Optional[float]:
+        """
+        T1 Breakeven Trailing Stop Lock (Strategy V2.4).
+        If price touches or exceeds Target 1 (T1), automatically ratchet Stop Loss
+        to Breakeven (Entry Price + 0.2% buffer), securing risk-free execution for T2/T3.
+        """
+        if not signal or not signal.entry_price or not signal.target_price_1 or not current_price:
+            return None
+
+        # Check if T1 has been reached
+        if signal.direction == "LONG" and current_price >= signal.target_price_1:
+            breakeven_stop = round(signal.entry_price * 1.002, 2) # Entry + 0.2% buffer
+            if not signal.stop_price or breakeven_stop > signal.stop_price:
+                return breakeven_stop
+        elif signal.direction == "SHORT" and current_price <= signal.target_price_1:
+            breakeven_stop = round(signal.entry_price * 0.998, 2) # Entry - 0.2% buffer
+            if not signal.stop_price or breakeven_stop < signal.stop_price:
+                return breakeven_stop
+
+        return None
 
     @staticmethod
     async def transition_signal(signal_id: str, new_status: str, updates: Optional[Dict[str, Any]] = None) -> bool:
@@ -45,24 +67,19 @@ class SignalLifecycleService:
             full_updates["lifecycle_state"] = "TERMINAL"
             full_updates["exit_at"] = datetime.datetime.now(timezone.utc)
 
-
         return await SignalLedgerService.update_signal(signal_id, full_updates)
 
     @staticmethod
     async def audit_signal(signal_id: str) -> bool:
         """
-        Retrieves current market data and checks for lifecycle triggers.
-        Harden: Blocks mutation if data is STALE. (Phase 4).
+        Retrieves current market data and checks for lifecycle triggers & T1 Breakeven Locks.
         """
         signal = await SignalLedgerService.get_signal(signal_id)
         if not signal or signal.status in OutcomeService.TERMINAL_STATES:
             return False
 
-        # 1. Freshness Check (Phase 4 Hardening)
         from backend.services.market_data_service import MarketDataService
-        from backend.services.freshness_policy import FreshnessPolicy
 
-        # Use underlying symbol for horizon evaluation if derivative
         sym = signal.underlying_symbol or signal.symbol
         price_meta = await MarketDataService.get_current_price(sym)
 
@@ -70,7 +87,19 @@ class SignalLifecycleService:
             print(f"[Lifecycle] Audit BLOCKED for {signal.symbol}: Market data is {price_meta['status']}.")
             return False
 
-        # 2. Fetch recent price action for outcome resolution
+        current_p = price_meta.get("price", 0.0)
+
+        # Check T1 Breakeven Stop Loss Lock
+        new_breakeven_stop = SignalLifecycleService.evaluate_t1_breakeven_lock(signal, current_p)
+        if new_breakeven_stop:
+            print(f"[Lifecycle] T1 Reached for {signal.symbol}! Ratcheting Stop Loss to Breakeven ₹{new_breakeven_stop}")
+            await SignalLedgerService.update_signal(signal_id, {
+                "stop_price": new_breakeven_stop,
+                "stop_loss_price": new_breakeven_stop,
+                "updated_at": datetime.datetime.now(timezone.utc)
+            })
+
+        # Fetch recent price action for outcome resolution
         try:
             provider = container.provider
             history = await provider.get_history(signal.symbol, start_date=signal.timestamp)
