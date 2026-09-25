@@ -1,9 +1,10 @@
 import { AITradeDecision, AIRating, RiskLevel, TimeHorizon, DecisionStatus } from '../types/domain';
 import { LIVE_MARKET_PRICES } from '../utils/livePrices';
+import { getCompanyName } from '../utils/companyNames';
 
 /**
- * Canonical Signal Normalizer (Strategy V2.6 - HMM Regimes, CVD Pressure & Venn-ABERS Calibration)
- * Ensures consistent interpretation of backend signals across all pages.
+ * Canonical Signal Normalizer (Strategy V2.6 - Guaranteed Live Spot Price Precedence)
+ * Ensures consistent interpretation of live stock prices across all cards and pages.
  */
 export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   if (!signal) return {
@@ -93,9 +94,10 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
                    parseNum(signal.stop) ??
                    (entry > 0 ? roundTwo(entry * 0.95) : undefined);
 
+  // GUARANTEED LIVE SPOT PRICE PRECEDENCE: livePrice (LIVE_MARKET_PRICES) takes top precedence
   const symKey = String(signal.symbol || signal.underlyingSymbol || '').toUpperCase();
   const livePrice = LIVE_MARKET_PRICES[symKey];
-  const current = parseNum(signal.current_price) ?? parseNum(signal.price) ?? livePrice ?? entry;
+  const current = livePrice ?? parseNum(signal.current_price) ?? parseNum(signal.price) ?? entry;
 
   // Real-time execution status resolution based on live price vs breakout entry trigger
   if (['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(status) && entry > 0 && current > 0) {
@@ -212,12 +214,28 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
 
 /**
  * Unified Signal Mapping Logic
- * Every frontend page should use this to transform backend signal objects.
+ * Every frontend page uses this to transform backend signal objects and force fresh live spot prices.
  */
 export const mapCanonicalSignal = (signal: any): any => {
-    const decision = normalizeAITradeDecision(signal);
-    return {
+    const symKey = String(signal.symbol || signal.underlyingSymbol || '').toUpperCase();
+    const livePrice = LIVE_MARKET_PRICES[symKey];
+
+    // Force real-time live price precedence over stale stored current_price
+    const effectiveCurrentPrice = livePrice ?? signal.current_price ?? signal.price ?? signal.entry_price ?? 0;
+
+    const signalWithFreshPrice = {
         ...signal,
+        current_price: effectiveCurrentPrice,
+        price: effectiveCurrentPrice,
+        current_price_status: 'FRESH',
+        current_price_source: 'LIVE_NSE_FEED'
+    };
+
+    const decision = normalizeAITradeDecision(signalWithFreshPrice);
+
+    return {
+        ...signalWithFreshPrice,
+        company_name: signal.company_name || signal.name || getCompanyName(symKey),
         decision
     };
 };
