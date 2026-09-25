@@ -28,13 +28,21 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
   if (!decision) return null;
 
   const isBuy = decision.rating?.includes('BUY');
-  const entry = decision.entry;
-  const target1 = decision.target1 || decision.target;
-  const target2 = decision.target2 || decision.target;
-  const target3 = decision.target3 || decision.target;
-  const stop = decision.stopLoss;
-  const current = decision.normalizedCurrentPrice;
-  const conviction = decision.conviction || 75;
+  const entry = decision.entry || stock.entry_price || stock.entry || 0;
+  const target1 = decision.target1 || decision.target || (entry > 0 ? Math.round(entry * 1.05 * 100) / 100 : undefined);
+  const target2 = decision.target2 || decision.target || (entry > 0 ? Math.round(entry * 1.08 * 100) / 100 : undefined);
+  const target3 = decision.target3 || decision.target || (entry > 0 ? Math.round(entry * 1.13 * 100) / 100 : undefined);
+
+  // Multi-tier fallback for Stop Loss (Guarantees Stop Loss level is never missing)
+  const stop = decision.stopLoss ??
+               (stock as any)?.stop_price ??
+               (stock as any)?.stop_loss ??
+               (stock as any)?.stopLoss ??
+               (stock as any)?.stop_loss_price ??
+               (entry > 0 ? Math.round(entry * 0.95 * 100) / 100 : undefined);
+
+  const current = decision.normalizedCurrentPrice || stock.current_price || stock.price || entry;
+  const conviction = decision.conviction || stock.conviction || 75;
 
   const { createdAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
 
@@ -122,7 +130,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         </Box>
       </Box>
 
-      {/* 2. Metric Price Grid Zone (3-Target Profit Geometry & Stop Loss) */}
+      {/* 2. Metric Price Grid Zone (3-Target Profit Geometry & Hardened Stop Loss) */}
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
         <Grid container spacing={1.5}>
           <PriceTile label="ENTRY" value={entry} xs={6} />

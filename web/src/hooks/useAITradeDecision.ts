@@ -2,7 +2,7 @@ import { AITradeDecision, AIRating, RiskLevel, TimeHorizon, DecisionStatus } fro
 import { LIVE_MARKET_PRICES } from '../utils/livePrices';
 
 /**
- * Canonical Signal Normalizer (V2.3 - 3-Target Profit Geometry)
+ * Canonical Signal Normalizer (V2.3 - 3-Target Profit Geometry & Hardened Stop Loss)
  * Ensures consistent interpretation of backend signals across all pages.
  */
 export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
@@ -82,7 +82,16 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   const target1 = parseNum(signal.target_price_1) ?? parseNum(structured.target1) ?? (entry > 0 ? roundTwo(entry * 1.05) : undefined);
   const target2 = parseNum(signal.target_price_2) ?? parseNum(signal.target_price) ?? parseNum(structured.target) ?? (entry > 0 ? roundTwo(entry * 1.08) : undefined);
   const target3 = parseNum(signal.target_price_3) ?? parseNum(structured.target3) ?? (entry > 0 ? roundTwo(entry * 1.13) : undefined);
-  const stopLoss = parseNum(structured.stop_loss) ?? parseNum(signal.stop_price) ?? parseNum(signal.stop_loss_price) ?? parseNum(signal.stop);
+
+  // Hardened Stop Loss Resolution
+  const stopLoss = parseNum(signal.stop_price) ??
+                   parseNum(signal.stop_loss) ??
+                   parseNum(signal.stopLoss) ??
+                   parseNum(signal.stop_loss_price) ??
+                   parseNum(structured.stop_loss) ??
+                   parseNum(structured.stopLoss) ??
+                   parseNum(signal.stop) ??
+                   (entry > 0 ? roundTwo(entry * 0.95) : undefined);
 
   const symKey = String(signal.symbol || signal.underlyingSymbol || '').toUpperCase();
   const livePrice = LIVE_MARKET_PRICES[symKey];
