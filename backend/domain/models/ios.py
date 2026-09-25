@@ -40,7 +40,7 @@ class LiveSignal(BaseModel):
     direction: str # LONG or SHORT
     rating: Optional[str] = None # BUY, SELL, HOLD
     timeframe: Optional[str] = None
-    strategy_version: str = "v2.2"
+    strategy_version: str = "v2.5"
     signal_version: str = "1.0"
 
     # Timing
@@ -66,7 +66,7 @@ class LiveSignal(BaseModel):
     current_price: Optional[float] = None
     risk_reward_ratio: Optional[float] = None
 
-    # Intelligence
+    # Intelligence & Strategy V2.5 Accuracy Upgrades
     raw_probability: Optional[float] = None
     calibrated_probability: Optional[float] = None
     expected_value: Optional[float] = None
@@ -74,12 +74,19 @@ class LiveSignal(BaseModel):
     confidence: Optional[float] = None
     signal_score: Optional[float] = None
 
+    # V2.5 Accuracy Features
+    net_dealer_gex: Optional[float] = None          # Options Surface Gamma Exposure
+    sector_rrg_quadrant: Optional[str] = None      # LEADING, IMPROVING, WEAKENING, LAGGING
+    conformal_coverage_pct: Optional[float] = None # Certified Conformal Coverage (e.g. 92.5%)
+    order_book_imbalance: Optional[float] = None   # Top 5 BBO Bid/Ask Imbalance Ratio
+    shap_drivers: Dict[str, float] = Field(default_factory=dict) # SHAP Feature Weighting
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
     # Lineage
     model_id: Optional[str] = None
-    model_version: str = "TradeMind Core v2.2"
+    model_version: str = "TradeMind Core v2.5-Ensemble"
     model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
 
@@ -117,7 +124,7 @@ class LiveSignal(BaseModel):
     realized_mfe: Optional[float] = None
 
     # Quality
-    quality_class: str = "EXPERIMENTAL" # PRIMARY, SELECTIVE, EXPERIMENTAL
+    quality_class: str = "PRIMARY" # PRIMARY, SELECTIVE, EXPERIMENTAL
     current_price_status: Optional[str] = None
     current_price_source: Optional[str] = None
     current_price_timestamp: Optional[datetime] = None
@@ -129,14 +136,14 @@ class LiveSignal(BaseModel):
     data_quality_score: Optional[float] = None
     deployment_sha: Optional[str] = None
 
-    # Phase 8: Entry Instrumentation
+    # Entry Instrumentation
     candidate_timestamp: Optional[datetime] = None
     published_at: Optional[datetime] = None
     price_at_signal: Optional[float] = None
     price_at_publish: Optional[float] = None
     price_at_activation: Optional[float] = None
 
-    # Phase 9: Regime Instrumentation
+    # Regime Instrumentation
     regime_timestamp: Optional[datetime] = None
     regime_source: Optional[str] = None
     regime_confidence: Optional[float] = None

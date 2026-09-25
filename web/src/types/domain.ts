@@ -36,6 +36,14 @@ export interface AITradeDecision {
   stopRange?: [number, number];
   riskReward?: string;
 
+  // Strategy V2.5 Accuracy Upgrades
+  gexRegime?: string;                  // -GEX Momentum Acceleration
+  netDealerGex?: number;               // Net Dealer Gamma Exposure (e.g. -1.8)
+  sectorRrgQuadrant?: string;          // LEADING, IMPROVING, WEAKENING, LAGGING
+  conformalCoverage?: number;          // Certified Conformal Prediction Coverage (e.g. 92.5%)
+  orderBookImbalance?: number;         // Top 5 BBO Bid/Ask Volume Imbalance (e.g. +0.52)
+  shapDrivers?: Record<string, number>; // SHAP Feature Attribution Percentages
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {
