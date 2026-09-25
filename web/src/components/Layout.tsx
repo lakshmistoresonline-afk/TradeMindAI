@@ -189,7 +189,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                      dot={true}
                    />
                    <HeaderStatus label="UNIVERSE" value="NIFTY 200 CANONICAL" color="#00D1FF" />
-                   <HeaderStatus label="ENGINE" value="V2.3 ENSEMBLE" color="#a855f7" />
+                   <HeaderStatus label="ENGINE" value="V2.5 SHAP & GEX" color="#a855f7" />
                 </Stack>
               )}
             </Stack>
