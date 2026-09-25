@@ -20,6 +20,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { API_BASE_URL } from '../api/client';
 import { useAuth } from '../hooks/useAuth';
 import { useBackendHealth } from '../hooks/useBackendHealth';
+import { formatNSEDateTime } from '../utils/nseDateUtils';
 
 const drawerWidth = 260;
 
@@ -64,8 +65,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' as any });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date>(new Date());
 
   useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      setLastRefreshTime(new Date());
+    }, 30000);
+
     try {
       const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
       const socket = new WebSocket(wsUrl);
@@ -75,6 +81,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           const data = JSON.parse(event.data);
           if (data.type === 'AI_COMPLETED') {
             showNotification(data.message, 'success');
+            setLastRefreshTime(new Date());
           }
         } catch (e) {
           console.error("WS Error:", e);
@@ -86,10 +93,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       };
 
       return () => {
+        clearInterval(refreshInterval);
         try { socket.close(); } catch {}
       };
     } catch {
-      // Quiet failover
+      return () => clearInterval(refreshInterval);
     }
   }, []);
 
@@ -172,6 +180,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                      label="SERVER"
                      value={isOnline ? "LOCAL CONNECTED" : "OFFLINE MODE"}
                      color={isOnline ? "#10b981" : "#f59e0b"}
+                     dot={true}
+                   />
+                   <HeaderStatus
+                     label="LAST REFRESH"
+                     value={formatNSEDateTime(lastRefreshTime)}
+                     color="#10b981"
                      dot={true}
                    />
                    <HeaderStatus label="UNIVERSE" value="NIFTY 200 CANONICAL" color="#00D1FF" />
@@ -309,7 +323,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
                {isAdmin && (
                  <>
-                   <Typography variant="caption" sx={{ px: 2, mt: 3, mb: 1.5, display: 'block', fontWeight: 900, color: '#a855f7', letterSpacing: 1.5 }}>ADMINISTRATION</Typography>
+                   <Typography variant="caption" sx={{ px: 2, mt: 3, mb: 1.5, display: 'block', fontWeight: 950, color: '#a855f7', letterSpacing: 1.5 }}>ADMINISTRATION</Typography>
                    {adminMenuItems.map((item) => (
                      <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                         <ListItemButton

@@ -163,53 +163,58 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
       </Box>
 
       {/* 3. Card Footer Zone */}
-      <Box sx={{ px: 2.5, py: 1.8, bgcolor: 'rgba(2, 6, 23, 0.4)', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Stack spacing={0.4} sx={{ flex: 1, pr: 1, minWidth: 0 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-            <Calendar size={11} color="#38bdf8" />
-            <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
+      <Box sx={{ px: 2.5, py: 1.8, bgcolor: 'rgba(2, 6, 23, 0.4)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <Stack spacing={0.5} sx={{ mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+            <Calendar size={12} color="#38bdf8" />
+            <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace' }}>
               Created: <span style={{ color: '#f8fafc', fontWeight: 800 }}>{formatNSEDateTime(createdAt)}</span>
             </Typography>
           </Box>
           {hasStatusChanged && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-              <Clock size={11} color="#10b981" />
-              <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+              <Clock size={12} color="#10b981" />
+              <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace' }}>
                 {statusLabel}: <span style={{ color: '#10b981', fontWeight: 800 }}>{formatNSEDateTime(statusChangeTime)}</span>
               </Typography>
             </Box>
           )}
         </Stack>
 
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexShrink: 0 }}>
+        <Divider sx={{ my: 1, opacity: 0.08 }} />
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 0.5 }}>
           <Tooltip title={copied ? "Signal Link Copied!" : "Copy Signal Link"}>
             <IconButton size="small" onClick={handleCopyLink} sx={{ color: copied ? '#10b981' : '#708090', p: 0.5, '&:hover': { color: '#00D1FF' } }}>
-              {copied ? <Check size={13} /> : <Share2 size={13} />}
+              {copied ? <Check size={14} /> : <Share2 size={14} />}
             </IconButton>
           </Tooltip>
-          <Button
-            size="small"
-            startIcon={<Calculator size={12} color="#00D1FF" />}
-            onClick={() => setIsCalcOpen(true)}
-            sx={{ color: '#00D1FF', fontWeight: 800, fontSize: '0.65rem', textTransform: 'none', p: 0 }}
-          >
-            Sizer
-          </Button>
-          <Button
-            size="small"
-            onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: stock, decision } })}
-            sx={{
-              color: '#06b6d4',
-              fontWeight: 950,
-              fontSize: '0.65rem',
-              textTransform: 'none',
-              p: 0,
-              '&:hover': { bgcolor: 'transparent', color: '#38bdf8' }
-            }}
-          >
-            View Evidence →
-          </Button>
-        </Stack>
+
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Button
+              size="small"
+              startIcon={<Calculator size={13} color="#00D1FF" />}
+              onClick={() => setIsCalcOpen(true)}
+              sx={{ color: '#00D1FF', fontWeight: 800, fontSize: '0.65rem', textTransform: 'none', p: 0 }}
+            >
+              Sizer
+            </Button>
+            <Button
+              size="small"
+              onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: stock, decision } })}
+              sx={{
+                color: '#06b6d4',
+                fontWeight: 950,
+                fontSize: '0.65rem',
+                textTransform: 'none',
+                p: 0,
+                '&:hover': { bgcolor: 'transparent', color: '#38bdf8' }
+              }}
+            >
+              View Evidence →
+            </Button>
+          </Stack>
+        </Box>
       </Box>
 
       {/* 4. Position Sizer Risk Calculator Modal */}
