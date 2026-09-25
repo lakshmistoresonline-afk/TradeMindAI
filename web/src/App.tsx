@@ -40,50 +40,69 @@ const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
-    primary: { main: '#00D1FF' },
-    secondary: { main: '#7C3AED' },
+    primary: { main: '#00D1FF', light: '#38bdf8', dark: '#0284c7' },
+    secondary: { main: '#7C3AED', light: '#a855f7', dark: '#6d28d9' },
     background: { default: '#020617', paper: '#0f172a' },
-    success: { main: '#10b981' },
-    error: { main: '#ef4444' },
-    warning: { main: '#f59e0b' },
+    success: { main: '#10b981', light: '#34d399', dark: '#059669' },
+    error: { main: '#f43f5e', light: '#fb7185', dark: '#e11d48' },
+    warning: { main: '#f59e0b', light: '#fbbf24', dark: '#d97706' },
     text: { primary: '#f8fafc', secondary: '#94a3b8' },
   },
   typography: {
     fontFamily: '"Inter", "JetBrains Mono", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontWeight: 900, letterSpacing: '-0.02em' },
-    h2: { fontWeight: 900, letterSpacing: '-0.01em' },
-    h3: { fontWeight: 900, letterSpacing: '-0.01em' },
-    h4: { fontWeight: 800, letterSpacing: '-0.01em' },
-    h5: { fontWeight: 800 },
-    h6: { fontWeight: 700, letterSpacing: 0.5 },
+    h1: { fontWeight: 950, letterSpacing: '-0.025em' },
+    h2: { fontWeight: 950, letterSpacing: '-0.02em' },
+    h3: { fontWeight: 900, letterSpacing: '-0.015em' },
+    h4: { fontWeight: 900, letterSpacing: '-0.01em' },
+    h5: { fontWeight: 800, letterSpacing: '-0.005em' },
+    h6: { fontWeight: 800, letterSpacing: 0.2 },
     subtitle1: { fontWeight: 700 },
-    subtitle2: { fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.75rem' },
+    subtitle2: { fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: '0.75rem' },
     body1: { fontSize: '0.925rem', lineHeight: 1.6 },
     body2: { fontSize: '0.825rem', lineHeight: 1.6 },
-    caption: { fontWeight: 600, letterSpacing: '0.05em' },
+    caption: { fontWeight: 600, letterSpacing: '0.04em' },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
           backgroundColor: '#020617',
-          "&::-webkit-scrollbar, & *::-webkit-scrollbar": { width: 8, height: 8 },
-          "&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": { borderRadius: 8, backgroundColor: "#111821" },
+          color: '#f8fafc',
+          "&::-webkit-scrollbar, & *::-webkit-scrollbar": { width: 6, height: 6 },
+          "&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": { borderRadius: 4, backgroundColor: "#1e293b" },
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        root: { backgroundImage: 'none', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8 },
+        root: {
+          backgroundImage: 'none',
+          backgroundColor: 'rgba(15, 23, 42, 0.85)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 12
+        },
       },
     },
     MuiButton: {
-      styleOverrides: { root: { textTransform: 'none', fontWeight: 700, borderRadius: 6 } }
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 800,
+          borderRadius: 8,
+          transition: 'all 0.2s ease-in-out'
+        }
+      }
     },
     MuiTableCell: {
       styleOverrides: {
-        root: { borderBottom: '1px solid rgba(255,255,255,0.03)', padding: '12px 16px' },
-        head: { fontWeight: 800, color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.1em' }
+        root: { borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '14px 18px' },
+        head: { fontWeight: 800, color: '#64748b', fontSize: '0.675rem', textTransform: 'uppercase', letterSpacing: '0.08em' }
+      }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { fontWeight: 800, borderRadius: 6 }
       }
     }
   },

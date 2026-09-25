@@ -1,5 +1,5 @@
 import { Box, Typography, Paper, Grid, Stack, Button, alpha, Divider } from '@mui/material';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Zap, ShieldCheck, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Pricing() {
@@ -7,9 +7,13 @@ export default function Pricing() {
 
   return (
     <Box sx={{ pb: 10, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white' }}>
-      <Box sx={{ mb: 10, textAlign: 'center' }}>
-        <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, mb: 2 }}>PRICING</Typography>
-        <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800 }}>CHOOSE YOUR INTELLIGENCE TIER</Typography>
+      <Box sx={{ mb: 8, textAlign: 'center' }}>
+        <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -1.5, mb: 1.5 }}>
+          PRICING & TIERS
+        </Typography>
+        <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800, letterSpacing: 1 }}>
+          CHOOSE YOUR QUANTITATIVE INTELLIGENCE TIER
+        </Typography>
       </Box>
 
       <Grid container spacing={4} alignItems="stretch">
@@ -17,14 +21,14 @@ export default function Pricing() {
            <PriceTier
              title="FREE"
              price="₹0"
-             subtitle="Research Baseline"
+             subtitle="Research Baseline Access"
              features={[
                "Active Opportunity Scanner",
                "Limited Signal Replay",
                "Historical Outcome Ledger",
-               "Basic Market Regime"
+               "Basic Market Regime Monitor"
              ]}
-             cta="Get Started"
+             cta="Get Started Free"
              onClick={() => navigate('/login')}
            />
         </Grid>
@@ -34,15 +38,15 @@ export default function Pricing() {
              price="₹2,499"
              period="/ mo"
              highlighted
-             subtitle="Institutional Intelligence"
+             subtitle="Institutional Intelligence & Forensics"
              features={[
-               "Full Signal Detail Terminal",
-               "Advanced Evidence Forensic",
-               "Unlimited Signal Replay",
-               "Comparison Mode",
-               "120h Freshness Priority"
+               "Full Signal Detail Terminal Access",
+               "Advanced Evidence Forensic Audit",
+               "Unlimited Signal Replay & Timelines",
+               "Multi-Signal Comparison Mode",
+               "Priority Real-Time Data Pipeline"
              ]}
-             cta="Go Pro"
+             cta="Upgrade To Pro"
              onClick={() => navigate('/checkout/pro')}
            />
         </Grid>
@@ -51,47 +55,56 @@ export default function Pricing() {
              title="ALPHA"
              price="₹7,999"
              period="/ mo"
-             subtitle="Advanced Quantitative"
+             subtitle="Advanced Institutional Quant"
              features={[
-               "Everything in Pro",
-               "Custom Prediction API",
-               "Priority Model Retraining",
-               "Whitelabel Reporting",
-               "Dedicated Analyst Support"
+               "Everything in Pro Tier",
+               "Custom Prediction API Endpoints",
+               "Priority Model Retraining Runs",
+               "Whitelabel Forensic Reporting",
+               "Dedicated Quant Analyst Support"
              ]}
-             cta="Contact Sales"
+             cta="Subscribe Alpha"
              onClick={() => navigate('/checkout/alpha')}
            />
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 15, textAlign: 'center' }}>
-         <Typography variant="h5" sx={{ fontWeight: 900, mb: 4 }}>Frequently Asked Questions</Typography>
+      <Box sx={{ mt: 12, textAlign: 'center' }}>
+         <Typography variant="h5" sx={{ fontWeight: 950, mb: 4, letterSpacing: -0.5 }}>Frequently Asked Questions</Typography>
          <Grid container spacing={4} sx={{ textAlign: 'left' }}>
             <Grid item xs={12} md={6}>
-               <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: '#00D1FF' }}>Does TradeMind AI execute trades?</Typography>
-               <Typography variant="body2" sx={{ color: '#708090', mb: 4 }}>
-                  No. TradeMind AI is a signal intelligence and research terminal. We do not execute orders on your behalf. All signals are for informational purposes only.
-               </Typography>
+               <Paper sx={{ p: 3, bgcolor: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 1, color: '#00D1FF', display: 'flex', alignItems: 'center', gap: 1 }}>
+                     <ShieldCheck size={16} /> Does TradeMind AI execute orders on my broker?
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.6, fontWeight: 500 }}>
+                     No. TradeMind AI is a pure signal intelligence and quantitative terminal. We do not execute orders on your behalf. All generated signals serve as institutional decision support.
+                  </Typography>
+               </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-               <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: '#00D1FF' }}>What is the 'Observed Win Rate'?</Typography>
-               <Typography variant="body2" sx={{ color: '#708090', mb: 4 }}>
-                  It is the actual success rate of the signals generated by our models in a shadow execution environment. Every signal is recorded in real-time before the outcome is known.
-               </Typography>
+               <Paper sx={{ p: 3, bgcolor: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 1, color: '#00D1FF', display: 'flex', alignItems: 'center', gap: 1 }}>
+                     <Sparkles size={16} /> How is the Win Rate verified?
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#94a3b8', lineHeight: 1.6, fontWeight: 500 }}>
+                     Every signal generated by Strategy V2.3 is timestamped and recorded in our immutable Neon ledger before market movement occurs. Outcomes are validated automatically against NSE closing nodes.
+                  </Typography>
+               </Paper>
             </Grid>
          </Grid>
       </Box>
 
-      <Box sx={{ mt: 10, p: 4, bgcolor: alpha('#10b981', 0.05), borderRadius: 1, border: '1px dashed #10b981', textAlign: 'center' }}>
-         <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1 }}>READY TO DISCOVER THE STORY BEHIND EVERY SIGNAL?</Typography>
+      <Box sx={{ mt: 8, p: 4, bgcolor: alpha('#10b981', 0.05), borderRadius: 3, border: '1px dashed #10b981', textAlign: 'center' }}>
+         <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1 }}>READY TO DISCOVER THE FORENSICS BEHIND EVERY SIGNAL?</Typography>
          <Button
            variant="contained"
            size="large"
+           startIcon={<Zap size={18} />}
            onClick={() => navigate('/login')}
-           sx={{ mt: 2, px: 8, py: 1.5, fontWeight: 950 }}
+           sx={{ mt: 2, px: 6, py: 1.5, fontWeight: 950, bgcolor: '#10b981', color: '#000', '&:hover': { bgcolor: '#059669' } }}
          >
-           JOIN TRADEMIND AI
+           JOIN TRADEMIND TERMINAL
          </Button>
       </Box>
     </Box>
@@ -101,35 +114,41 @@ export default function Pricing() {
 function PriceTier({ title, price, period = "", subtitle, features, cta, onClick, highlighted = false }: any) {
     return (
         <Paper sx={{
-            p: 5,
+            p: 4.5,
             height: '100%',
-            bgcolor: highlighted ? alpha('#00D1FF', 0.03) : '#0f172a',
-            border: highlighted ? '2px solid #00D1FF' : '1px solid rgba(255,255,255,0.05)',
+            bgcolor: highlighted ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.85)',
+            border: highlighted ? '2px solid #00D1FF' : '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 3,
             display: 'flex',
             flexDirection: 'column',
-            position: 'relative'
+            position: 'relative',
+            boxShadow: highlighted ? '0 15px 35px -10px rgba(0, 209, 255, 0.2)' : 'none',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+                transform: 'translateY(-4px)'
+            }
         }}>
             {highlighted && (
                 <Box sx={{
-                    position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                    bgcolor: '#00D1FF', color: '#000', px: 2, py: 0.2, borderRadius: 0.5,
-                    fontSize: '0.6rem', fontWeight: 950, letterSpacing: 1
+                    position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
+                    bgcolor: '#00D1FF', color: '#000', px: 2, py: 0.3, borderRadius: 1,
+                    fontSize: '0.65rem', fontWeight: 950, letterSpacing: 1, boxShadow: '0 4px 12px rgba(0,209,255,0.4)'
                 }}>
-                    MOST POPULAR
+                    POPULAR CHOICE
                 </Box>
             )}
-            <Typography variant="caption" sx={{ fontWeight: 950, color: '#708090', letterSpacing: 2, display: 'block', mb: 2 }}>{title}</Typography>
+            <Typography variant="caption" sx={{ fontWeight: 950, color: '#64748b', letterSpacing: 2, display: 'block', mb: 2 }}>{title}</Typography>
             <Stack direction="row" alignItems="baseline" spacing={0.5} sx={{ mb: 1 }}>
-                <Typography variant="h3" sx={{ fontWeight: 950 }}>{price}</Typography>
-                <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>{period}</Typography>
+                <Typography variant="h3" sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono, monospace' }}>{price}</Typography>
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800 }}>{period}</Typography>
             </Stack>
-            <Typography variant="body2" sx={{ color: '#00D1FF', fontWeight: 800, mb: 4 }}>{subtitle}</Typography>
-            <Divider sx={{ mb: 4, opacity: 0.05 }} />
-            <Stack spacing={2} sx={{ flexGrow: 1, mb: 6 }}>
+            <Typography variant="body2" sx={{ color: '#00D1FF', fontWeight: 800, mb: 3 }}>{subtitle}</Typography>
+            <Divider sx={{ mb: 3, opacity: 0.08 }} />
+            <Stack spacing={2} sx={{ flexGrow: 1, mb: 5 }}>
                 {features.map((f: string, i: number) => (
                     <Stack key={i} direction="row" spacing={1.5} alignItems="center">
                         <CheckCircle2 size={16} color="#10b981" />
-                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 600, fontSize: '0.85rem' }}>{f}</Typography>
+                        <Typography variant="body2" sx={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.85rem' }}>{f}</Typography>
                     </Stack>
                 ))}
             </Stack>
@@ -137,7 +156,17 @@ function PriceTier({ title, price, period = "", subtitle, features, cta, onClick
                 fullWidth
                 variant={highlighted ? "contained" : "outlined"}
                 onClick={onClick}
-                sx={{ py: 1.5, fontWeight: 950, borderColor: 'rgba(255,255,255,0.1)', color: highlighted ? '#000' : '#fff' }}
+                sx={{
+                  py: 1.5,
+                  fontWeight: 950,
+                  borderRadius: 2,
+                  bgcolor: highlighted ? '#00D1FF' : 'transparent',
+                  color: highlighted ? '#000' : '#fff',
+                  borderColor: highlighted ? '#00D1FF' : 'rgba(255,255,255,0.15)',
+                  '&:hover': {
+                    bgcolor: highlighted ? '#38bdf8' : 'rgba(255,255,255,0.05)'
+                  }
+                }}
             >
                 {cta}
             </Button>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Chip, Menu, MenuItem, IconButton, Avatar, alpha } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Chip, Menu, MenuItem, IconButton, Avatar } from '@mui/material';
 import {
   LayoutDashboard,
   Zap,
@@ -10,11 +10,14 @@ import {
   User,
   Database,
   FileText,
+  ShieldCheck,
+  TrendingUp
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { API_BASE_URL } from '../api/client';
 import { useAuth } from '../hooks/useAuth';
+import { useBackendHealth } from '../hooks/useBackendHealth';
 
 const drawerWidth = 260;
 
@@ -26,17 +29,18 @@ export const NotificationContext = createContext({
 export const useNotification = () => useContext(NotificationContext);
 
 const userMenuItems = [
-  { text: 'DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-  { text: 'SIGNALS', icon: <Zap size={20} />, path: '/signals' },
-  { text: 'PREMIUM', icon: <FileText size={20} />, path: '/pricing' },
-  { text: 'ACCOUNT', icon: <User size={20} />, path: '/account' },
+  { text: 'DASHBOARD', icon: <LayoutDashboard size={18} />, path: '/dashboard' },
+  { text: 'SIGNALS', icon: <Zap size={18} />, path: '/signals' },
+  { text: 'PERFORMANCE', icon: <TrendingUp size={18} />, path: '/performance' },
+  { text: 'PRICING', icon: <FileText size={18} />, path: '/pricing' },
+  { text: 'ACCOUNT', icon: <User size={18} />, path: '/account' },
 ];
 
 const adminMenuItems = [
-  { text: 'ADMIN DASHBOARD', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
-  { text: 'SIGNAL OPS', icon: <Zap size={20} />, path: '/admin/signals' },
-  { text: 'DATA PIPELINE', icon: <Database size={20} />, path: '/admin/data' },
-  { text: 'SYSTEM STATUS', icon: <Activity size={20} />, path: '/admin/status' },
+  { text: 'ADMIN DASHBOARD', icon: <LayoutDashboard size={18} />, path: '/admin/dashboard' },
+  { text: 'SIGNAL OPS', icon: <Zap size={18} />, path: '/admin/signals' },
+  { text: 'DATA PIPELINE', icon: <Database size={18} />, path: '/admin/data' },
+  { text: 'SYSTEM STATUS', icon: <Activity size={18} />, path: '/admin/status' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -44,6 +48,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const theme = useTheme();
   const { user, isAdmin, logout } = useAuth();
+  const { isOnline } = useBackendHealth();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -67,7 +72,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       };
 
       socket.onerror = () => {
-        // Quietly close WS on static hosting fallback
         try { socket.close(); } catch {}
       };
 
@@ -75,7 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         try { socket.close(); } catch {}
       };
     } catch {
-      // Ignore WS setup on static hosting
+      // Quiet failover
     }
   }, []);
 
@@ -98,17 +102,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#020617' }}>
+        {/* Top Accent Gradient Line */}
+        <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, height: 2, zIndex: 1400, background: 'linear-gradient(90deg, #00D1FF, #7C3AED, #10b981)' }} />
+
         <AppBar
           position="fixed"
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            backgroundColor: 'rgba(5, 8, 12, 0.9)', // Slightly darker for V2.3.1
-            backdropFilter: 'blur(12px)',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            backgroundColor: 'rgba(2, 6, 23, 0.85)',
+            backdropFilter: 'blur(16px)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
             boxShadow: 'none'
           }}
         >
-          <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 4 } }}>
+          <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 4 }, minHeight: 70 }}>
             <Stack direction="row" spacing={3} alignItems="center">
               {isMobile && (
                 <IconButton color="inherit" onClick={() => setDrawerOpen(true)} sx={{ mr: 1 }}>
@@ -118,7 +125,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Typography
                 variant="h6"
                 noWrap
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/dashboard')}
                 sx={{
                   fontWeight: 950,
                   letterSpacing: -1,
@@ -126,48 +133,48 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1.5,
-                  fontSize: '1.25rem'
+                  fontSize: '1.2rem',
+                  fontFamily: 'JetBrains Mono, monospace'
                 }}
               >
-                <Box sx={{ bgcolor: '#00D1FF', color: '#000', px: 1, borderRadius: 0.5, fontSize: '0.8rem', fontWeight: 900 }}>TM</Box>
+                <Box sx={{ bgcolor: '#00D1FF', color: '#000', px: 1, py: 0.2, borderRadius: 1, fontSize: '0.85rem', fontWeight: 950 }}>TM</Box>
                 TRADEMIND AI
                 <Chip
-                  label="V2.2 FROZEN"
+                  label="INSTITUTIONAL"
                   size="small"
                   sx={{
-                    height: 18,
+                    height: 20,
                     fontSize: '0.55rem',
                     fontWeight: 950,
-                    bgcolor: '#10b981',
-                    color: '#000',
-                    borderRadius: 0.5,
-                    ml: 1
+                    bgcolor: 'rgba(16, 185, 129, 0.15)',
+                    color: '#10b981',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: 1,
+                    ml: 0.5
                   }}
                 />
               </Typography>
 
               {!isMobile && (
-                <Stack direction="row" spacing={1} sx={{ ml: 4 }}>
-                   <HeaderStatus label="SCAN" value="NIFTY 200 CANONICAL" color="#10b981" />
-                   <HeaderStatus label="MODE" value="SHADOW SIGNAL" color="#00D1FF" />
+                <Stack direction="row" spacing={1.5} sx={{ ml: 4 }}>
+                   <HeaderStatus
+                     label="SERVER"
+                     value={isOnline ? "LOCAL CONNECTED" : "OFFLINE MODE"}
+                     color={isOnline ? "#10b981" : "#f59e0b"}
+                     dot={true}
+                   />
+                   <HeaderStatus label="UNIVERSE" value="NIFTY 200 CANONICAL" color="#00D1FF" />
+                   <HeaderStatus label="ENGINE" value="V2.3 ENSEMBLE" color="#a855f7" />
                 </Stack>
               )}
             </Stack>
 
             <Stack direction="row" spacing={2} alignItems="center">
-              {!isMobile && (
-                <Stack direction="row" spacing={1} sx={{ mr: 4 }}>
-                   <HeaderStatus label="MODE" value="SHADOW SIGNAL" color="#00D1FF" />
-                   <HeaderStatus label="REAL TRADING" value="DISABLED" color="#ef4444" />
-                   <HeaderStatus label="ROUTING" value="LOCKED" color="#ef4444" />
-                </Stack>
-              )}
-
-              <IconButton onClick={handleProfileClick} sx={{ p: 0.5, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1 }}>
-                <Avatar sx={{ width: 28, height: 28, bgcolor: '#7C3AED', fontSize: '0.7rem', fontWeight: 900, borderRadius: 0.5 }}>
-                  {user?.email?.substring(0, 2).toUpperCase() || 'TR'}
+              <IconButton onClick={handleProfileClick} sx={{ p: 0.5, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 2, bgcolor: 'rgba(255,255,255,0.02)' }}>
+                <Avatar sx={{ width: 30, height: 38, bgcolor: '#7C3AED', fontSize: '0.75rem', fontWeight: 950, borderRadius: 1.5 }}>
+                  {user?.email?.substring(0, 2).toUpperCase() || 'TM'}
                 </Avatar>
-                <ChevronDown size={14} style={{ marginLeft: 6, opacity: 0.5 }} color="white" />
+                <ChevronDown size={14} style={{ marginLeft: 6, opacity: 0.6 }} color="white" />
               </IconButton>
 
               <Menu
@@ -181,22 +188,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     bgcolor: '#0f172a',
                     border: '1px solid rgba(255,255,255,0.1)',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
-                    borderRadius: 1
+                    borderRadius: 2
                   }
                 }}
               >
                 <Box sx={{ px: 2, py: 2 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>{user?.email || 'TradeMind Pro'}</Typography>
-                  <Typography variant="caption" sx={{ color: '#708090', fontWeight: 700 }}>Institutional Access</Typography>
+                  <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
+                    <ShieldCheck size={12} /> Institutional Tier
+                  </Typography>
                 </Box>
-                <Divider sx={{ opacity: 0.05 }} />
-                <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.5 }}>
-                  <ListItemIcon><Activity size={18} color="#708090" /></ListItemIcon>
-                  <ListItemText primary="System Status" primaryTypographyProps={{ variant: 'body2', fontWeight: 800, color: '#708090' }} />
+                <Divider sx={{ opacity: 0.08 }} />
+                <MenuItem onClick={() => { handleProfileClose(); navigate('/account'); }} sx={{ py: 1.2 }}>
+                  <ListItemIcon><User size={16} color="#94a3b8" /></ListItemIcon>
+                  <ListItemText primary="Account & Referral" primaryTypographyProps={{ variant: 'body2', fontWeight: 700, color: '#f8fafc' }} />
                 </MenuItem>
-                <Divider sx={{ opacity: 0.05 }} />
-                <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: '#ef4444', py: 1.5 }}>
-                  <ListItemIcon><LogOut size={18} color="currentColor" /></ListItemIcon>
+                <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.2 }}>
+                  <ListItemIcon><Activity size={16} color="#94a3b8" /></ListItemIcon>
+                  <ListItemText primary="System Diagnostics" primaryTypographyProps={{ variant: 'body2', fontWeight: 700, color: '#f8fafc' }} />
+                </MenuItem>
+                <Divider sx={{ opacity: 0.08 }} />
+                <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: '#f43f5e', py: 1.2 }}>
+                  <ListItemIcon><LogOut size={16} color="#f43f5e" /></ListItemIcon>
                   <ListItemText primary="Disconnect Terminal" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
                 </MenuItem>
               </Menu>
@@ -214,35 +227,37 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             [`& .MuiDrawer-paper`]: {
               width: drawerWidth,
               boxSizing: 'border-box',
-              backgroundColor: '#070a0f',
-              borderRight: '1px solid rgba(255,255,255,0.08)',
+              backgroundColor: '#070d19',
+              borderRight: '1px solid rgba(255,255,255,0.06)',
               color: 'white',
               backgroundImage: 'none'
             },
           }}
         >
-          <Toolbar sx={{ minHeight: 80 }} />
+          <Toolbar sx={{ minHeight: 70 }} />
           <Box sx={{ overflow: 'auto', mt: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <List sx={{ px: 2 }}>
-               <Typography variant="caption" sx={{ px: 2, mb: 2, display: 'block', fontWeight: 900, color: '#708090', letterSpacing: 2 }}>PRIMARY COMMANDS</Typography>
+               <Typography variant="caption" sx={{ px: 2, mb: 1.5, display: 'block', fontWeight: 900, color: '#64748b', letterSpacing: 1.5 }}>PRIMARY COMMANDS</Typography>
                {userMenuItems.map((item) => (
                  <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                     <ListItemButton
                       onClick={() => { navigate(item.path); if (isMobile) setDrawerOpen(false); }}
                       selected={currentPath === item.path || (location.pathname.startsWith(item.path))}
                       sx={{
-                        borderRadius: 1,
-                        py: 1.4,
+                        borderRadius: 2,
+                        py: 1.2,
+                        px: 2,
                         '&.Mui-selected': {
-                          backgroundColor: alpha('#00D1FF', 0.08),
+                          backgroundColor: 'rgba(0, 209, 255, 0.1)',
                           color: '#00D1FF',
+                          border: '1px solid rgba(0, 209, 255, 0.2)',
                           '& .MuiListItemIcon-root': { color: '#00D1FF' },
                           '& .MuiTypography-root': { fontWeight: 950 }
                         },
-                        '&:hover': { backgroundColor: alpha('#fff', 0.03) }
+                        '&:hover': { backgroundColor: 'rgba(255,255,255,0.03)' }
                       }}
                     >
-                      <ListItemIcon sx={{ color: '#708090', minWidth: 40 }}>
+                      <ListItemIcon sx={{ color: '#64748b', minWidth: 36 }}>
                         {item.icon}
                       </ListItemIcon>
                       <ListItemText
@@ -250,8 +265,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         primaryTypographyProps={{
                           variant: 'body2',
                           fontWeight: 800,
-                          letterSpacing: 1,
-                          fontSize: '0.75rem'
+                          letterSpacing: 0.8,
+                          fontSize: '0.725rem'
                         }}
                       />
                     </ListItemButton>
@@ -260,25 +275,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
                {isAdmin && (
                  <>
-                   <Typography variant="caption" sx={{ px: 2, mt: 4, mb: 2, display: 'block', fontWeight: 900, color: 'secondary.main', letterSpacing: 2 }}>ADMINISTRATION</Typography>
+                   <Typography variant="caption" sx={{ px: 2, mt: 3, mb: 1.5, display: 'block', fontWeight: 900, color: '#a855f7', letterSpacing: 1.5 }}>ADMINISTRATION</Typography>
                    {adminMenuItems.map((item) => (
                      <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                         <ListItemButton
                           onClick={() => { navigate(item.path); if (isMobile) setDrawerOpen(false); }}
                           selected={currentPath === item.path || (location.pathname.startsWith(item.path))}
                           sx={{
-                            borderRadius: 1,
-                            py: 1.4,
+                            borderRadius: 2,
+                            py: 1.2,
+                            px: 2,
                             '&.Mui-selected': {
-                              backgroundColor: alpha('#7C3AED', 0.08),
-                              color: 'secondary.main',
-                              '& .MuiListItemIcon-root': { color: 'secondary.main' },
+                              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                              color: '#a855f7',
+                              border: '1px solid rgba(124, 58, 237, 0.2)',
+                              '& .MuiListItemIcon-root': { color: '#a855f7' },
                               '& .MuiTypography-root': { fontWeight: 950 }
                             },
-                            '&:hover': { backgroundColor: alpha('#fff', 0.03) }
+                            '&:hover': { backgroundColor: 'rgba(255,255,255,0.03)' }
                           }}
                         >
-                          <ListItemIcon sx={{ color: '#708090', minWidth: 40 }}>
+                          <ListItemIcon sx={{ color: '#64748b', minWidth: 36 }}>
                             {item.icon}
                           </ListItemIcon>
                           <ListItemText
@@ -286,8 +303,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             primaryTypographyProps={{
                               variant: 'body2',
                               fontWeight: 800,
-                              letterSpacing: 1,
-                              fontSize: '0.75rem'
+                              letterSpacing: 0.8,
+                              fontSize: '0.725rem'
                             }}
                           />
                         </ListItemButton>
@@ -297,23 +314,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                )}
             </List>
 
-            <Box sx={{ mt: 'auto', p: 3, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.6rem' }}>
-                  © 2026 TRADEMIND AI • STRATEGY V2.2
+            <Box sx={{ mt: 'auto', p: 2.5, borderTop: '1px solid rgba(255,255,255,0.05)', bgcolor: 'rgba(2, 6, 23, 0.4)' }}>
+               <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, fontSize: '0.625rem', display: 'block', fontFamily: 'JetBrains Mono, monospace' }}>
+                  TRADEMIND TERMINAL V2.3
+               </Typography>
+               <Typography variant="caption" sx={{ color: '#475569', fontWeight: 700, fontSize: '0.55rem' }}>
+                  NIFTY-200 Quantitative Intelligence
                </Typography>
             </Box>
           </Box>
         </Drawer>
 
         <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 4 }, width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
-          <Toolbar sx={{ minHeight: 80 }} />
+          <Toolbar sx={{ minHeight: 70 }} />
           <Container maxWidth="xl" disableGutters={isMobile}>
             {children}
           </Container>
         </Box>
 
         <Snackbar open={notification.open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity={notification.severity} sx={{ width: '100%', borderRadius: 0.5, fontWeight: 800, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
+          <Alert onClose={handleClose} severity={notification.severity} sx={{ width: '100%', borderRadius: 1, fontWeight: 800, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
             {notification.message}
           </Alert>
         </Snackbar>
@@ -322,12 +342,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-
-function HeaderStatus({ label, value, color }: any) {
+function HeaderStatus({ label, value, color, dot }: any) {
    return (
-      <Box sx={{ px: 1.5, py: 0.5, border: '1px solid rgba(255,255,255,0.05)', borderRadius: 0.5, bgcolor: 'rgba(255,255,255,0.02)' }}>
-         <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, fontSize: '0.55rem', mr: 1 }}>{label}:</Typography>
-         <Typography variant="caption" sx={{ color: color, fontWeight: 950, fontSize: '0.55rem' }}>{value}</Typography>
+      <Box sx={{ px: 1.2, py: 0.4, border: '1px solid rgba(255,255,255,0.06)', borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)', display: 'flex', alignItems: 'center', gap: 0.8 }}>
+         {dot && (
+           <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: color, boxShadow: `0 0 8px ${color}` }} />
+         )}
+         <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 900, fontSize: '0.55rem', fontFamily: 'JetBrains Mono, monospace' }}>{label}:</Typography>
+         <Typography variant="caption" sx={{ color: color, fontWeight: 950, fontSize: '0.55rem', fontFamily: 'JetBrains Mono, monospace' }}>{value}</Typography>
       </Box>
    );
 }

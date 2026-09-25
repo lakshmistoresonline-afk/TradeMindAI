@@ -18,19 +18,19 @@ export default function AdminSignals() {
 
   return (
     <Box sx={{ pb: 10, maxWidth: 1400, mx: 'auto', p: 4, color: 'white' }}>
-      <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>SIGNAL OPERATIONS</Typography>
-           <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 800, letterSpacing: 1.5 }}>
+           <Typography variant="caption" sx={{ color: '#a855f7', fontWeight: 800, letterSpacing: 1.5 }}>
               MASTER PUBLICATION & LIFECYCLE GATE
            </Typography>
         </Box>
       </Box>
 
-      <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+      <TableContainer component={Paper} sx={{ bgcolor: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
          <Table>
             <TableHead>
-               <TableRow sx={{ '& th': { color: '#708090', fontWeight: 900, borderBottom: '1px solid rgba(255,255,255,0.05)' } }}>
+               <TableRow sx={{ '& th': { color: '#64748b', fontWeight: 900, borderBottom: '1px solid rgba(255,255,255,0.06)' } }}>
                   <TableCell>SIGNAL ID</TableCell>
                   <TableCell>SYMBOL</TableCell>
                   <TableCell>DIRECTION</TableCell>
@@ -43,27 +43,26 @@ export default function AdminSignals() {
             </TableHead>
             <TableBody>
                {signals.map((s) => (
-                  <TableRow key={s.id} hover sx={{ cursor: 'pointer' }}>
-                     <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: '#708090' }}>{s.id}</TableCell>
-                     <TableCell sx={{ fontWeight: 950 }}>{s.symbol}</TableCell>
+                  <TableRow key={s.id} hover sx={{ cursor: 'pointer', '& td': { borderBottom: '1px solid rgba(255,255,255,0.03)' } }}>
+                     <TableCell sx={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.65rem', color: '#64748b' }}>{s.id}</TableCell>
+                     <TableCell sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono, monospace' }}>{s.symbol}</TableCell>
                      <TableCell>
-                        <Chip label={s.direction} size="small" sx={{ fontWeight: 950, height: 20, bgcolor: alpha(s.direction === 'LONG' ? '#10b981' : '#ef4444', 0.1), color: s.direction === 'LONG' ? '#10b981' : '#ef4444' }} />
+                        <Chip label={s.direction || (s.rating?.includes('BUY') ? 'LONG' : 'SHORT')} size="small" sx={{ fontWeight: 950, height: 20, bgcolor: alpha(s.direction === 'LONG' || s.rating?.includes('BUY') ? '#10b981' : '#f43f5e', 0.12), color: s.direction === 'LONG' || s.rating?.includes('BUY') ? '#10b981' : '#f43f5e' }} />
                      </TableCell>
-                     <TableCell sx={{ fontWeight: 900, color: '#00D1FF' }}>{Math.round(s.conviction)}%</TableCell>
-                     <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.entry_price?.toLocaleString()}</TableCell>
+                     <TableCell sx={{ fontWeight: 950, color: '#00D1FF', fontFamily: 'JetBrains Mono, monospace' }}>{Math.round(s.conviction || 75)}%</TableCell>
+                     <TableCell sx={{ fontFamily: 'JetBrains Mono, monospace' }}>₹{s.entry_price?.toLocaleString() || '—'}</TableCell>
                      <TableCell>
-                        <Chip label={s.status} size="small" variant="outlined" sx={{ fontWeight: 900, fontSize: '0.5rem', height: 18, color: '#708090' }} />
+                        <Chip label={s.status || 'ACTIVE'} size="small" variant="outlined" sx={{ fontWeight: 950, fontSize: '0.55rem', height: 20, color: '#64748b', borderColor: 'rgba(255,255,255,0.15)' }} />
                      </TableCell>
                      <TableCell>
                         <Stack direction="row" spacing={1} alignItems="center">
                            <CheckCircle2 size={12} color="#10b981" />
-                           <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 900, fontSize: '0.6rem' }}>PASSED</Typography>
+                           <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, fontSize: '0.65rem' }}>PASSED GATE</Typography>
                         </Stack>
                      </TableCell>
                      <TableCell align="right">
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
-                           <Button size="small" variant="outlined" color="error" sx={{ fontSize: '0.6rem', fontWeight: 900 }}>REJECT</Button>
-                           <Button size="small" variant="outlined" color="primary" onClick={() => navigate(`/signals/${s.id}`)} sx={{ fontSize: '0.6rem', fontWeight: 900 }}>AUDIT</Button>
+                           <Button size="small" variant="outlined" color="primary" onClick={() => navigate(`/signals/${s.id}`)} sx={{ fontSize: '0.65rem', fontWeight: 900 }}>AUDIT</Button>
                         </Stack>
                      </TableCell>
                   </TableRow>
