@@ -9,12 +9,20 @@
 
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 const UPDATE_INTERVAL_MS = 15 * 60 * 1000; // 15 Minutes (900,000 ms)
+const LOG_FILE_PATH = path.join(__dirname, 'updater.log');
 
 function log(msg) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-  console.log(`[${timestamp} IST] ${msg}`);
+  const logLine = `[${timestamp} IST] ${msg}\n`;
+  console.log(logLine.trim());
+  try {
+    fs.appendFileSync(LOG_FILE_PATH, logLine, 'utf8');
+  } catch (e) {
+    console.error("Log file write error:", e);
+  }
 }
 
 async function runUpdateCycle() {
