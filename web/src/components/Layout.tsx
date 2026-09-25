@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Chip, Menu, MenuItem, IconButton, Avatar } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Container, Snackbar, Alert, Stack, Divider, Chip, Menu, MenuItem, IconButton, Avatar, Button } from '@mui/material';
 import {
   LayoutDashboard,
   Zap,
@@ -11,7 +11,9 @@ import {
   Database,
   FileText,
   ShieldCheck,
-  TrendingUp
+  TrendingUp,
+  Home,
+  Cpu
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -34,6 +36,14 @@ const userMenuItems = [
   { text: 'PERFORMANCE', icon: <TrendingUp size={18} />, path: '/performance' },
   { text: 'PRICING', icon: <FileText size={18} />, path: '/pricing' },
   { text: 'ACCOUNT', icon: <User size={18} />, path: '/account' },
+];
+
+const publicMenuItems = [
+  { text: 'HOME', icon: <Home size={18} />, path: '/' },
+  { text: 'PERFORMANCE', icon: <TrendingUp size={18} />, path: '/performance' },
+  { text: 'PRICING', icon: <FileText size={18} />, path: '/pricing' },
+  { text: 'TRUST CENTER', icon: <ShieldCheck size={18} />, path: '/trust' },
+  { text: 'METHODOLOGY', icon: <Cpu size={18} />, path: '/methodology' },
 ];
 
 const adminMenuItems = [
@@ -98,6 +108,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   const currentPath = location.pathname + location.search;
+  const navItems = user ? userMenuItems : publicMenuItems;
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
@@ -125,7 +136,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Typography
                 variant="h6"
                 noWrap
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate(user ? '/dashboard' : '/')}
                 sx={{
                   fontWeight: 950,
                   letterSpacing: -1,
@@ -170,49 +181,70 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Stack>
 
             <Stack direction="row" spacing={2} alignItems="center">
-              <IconButton onClick={handleProfileClick} sx={{ p: 0.5, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 2, bgcolor: 'rgba(255,255,255,0.02)' }}>
-                <Avatar sx={{ width: 30, height: 38, bgcolor: '#7C3AED', fontSize: '0.75rem', fontWeight: 950, borderRadius: 1.5 }}>
-                  {user?.email?.substring(0, 2).toUpperCase() || 'TM'}
-                </Avatar>
-                <ChevronDown size={14} style={{ marginLeft: 6, opacity: 0.6 }} color="white" />
-              </IconButton>
+              {user ? (
+                <>
+                  <IconButton onClick={handleProfileClick} sx={{ p: 0.5, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 2, bgcolor: 'rgba(255,255,255,0.02)' }}>
+                    <Avatar sx={{ width: 30, height: 38, bgcolor: '#7C3AED', fontSize: '0.75rem', fontWeight: 950, borderRadius: 1.5 }}>
+                      {user.email?.substring(0, 2).toUpperCase() || 'TM'}
+                    </Avatar>
+                    <ChevronDown size={14} style={{ marginLeft: 6, opacity: 0.6 }} color="white" />
+                  </IconButton>
 
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleProfileClose}
-                PaperProps={{
-                  sx: {
-                    width: 240,
-                    mt: 1.5,
-                    bgcolor: '#0f172a',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
-                    borderRadius: 2
-                  }
-                }}
-              >
-                <Box sx={{ px: 2, py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>{user?.email || 'TradeMind Pro'}</Typography>
-                  <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
-                    <ShieldCheck size={12} /> Institutional Tier
-                  </Typography>
-                </Box>
-                <Divider sx={{ opacity: 0.08 }} />
-                <MenuItem onClick={() => { handleProfileClose(); navigate('/account'); }} sx={{ py: 1.2 }}>
-                  <ListItemIcon><User size={16} color="#94a3b8" /></ListItemIcon>
-                  <ListItemText primary="Account & Referral" primaryTypographyProps={{ variant: 'body2', fontWeight: 700, color: '#f8fafc' }} />
-                </MenuItem>
-                <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.2 }}>
-                  <ListItemIcon><Activity size={16} color="#94a3b8" /></ListItemIcon>
-                  <ListItemText primary="System Diagnostics" primaryTypographyProps={{ variant: 'body2', fontWeight: 700, color: '#f8fafc' }} />
-                </MenuItem>
-                <Divider sx={{ opacity: 0.08 }} />
-                <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: '#f43f5e', py: 1.2 }}>
-                  <ListItemIcon><LogOut size={16} color="#f43f5e" /></ListItemIcon>
-                  <ListItemText primary="Disconnect Terminal" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
-                </MenuItem>
-              </Menu>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleProfileClose}
+                    PaperProps={{
+                      sx: {
+                        width: 240,
+                        mt: 1.5,
+                        bgcolor: '#0f172a',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
+                        borderRadius: 2
+                      }
+                    }}
+                  >
+                    <Box sx={{ px: 2, py: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff' }}>{user.email || 'TradeMind Pro'}</Typography>
+                      <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.3 }}>
+                        <ShieldCheck size={12} /> Institutional Tier
+                      </Typography>
+                    </Box>
+                    <Divider sx={{ opacity: 0.08 }} />
+                    <MenuItem onClick={() => { handleProfileClose(); navigate('/account'); }} sx={{ py: 1.2 }}>
+                      <ListItemIcon><User size={16} color="#94a3b8" /></ListItemIcon>
+                      <ListItemText primary="Account & Referral" primaryTypographyProps={{ variant: 'body2', fontWeight: 700, color: '#f8fafc' }} />
+                    </MenuItem>
+                    <MenuItem onClick={() => { handleProfileClose(); navigate('/status'); }} sx={{ py: 1.2 }}>
+                      <ListItemIcon><Activity size={16} color="#94a3b8" /></ListItemIcon>
+                      <ListItemText primary="System Diagnostics" primaryTypographyProps={{ variant: 'body2', fontWeight: 700, color: '#f8fafc' }} />
+                    </MenuItem>
+                    <Divider sx={{ opacity: 0.08 }} />
+                    <MenuItem onClick={() => { handleProfileClose(); logout(); }} sx={{ color: '#f43f5e', py: 1.2 }}>
+                      <ListItemIcon><LogOut size={16} color="#f43f5e" /></ListItemIcon>
+                      <ListItemText primary="Disconnect Terminal" primaryTypographyProps={{ variant: 'body2', fontWeight: 800 }} />
+                    </MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => navigate('/login')}
+                  sx={{
+                    fontWeight: 950,
+                    bgcolor: '#00D1FF',
+                    color: '#000',
+                    px: 2.5,
+                    py: 0.8,
+                    borderRadius: 1.5,
+                    '&:hover': { bgcolor: '#38bdf8' }
+                  }}
+                >
+                  SIGN IN
+                </Button>
+              )}
             </Stack>
           </Toolbar>
         </AppBar>
@@ -237,12 +269,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Toolbar sx={{ minHeight: 70 }} />
           <Box sx={{ overflow: 'auto', mt: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <List sx={{ px: 2 }}>
-               <Typography variant="caption" sx={{ px: 2, mb: 1.5, display: 'block', fontWeight: 900, color: '#64748b', letterSpacing: 1.5 }}>PRIMARY COMMANDS</Typography>
-               {userMenuItems.map((item) => (
+               <Typography variant="caption" sx={{ px: 2, mb: 1.5, display: 'block', fontWeight: 900, color: '#64748b', letterSpacing: 1.5 }}>
+                 {user ? 'PRIMARY COMMANDS' : 'PUBLIC DIRECTORY'}
+               </Typography>
+               {navItems.map((item) => (
                  <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
                     <ListItemButton
                       onClick={() => { navigate(item.path); if (isMobile) setDrawerOpen(false); }}
-                      selected={currentPath === item.path || (location.pathname.startsWith(item.path))}
+                      selected={currentPath === item.path || (item.path !== '/' && location.pathname.startsWith(item.path))}
                       sx={{
                         borderRadius: 2,
                         py: 1.2,

@@ -115,18 +115,24 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* PUBLIC MARKETING ROUTES (Unauthenticated Standalone) */}
+            {/* PUBLIC MARKETING & LANDING ROUTES */}
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
 
-            {/* Placeholders for legal/info (Public Standalone) */}
-            <Route path="/how-it-works" element={<Methodology />} />
-            <Route path="/faq" element={<Pricing />} />
+            {/* PUBLIC RESEARCH & PERFORMANCE PAGES (Accessible without signing in) */}
+            <Route path="/performance" element={<Layout><Performance /></Layout>} />
+            <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
+            <Route path="/trust" element={<Layout><Trust /></Layout>} />
+            <Route path="/methodology" element={<Layout><Methodology /></Layout>} />
+            <Route path="/how-it-works" element={<Layout><Methodology /></Layout>} />
+            <Route path="/evidence" element={<Layout><Evidence /></Layout>} />
+            <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
+            <Route path="/faq" element={<Layout><Pricing /></Layout>} />
             <Route path="/risk-disclosure" element={<RiskDisclosure />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
 
-            {/* PROTECTED APPLICATION ROUTES (Wrapped inside Navigation Layout) */}
+            {/* PROTECTED APPLICATION ROUTES (Wrapped inside AuthGuard) */}
             <Route path="/*" element={
               <AuthGuard>
                 <Layout>
@@ -135,11 +141,6 @@ function App() {
                     <Route path="/dashboard" element={<UserDashboard />} />
                     <Route path="/signals" element={<EquitySignals />} />
                     <Route path="/signals/:id" element={<SignalDetail />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/performance" element={<Performance />} />
-                    <Route path="/evidence" element={<Evidence />} />
-                    <Route path="/methodology" element={<Methodology />} />
-                    <Route path="/trust" element={<Trust />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/checkout/:planId" element={<Checkout />} />
 
@@ -151,14 +152,11 @@ function App() {
                           <Route path="signals" element={<AdminSignals />} />
                           <Route path="data" element={<AdminDataFeeds />} />
                           <Route path="status" element={<SystemStatus />} />
-                          {/* Fallback to admin dashboard */}
                           <Route path="*" element={<Navigate to="dashboard" replace />} />
                         </Routes>
                       </AdminGuard>
                     } />
 
-                    {/* Compatibility redirects */}
-                    <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
                     <Route path="/status" element={<Navigate to="/admin/status" replace />} />
 
                     {/* Fallback to Dashboard */}
