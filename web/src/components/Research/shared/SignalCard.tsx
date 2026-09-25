@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Box, Typography, Paper, Grid, Stack, Chip, alpha, LinearProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, Divider, IconButton, Tooltip } from '@mui/material';
-import { ArrowUpRight, ArrowDownRight, Clock, Calculator, Share2, Check } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Clock, Calendar, Calculator, Share2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
+import { formatNSEDateTime, getSignalStatusMeta } from '../../../utils/nseDateUtils';
 
 interface SignalCardProps {
   stock: any;
@@ -31,6 +32,8 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
   const stop = decision.stopLoss;
   const current = decision.normalizedCurrentPrice;
   const conviction = decision.conviction || 75;
+
+  const { createdAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
 
   return (
     <Paper
@@ -161,14 +164,24 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
 
       {/* 3. Card Footer Zone */}
       <Box sx={{ px: 2.5, py: 1.8, bgcolor: 'rgba(2, 6, 23, 0.4)', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Clock size={12} color="#cbd5e1" />
-          <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.65rem' }}>
-            AGE: {decision.signalAgeHours ? `${decision.signalAgeHours.toFixed(1)}H` : 'FRESH'}
-          </Typography>
+        <Stack spacing={0.4} sx={{ flex: 1, pr: 1, minWidth: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+            <Calendar size={11} color="#38bdf8" />
+            <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
+              Created: <span style={{ color: '#f8fafc', fontWeight: 800 }}>{formatNSEDateTime(createdAt)}</span>
+            </Typography>
+          </Box>
+          {hasStatusChanged && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+              <Clock size={11} color="#10b981" />
+              <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
+                {statusLabel}: <span style={{ color: '#10b981', fontWeight: 800 }}>{formatNSEDateTime(statusChangeTime)}</span>
+              </Typography>
+            </Box>
+          )}
         </Stack>
 
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexShrink: 0 }}>
           <Tooltip title={copied ? "Signal Link Copied!" : "Copy Signal Link"}>
             <IconButton size="small" onClick={handleCopyLink} sx={{ color: copied ? '#10b981' : '#708090', p: 0.5, '&:hover': { color: '#00D1FF' } }}>
               {copied ? <Check size={13} /> : <Share2 size={13} />}

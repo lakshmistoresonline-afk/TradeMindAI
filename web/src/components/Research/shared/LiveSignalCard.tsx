@@ -1,8 +1,8 @@
 import { Box, Typography, Paper, Grid, Stack, Chip, alpha, Divider, Button, Tooltip } from '@mui/material';
 import { HelpCircle } from 'lucide-react';
-// V2.3 Hardened Card
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
+import { formatNSEDateTime, getSignalStatusMeta } from '../../../utils/nseDateUtils';
 
 interface LiveSignalCardProps {
   stock: any;
@@ -17,22 +17,13 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 
   const isBuy = decision.rating?.includes('BUY');
 
-  // authorative levels from decision
+  // authoritative levels from decision
   const entry = decision.entry;
   const target = decision.target;
   const stop = decision.stopLoss;
   const current = decision.normalizedCurrentPrice;
 
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return 'UNAVAILABLE';
-    try {
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return 'UNAVAILABLE';
-      return `${date.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][date.getMonth()]} ${date.getFullYear()} • ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} IST`;
-    } catch {
-      return 'UNAVAILABLE';
-    }
-  };
+  const { createdAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -197,36 +188,20 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
 
          <Stack spacing={1.2}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>CREATED AT</Typography>
-               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(decision.generatedAt)}</Typography>
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.55rem' }}>CREATED AT</Typography>
+               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.55rem' }}>{formatNSEDateTime(createdAt)}</Typography>
             </Box>
+            {hasStatusChanged && (
+               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.55rem' }}>{statusLabel.toUpperCase()}</Typography>
+                  <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 800, fontSize: '0.55rem' }}>
+                     {formatNSEDateTime(statusChangeTime)}
+                  </Typography>
+               </Box>
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>TRIGGERED AT</Typography>
-               <Typography variant="caption" sx={{ color: decision.triggeredAt ? '#10b981' : '#f59e0b', fontWeight: 800, fontSize: '0.5rem' }}>
-                  {decision.triggeredAt ? formatDate(decision.triggeredAt) : 'PENDING BREAKOUT'}
-               </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>DATA TIME (NSE)</Typography>
-               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.5rem' }}>{formatDate(stock.data_timestamp || stock.timestamp)}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-                {decision.signalAgeHours !== undefined && (
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>SIGNAL AGE</Typography>
-                        <Typography variant="caption" sx={{ color: decision.signalAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem', display: 'block' }}>
-                            {decision.signalAgeHours.toFixed(1)} HOURS
-                        </Typography>
-                    </Box>
-                )}
-                {decision.dataAgeHours !== undefined && (
-                    <Box sx={{ flex: 1, textAlign: 'right' }}>
-                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.5rem' }}>DATA AGE</Typography>
-                        <Typography variant="caption" sx={{ color: decision.dataAgeHours > 24 ? '#ef4444' : '#10b981', fontWeight: 800, fontSize: '0.5rem', display: 'block' }}>
-                            {decision.dataAgeHours.toFixed(1)} HOURS
-                        </Typography>
-                    </Box>
-                )}
+               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, fontSize: '0.55rem' }}>DATA TIME (NSE)</Typography>
+               <Typography variant="caption" sx={{ color: '#e2e8f0', fontWeight: 800, fontSize: '0.55rem' }}>{formatNSEDateTime(stock.data_timestamp || stock.timestamp)}</Typography>
             </Box>
          </Stack>
       </Box>
