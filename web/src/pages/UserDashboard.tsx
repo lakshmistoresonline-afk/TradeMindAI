@@ -72,14 +72,28 @@ export default function UserDashboard() {
     }
   }, [firestoreSignals, marketContext]);
 
+  // Strict Deduplication by Symbol (Guarantees unique card per symbol on Dashboard)
   const filteredSignals = useMemo(() => {
     const horizon = ['SWING', 'SHORT', 'LONG'][tab];
-    return signals.filter(s => {
+
+    const raw = signals.filter(s => {
       const isLongTrade = s.decision?.direction === 'LONG' || s.decision?.rating?.includes('BUY');
-      return isLongTrade &&
-        s.decision?.timeframe === horizon &&
-        ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision?.status);
-    }).slice(0, 3);
+      const isMatchingHorizon = s.decision?.timeframe === horizon || (horizon === 'SWING' && (!s.decision?.timeframe || s.decision?.timeframe === 'SWING'));
+      const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(s.decision?.status);
+      return isLongTrade && isMatchingHorizon && isActive;
+    });
+
+    raw.sort((a, b) => new Date(b.decision?.generatedAt || b.created_at || 0).getTime() - new Date(a.decision?.generatedAt || a.created_at || 0).getTime());
+
+    const dedupMap = new Map<string, any>();
+    raw.forEach(s => {
+      const sym = s.symbol.toUpperCase();
+      if (!dedupMap.has(sym)) {
+        dedupMap.set(sym, s);
+      }
+    });
+
+    return Array.from(dedupMap.values()).slice(0, 3);
   }, [signals, tab]);
 
   return (
