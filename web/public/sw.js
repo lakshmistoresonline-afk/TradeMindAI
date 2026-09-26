@@ -1,6 +1,6 @@
 /**
  * TradeMind AI: Progressive Web App (PWA) Offline Service Worker
- * Provides instant app shell loading, offline caching, and native background sync.
+ * Caches static web shell assets while cleanly bypassing API and WebSocket calls.
  */
 
 const CACHE_NAME = 'trademind-pwa-v3.3';
@@ -32,13 +32,24 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests for app shell
-  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+
+  // Ignore non-GET requests, API calls, WebSockets, and localhost dev backend
+  if (
+    event.request.method !== 'GET' ||
+    url.pathname.includes('/api/') ||
+    url.pathname.includes('/ws/') ||
+    url.hostname === 'localhost' ||
+    url.protocol === 'ws:' ||
+    url.protocol === 'wss:'
+  ) {
+    return; // Pass through to browser
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch fresh copy in background to update cache (Stale-While-Revalidate)
+        // Background cache update
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => {
@@ -48,7 +59,13 @@ self.addEventListener('fetch', (event) => {
         }).catch(() => {});
         return cachedResponse;
       }
-      return fetch(event.request);
+      return fetch(event.request).catch((err) => {
+        // Return index.html fallback for navigation routes when offline
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
+        throw err;
+      });
     })
   );
 });

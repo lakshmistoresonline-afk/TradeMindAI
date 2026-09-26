@@ -79,33 +79,36 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       setLastRefreshTime(new Date());
     }, 30000);
 
-    try {
-      const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
-      const socket = new WebSocket(wsUrl);
+    // Only attempt WebSocket connection if running on localhost backend
+    if (window.location.hostname === 'localhost') {
+      try {
+        const wsUrl = API_BASE_URL.replace('http', 'ws').replace('/api/v1', '/ws/alerts');
+        const socket = new WebSocket(wsUrl);
 
-      socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.type === 'AI_COMPLETED') {
-            showNotification(data.message, 'success');
-            setLastRefreshTime(new Date());
-          }
-        } catch (e) {
-          console.error("WS Error:", e);
-        }
-      };
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'AI_COMPLETED') {
+              showNotification(data.message, 'success');
+              setLastRefreshTime(new Date());
+            }
+          } catch {}
+        };
 
-      socket.onerror = () => {
-        try { socket.close(); } catch {}
-      };
+        socket.onerror = () => {
+          try { socket.close(); } catch {}
+        };
 
-      return () => {
-        clearInterval(refreshInterval);
-        try { socket.close(); } catch {}
-      };
-    } catch {
-      return () => clearInterval(refreshInterval);
+        return () => {
+          clearInterval(refreshInterval);
+          try { socket.close(); } catch {}
+        };
+      } catch {
+        return () => clearInterval(refreshInterval);
+      }
     }
+
+    return () => clearInterval(refreshInterval);
   }, []);
 
   const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
