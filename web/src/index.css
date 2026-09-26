@@ -17,6 +17,25 @@ body {
   color: #f8fafc;
 }
 
+/* Native Mobile App Touch & Gesture Ergonomics */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation;
+}
+
+html, body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent accidental text selection on mobile buttons & cards */
+.select-none-mobile, button, .MuiButton-root, .MuiChip-root, .MuiPaper-root {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* Chrome / Edge / WebKit Autofill Overrides (Fixes Mismatched Blue Input Box Background) */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

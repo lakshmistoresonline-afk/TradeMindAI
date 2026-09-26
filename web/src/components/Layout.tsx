@@ -21,6 +21,8 @@ import { API_BASE_URL } from '../api/client';
 import { useAuth } from '../hooks/useAuth';
 import { useBackendHealth } from '../hooks/useBackendHealth';
 import { formatNSEDateTime } from '../utils/nseDateUtils';
+import MobileBottomNav from './MobileBottomNav';
+import InstallPwaPrompt from './InstallPwaPrompt';
 
 const drawerWidth = 260;
 
@@ -385,6 +387,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {notification.message}
           </Alert>
         </Snackbar>
+
+        {/* Mobile PWA Bottom Navigation & Add-To-Homescreen Installer */}
+        {user && <MobileBottomNav />}
+        <InstallPwaPrompt />
       </Box>
     </NotificationContext.Provider>
   );
