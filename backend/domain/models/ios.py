@@ -156,6 +156,22 @@ class LiveSignal(BaseModel):
     gnn_supply_chain_ripple_risk: Optional[float] = None    # Global Graph Neural Network Supply Chain Ripple Risk (e.g. 0.02)
     dark_web_insider_threat_status: Optional[str] = None    # Dark Web Corporate Insider Threat Status (e.g. SECURE_NO_CHATTER)
 
+    # V5.0 Precognitive AGI & Sub-Planck Temporal Arbitrage
+    trans_earth_neutrino_latency_ms: Optional[float] = None # Trans-Earth Neutrino Arbitrage Latency Advantage (e.g. 0.00ms)
+    quantum_entangled_execution_state: Optional[str] = None # Quantum Entangled Order Execution (e.g. INSTANT_COLLAPSE)
+    laplaces_demon_probability: Optional[float] = None      # Laplace's Demon Precognitive Deterministic Matrix (100.0%)
+    bci_retail_capitulation_index: Optional[float] = None   # BCI Smartwatch Retail Capitulation Index (e.g. 99.9%)
+    cosmic_ray_seu_risk_level: Optional[str] = None         # Solar Flare Cosmic Ray Bit-Flip SEU Risk (e.g. NOMINAL)
+
+    regime: Optional[str] = None
+    regime_probability: Optional[float] = None
+
+    # Lineage
+    model_id: Optional[str] = None
+    model_version: str = "TradeMind Core v5.0-God Mode"
+    gnn_supply_chain_ripple_risk: Optional[float] = None    # Global Graph Neural Network Supply Chain Ripple Risk (e.g. 0.02)
+    dark_web_insider_threat_status: Optional[str] = None    # Dark Web Corporate Insider Threat Status (e.g. SECURE_NO_CHATTER)
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 

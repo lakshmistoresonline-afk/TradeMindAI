@@ -119,6 +119,13 @@ export interface AITradeDecision {
   gnnSupplyChainRippleRisk?: number;   // Global GNN Supply Chain Ripple Risk (e.g. 0.02)
   darkWebInsiderThreatStatus?: string; // Dark Web Corporate Insider Threat Status (e.g. SECURE_NO_CHATTER)
 
+  // Strategy V5.0 Precognitive AGI & Sub-Planck Temporal Arbitrage
+  transEarthNeutrinoLatencyMs?: number; // Trans-Earth Neutrino Arbitrage Latency Advantage (e.g. 0.00ms)
+  quantumEntangledExecutionState?: string; // Quantum Entangled Order Execution (e.g. INSTANT_COLLAPSE)
+  laplacesDemonProbability?: number;    // Laplace's Demon Precognitive Deterministic Matrix (100.0%)
+  bciRetailCapitulationIndex?: number;  // BCI Smartwatch Retail Capitulation Index (e.g. 99.9%)
+  cosmicRaySeuRiskLevel?: string;       // Solar Flare Cosmic Ray Bit-Flip SEU Risk (e.g. NOMINAL)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

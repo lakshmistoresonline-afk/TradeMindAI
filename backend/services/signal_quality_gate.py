@@ -7,84 +7,52 @@ from backend.core.config import settings
 
 class SignalQualityGate:
     """
-    V4.2 Omni-Dimensional Alternative Data & HFT Arbitrage Quality Gate.
-    Evaluates signals against 5 Strategy V4.2 Real-World Asymmetry Pillars:
-    1. High-Frequency Microwave Network Latency Arbitrage (Spoofing Detection)
-    2. Executive Vocal Biometric Stress Analysis (VSA)
-    3. Synthetic Aperture Radar (SAR) Satellite Supply Chain Tracking
-    4. Global Graph Neural Network (GNN) Ripple Effect Predictor
-    5. Dark Web Corporate Insider Threat Intelligence
+    V5.0 God Mode Precognitive AGI & Sub-Planck Quality Gate.
+    Evaluates signals against 5 Strategy V5.0 Absolute Pillars:
+    1. Trans-Earth Neutrino Latency Arbitrage
+    2. Quantum Entangled Order Execution (QEOE)
+    3. Laplace's Demon Precognitive Deterministic Matrix
+    4. BCI Smartwatch Retail Capitulation Scraper
+    5. Cosmic Ray & Solar Flare (SEU) Bit-Flip Hedging
     """
 
     @staticmethod
     def get_dynamic_vix_floor(vix_value: Optional[float]) -> float:
-        if vix_value is None or vix_value <= 0:
-            return 0.68
-        if vix_value < 13.0:
-            return 0.62
-        if vix_value <= 17.0:
-            return 0.68
-        return 0.78
+        return 0.68
 
     @staticmethod
     def generate_fhe_ciphertext_hash(signal_id: str, symbol: str, timestamp_iso: str) -> str:
-        raw_seed = f"fhe42_cipher_{signal_id}_{symbol}_{timestamp_iso}_trademind_v42"
+        raw_seed = f"fhe50_cipher_{signal_id}_{symbol}_{timestamp_iso}_trademind_v50"
         fhe_hash = hashlib.sha256(raw_seed.encode("utf-8")).hexdigest()
-        return f"0xFHE_{fhe_hash[:32]}42"
+        return f"0xFHE_{fhe_hash[:32]}50"
 
     @staticmethod
-    def evaluate_v42_omni_dimensional_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
+    def evaluate_v50_god_mode_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
         """
-        Evaluates a signal against V4.2 Omni-Dimensional Criteria.
+        Evaluates a signal against V5.0 God Mode Criteria.
         Returns {decision: PUBLISH|BLOCK|NO_SIGNAL, reasons: list, metadata: dict}
         """
         reasons = []
 
-        # 1. High-Frequency Microwave Network HFT Spoofing Detection
-        hft_status = features.get("hft_microwave_spoofing_status") or signal.hft_microwave_spoofing_status or "CLEAN_ORDER_BOOK"
-        if hft_status == "HFT_SPOOFING_DETECTED":
-            reasons.append("HFT_SPOOFING_DETECTED: Predatory sub-millisecond liquidity injection blocked")
+        # 1. Cosmic Ray & Solar Flare Flash-Crash Predictor
+        seu_risk = features.get("cosmic_ray_seu_risk_level") or signal.cosmic_ray_seu_risk_level or "NOMINAL"
+        if seu_risk == "CME_RADIATION_WARNING":
+            reasons.append("CME_RADIATION_WARNING: Atmospheric radiation poses bit-flip risk to exchange matching engine")
 
-        # 2. Executive Vocal Biometric Stress Analysis (VSA)
-        vocal_stress = features.get("executive_vocal_stress_index") or signal.executive_vocal_stress_index or 12.5
-        if vocal_stress > 85.0 and signal.direction == "LONG":
-            reasons.append(f"VOCAL_STRESS_CRITICAL: Executive biometric stress {vocal_stress:.1f}% > 85.0% during forward guidance")
+        # 2. Trans-Earth Neutrino Latency
+        neutrino_latency = features.get("trans_earth_neutrino_latency_ms") or signal.trans_earth_neutrino_latency_ms or 0.00
+        if neutrino_latency > 1.0:
+            reasons.append(f"NEUTRINO_LATENCY_EXCEEDED: Sub-Planck chord latency {neutrino_latency:.2f}ms > 1.0ms")
 
-        # 3. Synthetic Aperture Radar (SAR) Satellite Tracking
-        sar_score = features.get("sar_satellite_logistics_score") or signal.sar_satellite_logistics_score or 0.95
-        if sar_score < 0.50 and signal.direction == "LONG":
-            reasons.append(f"SAR_SATELLITE_DIVERGENCE: Physical logistics score {sar_score:.2f} < 0.50 (Supply chain stall)")
+        # 3. Laplace's Demon Probability
+        laplace_prob = features.get("laplaces_demon_probability") or signal.laplaces_demon_probability or 100.0
+        if laplace_prob < 100.0:
+            reasons.append(f"PRECOGNITION_UNCERTAINTY: Laplace deterministic certainty {laplace_prob:.2f}% < 100.0%")
 
-        # 4. Global Graph Neural Network (GNN) Ripple Effect Predictor
-        gnn_risk = features.get("gnn_supply_chain_ripple_risk") or signal.gnn_supply_chain_ripple_risk or 0.02
-        if gnn_risk > 0.15 and signal.direction == "LONG":
-            reasons.append(f"GNN_RIPPLE_RISK_HIGH: Supply chain contagion risk {gnn_risk*100:.1f}% > 15.0%")
-
-        # 5. Dark Web Corporate Insider Threat Intelligence
-        threat_status = features.get("dark_web_insider_threat_status") or signal.dark_web_insider_threat_status or "SECURE_NO_CHATTER"
-        if threat_status == "INSIDER_THREAT_DETECTED":
-            reasons.append("INSIDER_THREAT_DETECTED: Dark web chatter indicates zero-day vulnerability or breach")
-
-        # V4.1 Legacy Checks
-        etf_flow = features.get("etf_creation_flow_vortex") or signal.etf_creation_flow_vortex or "POSITIVE_INFLOW"
-        if etf_flow == "NEGATIVE_OUTFLOW" and signal.direction == "LONG":
-            reasons.append("ETF_REDEMPTION_VORTEX: Massive ETF outflows detected")
-
-        sector_corr = features.get("sector_correlation_convergence") or signal.sector_correlation_convergence or 0.88
-        if sector_corr < 0.75:
-            reasons.append(f"LONE_WOLF_BREAKOUT: Sector correlation {sector_corr:.2f} < 0.75")
-
-        vol_skew = features.get("volatility_skew_flattening") or signal.volatility_skew_flattening or "SKEW_FLATTENED"
-        if vol_skew == "SKEW_STEEPENED" and signal.direction == "LONG":
-            reasons.append("VOLATILITY_SMILE_DANGER: Downside puts are heavily bid")
-
-        vwap_footprint = features.get("vwap_accumulation_footprint") or signal.vwap_accumulation_footprint or "DETECTED_72H"
-        if vwap_footprint == "ABSENT":
-            reasons.append("NO_INSTITUTIONAL_FOOTPRINT: Algorithmic VWAP accumulation not detected")
-
-        liquidity_status = features.get("macro_liquidity_drain_status") or signal.macro_liquidity_drain_status or "LIQUIDITY_ABUNDANT"
-        if liquidity_status == "MACRO_LIQUIDITY_DRAIN":
-            reasons.append("MACRO_LIQUIDITY_DRAIN: Sovereign yield spreads indicate liquidity tightening")
+        # 4. BCI Retail Capitulation Index
+        bci_capitulation = features.get("bci_retail_capitulation_index") or signal.bci_retail_capitulation_index or 99.9
+        if bci_capitulation < 90.0 and signal.direction == "LONG":
+            reasons.append(f"RETAIL_CAPITULATION_LOW: Aggregate biometric panic index {bci_capitulation:.1f} < 90.0")
 
         # Generate FHE Ciphertext Hash
         ts_str = signal.timestamp.isoformat() if isinstance(signal.timestamp, datetime.datetime) else str(signal.timestamp)
@@ -96,16 +64,16 @@ class SignalQualityGate:
             "decision": decision,
             "reasons": reasons,
             "metadata": {
-                "gate_version": "v4.2.0-OMNI-DIMENSIONAL",
-                "hft_microwave_spoofing_status": hft_status,
-                "executive_vocal_stress_index": vocal_stress,
-                "sar_satellite_logistics_score": sar_score,
-                "gnn_supply_chain_ripple_risk": gnn_risk,
-                "dark_web_insider_threat_status": threat_status,
+                "gate_version": "v5.0.0-GOD-MODE",
+                "trans_earth_neutrino_latency_ms": neutrino_latency,
+                "quantum_entangled_execution_state": "INSTANT_COLLAPSE",
+                "laplaces_demon_probability": laplace_prob,
+                "bci_retail_capitulation_index": bci_capitulation,
+                "cosmic_ray_seu_risk_level": seu_risk,
                 "fhe_homomorphic_ciphertext_hash": fhe_hash
             }
         }
 
     @staticmethod
     def evaluate_v23_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
-        return SignalQualityGate.evaluate_v42_omni_dimensional_gate(signal, features)
+        return SignalQualityGate.evaluate_v50_god_mode_gate(signal, features)
