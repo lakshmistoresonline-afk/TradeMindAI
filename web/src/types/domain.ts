@@ -65,6 +65,13 @@ export interface AITradeDecision {
   tsallisEntropyExhaustionIndex?: number; // Tsallis Non-Extensive Information Entropy Index (e.g. 0.18)
   lobQueueImpactCost?: number;         // LOB Queue Priority Impact Cost Estimator (e.g. 0.02%)
 
+  // Strategy V2.9 Neuromorphic & Topological Upgrades
+  snnTapeSpikeDetected?: boolean;      // Neuromorphic Spiking Neural Net Sub-Millisecond Tape Spike (True)
+  tdaBettiHomologyScore?: number;      // Topological Data Analysis Persistent Homology Score (e.g. 0.94)
+  hurstExponentH?: number;             // Fractional Brownian Motion Hurst Memory Exponent (e.g. 0.72)
+  zkSnarkProofHash?: string;           // Cryptographic Zero-Knowledge zk-SNARK Proof of Alpha Hash
+  varianceSwapArbitrageScore?: number; // Implied Volatility vs OFI Realized Variance Arbitrage Score (+2.85 sigma)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

@@ -40,7 +40,7 @@ class LiveSignal(BaseModel):
     direction: str # LONG or SHORT
     rating: Optional[str] = None # BUY, SELL, HOLD
     timeframe: Optional[str] = None
-    strategy_version: str = "v2.8"
+    strategy_version: str = "v2.9"
     signal_version: str = "1.0"
 
     # Timing
@@ -66,7 +66,7 @@ class LiveSignal(BaseModel):
     current_price: Optional[float] = None
     risk_reward_ratio: Optional[float] = None
 
-    # Intelligence & Strategy V2.5/V2.6/V2.7/V2.8 Accuracy Upgrades
+    # Intelligence & Strategy V2.5-V2.9 Accuracy Upgrades
     raw_probability: Optional[float] = None
     calibrated_probability: Optional[float] = None
     expected_value: Optional[float] = None
@@ -96,18 +96,25 @@ class LiveSignal(BaseModel):
     ppo_rl_exit_status: Optional[str] = None        # HOLD_DYNAMIC_TRAIL, MARKET_SELL, BREAKEVEN_LOCK
 
     # V2.8 Autonomous Swarm & Quantum Upgrades
-    agent_swarm_consensus_score: Optional[float] = None   # 4-Agent LLM Committee Consensus Score (e.g. 0.95 - 4/4 Votes)
+    agent_swarm_consensus_score: Optional[float] = None   # 4-Agent LLM Committee Consensus Score (e.g. 0.95)
     quantum_density_probability: Optional[float] = None   # Schrödinger Wave Probability Density (e.g. 0.88)
     rmt_cluster_uncorrelated_score: Optional[float] = None# Random Matrix Theory Noise-Filtered Covariance Score (e.g. 0.92)
     tsallis_entropy_exhaustion_index: Optional[float] = None# Tsallis Non-Extensive Information Entropy Index (e.g. 0.18)
     lob_queue_impact_cost: Optional[float] = None          # LOB Queue Priority Impact Cost Estimator (e.g. 0.02%)
+
+    # V2.9 Neuromorphic & Topological Upgrades
+    snn_tape_spike_detected: Optional[bool] = None         # Neuromorphic Spiking Neural Net Sub-Millisecond Tape Spike (True)
+    tda_betti_homology_score: Optional[float] = None       # Topological Data Analysis Persistent Homology Score (0.94)
+    hurst_exponent_h: Optional[float] = None               # Fractional Brownian Motion Hurst Memory Exponent (0.72)
+    zk_snark_proof_hash: Optional[str] = None              # Cryptographic Zero-Knowledge zk-SNARK Proof of Alpha Hash
+    variance_swap_arbitrage_score: Optional[float] = None  # Implied Volatility vs OFI Variance Mispricing (+2.85 sigma)
 
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
     # Lineage
     model_id: Optional[str] = None
-    model_version: str = "TradeMind Core v2.8-Swarm Quantum"
+    model_version: str = "TradeMind Core v2.9-Neuromorphic SNN"
     model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
 
