@@ -99,6 +99,12 @@ export interface AITradeDecision {
   executionSlippagePct?: number;       // Real-World Execution Slippage Percentage (e.g. 0.00%)
   watchdogFailoverStatus?: string;     // Autonomous Failover Watchdog Status (WATCHDOG_NOMINAL_PRIMARY)
 
+  // Strategy V4.0 Empirical Convergence & Deep Alpha
+  liquidityVoidDistance?: number;      // Distance to VPVR High Volume Node (LVN Void)
+  todExecutionWindow?: string;         // Time of Day (ToD) Optimal Window (e.g. 09:15-10:30 AM)
+  orderBookSkew?: number;              // Dynamic OIB Skew % (e.g. 87.5%)
+  gammaSqueezeState?: string;          // Negative Gamma Squeeze Confirmation
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {
