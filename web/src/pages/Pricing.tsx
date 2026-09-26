@@ -7,7 +7,7 @@ export default function Pricing() {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ pb: 10, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white' }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white', boxSizing: 'border-box' }}>
       {/* Hero Header */}
       <Box sx={{ ...HERO_BANNER_STYLE, mb: 6, textAlign: 'center' }}>
         <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />

@@ -259,7 +259,7 @@ export default function EquitySignals() {
   const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
   return (
-    <Box sx={{ pb: 10, maxWidth: 1400, mx: 'auto', p: 4, color: 'white' }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, maxWidth: 1400, mx: 'auto', p: { xs: 2, sm: 4 }, color: 'white', boxSizing: 'border-box' }}>
       {/* 1. Terminal Hero Header */}
       <Box sx={{ ...HERO_BANNER_STYLE, mb: 4 }}>
          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />

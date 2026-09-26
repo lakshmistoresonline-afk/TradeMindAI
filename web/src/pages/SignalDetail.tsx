@@ -82,7 +82,7 @@ export default function SignalDetail() {
   const decision = signal.decision;
 
   return (
-    <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, bgcolor: '#020617', minHeight: '100vh', px: { xs: 2, sm: 4 }, pt: 2, boxSizing: 'border-box' }}>
       {/* 0. Breadcrumbs / Back */}
       <Button
         startIcon={<ArrowLeft size={16} />}

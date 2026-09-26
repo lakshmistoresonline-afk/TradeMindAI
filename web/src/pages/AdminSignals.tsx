@@ -43,7 +43,7 @@ export default function AdminSignals() {
   }, [firestoreSignals]);
 
   return (
-    <Box sx={{ pb: 10, maxWidth: 1400, mx: 'auto', p: 4, color: 'white' }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, maxWidth: 1400, mx: 'auto', p: { xs: 2, sm: 4 }, color: 'white', boxSizing: 'border-box' }}>
       <Box sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>SIGNAL OPERATIONS</Typography>

@@ -79,7 +79,7 @@ export default function Performance() {
   }, [firestoreHistory]);
 
   return (
-    <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, bgcolor: '#020617', minHeight: '100vh', px: { xs: 2, sm: 4 }, pt: 2, boxSizing: 'border-box' }}>
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>OBSERVED SIGNAL PERFORMANCE</Typography>
         <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, letterSpacing: 1.5, display: 'block', mt: 0.5 }}>

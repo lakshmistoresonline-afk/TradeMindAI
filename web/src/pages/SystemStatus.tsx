@@ -13,7 +13,7 @@ export default function SystemStatus() {
   const components = health?.components || {};
 
   return (
-    <Box sx={{ pb: 8, maxWidth: 1200, mx: 'auto', p: 4, color: 'white' }}>
+    <Box sx={{ pb: { xs: 14, md: 8 }, maxWidth: 1200, mx: 'auto', p: { xs: 2, sm: 4 }, color: 'white', boxSizing: 'border-box' }}>
       <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>SYSTEM DIAGNOSTICS</Typography>

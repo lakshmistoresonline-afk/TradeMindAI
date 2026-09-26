@@ -45,7 +45,7 @@ export default function Account() {
   };
 
   return (
-    <Box sx={{ pb: 10, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white' }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, width: '100%', maxWidth: 1280, mx: 'auto', px: { xs: 2, sm: 4, lg: 6 }, pt: 4, color: 'white', boxSizing: 'border-box' }}>
       <Box sx={{ mb: 5 }}>
         <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1 }}>ACCOUNT & REFERRALS</Typography>
         <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, letterSpacing: 1.5 }}>

@@ -2,7 +2,7 @@ import { Box, Typography, Paper, Stack, Divider, alpha } from '@mui/material';
 
 export default function Methodology() {
   return (
-    <Box sx={{ pb: 10, maxWidth: 900, mx: 'auto', p: 4 }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 4 }, boxSizing: 'border-box' }}>
       <Box sx={{ mb: 6, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: 'white' }}>SIGNAL METHODOLOGY</Typography>
         <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800, mt: 1 }}>STRATEGY V2.2 CORE PROTOCOL</Typography>

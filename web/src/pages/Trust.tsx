@@ -3,7 +3,7 @@ import { ShieldCheck, Lock, Activity, BarChart2 } from 'lucide-react';
 
 export default function Trust() {
   return (
-    <Box sx={{ pb: 10, maxWidth: 1000, mx: 'auto', p: 4, color: 'white' }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, maxWidth: 1000, mx: 'auto', p: { xs: 2, sm: 4 }, color: 'white', boxSizing: 'border-box' }}>
       <Box sx={{ mb: 8, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, mb: 2 }}>TRUST CENTER</Typography>
         <Typography variant="h6" sx={{ color: '#00D1FF', fontWeight: 800 }}>TRANSPARENCY • TRACEABILITY • ACCOUNTABILITY</Typography>
