@@ -135,7 +135,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, bgcolor: '#020617', minHeight: '100vh', px: { xs: 2, sm: 4 }, pt: 2, boxSizing: 'border-box' }}>
       {/* 1. Executive Intelligence Header */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff', mb: 1, fontFamily: 'JetBrains Mono, monospace' }}>TRADEMIND AI</Typography>
