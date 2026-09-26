@@ -86,6 +86,13 @@ export interface AITradeDecision {
   nashEquilibriumLobNode?: string;     // N-Player Non-Cooperative Stochastic Game Nash Equilibrium LOB Node
   zkStarkProofCertificate?: string;    // Post-Quantum zk-STARK Cryptographic Proof Certificate
 
+  // Strategy V3.2 Quantum-Biological Upgrades
+  nasEvolutionaryFitnessScore?: number; // Evolutionary Neural Architecture Search Fitness Score (e.g. 99.8%)
+  calabiYauStringResonance?: number;   // 10D Calabi-Yau String Field Harmonic Resonance (e.g. 0.96)
+  fractionalMomentumOrderAlpha?: number;// Fractional Calculus Differential Momentum Acceleration (e.g. +2.85)
+  acoAntColonyRoutingStatus?: string;  // Ant Colony Optimization Pheromone Route Status (ACO_OPTIMAL_PHEROMONE_PATH)
+  fheHomomorphicCiphertextHash?: string;// Fully Homomorphic Encryption Ciphertext Hash (0xFHE_a1b2...32)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {
