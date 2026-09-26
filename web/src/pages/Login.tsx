@@ -4,10 +4,11 @@ import { TrendingUp, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../core/firebase';
+import { MONO_FONT, COLORS, GLASS_PANEL_STYLE, GRADIENT_ACCENT_BAR } from '../theme/institutionalTheme';
 
 /**
- * TradeMind AI Premium Login (Institutional V2.2)
- * High-performance split-pane layout with forensic security overrides.
+ * TradeMind AI Premium Login (Strategy V3.3)
+ * High-performance split-pane layout with glassmorphic cards and forensic security.
  */
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -54,7 +55,6 @@ export default function Login() {
     } catch (err: any) {
       console.error(err);
       const code = err?.code || '';
-      // Secure error mapping (Anti-Enumeration)
       if (code === 'auth/wrong-password' || code === 'auth/user-not-found' || code === 'auth/invalid-credential') {
         setError('Email or password is incorrect.');
       } else if (code === 'auth/invalid-email') {
@@ -97,8 +97,12 @@ export default function Login() {
       display: 'grid',
       gridTemplateColumns: { xs: '1fr', md: '1.2fr 1fr' },
       background: 'radial-gradient(circle at top right, #0f172a, #020617)',
-      color: '#f8fafc'
+      color: '#f8fafc',
+      position: 'relative'
     }}>
+      {/* Top Accent Gradient Line */}
+      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR, zIndex: 10 }} />
+
       {/* LEFT AREA: PRIMARY BRANDING & POSITIONING */}
       <Box sx={{
         display: { xs: 'none', md: 'flex' },
@@ -106,20 +110,20 @@ export default function Login() {
         justifyContent: 'center',
         px: 10,
         position: 'relative',
-        borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 0.9))'
+        borderRight: `1px solid ${COLORS.borderLight}`,
+        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(2, 6, 23, 0.95))'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-          <TrendingUp size={48} className="text-emerald-500" />
-          <Typography variant="h3" fontWeight="950" sx={{ tracking: '-0.04em', color: '#fff' }}>
+          <TrendingUp size={48} color={COLORS.cyan} />
+          <Typography variant="h3" fontWeight="950" sx={{ letterSpacing: '-0.04em', color: '#fff', fontFamily: MONO_FONT }}>
             TradeMind AI
           </Typography>
         </Box>
-        <Typography variant="h4" fontWeight="800" sx={{ mb: 3, color: '#e2e8f0', maxWidth: 600 }}>
+        <Typography variant="h4" fontWeight="800" sx={{ mb: 3, color: '#e2e8f0', maxWidth: 600, fontFamily: MONO_FONT }}>
           Evidence-Driven Market Signal Intelligence
         </Typography>
-        <Typography variant="body1" sx={{ color: '#94a3b8', lineHeight: 1.8, maxWidth: 520, mb: 8, fontSize: '1.1rem' }}>
-          Access validated market signals, bitwise forensic evidence, lifecycle status, and historical signal intelligence. Built for professional market analysis.
+        <Typography variant="body1" sx={{ color: COLORS.slateText, lineHeight: 1.8, maxWidth: 520, mb: 8, fontSize: '1.1rem' }}>
+          Access validated market signals, bitwise forensic evidence, lifecycle status, and Strategy V3.3 Master Edition signal intelligence.
         </Typography>
 
         <Box sx={{
@@ -127,14 +131,14 @@ export default function Login() {
           alignItems: 'center',
           gap: 2,
           p: 3,
-          borderRadius: 1,
+          borderRadius: 2,
           bgcolor: 'rgba(16, 185, 129, 0.05)',
-          border: '1px solid rgba(16, 185, 129, 0.1)',
+          border: `1px solid ${COLORS.borderGreen}`,
           maxWidth: 520
         }}>
-          <ShieldCheck size={24} className="text-emerald-400 flex-shrink-0" />
+          <ShieldCheck size={24} color={COLORS.green} style={{ flexShrink: 0 }} />
           <Typography variant="body2" sx={{ color: '#a7f3d0', fontWeight: 600 }}>
-            TradeMind AI provides market signal intelligence, and NOT brokerage, trade execution, or investment guarantees. REAL_TRADING remains permanently inactive.
+            TradeMind AI provides market signal intelligence, and NOT brokerage or investment guarantees. REAL_TRADING remains permanently inactive.
           </Typography>
         </Box>
       </Box>
@@ -149,25 +153,22 @@ export default function Login() {
       }}>
         {/* Mobile branding header */}
         <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1.5, mb: 6 }}>
-          <TrendingUp size={32} className="text-emerald-500" />
-          <Typography variant="h5" fontWeight="900" sx={{ color: '#fff', letterSpacing: -0.5 }}>
+          <TrendingUp size={32} color={COLORS.cyan} />
+          <Typography variant="h5" fontWeight="900" sx={{ color: '#fff', letterSpacing: -0.5, fontFamily: MONO_FONT }}>
             TradeMind AI
           </Typography>
         </Box>
 
         <Paper elevation={0} sx={{
+          ...GLASS_PANEL_STYLE,
           p: { xs: 4, sm: 6 },
           width: '100%',
-          maxWidth: 480,
-          borderRadius: 2,
-          bgcolor: 'rgba(30, 41, 59, 0.4)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(16px)'
+          maxWidth: 480
         }}>
-          <Typography variant="h4" fontWeight="900" sx={{ mb: 1, color: '#fff', letterSpacing: -1 }}>
+          <Typography variant="h4" fontWeight="900" sx={{ mb: 1, color: '#fff', letterSpacing: -1, fontFamily: MONO_FONT }}>
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </Typography>
-          <Typography variant="body1" sx={{ mb: 6, color: '#94a3b8', fontWeight: 500 }}>
+          <Typography variant="body1" sx={{ mb: 5, color: COLORS.slateText, fontWeight: 500 }}>
             {isSignUp ? 'Register to explore validated signal intelligence.' : 'Sign in to continue to TradeMind AI.'}
           </Typography>
 
@@ -203,10 +204,11 @@ export default function Login() {
                   '& .MuiOutlinedInput-root': {
                     color: '#fff',
                     fontWeight: 600,
+                    fontFamily: MONO_FONT,
                     bgcolor: 'rgba(15, 23, 42, 0.5)',
-                    '& fieldset': { borderColor: 'rgba(255,255,255,0.1)', borderWidth: 2 },
+                    '& fieldset': { borderColor: COLORS.borderLight, borderWidth: 2 },
                     '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                    '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                    '&.Mui-focused fieldset': { borderColor: COLORS.cyan },
                   },
                   '& .MuiInputLabel-root': {
                     color: '#fff !important',
@@ -243,10 +245,11 @@ export default function Login() {
                   '& .MuiOutlinedInput-root': {
                     color: '#fff',
                     fontWeight: 600,
+                    fontFamily: MONO_FONT,
                     bgcolor: 'rgba(15, 23, 42, 0.5)',
-                    '& fieldset': { borderColor: 'rgba(255,255,255,0.1)', borderWidth: 2 },
+                    '& fieldset': { borderColor: COLORS.borderLight, borderWidth: 2 },
                     '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                    '&.Mui-focused fieldset': { borderColor: '#10b981' },
+                    '&.Mui-focused fieldset': { borderColor: COLORS.cyan },
                   },
                   '& .MuiInputLabel-root': {
                     color: '#fff !important',
@@ -264,7 +267,7 @@ export default function Login() {
                     variant="body2"
                     onClick={handleForgotPassword}
                     underline="hover"
-                    sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.85rem', '&:hover': { color: '#10b981' } }}
+                    sx={{ color: COLORS.slateText, fontWeight: 700, fontSize: '0.85rem', '&:hover': { color: COLORS.cyan } }}
                   >
                     Forgot Password?
                   </Link>
@@ -278,16 +281,16 @@ export default function Login() {
                 type="submit"
                 disabled={loading}
                 sx={{
-                  py: 2,
-                  fontWeight: '900',
+                  py: 1.8,
+                  fontWeight: '950',
                   textTransform: 'none',
-                  fontSize: '1.1rem',
-                  bgcolor: '#10b981',
-                  color: '#020617',
-                  borderRadius: 1,
-                  boxShadow: '0 4px 14px 0 rgba(16, 185, 129, 0.39)',
-                  '&:hover': { bgcolor: '#059669', transform: 'translateY(-1px)' },
-                  '&.Mui-disabled': { bgcolor: 'rgba(16, 185, 129, 0.3)', color: 'rgba(2, 6, 23, 0.5)' }
+                  fontSize: '1rem',
+                  fontFamily: MONO_FONT,
+                  bgcolor: COLORS.cyan,
+                  color: '#000',
+                  borderRadius: 1.5,
+                  boxShadow: '0 4px 14px 0 rgba(0, 209, 255, 0.39)',
+                  '&:hover': { bgcolor: '#38bdf8', transform: 'translateY(-1px)' }
                 }}
               >
                 {loading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
@@ -295,8 +298,8 @@ export default function Login() {
             </Stack>
           </form>
 
-          <Box sx={{ mt: 6, textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 600 }}>
+          <Box sx={{ mt: 5, textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 600 }}>
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <Link
                 component="button"
@@ -307,7 +310,7 @@ export default function Login() {
                   setInfoMessage('');
                 }}
                 underline="hover"
-                sx={{ fontWeight: '800', color: '#10b981', '&:hover': { color: '#059669' }, ml: 0.5 }}
+                sx={{ fontWeight: '800', color: COLORS.cyan, '&:hover': { color: '#38bdf8' }, ml: 0.5 }}
               >
                 {isSignUp ? 'Sign In' : 'Create Account'}
               </Link>
