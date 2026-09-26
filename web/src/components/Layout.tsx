@@ -180,7 +180,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     color: '#10b981',
                     border: '1px solid rgba(16, 185, 129, 0.3)',
                     borderRadius: 1,
-                    ml: 0.5
+                    ml: 0.5,
+                    display: { xs: 'none', sm: 'inline-flex' }
                   }}
                 />
               </Typography>

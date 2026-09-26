@@ -98,20 +98,20 @@ export default function UserDashboard() {
   }, [signals, tab]);
 
   return (
-    <Box sx={{ pb: 8, color: 'white', maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ pb: { xs: 14, md: 8 }, px: { xs: 1, sm: 2, md: 0 }, color: 'white', maxWidth: 1400, mx: 'auto', boxSizing: 'border-box' }}>
       {/* 1. Executive Hero Header Banner */}
       <Box sx={{ ...HERO_BANNER_STYLE, mb: 5 }}>
         <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-          <Box>
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
-              <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: COLORS.textBright, fontFamily: MONO_FONT }}>
+          <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: COLORS.textBright, fontFamily: MONO_FONT, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                 EXECUTIVE TERMINAL
               </Typography>
-              <Chip label="NIFTY-200 LIVE" size="small" sx={{ bgcolor: alpha(COLORS.cyan, 0.15), color: COLORS.cyan, border: `1px solid ${COLORS.borderCyan}`, fontWeight: 950, fontSize: '0.65rem' }} />
-              <Chip label="STRATEGY V3.3" size="small" sx={{ bgcolor: alpha(COLORS.purple, 0.15), color: COLORS.purple, border: `1px solid ${COLORS.borderPurple}`, fontWeight: 950, fontSize: '0.65rem' }} />
+              <Chip label="NIFTY-200 LIVE" size="small" sx={{ bgcolor: alpha(COLORS.cyan, 0.15), color: COLORS.cyan, border: `1px solid ${COLORS.borderCyan}`, fontWeight: 950, fontSize: '0.625rem' }} />
+              <Chip label="STRATEGY V3.3" size="small" sx={{ bgcolor: alpha(COLORS.purple, 0.15), color: COLORS.purple, border: `1px solid ${COLORS.borderPurple}`, fontWeight: 950, fontSize: '0.625rem' }} />
             </Stack>
-            <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 600 }}>
+            <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 600, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
               Auditable quantitative intelligence, institutional order flow, and Strategy V3.3 Master Edition signals.
             </Typography>
           </Box>
@@ -121,7 +121,7 @@ export default function UserDashboard() {
             size="medium"
             sx={{
               fontWeight: 950,
-              fontSize: '0.7rem',
+              fontSize: '0.675rem',
               px: 1,
               height: 32,
               bgcolor: isOnline ? alpha(COLORS.green, 0.12) : alpha(COLORS.amber, 0.12),
@@ -136,7 +136,7 @@ export default function UserDashboard() {
       <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>
         NIFTY-200 MARKET SNAPSHOT
       </Typography>
-      <Grid container spacing={2.5} sx={{ mb: 5 }}>
+      <Grid container spacing={2} sx={{ mb: 5 }}>
          <Grid item xs={12} sm={6} md={3}>
             <MarketMiniCard label="NIFTY 200" data={stats?.['NIFTY 200']} value={market?.nifty_price} fallbackVal={24250.8} icon={<TrendingUp size={18} color={COLORS.cyan} />} />
          </Grid>
@@ -171,8 +171,8 @@ export default function UserDashboard() {
 
       {/* 3. Today's Top Signals */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: 950, letterSpacing: -0.5, fontFamily: MONO_FONT }}>TOP QUANTITATIVE OPPORTUNITIES</Typography>
-        <Button onClick={() => navigate('/signals')} endIcon={<ArrowRight size={16} />} sx={{ color: COLORS.cyan, fontWeight: 950 }}>VIEW TERMINAL →</Button>
+        <Typography variant="h6" sx={{ fontWeight: 950, letterSpacing: -0.5, fontFamily: MONO_FONT, fontSize: { xs: '1rem', sm: '1.25rem' } }}>TOP QUANTITATIVE OPPORTUNITIES</Typography>
+        <Button onClick={() => navigate('/signals')} endIcon={<ArrowRight size={16} />} sx={{ color: COLORS.cyan, fontWeight: 950, fontSize: '0.75rem' }}>VIEW TERMINAL →</Button>
       </Box>
 
       <Paper sx={{ mb: 4, bgcolor: 'transparent', border: 'none', p: 0 }}>
@@ -182,7 +182,7 @@ export default function UserDashboard() {
             sx={{
                 mb: 3,
                 '& .MuiTabs-indicator': { bgcolor: COLORS.cyan, height: 3 },
-                '& .MuiTab-root': { color: COLORS.slateMuted, fontWeight: 950, fontSize: '0.75rem', letterSpacing: 1, '&.Mui-selected': { color: COLORS.textBright } }
+                '& .MuiTab-root': { color: COLORS.slateMuted, fontWeight: 950, fontSize: '0.725rem', letterSpacing: 1, '&.Mui-selected': { color: COLORS.textBright } }
             }}
         >
             <Tab label="SWING (1-30D)" />
