@@ -21,6 +21,7 @@ import UserDashboard from './pages/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminSignals from './pages/AdminSignals'
 import AdminDataFeeds from './pages/AdminDataFeeds'
+import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -114,6 +115,7 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <Routes>
             {/* PUBLIC MARKETING & LANDING ROUTES */}
             <Route path="/" element={<Landing />} />
