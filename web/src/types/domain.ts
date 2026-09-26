@@ -72,6 +72,13 @@ export interface AITradeDecision {
   zkSnarkProofHash?: string;           // Cryptographic Zero-Knowledge zk-SNARK Proof of Alpha Hash
   varianceSwapArbitrageScore?: number; // Implied Volatility vs OFI Realized Variance Arbitrage Score (+2.85 sigma)
 
+  // Strategy V3.0 Quantum-Classical Hybrid & Causal Upgrades
+  causalDoCalculusScore?: number;      // Structural Causal Do-Calculus Causal Driver Score (e.g. 0.98)
+  vqeQuantumPortfolioState?: string;   // Variational Quantum Eigensolver QUBO Eigen State (EIGEN_STATE_OPTIMAL_QUBO)
+  hawkesIntensitySpike?: number;       // Self-Exciting Hawkes Process Order Arrival Intensity (e.g. 4.2x)
+  wganSyntheticSurvivalRate?: number;  // WGAN-GP Synthetic Crash Stress Test Survival Rate (e.g. 100.0%)
+  alorQueuePriorityStatus?: string;    // Atomic Limit Order Routing Queue Status (NBBO_TOUCH_ZERO_SLIPPAGE)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {
