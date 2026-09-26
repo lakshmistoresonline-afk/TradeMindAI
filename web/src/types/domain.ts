@@ -93,6 +93,12 @@ export interface AITradeDecision {
   acoAntColonyRoutingStatus?: string;  // Ant Colony Optimization Pheromone Route Status (ACO_OPTIMAL_PHEROMONE_PATH)
   fheHomomorphicCiphertextHash?: string;// Fully Homomorphic Encryption Ciphertext Hash (0xFHE_a1b2...32)
 
+  // Strategy V3.3 Real-World Operational Telemetry Upgrades
+  feedConsensusScore?: number;         // 3-Source Real-Time Price Median Consensus Score (e.g. 1.00 = 100%)
+  conceptDriftKsPvalue?: number;       // Kolmogorov-Smirnov Concept Drift p-value (e.g. 0.85 = Nominal)
+  executionSlippagePct?: number;       // Real-World Execution Slippage Percentage (e.g. 0.00%)
+  watchdogFailoverStatus?: string;     // Autonomous Failover Watchdog Status (WATCHDOG_NOMINAL_PRIMARY)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

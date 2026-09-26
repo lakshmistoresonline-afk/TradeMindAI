@@ -146,7 +146,7 @@ export default function AdminDashboard() {
               <Paper sx={{ p: 3.5, bgcolor: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
                  <Grid container spacing={4}>
                     <HeroStat label="MARKET REGIME" value={marketState?.regime?.toUpperCase() || 'SIDEWAYS'} color={marketState?.regime === 'BULL' ? '#10b981' : (marketState?.regime === 'BEAR' ? '#f43f5e' : '#00D1FF')} />
-                    <HeroStat label="STRATEGY" value="V2.5 SHAP & GEX" color="#a855f7" />
+                    <HeroStat label="STRATEGY" value="V3.3 SELF-HEALING" color="#a855f7" />
                     <HeroStat label="ACTIVE SIGNALS" value={counts.total || 14} color="#fff" />
                     <HeroStat label="SYSTEM MODE" value="SHADOW" color="#00D1FF" />
                  </Grid>
