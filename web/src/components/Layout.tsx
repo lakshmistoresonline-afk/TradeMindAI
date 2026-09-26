@@ -23,6 +23,11 @@ import { useBackendHealth } from '../hooks/useBackendHealth';
 import { formatNSEDateTime } from '../utils/nseDateUtils';
 import MobileBottomNav from './MobileBottomNav';
 import InstallPwaPrompt from './InstallPwaPrompt';
+import TopLoadingBar from './TopLoadingBar';
+import SpotlightSearch from './SpotlightSearch';
+import BackToTopPill from './BackToTopPill';
+import OfflineBanner from './OfflineBanner';
+import BreadcrumbTrail from './BreadcrumbTrail';
 
 const drawerWidth = 260;
 
@@ -123,6 +128,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#020617' }}>
+        {/* Top Progress Bar & Offline Resilience Banner */}
+        <TopLoadingBar />
+        <OfflineBanner />
+
         {/* Top Accent Gradient Line */}
         <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, height: 2, zIndex: 1400, background: 'linear-gradient(90deg, #00D1FF, #7C3AED, #10b981)' }} />
 
@@ -378,6 +387,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 4 }, width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)` }}>
           <Toolbar sx={{ minHeight: 70 }} />
           <Container maxWidth="xl" disableGutters={isMobile}>
+            <BreadcrumbTrail />
             {children}
           </Container>
         </Box>
@@ -388,8 +398,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Alert>
         </Snackbar>
 
-        {/* Mobile PWA Bottom Navigation & Add-To-Homescreen Installer */}
+        {/* Mobile PWA Bottom Navigation, Back-To-Top Pill, Spotlight Search & Add-To-Homescreen Installer */}
         {user && <MobileBottomNav />}
+        <BackToTopPill />
+        <SpotlightSearch />
         <InstallPwaPrompt />
       </Box>
     </NotificationContext.Provider>
