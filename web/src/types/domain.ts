@@ -105,6 +105,13 @@ export interface AITradeDecision {
   orderBookSkew?: number;              // Dynamic OIB Skew % (e.g. 87.5%)
   gammaSqueezeState?: string;          // Negative Gamma Squeeze Confirmation
 
+  // Strategy V4.1 Dark Matter Arbitrage Upgrades
+  etfCreationFlowVortex?: string;      // Cross-Exchange ETF Creation Flow (e.g., POSITIVE_INFLOW)
+  sectorCorrelationConvergence?: number; // Sector Component Dispersion/Correlation Score (e.g. 0.88)
+  volatilitySkewFlattening?: string;   // Options Put-Call 25-delta Skew Status (e.g., SKEW_FLATTENED)
+  vwapAccumulationFootprint?: string;  // Algorithmic TWAP/VWAP Execution Footprint (e.g., DETECTED_72H)
+  macroLiquidityDrainStatus?: string;  // Sovereign Yield Spread & Liquidity (e.g., LIQUIDITY_ABUNDANT)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

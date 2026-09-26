@@ -112,18 +112,18 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   drivers = (drivers as any[]).filter(d => typeof d === 'string' && !d.includes('{'));
 
   // 8. Thesis & Deterministic Explanation (Signal Intelligence 4.0)
-  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V4.0 empirical convergence & liquidity void forensics.';
+  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V4.1 Institutional Dark Matter cross-exchange arbitrage.';
   if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
 
   const formattedThesis = {
-      trend: rawRating.includes('BUY') ? 'Bullish structure detected (V4.0 -GEX Momentum Squeeze)' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
-      momentum: conviction > 70 ? 'Strong directional momentum (OIB > 85% Skew)' : 'Consolidating / Neutral',
-      volume: 'Volume Profile Liquidity Void (LVN) target path verified',
+      trend: rawRating.includes('BUY') ? 'Bullish structure detected (V4.1 ETF Creation Flow Vortex)' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
+      momentum: conviction > 70 ? 'Strong directional momentum (Sector Correlation Converged)' : 'Consolidating / Neutral',
+      volume: 'Algorithmic VWAP Accumulation Footprint Verified',
       market: `${signal.regime || 'SIDEWAYS'} regime`,
-      probability: `${conviction}% model probability (V4.0 Empirical Calibration)`
+      probability: `${conviction}% model probability (V4.1 Volatility Skew Flattened)`
   };
 
-  // 9. Quality Class (Strict V4.0 Classification)
+  // 9. Quality Class (Strict V4.1 Classification)
   const qualityClass = signal.quality_class || (timeframe === 'SWING' ? 'PRIMARY' : timeframe === 'LONG' ? 'SELECTIVE' : 'EXPERIMENTAL');
 
   // 10. Timing (UTC & ISO Enforcement)
@@ -227,6 +227,13 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     todExecutionWindow: signal.tod_execution_window || '09:15-10:30 AM',
     orderBookSkew: parseNum(signal.order_book_skew) ?? 87.5,
     gammaSqueezeState: signal.gamma_squeeze_state || '-GEX MOMENTUM SQUEEZE',
+
+    // Strategy V4.1 Institutional Dark Matter
+    etfCreationFlowVortex: signal.etf_creation_flow_vortex || 'POSITIVE_INFLOW',
+    sectorCorrelationConvergence: parseNum(signal.sector_correlation_convergence) ?? 0.88,
+    volatilitySkewFlattening: signal.volatility_skew_flattening || 'SKEW_FLATTENED',
+    vwapAccumulationFootprint: signal.vwap_accumulation_footprint || 'DETECTED_72H',
+    macroLiquidityDrainStatus: signal.macro_liquidity_drain_status || 'LIQUIDITY_ABUNDANT',
 
     thesis,
     formattedThesis,

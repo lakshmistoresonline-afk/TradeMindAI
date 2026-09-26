@@ -136,12 +136,25 @@ class LiveSignal(BaseModel):
     execution_slippage_pct: Optional[float] = None          # Real-World Execution Slippage Percentage (0.00%)
     watchdog_failover_status: Optional[str] = None          # Autonomous Failover Watchdog Status (WATCHDOG_NOMINAL_PRIMARY)
 
+    # V4.0 Empirical Convergence
+    liquidity_void_distance: Optional[float] = None         # Distance to VPVR High Volume Node (LVN Void)
+    tod_execution_window: Optional[str] = None              # Time of Day (ToD) Optimal Window (e.g. 09:15-10:30 AM)
+    order_book_skew: Optional[float] = None                 # Dynamic OIB Skew % (e.g. 87.5%)
+    gamma_squeeze_state: Optional[str] = None               # Negative Gamma Squeeze Confirmation
+
+    # V4.1 Dark Matter Arbitrage Upgrades
+    etf_creation_flow_vortex: Optional[str] = None          # Cross-Exchange ETF Creation Flow (e.g., POSITIVE_INFLOW)
+    sector_correlation_convergence: Optional[float] = None  # Sector Component Dispersion/Correlation Score (e.g. 0.88)
+    volatility_skew_flattening: Optional[str] = None        # Options Put-Call 25-delta Skew Status (e.g., SKEW_FLATTENED)
+    vwap_accumulation_footprint: Optional[str] = None       # Algorithmic TWAP/VWAP Execution Footprint (e.g., DETECTED_72H)
+    macro_liquidity_drain_status: Optional[str] = None      # Sovereign Yield Spread & Liquidity (e.g., LIQUIDITY_ABUNDANT)
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
     # Lineage
     model_id: Optional[str] = None
-    model_version: str = "TradeMind Core v3.3-Self Healing"
+    model_version: str = "TradeMind Core v4.1-Dark Matter"
     model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
 
