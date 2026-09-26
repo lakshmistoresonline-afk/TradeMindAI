@@ -66,10 +66,15 @@ const darkTheme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
+        html: {
+          overflowY: 'scroll !important',
+          scrollBehavior: 'smooth',
+        },
         body: {
           backgroundColor: '#020617',
           color: '#f8fafc',
-          "&::-webkit-scrollbar, & *::-webkit-scrollbar": { width: 6, height: 6 },
+          overflowX: 'hidden',
+          "&::-webkit-scrollbar, & *::-webkit-scrollbar": { width: 8, height: 8 },
           "&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": { borderRadius: 4, backgroundColor: "#1e293b" },
         },
       },
