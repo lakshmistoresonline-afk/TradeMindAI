@@ -6,6 +6,7 @@ import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import SignalCard from '../components/Research/shared/SignalCard';
 import { useNavigate } from 'react-router-dom';
+import { MONO_FONT, COLORS, GLASS_PANEL_STYLE, HERO_BANNER_STYLE, GRADIENT_ACCENT_BAR, TABLE_HEAD_CELL_STYLE, TABLE_ROW_STYLE } from '../theme/institutionalTheme';
 
 export default function EquitySignals() {
   const navigate = useNavigate();
@@ -71,12 +72,12 @@ export default function EquitySignals() {
 
   const { connectionStatus, firestoreSignals, firestoreHistory } = useTurboSync();
 
-  // Canonical Signal Universes (V2.3)
+  // Canonical Signal Universes
   const universes = useMemo(() => [
-    { label: 'ALL ACTIVE', value: 'ALL', color: '#00D1FF' },
-    { label: 'SWING', value: 'SWING', color: '#10b981' },
-    { label: 'SHORT HORIZON', value: 'SHORT', color: '#708090' },
-    { label: 'LONG HORIZON', value: 'LONG', color: '#00D1FF' }
+    { label: 'ALL ACTIVE', value: 'ALL', color: COLORS.cyan },
+    { label: 'SWING', value: 'SWING', color: COLORS.green },
+    { label: 'SHORT HORIZON', value: 'SHORT', color: COLORS.slateMuted },
+    { label: 'LONG HORIZON', value: 'LONG', color: COLORS.cyan }
   ], []);
 
   const fetchData = async () => {
@@ -127,12 +128,10 @@ export default function EquitySignals() {
     fetchData();
   }, [mode, page, rowsPerPage, hFilterHorizon, hFilterQuality, hFilterStatus, hFilterDirection]);
 
-  // Hybrid Data Integration (V2.3)
-  // Authoritatively merges REST API and Firestore Shadow Mirror
   useEffect(() => {
     if (firestoreSignals.length === 0) return;
 
-    setError(null); // Clear error since Firestore Mirror is streaming live signals
+    setError(null);
     const fsSignals = firestoreSignals.map(s => ({ ...mapCanonicalSignal(s), _isFirestore: true }));
 
     setSignals(prev => {
@@ -146,12 +145,9 @@ export default function EquitySignals() {
     });
   }, [firestoreSignals]);
 
-  // Hybrid History Integration (V2.3)
-  // Merges 1-Year Historical Shadow Signals from Firestore Mirror
   useEffect(() => {
     if (firestoreHistory.length === 0) return;
 
-    // Filter for last 1 year (<= 365 days old)
     const oneYearAgo = Date.now() - (365 * 24 * 60 * 60 * 1000);
     const fsHistory = firestoreHistory
       .filter((s: any) => {
@@ -163,7 +159,6 @@ export default function EquitySignals() {
     setHistory(fsHistory);
     setTotalHistory(fsHistory.length);
 
-    // Compute exact summary stats for 1-year history
     const targetHits = fsHistory.filter((s: any) => s.decision?.status === 'TARGET_HIT' || s.status === 'TARGET_HIT').length;
     const stopLosses = fsHistory.filter((s: any) => s.decision?.status === 'STOP_LOSS' || s.status === 'STOP_LOSS').length;
     const expired = fsHistory.filter((s: any) => s.decision?.status === 'EXPIRED' || s.status === 'EXPIRED').length;
@@ -178,13 +173,11 @@ export default function EquitySignals() {
   }, [firestoreHistory]);
 
   const allActiveSignalsList = useMemo(() => {
-    // 1. Filter for active status, LONG trade direction, and freshness matching trade horizon
     const rawActive = signals.filter(s => {
       const status = (s.decision?.status || s.status || '').toUpperCase();
       const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(status);
       if (!isActive) return false;
 
-      // User Preference: Showcase ONLY LONG trade directed signals on dashboard
       const rating = (s.decision?.rating || s.rating || '').toUpperCase();
       const direction = (s.decision?.direction || s.direction || '').toUpperCase();
       const isLongTrade = direction === 'LONG' || rating.includes('BUY');
@@ -193,21 +186,19 @@ export default function EquitySignals() {
       const genTime = new Date(s.decision?.generatedAt || s.created_at || s.timestamp || 0).getTime();
       if (genTime > 0) {
         const horizon = (s.decision?.timeframe || s.timeframe || 'SWING').toUpperCase();
-        const maxAgeHours = horizon === 'SHORT' ? 168 : horizon === 'SWING' ? 720 : 8760; // 7d / 30d / 365d
+        const maxAgeHours = horizon === 'SHORT' ? 168 : horizon === 'SWING' ? 720 : 8760;
         const ageHours = (Date.now() - genTime) / (1000 * 60 * 60);
-        if (ageHours > maxAgeHours) return false; // Exclude signals past their horizon limit
+        if (ageHours > maxAgeHours) return false;
       }
       return true;
     });
 
-    // 2. Sort newest first
     rawActive.sort((a, b) => {
       const timeA = new Date(a.decision?.generatedAt || a.created_at || 0).getTime();
       const timeB = new Date(b.decision?.generatedAt || b.created_at || 0).getTime();
       return timeB - timeA;
     });
 
-    // 3. Deduplicate by symbol + timeframe (keep newest per stock & horizon)
     const dedupMap = new Map<string, any>();
     rawActive.forEach(s => {
       const key = `${s.symbol.toUpperCase()}_${s.decision?.timeframe || s.timeframe || 'SWING'}`;
@@ -268,56 +259,59 @@ export default function EquitySignals() {
   const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
   return (
-    <Box sx={{ pb: 10, bgcolor: '#020617', minHeight: '100vh', mx: -4, px: 4, pt: 2 }}>
-      {/* 1. Terminal Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 5, flexWrap: 'wrap', gap: 3 }}>
-         <Box>
-            <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff' }}>SIGNAL TERMINAL</Typography>
-            <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-               <Typography variant="caption" sx={{ fontWeight: 900, color: '#10b981', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Activity size={14} /> LIVE SHADOW SCAN
-               </Typography>
-               <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
-               <Typography variant="caption" sx={{ fontWeight: 900, color: connectionStatus === 'ONLINE' ? '#10b981' : '#f59e0b' }}>
-                  {connectionStatus === 'ONLINE' ? '🟢 Local Server Connected' : '🟡 Offline Client Mode'}
-               </Typography>
+    <Box sx={{ pb: 10, maxWidth: 1400, mx: 'auto', p: 4, color: 'white' }}>
+      {/* 1. Terminal Hero Header */}
+      <Box sx={{ ...HERO_BANNER_STYLE, mb: 4 }}>
+         <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
+            <Box>
+               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT }}>SIGNAL OPERATIONS TERMINAL</Typography>
+               <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: COLORS.green, display: 'flex', alignItems: 'center', gap: 0.5, fontFamily: MONO_FONT }}>
+                     <Activity size={14} /> LIVE SHADOW SCAN (V3.3)
+                  </Typography>
+                  <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto', bgcolor: COLORS.borderLight }} />
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: connectionStatus === 'ONLINE' ? COLORS.green : COLORS.amber, fontFamily: MONO_FONT }}>
+                     {connectionStatus === 'ONLINE' ? '🟢 Local Server Connected' : '🟡 Offline Client Mode'}
+                  </Typography>
+               </Stack>
+            </Box>
+
+            <Stack direction="row" spacing={2} alignItems="center">
+               <Button
+                  variant="outlined"
+                  startIcon={<Upload size={16} />}
+                  onClick={() => setIsImportOpen(true)}
+                  sx={{ height: 44, fontWeight: 900, fontSize: '0.7rem', borderColor: COLORS.borderLight, color: COLORS.cyan, textTransform: 'uppercase' }}
+               >
+                  IMPORT CSV
+               </Button>
+               <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(15, 23, 42, 0.85)',
+                  border: `1px solid ${COLORS.borderLight}`,
+                  borderRadius: 1,
+                  px: 2,
+                  width: { xs: '100%', sm: 280 },
+                  height: 44,
+                  transition: '0.2s',
+                  '&:focus-within': { borderColor: COLORS.green, bgcolor: '#111827', boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.1)' }
+               }}>
+                  <Search size={18} color={COLORS.slateMuted} />
+                  <InputBase
+                     placeholder="SEARCH SYMBOL OR ID..."
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     onKeyPress={(e) => { if (e.key === 'Enter') fetchData(); }}
+                     sx={{ ml: 1.5, flex: 1, fontSize: '0.8rem', fontWeight: 800, color: 'white', fontFamily: MONO_FONT }}
+                  />
+               </Box>
+               <IconButton onClick={fetchData} sx={{ border: `1px solid ${COLORS.borderLight}`, borderRadius: 1, p: 1.2, bgcolor: COLORS.surfaceSlate }}>
+                  <RefreshCw size={18} className={loading ? 'animate-spin' : ''} color={COLORS.slateMuted} />
+               </IconButton>
             </Stack>
          </Box>
-
-         <Stack direction="row" spacing={2} alignItems="center">
-            <Button
-               variant="outlined"
-               startIcon={<Upload size={16} />}
-               onClick={() => setIsImportOpen(true)}
-               sx={{ height: 48, fontWeight: 900, fontSize: '0.7rem', borderColor: 'rgba(255,255,255,0.1)', color: '#00D1FF', textTransform: 'uppercase' }}
-            >
-               IMPORT CSV
-            </Button>
-            <Box sx={{
-               display: 'flex',
-               alignItems: 'center',
-               bgcolor: '#0f172a',
-               border: '1px solid rgba(255,255,255,0.08)',
-               borderRadius: 1,
-               px: 2,
-               width: { xs: '100%', sm: 280 },
-               height: 48,
-               transition: '0.2s',
-               '&:focus-within': { borderColor: '#10b981', bgcolor: '#111827', boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.1)' }
-            }}>
-               <Search size={18} color="#708090" />
-               <InputBase
-                  placeholder="SEARCH SYMBOL OR ID..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => { if (e.key === 'Enter') fetchData(); }}
-                  sx={{ ml: 1.5, flex: 1, fontSize: '0.8rem', fontWeight: 800, color: 'white' }}
-               />
-            </Box>
-            <IconButton onClick={fetchData} sx={{ border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 1.5, bgcolor: '#0f172a' }}>
-               <RefreshCw size={20} className={loading ? 'animate-spin' : ''} color="#708090" />
-            </IconButton>
-         </Stack>
       </Box>
 
       {/* 2. Mode Switch & Controls */}
@@ -327,14 +321,14 @@ export default function EquitySignals() {
             <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setPage(0); setSearchQuery(''); }}>SIGNAL HISTORY</ModeButton>
          </Stack>
 
-         <Stack direction="row" spacing={1}>
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel sx={{ color: '#708090', fontSize: '0.6rem', fontWeight: 900 }}>DISPLAY RANKING</InputLabel>
+         <Stack direction="row" spacing={1} alignItems="center">
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+                <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>DISPLAY RANKING</InputLabel>
                 <Select
                     value={sortBy}
                     label="DISPLAY RANKING"
                     onChange={(e) => setSortBy(e.target.value)}
-                    sx={{ height: 40, bgcolor: '#0f172a', color: 'white', fontWeight: 800, fontSize: '0.7rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.08)' } }}
+                    sx={{ height: 40, bgcolor: COLORS.surfaceSlate, color: 'white', fontWeight: 800, fontSize: '0.7rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.borderLight } }}
                 >
                     <MenuItem value="NEWEST" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>NEWEST</MenuItem>
                     <MenuItem value="PROBABILITY" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>PROBABILITY</MenuItem>
@@ -344,10 +338,10 @@ export default function EquitySignals() {
             <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
             {mode === 'ACTIVE' && (
                 <>
-                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? '#00D1FF' : '#708090' }}>
+                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? COLORS.cyan : COLORS.slateMuted }}>
                         <LayoutGrid size={20} />
                     </IconButton>
-                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? '#00D1FF' : '#708090' }}>
+                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? COLORS.cyan : COLORS.slateMuted }}>
                         <ListIcon size={20} />
                     </IconButton>
                 </>
@@ -359,7 +353,7 @@ export default function EquitySignals() {
                 startIcon={<Columns size={16} />}
                 disabled={selectedForCompare.length < 2}
                 onClick={() => setIsCompareOpen(true)}
-                sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: '#00D1FF', color: '#00D1FF' }}
+                sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: COLORS.borderCyan, color: COLORS.cyan }}
             >
                 COMPARE {selectedForCompare.length > 0 ? `(${selectedForCompare.length})` : ''}
             </Button>
@@ -371,21 +365,21 @@ export default function EquitySignals() {
             {/* 3. Active Signal Summary */}
             <Grid container spacing={2} sx={{ mb: 4 }}>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="TOTAL OPEN" value={counts.all} color="#00D1FF" />
+                    <SummaryStat label="TOTAL OPEN" value={counts.all} color={COLORS.cyan} />
                 </Grid>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="SWING" value={counts.swing} color="#10b981" />
+                    <SummaryStat label="SWING" value={counts.swing} color={COLORS.green} />
                 </Grid>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="LONG" value={counts.long} color="#00D1FF" />
+                    <SummaryStat label="LONG" value={counts.long} color={COLORS.cyan} />
                 </Grid>
                 <Grid item xs={6} md={3}>
-                    <SummaryStat label="SHORT" value={counts.short} color="#708090" />
+                    <SummaryStat label="SHORT" value={counts.short} color={COLORS.slateMuted} />
                 </Grid>
             </Grid>
 
             {/* 4. Active Universe Selectors */}
-            <Paper sx={{ mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 1, p: 0.5, width: 'fit-content' }}>
+            <Paper sx={{ ...GLASS_PANEL_STYLE, mb: 4, p: 0.5, width: 'fit-content' }}>
                 <Tabs
                     value={activeTab}
                     onChange={(_, v) => setActiveTab(v)}
@@ -393,7 +387,7 @@ export default function EquitySignals() {
                         minHeight: 44,
                         '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
                         '& .MuiTab-root': {
-                            color: '#708090',
+                            color: COLORS.slateMuted,
                             fontWeight: 950,
                             fontSize: '0.7rem',
                             minWidth: 160,
@@ -413,15 +407,15 @@ export default function EquitySignals() {
                 <Grid container spacing={3}>
                     {[1,2,3,4,5,6].map(i => (
                         <Grid item xs={12} md={6} lg={4} key={i}>
-                            <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 1, bgcolor: 'rgba(255,255,255,0.02)' }} />
+                            <Skeleton variant="rectangular" height={450} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.02)' }} />
                         </Grid>
                     ))}
                 </Grid>
             ) : error ? (
-                <Paper sx={{ py: 15, textAlign: 'center', bgcolor: alpha('#ef4444', 0.05), border: '1px dashed #ef4444', borderRadius: 1 }}>
-                    <ShieldAlert size={56} color="#ef4444" style={{ margin: '0 auto 24px', opacity: 0.5 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1 }}>CONNECTION FAILED</Typography>
-                    <Typography variant="body2" sx={{ color: '#708090', mb: 4, maxWidth: 400, mx: 'auto' }}>{error}</Typography>
+                <Paper sx={{ py: 15, textAlign: 'center', bgcolor: alpha(COLORS.red, 0.05), border: `1px dashed ${COLORS.red}`, borderRadius: 2 }}>
+                    <ShieldAlert size={56} color={COLORS.red} style={{ margin: '0 auto 24px', opacity: 0.5 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 950, color: 'white', mb: 1, fontFamily: MONO_FONT }}>CONNECTION FAILED</Typography>
+                    <Typography variant="body2" sx={{ color: COLORS.slateMuted, mb: 4, maxWidth: 400, mx: 'auto' }}>{error}</Typography>
                     <Button variant="outlined" onClick={fetchData} startIcon={<RefreshCw size={16} />}>RETRY SYNCHRONIZATION</Button>
                 </Paper>
             ) : (
@@ -441,9 +435,9 @@ export default function EquitySignals() {
                                                     position: 'absolute', top: 10, right: 80,
                                                     zIndex: 10, height: 20, fontSize: '0.5rem',
                                                     fontWeight: 950, cursor: 'pointer',
-                                                    bgcolor: selectedForCompare.includes(s.id) ? '#00D1FF' : 'rgba(0,0,0,0.4)',
+                                                    bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'rgba(0,0,0,0.4)',
                                                     color: selectedForCompare.includes(s.id) ? '#000' : 'white',
-                                                    '&:hover': { bgcolor: '#00D1FF', color: '#000' }
+                                                    '&:hover': { bgcolor: COLORS.cyan, color: '#000' }
                                                 }}
                                             />
                                         </Box>
@@ -451,10 +445,10 @@ export default function EquitySignals() {
                                 ))}
                             </Grid>
                         ) : (
-                            <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+                            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE }}>
                                 <Table sx={{ minWidth: 1200 }}>
                                     <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
-                                        <TableRow>
+                                        <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
                                             <TableCell padding="checkbox" />
                                             <TableCell>SYMBOL</TableCell>
                                             <TableCell>DIRECTION</TableCell>
@@ -470,31 +464,31 @@ export default function EquitySignals() {
                                     </TableHead>
                                     <TableBody>
                                         {finalDisplaySignals.map((s) => (
-                                            <TableRow key={s.id} hover onClick={() => navigate(`/signals/${s.id}`)} sx={{ cursor: 'pointer' }}>
+                                            <TableRow key={s.id} hover onClick={() => navigate(`/signals/${s.id}`)} sx={{ ...TABLE_ROW_STYLE, cursor: 'pointer' }}>
                                                 <TableCell padding="checkbox">
                                                     <MuiChip
                                                         size="small"
                                                         onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
                                                         sx={{
                                                             height: 18, width: 18, minWidth: 0, p: 0,
-                                                            bgcolor: selectedForCompare.includes(s.id) ? '#00D1FF' : 'transparent',
-                                                            border: '1px solid rgba(255,255,255,0.1)'
+                                                            bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'transparent',
+                                                            border: `1px solid ${COLORS.borderLight}`
                                                         }}
                                                     />
                                                 </TableCell>
-                                                <TableCell sx={{ fontWeight: 950 }}>{s.symbol}</TableCell>
+                                                <TableCell sx={{ fontWeight: 950, fontFamily: MONO_FONT }}>{s.symbol}</TableCell>
                                                 <TableCell>
-                                                    <Typography sx={{ fontWeight: 900, color: s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444', fontSize: '0.75rem' }}>
+                                                    <Typography sx={{ fontWeight: 950, color: s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red, fontSize: '0.75rem' }}>
                                                         {s.decision.rating}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>{s.decision.timeframe}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{(s.decision.normalizedCurrentPrice || s.decision.exitPrice)?.toLocaleString()}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#10b981' }}>₹{s.decision.target?.toLocaleString()}</TableCell>
-                                                <TableCell sx={{ fontFamily: 'JetBrains Mono', color: '#ef4444' }}>₹{s.decision.stopLoss?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: MONO_FONT }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: MONO_FONT }}>₹{(s.decision.normalizedCurrentPrice || s.decision.exitPrice)?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: MONO_FONT, color: COLORS.green }}>₹{s.decision.target?.toLocaleString()}</TableCell>
+                                                <TableCell sx={{ fontFamily: MONO_FONT, color: COLORS.red }}>₹{s.decision.stopLoss?.toLocaleString()}</TableCell>
                                                 <TableCell sx={{ fontWeight: 800 }}>{s.decision.conviction}%</TableCell>
-                                                <TableCell sx={{ fontFamily: 'JetBrains Mono' }}>₹{s.decision.expectedValue?.toFixed(1)}</TableCell>
+                                                <TableCell sx={{ fontFamily: MONO_FONT }}>₹{s.decision.expectedValue?.toFixed(1)}</TableCell>
                                                 <TableCell align="right">
                                                     <Button size="small" sx={{ fontWeight: 900, fontSize: '0.65rem' }}>TERMINAL</Button>
                                                 </TableCell>
@@ -505,9 +499,9 @@ export default function EquitySignals() {
                             </TableContainer>
                         )
                     ) : (
-                        <Paper sx={{ py: 20, textAlign: 'center', bgcolor: alpha('#0f172a', 0.5), border: '1px dashed rgba(255,255,255,0.05)', borderRadius: 1 }}>
-                            <ShieldAlert size={56} color="#708090" style={{ margin: '0 auto 24px', opacity: 0.2 }} />
-                            <Typography variant="h6" sx={{ fontWeight: 900, color: '#708090', letterSpacing: 1 }}>
+                        <Paper sx={{ ...GLASS_PANEL_STYLE, py: 15, textAlign: 'center' }}>
+                            <ShieldAlert size={56} color={COLORS.slateMuted} style={{ margin: '0 auto 24px', opacity: 0.3 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 900, color: COLORS.slateMuted, letterSpacing: 1, fontFamily: MONO_FONT }}>
                                 {universes[activeTab].label} — NO QUALIFIED SIGNALS
                             </Typography>
                         </Paper>
@@ -519,14 +513,14 @@ export default function EquitySignals() {
         /* 6. Signal History View */
         <Box>
             <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color="#00D1FF" /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color="#10b981" /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color="#ef4444" /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color="orange" /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color="#708090" /></Grid>
+                <Grid item xs={12} md={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color={COLORS.cyan} /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color={COLORS.green} /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color={COLORS.red} /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color={COLORS.amber} /></Grid>
+                <Grid item xs={6} md={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color={COLORS.slateMuted} /></Grid>
             </Grid>
 
-            <Paper sx={{ p: 2, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+            <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, mb: 4 }}>
                <Grid container spacing={3} alignItems="center">
                   <Grid item xs={12} md={2.4}><HistorySelect label="DIRECTION" value={hFilterDirection} onChange={setHFilterDirection} options={['ALL', 'LONG', 'SHORT']} /></Grid>
                   <Grid item xs={12} md={2.4}><HistorySelect label="HORIZON" value={hFilterHorizon} onChange={setHFilterHorizon} options={['ALL', 'SWING', 'SHORT', 'LONG']} /></Grid>
@@ -538,7 +532,7 @@ export default function EquitySignals() {
                         variant="outlined"
                         onClick={() => { setHFilterDirection('ALL'); setHFilterHorizon('ALL'); setHFilterQuality('ALL'); setHFilterStatus('ALL'); setSearchQuery(''); }}
                         startIcon={<RefreshCw size={14} />}
-                        sx={{ height: 40, fontWeight: 900, borderColor: 'rgba(255,255,255,0.1)', color: '#708090' }}
+                        sx={{ height: 40, fontWeight: 900, borderColor: COLORS.borderLight, color: COLORS.slateMuted }}
                      >
                         RESET FILTERS
                      </Button>
@@ -546,10 +540,10 @@ export default function EquitySignals() {
                </Grid>
             </Paper>
 
-            <TableContainer component={Paper} sx={{ bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE }}>
                <Table sx={{ minWidth: 1400 }}>
                   <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
-                     <TableRow>
+                     <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
                         <TableCell padding="checkbox" />
                         <TableCell>DATE</TableCell>
                         <TableCell>SYMBOL</TableCell>
@@ -568,33 +562,33 @@ export default function EquitySignals() {
                   <TableBody>
                      {loading ? (
                         [1,2,3,4,5].map(i => (
-                           <TableRow key={i}><TableCell colSpan={12}><Skeleton height={40} /></TableCell></TableRow>
+                           <TableRow key={i}><TableCell colSpan={13}><Skeleton height={40} /></TableCell></TableRow>
                         ))
                      ) : history.length > 0 ? (
                         history.map((s) => (
-                           <TableRow key={s.id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
+                           <TableRow key={s.id} hover sx={{ ...TABLE_ROW_STYLE }}>
                               <TableCell padding="checkbox">
                                   <MuiChip
                                       size="small"
                                       onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
                                       sx={{
                                           height: 18, width: 18, minWidth: 0, p: 0,
-                                          bgcolor: selectedForCompare.includes(s.id) ? '#00D1FF' : 'transparent',
-                                          border: '1px solid rgba(255,255,255,0.1)'
+                                          bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'transparent',
+                                          border: `1px solid ${COLORS.borderLight}`
                                       }}
                                   />
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 700, color: '#708090', fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
-                              <TableCell><Typography sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
-                              <TableCell sx={{ fontSize: '0.6rem', color: '#708090', fontFamily: 'JetBrains Mono' }}>{s.id}</TableCell>
+                              <TableCell sx={{ fontWeight: 700, color: COLORS.slateMuted, fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
+                              <TableCell><Typography sx={{ fontWeight: 950, fontFamily: MONO_FONT, fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
+                              <TableCell sx={{ fontSize: '0.6rem', color: COLORS.slateMuted, fontFamily: MONO_FONT }}>{s.id}</TableCell>
                               <TableCell>
                                  <MuiChip
                                     label={s.decision.rating}
                                     size="small"
                                     sx={{
                                         fontWeight: 950, fontSize: '0.55rem', height: 20,
-                                        bgcolor: alpha(s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444', 0.1),
-                                        color: s.decision.rating.includes('BUY') ? '#10b981' : '#ef4444'
+                                        bgcolor: alpha(s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red, 0.12),
+                                        color: s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red
                                     }}
                                  />
                               </TableCell>
@@ -606,24 +600,24 @@ export default function EquitySignals() {
                                     variant="outlined"
                                     sx={{
                                         height: 18, fontSize: '0.5rem', fontWeight: 900,
-                                        borderColor: s.decision.qualityClass === 'PRIMARY' ? '#10b981' : s.decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090',
-                                        color: s.decision.qualityClass === 'PRIMARY' ? '#10b981' : s.decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090'
+                                        borderColor: s.decision.qualityClass === 'PRIMARY' ? COLORS.green : s.decision.qualityClass === 'SELECTIVE' ? COLORS.cyan : COLORS.slateMuted,
+                                        color: s.decision.qualityClass === 'PRIMARY' ? COLORS.green : s.decision.qualityClass === 'SELECTIVE' ? COLORS.cyan : COLORS.slateMuted
                                     }}
                                  />
                               </TableCell>
-                              <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.8rem' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
-                              <TableCell sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.8rem' }}>{s.decision.exitPrice ? `₹${s.decision.exitPrice.toLocaleString()}` : '—'}</TableCell>
+                              <TableCell sx={{ fontFamily: MONO_FONT, fontSize: '0.8rem' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
+                              <TableCell sx={{ fontFamily: MONO_FONT, fontSize: '0.8rem' }}>{s.decision.exitPrice ? `₹${s.decision.exitPrice.toLocaleString()}` : '—'}</TableCell>
                               <TableCell><OutcomeBadge outcome={s.decision.status} /></TableCell>
-                              <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? '#10b981' : '#ef4444', fontSize: '0.8rem' }}>
+                              <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? COLORS.green : COLORS.red, fontSize: '0.8rem', fontFamily: MONO_FONT }}>
                                  {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(2)}%` : '—'}
                               </TableCell>
-                              <TableCell sx={{ fontWeight: 800, color: '#00D1FF', fontSize: '0.8rem' }}>{s.decision?.conviction}%</TableCell>
+                              <TableCell sx={{ fontWeight: 800, color: COLORS.cyan, fontSize: '0.8rem', fontFamily: MONO_FONT }}>{s.decision?.conviction}%</TableCell>
                               <TableCell align="right">
                                  <Stack direction="row" spacing={1} justifyContent="flex-end">
                                      <Button
                                         size="small"
                                         onClick={() => navigate(`/signals/${s.id}`, { state: { scrollReplay: true } })}
-                                        sx={{ fontWeight: 900, fontSize: '0.65rem', color: '#10b981' }}
+                                        sx={{ fontWeight: 900, fontSize: '0.65rem', color: COLORS.green }}
                                      >
                                          REPLAY
                                      </Button>
@@ -640,8 +634,8 @@ export default function EquitySignals() {
                         ))
                      ) : (
                         <TableRow>
-                           <TableCell colSpan={12} sx={{ py: 10, textAlign: 'center' }}>
-                              <Typography variant="body2" sx={{ color: '#708090', fontWeight: 700 }}>NO HISTORICAL RECORDS MATCHING CURRENT FILTERS</Typography>
+                           <TableCell colSpan={13} sx={{ py: 10, textAlign: 'center' }}>
+                              <Typography variant="body2" sx={{ color: COLORS.slateMuted, fontWeight: 700 }}>NO HISTORICAL RECORDS MATCHING CURRENT FILTERS</Typography>
                            </TableCell>
                         </TableRow>
                      )}
@@ -655,22 +649,22 @@ export default function EquitySignals() {
                   rowsPerPage={rowsPerPage}
                   onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
                   rowsPerPageOptions={[25, 50, 100]}
-                  sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', color: '#708090' }}
+                  sx={{ borderTop: `1px solid ${COLORS.borderLight}`, color: COLORS.slateMuted }}
                />
             </TableContainer>
         </Box>
       )}
 
       {/* 7. Comparison Dialog */}
-      <Dialog open={isCompareOpen} onClose={() => setIsCompareOpen(false)} maxWidth="lg" fullWidth PaperProps={{ sx: { bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' } }}>
-         <DialogTitle sx={{ color: 'white', fontWeight: 950 }}>SIGNAL COMPARISON</DialogTitle>
+      <Dialog open={isCompareOpen} onClose={() => setIsCompareOpen(false)} maxWidth="lg" fullWidth PaperProps={{ sx: { ...GLASS_PANEL_STYLE } }}>
+         <DialogTitle sx={{ color: 'white', fontWeight: 950, fontFamily: MONO_FONT }}>SIGNAL COMPARISON</DialogTitle>
          <DialogContent>
             <TableContainer sx={{ mt: 2 }}>
                <Table>
                   <TableHead>
-                     <TableRow>
+                     <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
                         <TableCell>METRIC</TableCell>
-                        {comparedSignals.map(s => <TableCell key={s.id} sx={{ fontWeight: 950, color: '#00D1FF' }}>{s.symbol}</TableCell>)}
+                        {comparedSignals.map(s => <TableCell key={s.id} sx={{ fontWeight: 950, color: COLORS.cyan, fontFamily: MONO_FONT }}>{s.symbol}</TableCell>)}
                      </TableRow>
                   </TableHead>
                   <TableBody>
@@ -699,13 +693,13 @@ export default function EquitySignals() {
       </Dialog>
 
       {/* 8. Footer Metadata */}
-      <Box sx={{ mt: 10, p: 3, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1 }}>
+      <Box sx={{ ...GLASS_PANEL_STYLE, mt: 8, p: 3 }}>
          <Stack direction="row" spacing={3} alignItems="flex-start">
-            <Box sx={{ bgcolor: alpha('#10b981', 0.1), p: 1, borderRadius: 1 }}><Info size={20} color="#10b981" /></Box>
+            <Box sx={{ bgcolor: alpha(COLORS.green, 0.12), p: 1, borderRadius: 1 }}><Info size={20} color={COLORS.green} /></Box>
             <Box>
-               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1 }}>FORENSIC SIGNAL PROTOCOL</Typography>
-               <Typography variant="caption" sx={{ color: '#708090', lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
-                  Authoritative signals are derived from institutional order flow and Strategy V2.2 breakout logic.
+               <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 0.5, letterSpacing: 1, fontFamily: MONO_FONT }}>FORENSIC SIGNAL PROTOCOL</Typography>
+               <Typography variant="caption" sx={{ color: COLORS.slateMuted, lineHeight: 1.6, display: 'block', fontWeight: 600 }}>
+                  Authoritative signals are derived from institutional order flow and Strategy V3.3 breakout logic.
                   All historical outcomes are verified against NSE Spot closing nodes.
                   Latest sync confirmed at {latestUpdate} IST.
                </Typography>
@@ -714,8 +708,8 @@ export default function EquitySignals() {
       </Box>
 
       {/* 9. Drag-and-Drop CSV Custom Data Importer Modal */}
-      <Dialog open={isImportOpen} onClose={() => setIsImportOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' } }}>
-         <DialogTitle sx={{ fontWeight: 950, color: '#fff' }}>IMPORT CUSTOM OHLCV MARKET DATA</DialogTitle>
+      <Dialog open={isImportOpen} onClose={() => setIsImportOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { ...GLASS_PANEL_STYLE } }}>
+         <DialogTitle sx={{ fontWeight: 950, color: '#fff', fontFamily: MONO_FONT }}>IMPORT CUSTOM OHLCV MARKET DATA</DialogTitle>
          <DialogContent>
             <Box
                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -731,34 +725,34 @@ export default function EquitySignals() {
                   p: 4,
                   textAlign: 'center',
                   border: '2px dashed',
-                  borderColor: isDragging ? '#10b981' : 'rgba(255,255,255,0.15)',
-                  bgcolor: isDragging ? alpha('#10b981', 0.05) : 'rgba(255,255,255,0.01)',
+                  borderColor: isDragging ? COLORS.green : COLORS.borderLight,
+                  bgcolor: isDragging ? alpha(COLORS.green, 0.05) : 'rgba(255,255,255,0.01)',
                   borderRadius: 2,
                   cursor: 'pointer',
                   my: 2
                }}
             >
-               <Upload size={40} color={isDragging ? '#10b981' : '#00D1FF'} style={{ margin: '0 auto 12px' }} />
-               <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#fff' }}>
+               <Upload size={40} color={isDragging ? COLORS.green : COLORS.cyan} style={{ margin: '0 auto 12px' }} />
+               <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#fff', fontFamily: MONO_FONT }}>
                   {importFile ? importFile.name : 'Drag & Drop CSV / JSON OHLCV File Here'}
                </Typography>
-               <Typography variant="caption" sx={{ color: '#708090', display: 'block', mt: 1 }}>
+               <Typography variant="caption" sx={{ color: COLORS.slateMuted, display: 'block', mt: 1 }}>
                   Expected columns: symbol, timestamp, open, high, low, close, volume
                </Typography>
-               <Button variant="text" component="label" sx={{ mt: 2, color: '#00D1FF', fontWeight: 900 }}>
+               <Button variant="text" component="label" sx={{ mt: 2, color: COLORS.cyan, fontWeight: 900 }}>
                   Browse File
                   <input type="file" hidden accept=".csv,.json" onChange={(e) => { if (e.target.files && e.target.files[0]) setImportFile(e.target.files[0]); }} />
                </Button>
             </Box>
             {importStatus && (
-               <Typography variant="caption" sx={{ color: importStatus.includes('SUCCESS') ? '#10b981' : '#00D1FF', fontWeight: 800, display: 'block', mt: 1 }}>
+               <Typography variant="caption" sx={{ color: importStatus.includes('SUCCESS') ? COLORS.green : COLORS.cyan, fontWeight: 800, display: 'block', mt: 1, fontFamily: MONO_FONT }}>
                   {importStatus}
                </Typography>
             )}
          </DialogContent>
          <DialogActions sx={{ p: 3 }}>
-            <Button onClick={() => setIsImportOpen(false)} sx={{ color: '#708090', fontWeight: 900 }}>Cancel</Button>
-            <Button variant="contained" disabled={!importFile} onClick={handleFileImport} sx={{ bgcolor: '#10b981', color: '#000', fontWeight: 950 }}>
+            <Button onClick={() => setIsImportOpen(false)} sx={{ color: COLORS.slateMuted, fontWeight: 900 }}>Cancel</Button>
+            <Button variant="contained" disabled={!importFile} onClick={handleFileImport} sx={{ bgcolor: COLORS.green, color: '#000', fontWeight: 950 }}>
                Import Data
             </Button>
          </DialogActions>
@@ -773,13 +767,14 @@ function ModeButton({ active, children, onClick }: any) {
             onClick={onClick}
             sx={{
                 px: 3, py: 1,
-                borderRadius: 0.5,
-                bgcolor: active ? '#00D1FF' : 'transparent',
-                color: active ? '#000' : '#708090',
+                borderRadius: 1,
+                bgcolor: active ? COLORS.cyan : 'transparent',
+                color: active ? '#000' : COLORS.slateMuted,
                 fontWeight: 950,
                 fontSize: '0.75rem',
-                border: active ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                '&:hover': { bgcolor: active ? '#00D1FF' : 'rgba(255,255,255,0.03)' }
+                fontFamily: MONO_FONT,
+                border: active ? 'none' : `1px solid ${COLORS.borderLight}`,
+                '&:hover': { bgcolor: active ? COLORS.cyan : 'rgba(255,255,255,0.03)' }
             }}
         >
             {children}
@@ -789,9 +784,9 @@ function ModeButton({ active, children, onClick }: any) {
 
 function SummaryStat({ label, value, color }: any) {
     return (
-        <Paper sx={{ p: 2, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.03)', height: '100%' }}>
-            <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, fontSize: '0.6rem', display: 'block', mb: 0.5 }}>{label}</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: 'JetBrains Mono' }}>{value}</Typography>
+        <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, height: '100%' }}>
+            <Typography variant="caption" sx={{ color: COLORS.slateMuted, fontWeight: 950, fontSize: '0.6rem', display: 'block', mb: 0.5, letterSpacing: 0.5 }}>{label}</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: MONO_FONT }}>{value}</Typography>
         </Paper>
     );
 }
@@ -799,9 +794,9 @@ function SummaryStat({ label, value, color }: any) {
 function HistorySelect({ label, value, onChange, options }: any) {
     return (
         <FormControl fullWidth size="small">
-            <InputLabel sx={{ color: '#708090', fontWeight: 800, fontSize: '0.7rem' }}>{label}</InputLabel>
+            <InputLabel sx={{ color: COLORS.slateMuted, fontWeight: 800, fontSize: '0.7rem' }}>{label}</InputLabel>
             <Select value={value} label={label} onChange={(e) => onChange(e.target.value)}
-                sx={{ bgcolor: 'rgba(255,255,255,0.02)', color: 'white', fontWeight: 800, fontSize: '0.75rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' } }}>
+                sx={{ bgcolor: COLORS.surfaceSlate, color: 'white', fontWeight: 800, fontSize: '0.75rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.borderLight } }}>
                 {options.map((o: string) => (<MenuItem key={o} value={o} sx={{ fontSize: '0.75rem', fontWeight: 700 }}>{o.replace(/_/g, ' ')}</MenuItem>))}
             </Select>
         </FormControl>
@@ -809,13 +804,13 @@ function HistorySelect({ label, value, onChange, options }: any) {
 }
 
 function OutcomeBadge({ outcome }: { outcome: string }) {
-    let color = '#708090';
+    let color = COLORS.slateMuted;
     let icon = <Clock size={12} />;
-    if (outcome === 'TARGET_HIT') { color = '#10b981'; icon = <CheckCircle size={12} />; }
-    if (outcome === 'STOP_LOSS' || outcome === 'STOP_HIT') { color = '#ef4444'; icon = <XCircle size={12} />; }
-    if (outcome === 'EXPIRED') { color = 'orange'; icon = <AlertCircle size={12} />; }
+    if (outcome === 'TARGET_HIT') { color = COLORS.green; icon = <CheckCircle size={12} />; }
+    if (outcome === 'STOP_LOSS' || outcome === 'STOP_HIT') { color = COLORS.red; icon = <XCircle size={12} />; }
+    if (outcome === 'EXPIRED') { color = COLORS.amber; icon = <AlertCircle size={12} />; }
     return (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ color, fontWeight: 900, fontSize: '0.65rem' }}>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ color, fontWeight: 900, fontSize: '0.65rem', fontFamily: MONO_FONT }}>
             {icon}
             <Typography variant="caption" sx={{ fontWeight: 950, fontSize: '0.65rem' }}>{outcome?.replace(/_/g, ' ')}</Typography>
         </Stack>
@@ -824,9 +819,9 @@ function OutcomeBadge({ outcome }: { outcome: string }) {
 
 function CompareRow({ label, values }: any) {
     return (
-        <TableRow>
-            <TableCell sx={{ fontWeight: 800, color: '#708090', fontSize: '0.65rem' }}>{label}</TableCell>
-            {values.map((v: any, i: number) => <TableCell key={i} sx={{ fontWeight: 900, color: 'white', fontSize: '0.75rem' }}>{v || '—'}</TableCell>)}
+        <TableRow sx={{ ...TABLE_ROW_STYLE }}>
+            <TableCell sx={{ fontWeight: 800, color: COLORS.slateMuted, fontSize: '0.65rem' }}>{label}</TableCell>
+            {values.map((v: any, i: number) => <TableCell key={i} sx={{ fontWeight: 900, color: 'white', fontSize: '0.75rem', fontFamily: MONO_FONT }}>{v || '—'}</TableCell>)}
         </TableRow>
     );
 }
