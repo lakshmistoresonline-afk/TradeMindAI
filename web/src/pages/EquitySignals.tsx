@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, alpha, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuery, useTheme, alpha } from '@mui/material';
 import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle, LayoutGrid, List as ListIcon, Columns, Upload } from 'lucide-react';
 import { getEquitySignals, getEquityHistory } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
@@ -10,6 +10,9 @@ import { MONO_FONT, COLORS, GLASS_PANEL_STYLE, HERO_BANNER_STYLE, GRADIENT_ACCEN
 
 export default function EquitySignals() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [mode, setMode] = useState<'ACTIVE' | 'HISTORY'>('ACTIVE');
   const [activeTab, setActiveTab] = useState(0); // Default to ALL ACTIVE (index 0)
   const [signals, setSignals] = useState<any[]>([]);
@@ -76,8 +79,8 @@ export default function EquitySignals() {
   const universes = useMemo(() => [
     { label: 'ALL ACTIVE', value: 'ALL', color: COLORS.cyan },
     { label: 'SWING', value: 'SWING', color: COLORS.green },
-    { label: 'SHORT HORIZON', value: 'SHORT', color: COLORS.slateMuted },
-    { label: 'LONG HORIZON', value: 'LONG', color: COLORS.cyan }
+    { label: 'SHORT', value: 'SHORT', color: COLORS.slateMuted },
+    { label: 'LONG', value: 'LONG', color: COLORS.cyan }
   ], []);
 
   const fetchData = async () => {
@@ -265,7 +268,7 @@ export default function EquitySignals() {
          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />
          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
             <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
-               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT, fontSize: { xs: '1.4rem', sm: '2rem' } }}>SIGNAL OPERATIONS TERMINAL</Typography>
+               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT, fontSize: { xs: '1.3rem', sm: '2rem' } }}>SIGNAL OPERATIONS TERMINAL</Typography>
                <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" gap={1} sx={{ mt: 1 }}>
                   <Typography variant="caption" sx={{ fontWeight: 900, color: COLORS.green, display: 'flex', alignItems: 'center', gap: 0.5, fontFamily: MONO_FONT }}>
                      <Activity size={14} /> LIVE SHADOW SCAN (V3.3)
@@ -323,7 +326,7 @@ export default function EquitySignals() {
          </Stack>
 
          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={1}>
-            <FormControl size="small" sx={{ minWidth: 140 }}>
+            <FormControl size="small" sx={{ minWidth: 130 }}>
                 <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>RANKING</InputLabel>
                 <Select
                     value={sortBy}
@@ -362,37 +365,38 @@ export default function EquitySignals() {
 
       {mode === 'ACTIVE' ? (
         <>
-            {/* 3. Active Signal Summary */}
+            {/* 3. Active Signal Summary (2x2 Grid on Mobile) */}
             <Grid container spacing={1.5} sx={{ mb: 4 }}>
                 <Grid item xs={6} sm={3}>
                     <SummaryStat label="TOTAL OPEN" value={counts.all} color={COLORS.cyan} />
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                    <SummaryStat label="SWING" value={counts.swing} color={COLORS.green} />
+                    <SummaryStat label="SWING (1-30D)" value={counts.swing} color={COLORS.green} />
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                    <SummaryStat label="LONG" value={counts.long} color={COLORS.cyan} />
+                    <SummaryStat label="LONG (1M-1Y)" value={counts.long} color={COLORS.cyan} />
                 </Grid>
                 <Grid item xs={6} sm={3}>
                     <SummaryStat label="SHORT" value={counts.short} color={COLORS.slateMuted} />
                 </Grid>
             </Grid>
 
-            {/* 4. Active Universe Selectors (Scrollable Container on Mobile) */}
-            <Paper sx={{ ...GLASS_PANEL_STYLE, mb: 4, p: 0.5, width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
+            {/* 4. Active Universe Selectors (Full Width 100% Fit on Mobile) */}
+            <Paper sx={{ ...GLASS_PANEL_STYLE, mb: 4, p: 0.5, width: '100%', boxSizing: 'border-box' }}>
                 <Tabs
                     value={activeTab}
                     onChange={(_, v) => setActiveTab(v)}
-                    variant="scrollable"
-                    scrollButtons="auto"
+                    variant={isMobile ? "fullWidth" : "standard"}
+                    centered={!isMobile}
                     sx={{
                         minHeight: 40,
                         '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
                         '& .MuiTab-root': {
                             color: COLORS.slateMuted,
                             fontWeight: 950,
-                            fontSize: '0.675rem',
-                            minWidth: { xs: 110, sm: 140 },
+                            fontSize: { xs: '0.6rem', sm: '0.7rem' },
+                            minWidth: 0,
+                            px: { xs: 1, sm: 2 },
                             textTransform: 'none',
                             py: 1,
                             '&.Mui-selected': { color: 'white' }
@@ -430,20 +434,6 @@ export default function EquitySignals() {
                                     <Grid item xs={12} md={6} lg={4} key={s.id}>
                                         <Box sx={{ position: 'relative', height: '100%' }}>
                                             <SignalCard stock={s} decision={s.decision} />
-                                            <MuiChip
-                                                label={selectedForCompare.includes(s.id) ? "SELECTED" : "COMPARE"}
-                                                onClick={() => toggleCompare(s.id)}
-                                                size="small"
-                                                sx={{
-                                                    position: 'absolute', top: 12, right: 12,
-                                                    zIndex: 10, height: 20, fontSize: '0.5rem',
-                                                    fontWeight: 950, cursor: 'pointer',
-                                                    bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'rgba(2, 6, 23, 0.8)',
-                                                    color: selectedForCompare.includes(s.id) ? '#000' : 'white',
-                                                    border: `1px solid ${COLORS.borderCyan}`,
-                                                    '&:hover': { bgcolor: COLORS.cyan, color: '#000' }
-                                                }}
-                                            />
                                         </Box>
                                     </Grid>
                                 ))}
