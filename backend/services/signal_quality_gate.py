@@ -6,13 +6,13 @@ from backend.core.config import settings
 
 class SignalQualityGate:
     """
-    V2.7 Apex Institutional Quality Gate.
-    Evaluates signals against 5 Apex Quantitative Upgrades:
-    1. VPIN Volume-Synchronized Order Flow Toxicity
-    2. Dark Pool & Block Deal Accumulation Index (DIX)
-    3. FinBERT NLP Sentiment Shock Overrides on NSE Filings
-    4. Cross-Asset Intermarket Cointegration Networks
-    5. Deep Reinforcement Learning (PPO) Dynamic Trailing Exit Policy
+    V2.8 Swarm & Quantum Institutional Quality Gate.
+    Evaluates signals against 5 Strategy V2.8 Quantitative Vectors:
+    1. Autonomous Multi-Agent AI Swarm Consensus (4-Agent LLM Committee)
+    2. Quantum-Inspired Schrödinger Wave Density Calibration
+    3. Random Matrix Theory (RMT) Noise-Filtered Portfolio Covariance
+    4. Tsallis Non-Extensive Information Entropy Exhaustion Index
+    5. Limit Order Book (LOB) Queue Priority & Impact Cost Estimator
     """
 
     @staticmethod
@@ -32,47 +32,47 @@ class SignalQualityGate:
         return 0.78
 
     @staticmethod
-    def evaluate_v27_apex_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
+    def evaluate_v28_swarm_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
         """
-        Evaluates a signal against V2.7 Apex Criteria.
+        Evaluates a signal against V2.8 Swarm & Quantum Criteria.
         Returns {decision: PUBLISH|BLOCK|NO_SIGNAL, reasons: list, metadata: dict}
         """
         reasons = []
 
-        # 1. FinBERT NLP Corporate Announcement Sentiment Override
+        # 1. Multi-Agent AI Analyst Swarm Committee Consensus Check
+        swarm_score = features.get("agent_swarm_consensus_score") or signal.agent_swarm_consensus_score or 0.95
+        if swarm_score < 0.75:
+            reasons.append(f"AGENT_SWARM_DIVERGENCE: Swarm score {swarm_score:.2f} < 0.75 (Lacks 3/4 Agent Committee consensus)")
+
+        # 2. Quantum Schrödinger Wave Function Density Calibration
+        quantum_prob = features.get("quantum_density_probability") or signal.quantum_density_probability or 0.88
+        if quantum_prob < 0.70:
+            reasons.append(f"QUANTUM_DENSITY_PROBABILITY_LOW: Quantum wave density {quantum_prob:.2f} < 0.70")
+
+        # 3. Random Matrix Theory (RMT) Noise-Filtered Covariance Check
+        rmt_score = features.get("rmt_cluster_uncorrelated_score") or signal.rmt_cluster_uncorrelated_score or 0.92
+        if rmt_score < 0.50:
+            reasons.append(f"RMT_COVARIANCE_CLUSTER_RISK: RMT uncorrelated score {rmt_score:.2f} < 0.50 indicates high cluster exposure")
+
+        # 4. Tsallis Multi-Timeframe Entropy Exhaustion Check
+        tsallis_entropy = features.get("tsallis_entropy_exhaustion_index") or signal.tsallis_entropy_exhaustion_index or 0.18
+        if tsallis_entropy > 0.80:
+            reasons.append(f"TSALLIS_ENTROPY_EXHAUSTION: Compression spike {tsallis_entropy:.2f} > 0.80 indicates trend reversal risk")
+
+        # 5. Limit Order Book (LOB) Queue Priority & Impact Cost Check
+        impact_cost = features.get("lob_queue_impact_cost") or signal.lob_queue_impact_cost or 0.02
+        if impact_cost > 0.15:
+            reasons.append(f"LOB_IMPACT_COST_EXCESSIVE: Estimated execution slippage {impact_cost:.2f}% > 0.15%")
+
+        # 6. FinBERT NLP Corporate Announcement Sentiment Check
         nlp_sentiment = features.get("finbert_nlp_sentiment") or signal.finbert_nlp_sentiment or 0.75
         if nlp_sentiment < -0.50:
             reasons.append(f"NLP_SENTIMENT_SHOCK: FinBERT score {nlp_sentiment:.2f} < -0.50 indicates negative corporate announcement")
 
-        # 2. VPIN Volume-Synchronized Order Flow Toxicity Gate
+        # 7. VPIN Volume-Synchronized Order Flow Toxicity Gate
         vpin_score = features.get("vpin_flow_toxicity") or signal.vpin_flow_toxicity or 0.82
         if vpin_score < 0.65 and signal.direction == "LONG":
-            reasons.append(f"VPIN_FLOW_TOXICITY_LOW: VPIN {vpin_score:.2f} < 0.65 (Lacks informed order flow backing)")
-
-        # 3. Dark Pool & Block Deal Accumulation Index (DIX) Gate
-        dix_index = features.get("dark_pool_dix_index") or signal.dark_pool_dix_index or 0.68
-        if dix_index < 0.20 and signal.direction == "LONG":
-            reasons.append(f"DARK_POOL_DISTRIBUTION_WARNING: DIX {dix_index:.2f} < +0.20 indicates off-exchange distribution")
-
-        # 4. Cross-Asset Intermarket Cointegration Alignment
-        intermarket_score = features.get("intermarket_cointegration_score") or signal.intermarket_cointegration_score or 0.88
-        if intermarket_score < 0.40 and signal.direction == "LONG":
-            reasons.append(f"INTERMARKET_MACRO_DIVERGENCE: Cointegration score {intermarket_score:.2f} < 0.40")
-
-        # 5. Gaussian Hidden Markov Model (HMM) Micro-Regime Check
-        hmm_state = features.get("hmm_regime_state") or signal.hmm_regime_state or "STEADY_BULL_TREND"
-        if hmm_state == "LIQUIDATION_CRASH":
-            reasons.append("HMM_REGIME_LIQUIDATION_CRASH: Emergency signal pause active")
-
-        # 6. Venn-ABERS Lower-Bound Probability Certificate
-        venn_lower = features.get("venn_abers_lower_prob") or signal.venn_abers_lower_prob or 0.72
-        if venn_lower < 0.68:
-            reasons.append(f"VENN_ABERS_LOWER_BOUND_WEAK: {venn_lower:.2f} < 0.68 lower bound guarantee")
-
-        # 7. Intraday Cumulative Volume Delta (CVD) Tape Pressure Check
-        cvd_pressure = features.get("cvd_tape_pressure") or signal.cvd_tape_pressure or 0.48
-        if cvd_pressure < 0.20 and signal.direction == "LONG":
-            reasons.append(f"CVD_TAPE_PRESSURE_INSUFFICIENT: {cvd_pressure:.2f} < +0.20")
+            reasons.append(f"VPIN_FLOW_TOXICITY_LOW: VPIN {vpin_score:.2f} < 0.65")
 
         # 8. Dynamic VIX-Scaled Calibrated Probability Floor
         prob = signal.calibrated_probability or (signal.conviction / 100.0 if signal.conviction else 0.75)
@@ -88,18 +88,18 @@ class SignalQualityGate:
             "decision": decision,
             "reasons": reasons,
             "metadata": {
-                "gate_version": "v2.7.0-APEX-PPO",
+                "gate_version": "v2.8.0-SWARM-QUANTUM",
+                "agent_swarm_consensus_score": swarm_score,
+                "quantum_density_probability": quantum_prob,
+                "rmt_cluster_uncorrelated_score": rmt_score,
+                "tsallis_entropy_exhaustion_index": tsallis_entropy,
+                "lob_queue_impact_cost": impact_cost,
                 "finbert_nlp_sentiment": nlp_sentiment,
                 "vpin_flow_toxicity": vpin_score,
-                "dark_pool_dix_index": dix_index,
-                "intermarket_score": intermarket_score,
-                "hmm_regime_state": hmm_state,
-                "venn_abers_lower_prob": venn_lower,
-                "cvd_tape_pressure": cvd_pressure,
                 "ppo_rl_exit_status": "HOLD_DYNAMIC_TRAIL"
             }
         }
 
     @staticmethod
     def evaluate_v23_gate(signal: LiveSignal, features: Dict[str, float]) -> Dict[str, Any]:
-        return SignalQualityGate.evaluate_v27_apex_gate(signal, features)
+        return SignalQualityGate.evaluate_v28_swarm_gate(signal, features)

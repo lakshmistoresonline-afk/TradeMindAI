@@ -58,6 +58,13 @@ export interface AITradeDecision {
   intermarketCointegrationScore?: number; // Cross-Asset Cointegration Alignment (e.g. +0.88)
   ppoRlExitStatus?: string;            // HOLD_DYNAMIC_TRAIL, MARKET_SELL, BREAKEVEN_LOCK
 
+  // Strategy V2.8 Autonomous Swarm & Quantum Upgrades
+  agentSwarmConsensusScore?: number;   // 4-Agent LLM Committee Consensus Score (e.g. 0.95)
+  quantumDensityProbability?: number;  // Schrödinger Wave Probability Density (e.g. 0.88)
+  rmtClusterUncorrelatedScore?: number;// Random Matrix Theory Noise-Filtered Covariance Score (e.g. 0.92)
+  tsallisEntropyExhaustionIndex?: number; // Tsallis Non-Extensive Information Entropy Index (e.g. 0.18)
+  lobQueueImpactCost?: number;         // LOB Queue Priority Impact Cost Estimator (e.g. 0.02%)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {
