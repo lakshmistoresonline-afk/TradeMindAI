@@ -112,6 +112,13 @@ export interface AITradeDecision {
   vwapAccumulationFootprint?: string;  // Algorithmic TWAP/VWAP Execution Footprint (e.g., DETECTED_72H)
   macroLiquidityDrainStatus?: string;  // Sovereign Yield Spread & Liquidity (e.g., LIQUIDITY_ABUNDANT)
 
+  // Strategy V4.2 Omni-Dimensional Alternative Data
+  hftMicrowaveSpoofingStatus?: string; // Microwave Network HFT Spoofing Detection (e.g. CLEAN_ORDER_BOOK)
+  sarSatelliteLogisticsScore?: number; // Synthetic Aperture Radar Logistics Score (e.g. 0.95)
+  executiveVocalStressIndex?: number;  // Executive Vocal Biometric Stress Index (e.g. 12.5% Nominal)
+  gnnSupplyChainRippleRisk?: number;   // Global GNN Supply Chain Ripple Risk (e.g. 0.02)
+  darkWebInsiderThreatStatus?: string; // Dark Web Corporate Insider Threat Status (e.g. SECURE_NO_CHATTER)
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

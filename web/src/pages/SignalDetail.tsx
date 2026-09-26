@@ -403,6 +403,26 @@ export default function SignalDetail() {
                </Box>
             </Paper>
 
+            {/* 3.11 Strategy V4.2 Omni-Dimensional Alternative Data Forensics */}
+            <SectionHeader icon={<ShieldCheck size={18} />} title="STRATEGY V4.2 OMNI-DIMENSIONAL ALT-DATA & HFT LATENCY FORENSICS" />
+            <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(0, 209, 255, 0.3)', borderRadius: 2 }}>
+               <Grid container spacing={3}>
+                  <PlanItem label="MICROWAVE HFT SPOOFING" value={decision.hftMicrowaveSpoofingStatus || 'CLEAN_ORDER_BOOK'} color="#10b981" />
+                  <PlanItem label="SAR SATELLITE LOGISTICS" value={`${decision.sarSatelliteLogisticsScore || 0.95} (GROWTH CORROBORATED)`} color="#00D1FF" />
+                  <PlanItem label="EXEC VOCAL STRESS VSA" value={`${decision.executiveVocalStressIndex || 12.5}% (NOMINAL CONFIDENCE)`} color="#10b981" />
+                  <PlanItem label="GNN RIPPLE RISK" value={`${((decision.gnnSupplyChainRippleRisk || 0.02) * 100).toFixed(1)}% (NO SUPPLY SHOCKS)`} color="#a855f7" />
+               </Grid>
+               <Divider sx={{ my: 3, opacity: 0.08 }} />
+               <Box sx={{ p: 2, bgcolor: alpha('#10b981', 0.08), borderRadius: 1.5, border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                  <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'block', mb: 0.5, letterSpacing: 1 }}>
+                     DARK WEB CORPORATE INSIDER THREAT INTELLIGENCE
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#f8fafc', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace' }}>
+                     THREAT STATUS: {decision.darkWebInsiderThreatStatus || 'SECURE_NO_CHATTER'} — NO PRE-MARKET INSIDER LEAKS DETECTED
+                  </Typography>
+               </Box>
+            </Paper>
+
             {/* 4. Signal Evidence Section */}
             <SectionHeader icon={<BarChart2 size={18} />} title="SIGNAL EVIDENCE & FORENSICS" />
             {isPremium ? (

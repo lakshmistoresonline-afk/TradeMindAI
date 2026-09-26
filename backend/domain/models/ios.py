@@ -149,6 +149,13 @@ class LiveSignal(BaseModel):
     vwap_accumulation_footprint: Optional[str] = None       # Algorithmic TWAP/VWAP Execution Footprint (e.g., DETECTED_72H)
     macro_liquidity_drain_status: Optional[str] = None      # Sovereign Yield Spread & Liquidity (e.g., LIQUIDITY_ABUNDANT)
 
+    # V4.2 Omni-Dimensional Alternative Data & HFT Arbitrage
+    hft_microwave_spoofing_status: Optional[str] = None     # Microwave Network HFT Spoofing Detection (e.g. CLEAN_ORDER_BOOK)
+    sar_satellite_logistics_score: Optional[float] = None   # Synthetic Aperture Radar Logistics Corroboration Score (e.g. 0.95)
+    executive_vocal_stress_index: Optional[float] = None    # Executive Vocal Biometric Stress Index (e.g. 12.5% Nominal)
+    gnn_supply_chain_ripple_risk: Optional[float] = None    # Global Graph Neural Network Supply Chain Ripple Risk (e.g. 0.02)
+    dark_web_insider_threat_status: Optional[str] = None    # Dark Web Corporate Insider Threat Status (e.g. SECURE_NO_CHATTER)
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
