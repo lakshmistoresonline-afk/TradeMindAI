@@ -40,7 +40,7 @@ class LiveSignal(BaseModel):
     direction: str # LONG or SHORT
     rating: Optional[str] = None # BUY, SELL, HOLD
     timeframe: Optional[str] = None
-    strategy_version: str = "v3.0"
+    strategy_version: str = "v3.1"
     signal_version: str = "1.0"
 
     # Timing
@@ -66,7 +66,7 @@ class LiveSignal(BaseModel):
     current_price: Optional[float] = None
     risk_reward_ratio: Optional[float] = None
 
-    # Intelligence & Strategy V2.5-V3.0 Accuracy Upgrades
+    # Intelligence & Strategy V2.5-V3.1 Accuracy Upgrades
     raw_probability: Optional[float] = None
     calibrated_probability: Optional[float] = None
     expected_value: Optional[float] = None
@@ -109,19 +109,26 @@ class LiveSignal(BaseModel):
     zk_snark_proof_hash: Optional[str] = None              # Cryptographic Zero-Knowledge zk-SNARK Proof of Alpha Hash
     variance_swap_arbitrage_score: Optional[float] = None  # Implied Volatility vs OFI Variance Mispricing (+2.85 sigma)
 
-    # V3.0 Quantum-Classical Hybrid & Causal Inference Upgrades
+    # V3.0 Quantum-Classical Hybrid & Causal Upgrades
     causal_do_calculus_score: Optional[float] = None        # Structural Causal Do-Calculus Causal Effect Score (0.98)
     vqe_quantum_portfolio_state: Optional[str] = None       # Variational Quantum Eigensolver QUBO State (EIGEN_STATE_OPTIMAL_QUBO)
     hawkes_intensity_spike: Optional[float] = None          # Self-Exciting Hawkes Process Order Arrival Intensity (4.2x)
     wgan_synthetic_survival_rate: Optional[float] = None    # WGAN-GP Synthetic Crash Stress Test Survival Rate (100.0%)
     alor_queue_priority_status: Optional[str] = None        # Atomic Limit Order Routing Queue Priority (NBBO_TOUCH_ZERO_SLIPPAGE)
 
+    # V3.1 AGI Swarm Synthesis & Lyapunov Chaos Upgrades
+    trademind_gpt_conviction_score: Optional[float] = None   # TradeMindGPT-7B Macro-Micro Fine-Tuned LLM Score (0.99)
+    lyapunov_exponent_lambda1: Optional[float] = None        # Maximal Lyapunov Exponent Phase Gate (-0.05 Laminar Stability)
+    clayton_copula_tail_contagion_risk: Optional[float] = None# Clayton/Student-t Copula Lower-Tail Contagion Risk (0.01)
+    nash_equilibrium_lob_node: Optional[str] = None         # N-Player Non-Cooperative Stochastic Game Nash Equilibrium LOB Node
+    zk_stark_proof_certificate: Optional[str] = None        # Post-Quantum zk-STARK Cryptographic Proof Certificate
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
     # Lineage
     model_id: Optional[str] = None
-    model_version: str = "TradeMind Core v3.0-Causal Quantum"
+    model_version: str = "TradeMind Core v3.1-AGI Swarm"
     model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
 

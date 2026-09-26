@@ -79,6 +79,13 @@ export interface AITradeDecision {
   wganSyntheticSurvivalRate?: number;  // WGAN-GP Synthetic Crash Stress Test Survival Rate (e.g. 100.0%)
   alorQueuePriorityStatus?: string;    // Atomic Limit Order Routing Queue Status (NBBO_TOUCH_ZERO_SLIPPAGE)
 
+  // Strategy V3.1 AGI Swarm Synthesis & Lyapunov Chaos Upgrades
+  trademindGptConvictionScore?: number;// TradeMindGPT-7B Macro-Micro Fine-Tuned LLM Score (e.g. 0.99)
+  lyapunovExponentLambda1?: number;    // Maximal Lyapunov Exponent Phase Gate (e.g. -0.05 Laminar Stability)
+  claytonCopulaTailContagionRisk?: number;// Clayton/Student-t Copula Lower-Tail Contagion Risk (e.g. 0.01)
+  nashEquilibriumLobNode?: string;     // N-Player Non-Cooperative Stochastic Game Nash Equilibrium LOB Node
+  zkStarkProofCertificate?: string;    // Post-Quantum zk-STARK Cryptographic Proof Certificate
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

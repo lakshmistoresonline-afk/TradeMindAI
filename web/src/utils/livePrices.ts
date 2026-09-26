@@ -1,5 +1,5 @@
 /**
- * Live NSE Stock Price Resolver (Strategy V3.0)
+ * Live NSE Stock Price Resolver (Strategy V3.1)
  * Provides real-time stock prices fetched directly from NSE market feeds.
  */
 
