@@ -8,7 +8,7 @@ import { MONO_FONT, COLORS, GLASS_PANEL_STYLE, GRADIENT_ACCENT_BAR } from '../th
 
 /**
  * TradeMind AI Premium Login (Strategy V3.3)
- * High-performance split-pane layout with glassmorphic cards and forensic security.
+ * High-performance split-pane layout with glassmorphic cards and WebKit autofill overrides.
  */
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -201,11 +201,16 @@ export default function Login() {
                 disabled={loading}
                 InputLabelProps={{ shrink: true, style: { color: '#ffffff', fontWeight: 800, fontSize: '0.9rem', marginBottom: '8px' } }}
                 sx={{
+                  '& input:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px #0f172a inset !important',
+                    WebkitTextFillColor: '#ffffff !important',
+                    caretColor: '#ffffff !important',
+                  },
                   '& .MuiOutlinedInput-root': {
                     color: '#fff',
                     fontWeight: 600,
                     fontFamily: MONO_FONT,
-                    bgcolor: 'rgba(15, 23, 42, 0.5)',
+                    bgcolor: '#0f172a !important',
                     '& fieldset': { borderColor: COLORS.borderLight, borderWidth: 2 },
                     '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
                     '&.Mui-focused fieldset': { borderColor: COLORS.cyan },
@@ -229,7 +234,7 @@ export default function Login() {
                 InputLabelProps={{ shrink: true, style: { color: '#ffffff', fontWeight: 800, fontSize: '0.9rem', marginBottom: '8px' } }}
                 InputProps={{
                   endAdornment: (
-                    <InputAdornment position="end">
+                    <InputAdornment position="end" sx={{ bgcolor: 'transparent' }}>
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         onMouseDown={(e) => e.preventDefault()}
@@ -242,11 +247,16 @@ export default function Login() {
                   )
                 }}
                 sx={{
+                  '& input:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px #0f172a inset !important',
+                    WebkitTextFillColor: '#ffffff !important',
+                    caretColor: '#ffffff !important',
+                  },
                   '& .MuiOutlinedInput-root': {
                     color: '#fff',
                     fontWeight: 600,
                     fontFamily: MONO_FONT,
-                    bgcolor: 'rgba(15, 23, 42, 0.5)',
+                    bgcolor: '#0f172a !important',
                     '& fieldset': { borderColor: COLORS.borderLight, borderWidth: 2 },
                     '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
                     '&.Mui-focused fieldset': { borderColor: COLORS.cyan },
