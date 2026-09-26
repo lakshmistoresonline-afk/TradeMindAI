@@ -259,14 +259,14 @@ export default function EquitySignals() {
   const latestUpdate = signals.length > 0 ? new Date(signals[0].decision?.generatedAt).toLocaleTimeString() : '—';
 
   return (
-    <Box sx={{ pb: { xs: 14, md: 10 }, maxWidth: 1400, mx: 'auto', p: { xs: 2, sm: 4 }, color: 'white', boxSizing: 'border-box' }}>
+    <Box sx={{ pb: { xs: 14, md: 10 }, maxWidth: 1400, mx: 'auto', p: { xs: 1.5, sm: 4 }, color: 'white', boxSizing: 'border-box', overflowX: 'hidden' }}>
       {/* 1. Terminal Hero Header */}
       <Box sx={{ ...HERO_BANNER_STYLE, mb: 4 }}>
          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />
-         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
-            <Box>
-               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT }}>SIGNAL OPERATIONS TERMINAL</Typography>
-               <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
+               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT, fontSize: { xs: '1.4rem', sm: '2rem' } }}>SIGNAL OPERATIONS TERMINAL</Typography>
+               <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" gap={1} sx={{ mt: 1 }}>
                   <Typography variant="caption" sx={{ fontWeight: 900, color: COLORS.green, display: 'flex', alignItems: 'center', gap: 0.5, fontFamily: MONO_FONT }}>
                      <Activity size={14} /> LIVE SHADOW SCAN (V3.3)
                   </Typography>
@@ -277,12 +277,12 @@ export default function EquitySignals() {
                </Stack>
             </Box>
 
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" gap={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
                <Button
                   variant="outlined"
                   startIcon={<Upload size={16} />}
                   onClick={() => setIsImportOpen(true)}
-                  sx={{ height: 44, fontWeight: 900, fontSize: '0.7rem', borderColor: COLORS.borderLight, color: COLORS.cyan, textTransform: 'uppercase' }}
+                  sx={{ height: 40, fontWeight: 900, fontSize: '0.675rem', borderColor: COLORS.borderLight, color: COLORS.cyan, textTransform: 'uppercase' }}
                >
                   IMPORT CSV
                </Button>
@@ -292,23 +292,24 @@ export default function EquitySignals() {
                   bgcolor: 'rgba(15, 23, 42, 0.85)',
                   border: `1px solid ${COLORS.borderLight}`,
                   borderRadius: 1,
-                  px: 2,
-                  width: { xs: '100%', sm: 280 },
-                  height: 44,
+                  px: 1.5,
+                  flex: { xs: 1, sm: 'none' },
+                  width: { xs: 'auto', sm: 240 },
+                  height: 40,
                   transition: '0.2s',
                   '&:focus-within': { borderColor: COLORS.green, bgcolor: '#111827', boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.1)' }
                }}>
-                  <Search size={18} color={COLORS.slateMuted} />
+                  <Search size={16} color={COLORS.slateMuted} />
                   <InputBase
-                     placeholder="SEARCH SYMBOL OR ID..."
+                     placeholder="SEARCH SYMBOL..."
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value)}
                      onKeyPress={(e) => { if (e.key === 'Enter') fetchData(); }}
-                     sx={{ ml: 1.5, flex: 1, fontSize: '0.8rem', fontWeight: 800, color: 'white', fontFamily: MONO_FONT }}
+                     sx={{ ml: 1, flex: 1, fontSize: '0.75rem', fontWeight: 800, color: 'white', fontFamily: MONO_FONT }}
                   />
                </Box>
-               <IconButton onClick={fetchData} sx={{ border: `1px solid ${COLORS.borderLight}`, borderRadius: 1, p: 1.2, bgcolor: COLORS.surfaceSlate }}>
-                  <RefreshCw size={18} className={loading ? 'animate-spin' : ''} color={COLORS.slateMuted} />
+               <IconButton onClick={fetchData} sx={{ border: `1px solid ${COLORS.borderLight}`, borderRadius: 1, p: 1, bgcolor: COLORS.surfaceSlate }}>
+                  <RefreshCw size={16} className={loading ? 'animate-spin' : ''} color={COLORS.slateMuted} />
                </IconButton>
             </Stack>
          </Box>
@@ -321,39 +322,38 @@ export default function EquitySignals() {
             <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setPage(0); setSearchQuery(''); }}>SIGNAL HISTORY</ModeButton>
          </Stack>
 
-         <Stack direction="row" spacing={1} alignItems="center">
-            <FormControl size="small" sx={{ minWidth: 160 }}>
-                <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>DISPLAY RANKING</InputLabel>
+         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={1}>
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+                <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>RANKING</InputLabel>
                 <Select
                     value={sortBy}
-                    label="DISPLAY RANKING"
+                    label="RANKING"
                     onChange={(e) => setSortBy(e.target.value)}
-                    sx={{ height: 40, bgcolor: COLORS.surfaceSlate, color: 'white', fontWeight: 800, fontSize: '0.7rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.borderLight } }}
+                    sx={{ height: 38, bgcolor: COLORS.surfaceSlate, color: 'white', fontWeight: 800, fontSize: '0.7rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.borderLight } }}
                 >
                     <MenuItem value="NEWEST" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>NEWEST</MenuItem>
                     <MenuItem value="PROBABILITY" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>PROBABILITY</MenuItem>
                     <MenuItem value="EV" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>EXPECTED VALUE</MenuItem>
                 </Select>
             </FormControl>
-            <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, opacity: 0.1, display: { xs: 'none', sm: 'block' } }} />
             {mode === 'ACTIVE' && (
-                <>
-                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? COLORS.cyan : COLORS.slateMuted }}>
-                        <LayoutGrid size={20} />
+                <Stack direction="row" spacing={0.5}>
+                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? COLORS.cyan : COLORS.slateMuted, p: 0.8 }}>
+                        <LayoutGrid size={18} />
                     </IconButton>
-                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? COLORS.cyan : COLORS.slateMuted }}>
-                        <ListIcon size={20} />
+                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? COLORS.cyan : COLORS.slateMuted, p: 0.8 }}>
+                        <ListIcon size={18} />
                     </IconButton>
-                </>
+                </Stack>
             )}
-            <Divider orientation="vertical" flexItem sx={{ mx: 1, opacity: 0.1 }} />
             <Button
                 variant="outlined"
                 size="small"
-                startIcon={<Columns size={16} />}
+                startIcon={<Columns size={14} />}
                 disabled={selectedForCompare.length < 2}
                 onClick={() => setIsCompareOpen(true)}
-                sx={{ fontWeight: 900, fontSize: '0.65rem', borderColor: COLORS.borderCyan, color: COLORS.cyan }}
+                sx={{ height: 38, fontWeight: 900, fontSize: '0.625rem', borderColor: COLORS.borderCyan, color: COLORS.cyan }}
             >
                 COMPARE {selectedForCompare.length > 0 ? `(${selectedForCompare.length})` : ''}
             </Button>
@@ -363,35 +363,38 @@ export default function EquitySignals() {
       {mode === 'ACTIVE' ? (
         <>
             {/* 3. Active Signal Summary */}
-            <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={6} md={3}>
+            <Grid container spacing={1.5} sx={{ mb: 4 }}>
+                <Grid item xs={6} sm={3}>
                     <SummaryStat label="TOTAL OPEN" value={counts.all} color={COLORS.cyan} />
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6} sm={3}>
                     <SummaryStat label="SWING" value={counts.swing} color={COLORS.green} />
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6} sm={3}>
                     <SummaryStat label="LONG" value={counts.long} color={COLORS.cyan} />
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6} sm={3}>
                     <SummaryStat label="SHORT" value={counts.short} color={COLORS.slateMuted} />
                 </Grid>
             </Grid>
 
-            {/* 4. Active Universe Selectors */}
-            <Paper sx={{ ...GLASS_PANEL_STYLE, mb: 4, p: 0.5, width: 'fit-content' }}>
+            {/* 4. Active Universe Selectors (Scrollable Container on Mobile) */}
+            <Paper sx={{ ...GLASS_PANEL_STYLE, mb: 4, p: 0.5, width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
                 <Tabs
                     value={activeTab}
                     onChange={(_, v) => setActiveTab(v)}
+                    variant="scrollable"
+                    scrollButtons="auto"
                     sx={{
-                        minHeight: 44,
+                        minHeight: 40,
                         '& .MuiTabs-indicator': { height: 3, bgcolor: universes[activeTab].color },
                         '& .MuiTab-root': {
                             color: COLORS.slateMuted,
                             fontWeight: 950,
-                            fontSize: '0.7rem',
-                            minWidth: 160,
+                            fontSize: '0.675rem',
+                            minWidth: { xs: 110, sm: 140 },
                             textTransform: 'none',
+                            py: 1,
                             '&.Mui-selected': { color: 'white' }
                         }
                     }}
@@ -419,10 +422,10 @@ export default function EquitySignals() {
                     <Button variant="outlined" onClick={fetchData} startIcon={<RefreshCw size={16} />}>RETRY SYNCHRONIZATION</Button>
                 </Paper>
             ) : (
-                <Box>
+                <Box sx={{ width: '100%', overflowX: 'hidden' }}>
                     {finalDisplaySignals.length > 0 ? (
                         viewLayout === 'GRID' && mode === 'ACTIVE' ? (
-                            <Grid container spacing={3}>
+                            <Grid container spacing={2.5}>
                                 {finalDisplaySignals.map((s) => (
                                     <Grid item xs={12} md={6} lg={4} key={s.id}>
                                         <Box sx={{ position: 'relative', height: '100%' }}>
@@ -432,11 +435,12 @@ export default function EquitySignals() {
                                                 onClick={() => toggleCompare(s.id)}
                                                 size="small"
                                                 sx={{
-                                                    position: 'absolute', top: 10, right: 80,
+                                                    position: 'absolute', top: 12, right: 12,
                                                     zIndex: 10, height: 20, fontSize: '0.5rem',
                                                     fontWeight: 950, cursor: 'pointer',
-                                                    bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'rgba(0,0,0,0.4)',
+                                                    bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'rgba(2, 6, 23, 0.8)',
                                                     color: selectedForCompare.includes(s.id) ? '#000' : 'white',
+                                                    border: `1px solid ${COLORS.borderCyan}`,
                                                     '&:hover': { bgcolor: COLORS.cyan, color: '#000' }
                                                 }}
                                             />
@@ -445,8 +449,8 @@ export default function EquitySignals() {
                                 ))}
                             </Grid>
                         ) : (
-                            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE }}>
-                                <Table sx={{ minWidth: 1200 }}>
+                            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE, overflowX: 'auto' }}>
+                                <Table sx={{ minWidth: 900 }}>
                                     <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
                                         <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
                                             <TableCell padding="checkbox" />
@@ -511,28 +515,28 @@ export default function EquitySignals() {
         </>
       ) : (
         /* 6. Signal History View */
-        <Box>
-            <Grid container spacing={2} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color={COLORS.cyan} /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color={COLORS.green} /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color={COLORS.red} /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color={COLORS.amber} /></Grid>
-                <Grid item xs={6} md={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color={COLORS.slateMuted} /></Grid>
+        <Box sx={{ width: '100%', overflowX: 'hidden' }}>
+            <Grid container spacing={1.5} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={2.4}><SummaryStat label="TOTAL HISTORY" value={historySummary?.total || 0} color={COLORS.cyan} /></Grid>
+                <Grid item xs={6} sm={2.4}><SummaryStat label="TARGET HITS" value={historySummary?.target_hits || 0} color={COLORS.green} /></Grid>
+                <Grid item xs={6} sm={2.4}><SummaryStat label="STOP LOSSES" value={historySummary?.stop_losses || 0} color={COLORS.red} /></Grid>
+                <Grid item xs={6} sm={2.4}><SummaryStat label="EXPIRED" value={historySummary?.expired || 0} color={COLORS.amber} /></Grid>
+                <Grid item xs={6} sm={2.4}><SummaryStat label="OTHER" value={historySummary?.other || 0} color={COLORS.slateMuted} /></Grid>
             </Grid>
 
             <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, mb: 4 }}>
-               <Grid container spacing={3} alignItems="center">
-                  <Grid item xs={12} md={2.4}><HistorySelect label="DIRECTION" value={hFilterDirection} onChange={setHFilterDirection} options={['ALL', 'LONG', 'SHORT']} /></Grid>
-                  <Grid item xs={12} md={2.4}><HistorySelect label="HORIZON" value={hFilterHorizon} onChange={setHFilterHorizon} options={['ALL', 'SWING', 'SHORT', 'LONG']} /></Grid>
-                  <Grid item xs={12} md={2.4}><HistorySelect label="QUALITY" value={hFilterQuality} onChange={setHFilterQuality} options={['ALL', 'PRIMARY', 'SELECTIVE', 'EXPERIMENTAL']} /></Grid>
-                  <Grid item xs={12} md={2.4}><HistorySelect label="OUTCOME" value={hFilterStatus} onChange={setHFilterStatus} options={['ALL', 'TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'CANCELLED']} /></Grid>
-                  <Grid item xs={12} md={2.4}>
+               <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={6} sm={2.4}><HistorySelect label="DIRECTION" value={hFilterDirection} onChange={setHFilterDirection} options={['ALL', 'LONG', 'SHORT']} /></Grid>
+                  <Grid item xs={6} sm={2.4}><HistorySelect label="HORIZON" value={hFilterHorizon} onChange={setHFilterHorizon} options={['ALL', 'SWING', 'SHORT', 'LONG']} /></Grid>
+                  <Grid item xs={6} sm={2.4}><HistorySelect label="QUALITY" value={hFilterQuality} onChange={setHFilterQuality} options={['ALL', 'PRIMARY', 'SELECTIVE', 'EXPERIMENTAL']} /></Grid>
+                  <Grid item xs={6} sm={2.4}><HistorySelect label="OUTCOME" value={hFilterStatus} onChange={setHFilterStatus} options={['ALL', 'TARGET_HIT', 'STOP_LOSS', 'EXPIRED', 'CANCELLED']} /></Grid>
+                  <Grid item xs={12} sm={2.4}>
                      <Button
                         fullWidth
                         variant="outlined"
                         onClick={() => { setHFilterDirection('ALL'); setHFilterHorizon('ALL'); setHFilterQuality('ALL'); setHFilterStatus('ALL'); setSearchQuery(''); }}
                         startIcon={<RefreshCw size={14} />}
-                        sx={{ height: 40, fontWeight: 900, borderColor: COLORS.borderLight, color: COLORS.slateMuted }}
+                        sx={{ height: 38, fontWeight: 900, borderColor: COLORS.borderLight, color: COLORS.slateMuted, fontSize: '0.7rem' }}
                      >
                         RESET FILTERS
                      </Button>
@@ -540,8 +544,8 @@ export default function EquitySignals() {
                </Grid>
             </Paper>
 
-            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE }}>
-               <Table sx={{ minWidth: 1400 }}>
+            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE, overflowX: 'auto' }}>
+               <Table sx={{ minWidth: 1000 }}>
                   <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
                      <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
                         <TableCell padding="checkbox" />
@@ -766,12 +770,12 @@ function ModeButton({ active, children, onClick }: any) {
         <Button
             onClick={onClick}
             sx={{
-                px: 3, py: 1,
+                px: 2.5, py: 0.8,
                 borderRadius: 1,
                 bgcolor: active ? COLORS.cyan : 'transparent',
                 color: active ? '#000' : COLORS.slateMuted,
                 fontWeight: 950,
-                fontSize: '0.75rem',
+                fontSize: '0.7rem',
                 fontFamily: MONO_FONT,
                 border: active ? 'none' : `1px solid ${COLORS.borderLight}`,
                 '&:hover': { bgcolor: active ? COLORS.cyan : 'rgba(255,255,255,0.03)' }
@@ -784,9 +788,9 @@ function ModeButton({ active, children, onClick }: any) {
 
 function SummaryStat({ label, value, color }: any) {
     return (
-        <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, height: '100%' }}>
-            <Typography variant="caption" sx={{ color: COLORS.slateMuted, fontWeight: 950, fontSize: '0.6rem', display: 'block', mb: 0.5, letterSpacing: 0.5 }}>{label}</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: MONO_FONT }}>{value}</Typography>
+        <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2, height: '100%' }}>
+            <Typography variant="caption" sx={{ color: COLORS.slateMuted, fontWeight: 950, fontSize: '0.55rem', display: 'block', mb: 0.5, letterSpacing: 0.5 }}>{label}</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 950, color, fontFamily: MONO_FONT, fontSize: { xs: '1.4rem', sm: '1.8rem' } }}>{value}</Typography>
         </Paper>
     );
 }
