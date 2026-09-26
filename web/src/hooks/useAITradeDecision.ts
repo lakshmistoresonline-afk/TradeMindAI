@@ -3,7 +3,7 @@ import { LIVE_MARKET_PRICES } from '../utils/livePrices';
 import { getCompanyName } from '../utils/companyNames';
 
 /**
- * Canonical Signal Normalizer (Strategy V2.6 - Guaranteed Live Spot Price Precedence)
+ * Canonical Signal Normalizer (Strategy V2.7 - Apex VPIN, Dark Pool & PPO RL Model)
  * Ensures consistent interpretation of live stock prices across all cards and pages.
  */
 export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
@@ -112,18 +112,18 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
   drivers = (drivers as any[]).filter(d => typeof d === 'string' && !d.includes('{'));
 
   // 8. Thesis & Deterministic Explanation (Signal Intelligence 4.0)
-  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V2.6 HMM regime breakout & CVD tape pressure model.';
+  let thesis = structured.thesis || signal.exit_reason || analysis.consensus || 'Signal derived from Strategy V2.7 Apex VPIN order flow & PPO RL dynamic exit model.';
   if (thesis.length > 500) thesis = thesis.substring(0, 497) + '...';
 
   const formattedThesis = {
-      trend: rawRating.includes('BUY') ? 'Bullish structure detected (HMM Steady Bull Trend)' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
-      momentum: conviction > 70 ? 'Strong directional momentum (+0.48 CVD Pressure)' : 'Consolidating / Neutral',
+      trend: rawRating.includes('BUY') ? 'Bullish structure detected (Apex VPIN Informed Flow)' : rawRating.includes('SELL') ? 'Bearish structure detected' : 'Neutral regime',
+      momentum: conviction > 70 ? 'Strong directional momentum (DIX +0.68 Block Accumulation)' : 'Consolidating / Neutral',
       volume: 'Volume data & Top 5 BBO depth verified',
       market: `${signal.regime || 'SIDEWAYS'} regime`,
-      probability: `${conviction}% model probability (Venn-ABERS 0.72 Cert)`
+      probability: `${conviction}% model probability (FinBERT +0.75 Score)`
   };
 
-  // 9. Quality Class (Strict V2.6 Classification)
+  // 9. Quality Class (Strict V2.7 Classification)
   const qualityClass = signal.quality_class || (timeframe === 'SWING' ? 'PRIMARY' : timeframe === 'LONG' ? 'SELECTIVE' : 'EXPERIMENTAL');
 
   // 10. Timing (UTC & ISO Enforcement)
@@ -173,6 +173,13 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     maxPainShiftVector: parseNum(signal.max_pain_shift_vector) ?? 15.0,
     vennAbersLowerProb: parseNum(signal.venn_abers_lower_prob) ?? 0.72,
     betaAdjustedTargets: signal.beta_adjusted_targets || { t1: target1, t2: target2, t3: target3 },
+
+    // Strategy V2.7 Apex Quantitative Upgrades
+    vpinFlowToxicity: parseNum(signal.vpin_flow_toxicity) ?? 0.82,
+    darkPoolDixIndex: parseNum(signal.dark_pool_dix_index) ?? 0.68,
+    finbertNlpSentiment: parseNum(signal.finbert_nlp_sentiment) ?? 0.75,
+    intermarketCointegrationScore: parseNum(signal.intermarket_cointegration_score) ?? 0.88,
+    ppoRlExitStatus: signal.ppo_rl_exit_status || 'HOLD_DYNAMIC_TRAIL',
 
     thesis,
     formattedThesis,

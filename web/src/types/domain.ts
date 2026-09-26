@@ -51,6 +51,13 @@ export interface AITradeDecision {
   vennAbersLowerProb?: number;         // Venn-ABERS Lower-Bound Probability Certificate (e.g. 0.72)
   betaAdjustedTargets?: Record<string, number>; // Beta-Scaled Target Geometry
 
+  // Strategy V2.7 Apex Upgrades
+  vpinFlowToxicity?: number;           // VPIN Volume-Synchronized Flow Toxicity (e.g. 0.82)
+  darkPoolDixIndex?: number;           // Off-Exchange Dark Pool Accumulation Index (e.g. +0.68)
+  finbertNlpSentiment?: number;        // FinBERT Corporate Filings Sentiment Score (e.g. +0.75)
+  intermarketCointegrationScore?: number; // Cross-Asset Cointegration Alignment (e.g. +0.88)
+  ppoRlExitStatus?: string;            // HOLD_DYNAMIC_TRAIL, MARKET_SELL, BREAKEVEN_LOCK
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

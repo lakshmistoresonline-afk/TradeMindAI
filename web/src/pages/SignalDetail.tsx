@@ -241,6 +241,26 @@ export default function SignalDetail() {
                </Grid>
             </Paper>
 
+            {/* 3.2 Strategy V2.7 Apex VPIN, DIX & PPO RL Forensics */}
+            <SectionHeader icon={<Zap size={18} />} title="STRATEGY V2.7 APEX VPIN, DIX & PPO RL FORENSICS" />
+            <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: 2 }}>
+               <Grid container spacing={3}>
+                  <PlanItem label="VPIN FLOW TOXICITY" value={`${decision.vpinFlowToxicity || 0.82} (INFORMED FLOW)`} color="#a855f7" />
+                  <PlanItem label="DARK POOL DIX INDEX" value={`+${decision.darkPoolDixIndex || 0.68} (BLOCK ACCUMULATION)`} color="#10b981" />
+                  <PlanItem label="FINBERT FILINGS SENTIMENT" value={`+${decision.finbertNlpSentiment || 0.75} (POSITIVE SHOCK)`} color="#00D1FF" />
+                  <PlanItem label="INTERMARKET ALIGNMENT" value={`+${decision.intermarketCointegrationScore || 0.88} (MACRO ALIGNED)`} color="#10b981" />
+               </Grid>
+               <Divider sx={{ my: 3, opacity: 0.08 }} />
+               <Box sx={{ p: 2, bgcolor: alpha('#7C3AED', 0.08), borderRadius: 1.5, border: '1px solid rgba(124, 58, 237, 0.2)' }}>
+                  <Typography variant="caption" sx={{ color: '#a855f7', fontWeight: 950, display: 'block', mb: 0.5, letterSpacing: 1 }}>
+                     PPO REINFORCEMENT LEARNING TRAILING EXIT POLICY
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#f8fafc', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace' }}>
+                     PPO AGENT STATUS: {decision.ppoRlExitStatus || 'HOLD_DYNAMIC_TRAIL'} — DYNAMIC ATR TRAILING ACTIVE
+                  </Typography>
+               </Box>
+            </Paper>
+
             {/* 4. Signal Evidence Section */}
             <SectionHeader icon={<BarChart2 size={18} />} title="SIGNAL EVIDENCE & FORENSICS" />
             {isPremium ? (

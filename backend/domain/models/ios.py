@@ -40,7 +40,7 @@ class LiveSignal(BaseModel):
     direction: str # LONG or SHORT
     rating: Optional[str] = None # BUY, SELL, HOLD
     timeframe: Optional[str] = None
-    strategy_version: str = "v2.6"
+    strategy_version: str = "v2.7"
     signal_version: str = "1.0"
 
     # Timing
@@ -66,7 +66,7 @@ class LiveSignal(BaseModel):
     current_price: Optional[float] = None
     risk_reward_ratio: Optional[float] = None
 
-    # Intelligence & Strategy V2.5/V2.6 Accuracy Upgrades
+    # Intelligence & Strategy V2.5/V2.6/V2.7 Accuracy Upgrades
     raw_probability: Optional[float] = None
     calibrated_probability: Optional[float] = None
     expected_value: Optional[float] = None
@@ -88,12 +88,19 @@ class LiveSignal(BaseModel):
     venn_abers_lower_prob: Optional[float] = None   # Venn-ABERS Lower-Bound Probability Certificate (0.72)
     beta_adjusted_targets: Dict[str, float] = Field(default_factory=dict) # Beta-Scaled Target Geometry
 
+    # V2.7 Apex Quantitative Upgrades
+    vpin_flow_toxicity: Optional[float] = None      # VPIN Volume-Synchronized Flow Toxicity (0.82)
+    dark_pool_dix_index: Optional[float] = None      # Off-Exchange Dark Pool Accumulation Index (+0.68)
+    finbert_nlp_sentiment: Optional[float] = None   # FinBERT Filings NLP Sentiment Score (+0.75)
+    intermarket_cointegration_score: Optional[float] = None # Global Intermarket Alignment (+0.88)
+    ppo_rl_exit_status: Optional[str] = None        # HOLD_DYNAMIC_TRAIL, MARKET_SELL, BREAKEVEN_LOCK
+
     regime: Optional[str] = None
     regime_probability: Optional[float] = None
 
     # Lineage
     model_id: Optional[str] = None
-    model_version: str = "TradeMind Core v2.6-HMM Ensemble"
+    model_version: str = "TradeMind Core v2.7-Apex PPO"
     model_hash: Optional[str] = None
     model_run_id: Optional[str] = None
 
