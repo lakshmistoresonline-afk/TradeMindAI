@@ -15,7 +15,7 @@ export default function SignalDetail() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isPremium } = useAuth();
-  const { firestoreSignals } = useTurboSync();
+  const { firestoreSignals, firestoreHistory } = useTurboSync();
   const [signal, setSignal] = useState<any>(null);
   const [forensics, setForensics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -33,9 +33,14 @@ export default function SignalDetail() {
                    rawData = await getEquitySignalDetail(id);
                }
 
-               // 3. Fallback to Firestore Mirror if API is offline / 404
+               // 3. Fallback to Firestore Mirror (Active Signals)
                if (!rawData && firestoreSignals.length > 0) {
                    rawData = firestoreSignals.find((s: any) => s.id === id);
+               }
+
+               // 4. Fallback to Firestore History Mirror (Closed Signals)
+               if (!rawData && firestoreHistory.length > 0) {
+                   rawData = firestoreHistory.find((s: any) => s.id === id);
                }
 
                if (rawData) {
@@ -60,7 +65,7 @@ export default function SignalDetail() {
            }, 500);
        }
     }
-  }, [id, isPremium, firestoreSignals, location.state]);
+  }, [id, isPremium, firestoreSignals, firestoreHistory, location.state]);
 
   if (loading) return (
      <Box sx={{ p: 4, bgcolor: '#020617', minHeight: '100vh' }}>
