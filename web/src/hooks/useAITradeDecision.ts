@@ -279,8 +279,8 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     marketContext: signal.market_context || signal.regime_metadata,
     technicalEvidence: signal.technical_evidence || signal.indicators,
     modelEvidence: signal.model_evidence,
-    triggeredAt: ensureUTC(signal.triggered_at || signal.activated_at || signal.entry_timestamp || (status === 'ENTRY_TRIGGERED' || status === 'ACTIVE' || status === 'TARGET_HIT' || status === 'STOP_LOSS' ? (signal.created_at || signal.timestamp) : undefined)),
-    isin: signal.isin || 'NSE_CASH',
+    triggeredAt: ensureUTC(signal.triggered_at || signal.activated_at || signal.entry_timestamp || signal.created_at || signal.timestamp),
+    isin: signal.isin || 'INE_CASH',
     lifecycleEvents: (signal.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) })),
     signalAgeHours: signal.signal_age_hours || (signal.created_at || signal.timestamp ? (Date.now() - new Date(signal.created_at || signal.timestamp).getTime()) / (1000 * 60 * 60) : undefined),
     dataAgeHours: (signal.data_timestamp || signal.timestamp) ? (Date.now() - new Date(signal.data_timestamp || signal.timestamp).getTime()) / (1000 * 60 * 60) : undefined
