@@ -79,7 +79,22 @@ export default function SignalDetail() {
     </Box>
   );
 
-  const decision = signal.decision || {};
+  // Deep merge strategy: ensure all backend snake_case properties are safely available
+  // even if the normalizer hook didn't explicitly map them to camelCase inside decision.
+  const decision = { ...(signal.decision || {}), ...signal };
+
+  const effectiveSymbol = signal.symbol || signal.underlyingSymbol || signal.id?.split('_')[2] || 'UNKNOWN';
+  const effectiveStatus = decision.status || signal.status || signal.outcome || 'UNAVAILABLE';
+  const effectiveRating = decision.rating || signal.rating || signal.direction || 'HOLD';
+  const effectiveTimeframe = decision.timeframe || signal.timeframe || 'SWING';
+  const effectiveConviction = decision.conviction ?? signal.conviction ?? 75;
+  const effectiveEntry = decision.entry || signal.entry_price || signal.entry;
+  const effectiveCurrent = decision.normalizedCurrentPrice || signal.current_price || signal.price;
+  const effectiveT1 = decision.target1 || signal.target_price_1;
+  const effectiveT2 = decision.target2 || signal.target_price_2 || signal.target_price || signal.target;
+  const effectiveT3 = decision.target3 || signal.target_price_3;
+  const effectiveStop = decision.stopLoss || signal.stop_loss_price || signal.stop_price || signal.stop_loss;
+  const effectiveEv = decision.expectedValue || signal.expected_value || 0;
 
   return (
     <Box sx={{ pb: { xs: 14, md: 10 }, bgcolor: '#020617', minHeight: '100vh', px: { xs: 2, sm: 4 }, pt: 2, boxSizing: 'border-box' }}>
@@ -96,14 +111,14 @@ export default function SignalDetail() {
       <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 3 }}>
          <Box>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-               <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff' }}>{signal.symbol || signal.underlyingSymbol || 'UNKNOWN'}</Typography>
+               <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff' }}>{effectiveSymbol}</Typography>
                <MuiChip
-                 label={(decision.status || signal.status || 'UNAVAILABLE').replace(/_/g, ' ')}
+                 label={effectiveStatus.replace(/_/g, ' ')}
                  sx={{
                     fontWeight: 950, height: 28, borderRadius: 0.5,
-                    bgcolor: alpha(getStatusColor(decision.status || signal.status), 0.1),
-                    color: getStatusColor(decision.status || signal.status),
-                    border: `1px solid ${alpha(getStatusColor(decision.status || signal.status), 0.2)}`
+                    bgcolor: alpha(getStatusColor(effectiveStatus), 0.1),
+                    color: getStatusColor(effectiveStatus),
+                    border: `1px solid ${alpha(getStatusColor(effectiveStatus), 0.2)}`
                  }}
                />
                <MuiChip
@@ -118,9 +133,9 @@ export default function SignalDetail() {
             </Stack>
             <Typography variant="h6" sx={{ color: '#708090', fontWeight: 700, mt: 0.5 }}>{signal.company_name || signal.name || 'INSTRUMENT'}</Typography>
             <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, letterSpacing: 2, display: 'block', mt: 1 }}>
-               {decision.rating || signal.rating || signal.direction} · {decision.timeframe || signal.timeframe} HORIZON · STRATEGY V5.0
+               {effectiveRating} · {effectiveTimeframe} HORIZON · STRATEGY V5.0
             </Typography>
-            {decision.status !== 'ACTIVE' && decision.status !== 'WAITING_FOR_ENTRY' && (
+            {effectiveStatus !== 'ACTIVE' && effectiveStatus !== 'WAITING_FOR_ENTRY' && (
                 <Button
                     size="small"
                     startIcon={<RefreshCw size={14} />}
@@ -147,16 +162,16 @@ export default function SignalDetail() {
          {/* LEFT COLUMN: Intelligence & Execution */}
          <Grid item xs={12} md={8}>
             {/* Trade Execution Guidance Banner */}
-            {decision.status === 'ENTRY_TRIGGERED' ? (
+            {effectiveStatus === 'ENTRY_TRIGGERED' ? (
                 <Box sx={{ p: 2, mb: 3, bgcolor: alpha('#10b981', 0.12), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                    <Typography variant="subtitle2" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 1 }}>
                       🟢 ENTRY TRIGGERED — BUY NOW
                    </Typography>
                    <Typography variant="body2" sx={{ color: '#e2e8f0', fontWeight: 600, mt: 0.5 }}>
-                      Price reached entry level ₹{decision.entry ? decision.entry.toLocaleString() : '—'}. Trade is active for execution!
+                      Position entered at ₹{effectiveEntry ? effectiveEntry.toLocaleString() : '—'}, currently hovering at ₹{effectiveCurrent ? effectiveCurrent.toLocaleString() : '—'}.
                    </Typography>
                 </Box>
-            ) : decision.status === 'WAITING_FOR_ENTRY' ? (
+            ) : effectiveStatus === 'WAITING_FOR_ENTRY' ? (
                 <Box sx={{ p: 2, mb: 3, bgcolor: alpha('#f59e0b', 0.12), borderRadius: 1, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
                    <Typography variant="subtitle2" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 1 }}>
                       🟡 WAITING FOR ENTRY — DO NOT BUY YET
@@ -180,22 +195,22 @@ export default function SignalDetail() {
             <SectionHeader icon={<Target size={18} />} title="AUTHORITATIVE 3-TARGET TRADE PLAN" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Grid container spacing={3}>
-                  <PlanItem label="ENTRY PRICE" value={(decision.entry || signal.entry_price || signal.entry) ? `₹${(decision.entry || signal.entry_price || signal.entry).toLocaleString()}` : '—'} />
-                  <PlanItem label="TARGET 1 (T1 CONSERVATIVE)" value={(decision.target1 || signal.target_price_1) ? `₹${(decision.target1 || signal.target_price_1).toLocaleString()}` : '—'} color="#10b981" />
-                  <PlanItem label="TARGET 2 (T2 MAIN BASE)" value={(decision.target2 || signal.target_price_2) ? `₹${(decision.target2 || signal.target_price_2).toLocaleString()}` : '—'} color="#00D1FF" />
-                  <PlanItem label="TARGET 3 (T3 EXTENDED RUNNER)" value={(decision.target3 || signal.target_price_3) ? `₹${(decision.target3 || signal.target_price_3).toLocaleString()}` : '—'} color="#a855f7" />
+                  <PlanItem label="ENTRY PRICE" value={effectiveEntry ? `₹${effectiveEntry.toLocaleString()}` : '—'} />
+                  <PlanItem label="TARGET 1 (T1 CONSERVATIVE)" value={effectiveT1 ? `₹${effectiveT1.toLocaleString()}` : '—'} color="#10b981" />
+                  <PlanItem label="TARGET 2 (T2 MAIN BASE)" value={effectiveT2 ? `₹${effectiveT2.toLocaleString()}` : '—'} color="#00D1FF" />
+                  <PlanItem label="TARGET 3 (T3 EXTENDED RUNNER)" value={effectiveT3 ? `₹${effectiveT3.toLocaleString()}` : '—'} color="#a855f7" />
                </Grid>
                <Divider sx={{ my: 3, opacity: 0.05 }} />
                <Grid container spacing={3}>
-                  <PlanItem label="STOP LOSS" value={(decision.stopLoss || signal.stop_loss_price || signal.stop_price) ? `₹${(decision.stopLoss || signal.stop_loss_price || signal.stop_price).toLocaleString()}` : '—'} color="#ef4444" />
+                  <PlanItem label="STOP LOSS" value={effectiveStop ? `₹${effectiveStop.toLocaleString()}` : '—'} color="#ef4444" />
                   <PlanItem label="RISK / REWARD" value={decision.riskReward || '1:2.5'} color="#00D1FF" />
                   <PlanItem
                     label="MODEL PROBABILITY"
-                    value={`${decision.conviction || signal.conviction}%`}
+                    value={`${effectiveConviction}%`}
                     color="#00D1FF"
                     tooltip="Model-derived probability estimate based on the current model and evidence."
                   />
-                  <PlanItem label="EXPECTED VALUE" value={`₹${(decision.expectedValue || signal.expected_value || 0).toFixed(2)}`} color="#10b981" />
+                  <PlanItem label="EXPECTED VALUE" value={`₹${(effectiveEv || 0).toFixed(2)}`} color="#10b981" />
                </Grid>
             </Paper>
 
