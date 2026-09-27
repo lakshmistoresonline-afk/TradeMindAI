@@ -3,7 +3,7 @@ import { Box, Typography, Grid, Paper, Stack, Chip, Divider, Skeleton, alpha, To
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getEquitySignalDetail, getEquitySignalForensics } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
-import { ShieldCheck, HelpCircle, Activity, Target, Clock, ArrowLeft, BarChart2, Briefcase, RefreshCw, Zap, TrendingUp, History, Cpu } from 'lucide-react';
+import { ShieldCheck, HelpCircle, Activity, Target, Clock, ArrowLeft, BarChart2, Briefcase, RefreshCw, Zap, TrendingUp, History, Cpu, Map as MapIcon, CheckCircle } from 'lucide-react';
 import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
 import PremiumOverlay from '../components/PremiumOverlay';
 import { useAuth } from '../hooks/useAuth';
@@ -79,7 +79,7 @@ export default function SignalDetail() {
     </Box>
   );
 
-  const decision = signal.decision;
+  const decision = signal.decision || {};
 
   return (
     <Box sx={{ pb: { xs: 14, md: 10 }, bgcolor: '#020617', minHeight: '100vh', px: { xs: 2, sm: 4 }, pt: 2, boxSizing: 'border-box' }}>
@@ -96,18 +96,18 @@ export default function SignalDetail() {
       <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 3 }}>
          <Box>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-               <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff' }}>{signal.symbol}</Typography>
+               <Typography variant="h3" sx={{ fontWeight: 950, letterSpacing: -2, color: '#fff' }}>{signal.symbol || signal.underlyingSymbol || 'UNKNOWN'}</Typography>
                <MuiChip
-                 label={decision.status?.replace(/_/g, ' ')}
+                 label={(decision.status || signal.status || 'UNAVAILABLE').replace(/_/g, ' ')}
                  sx={{
                     fontWeight: 950, height: 28, borderRadius: 0.5,
-                    bgcolor: alpha(getStatusColor(decision.status), 0.1),
-                    color: getStatusColor(decision.status),
-                    border: `1px solid ${alpha(getStatusColor(decision.status), 0.2)}`
+                    bgcolor: alpha(getStatusColor(decision.status || signal.status), 0.1),
+                    color: getStatusColor(decision.status || signal.status),
+                    border: `1px solid ${alpha(getStatusColor(decision.status || signal.status), 0.2)}`
                  }}
                />
                <MuiChip
-                 label={decision.qualityClass}
+                 label={decision.qualityClass || signal.quality_class || 'PRIMARY'}
                  variant="outlined"
                  sx={{
                    fontWeight: 950, height: 28, borderRadius: 0.5,
@@ -118,7 +118,7 @@ export default function SignalDetail() {
             </Stack>
             <Typography variant="h6" sx={{ color: '#708090', fontWeight: 700, mt: 0.5 }}>{signal.company_name || signal.name || 'INSTRUMENT'}</Typography>
             <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 900, letterSpacing: 2, display: 'block', mt: 1 }}>
-               {decision.rating} · {decision.timeframe} HORIZON · STRATEGY V2.2
+               {decision.rating || signal.rating || signal.direction} · {decision.timeframe || signal.timeframe} HORIZON · STRATEGY V5.0
             </Typography>
             {decision.status !== 'ACTIVE' && decision.status !== 'WAITING_FOR_ENTRY' && (
                 <Button
@@ -136,8 +136,8 @@ export default function SignalDetail() {
             <Typography variant="body2" sx={{ fontWeight: 900, fontFamily: 'JetBrains Mono', color: '#fff' }}>{signal.id}</Typography>
             <Box sx={{ mt: 1 }}>
                 <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800 }}>AGE</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 900, color: (decision.signalAgeHours || 0) > 24 ? '#ef4444' : '#10b981' }}>
-                    {(decision.signalAgeHours || 0).toFixed(1)} HOURS
+                <Typography variant="body2" sx={{ fontWeight: 900, color: (decision.signalAgeHours || signal.holding_period_days * 24 || 0) > 24 ? '#ef4444' : '#10b981' }}>
+                    {(decision.signalAgeHours || signal.holding_period_days * 24 || 0).toFixed(1)} HOURS
                 </Typography>
             </Box>
          </Box>
@@ -180,22 +180,22 @@ export default function SignalDetail() {
             <SectionHeader icon={<Target size={18} />} title="AUTHORITATIVE 3-TARGET TRADE PLAN" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                <Grid container spacing={3}>
-                  <PlanItem label="ENTRY PRICE" value={decision.entry ? `₹${decision.entry.toLocaleString()}` : '—'} />
-                  <PlanItem label="TARGET 1 (T1 CONSERVATIVE)" value={decision.target1 ? `₹${decision.target1.toLocaleString()}` : '—'} color="#10b981" />
-                  <PlanItem label="TARGET 2 (T2 MAIN BASE)" value={decision.target2 ? `₹${decision.target2.toLocaleString()}` : '—'} color="#00D1FF" />
-                  <PlanItem label="TARGET 3 (T3 EXTENDED RUNNER)" value={decision.target3 ? `₹${decision.target3.toLocaleString()}` : '—'} color="#a855f7" />
+                  <PlanItem label="ENTRY PRICE" value={(decision.entry || signal.entry_price || signal.entry) ? `₹${(decision.entry || signal.entry_price || signal.entry).toLocaleString()}` : '—'} />
+                  <PlanItem label="TARGET 1 (T1 CONSERVATIVE)" value={(decision.target1 || signal.target_price_1) ? `₹${(decision.target1 || signal.target_price_1).toLocaleString()}` : '—'} color="#10b981" />
+                  <PlanItem label="TARGET 2 (T2 MAIN BASE)" value={(decision.target2 || signal.target_price_2) ? `₹${(decision.target2 || signal.target_price_2).toLocaleString()}` : '—'} color="#00D1FF" />
+                  <PlanItem label="TARGET 3 (T3 EXTENDED RUNNER)" value={(decision.target3 || signal.target_price_3) ? `₹${(decision.target3 || signal.target_price_3).toLocaleString()}` : '—'} color="#a855f7" />
                </Grid>
                <Divider sx={{ my: 3, opacity: 0.05 }} />
                <Grid container spacing={3}>
-                  <PlanItem label="STOP LOSS" value={decision.stopLoss ? `₹${decision.stopLoss.toLocaleString()}` : '—'} color="#ef4444" />
+                  <PlanItem label="STOP LOSS" value={(decision.stopLoss || signal.stop_loss_price || signal.stop_price) ? `₹${(decision.stopLoss || signal.stop_loss_price || signal.stop_price).toLocaleString()}` : '—'} color="#ef4444" />
                   <PlanItem label="RISK / REWARD" value={decision.riskReward || '1:2.5'} color="#00D1FF" />
                   <PlanItem
                     label="MODEL PROBABILITY"
-                    value={`${decision.conviction}%`}
+                    value={`${decision.conviction || signal.conviction}%`}
                     color="#00D1FF"
                     tooltip="Model-derived probability estimate based on the current model and evidence."
                   />
-                  <PlanItem label="EXPECTED VALUE" value={`₹${(decision.expectedValue || 0).toFixed(2)}`} color="#10b981" />
+                  <PlanItem label="EXPECTED VALUE" value={`₹${(decision.expectedValue || signal.expected_value || 0).toFixed(2)}`} color="#10b981" />
                </Grid>
             </Paper>
 
@@ -446,52 +446,62 @@ export default function SignalDetail() {
             {/* 4. Signal Evidence Section */}
             <SectionHeader icon={<BarChart2 size={18} />} title="SIGNAL EVIDENCE & FORENSICS" />
             {isPremium ? (
-                <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', wordBreak: 'break-all' }}>
                 <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 2, display: 'block' }}>WHY THIS SIGNAL EXISTS</Typography>
-                <Typography variant="body1" sx={{ color: '#e2e8f0', fontWeight: 500, lineHeight: 1.6, mb: 4 }}>
-                    {decision.thesis || "Signal identified via V2.2 structural breakout logic combined with V2.3 ML classification. Forensic validation of institutional order flow confirmed at decision timestamp."}
+                <Typography variant="body1" sx={{ color: '#e2e8f0', fontWeight: 500, lineHeight: 1.6, mb: 4, wordBreak: 'break-word' }}>
+                    {decision.thesis || signal.thesis || signal.ai_thesis || "Signal identified via V2.2 structural breakout logic combined with V2.3 ML classification. Forensic validation of institutional order flow confirmed at decision timestamp."}
                 </Typography>
 
                 <Grid container spacing={3}>
-                    <EvidenceItem label="MARKET REGIME" value={signal.regime || 'SIDEWAYS'} />
-                    <EvidenceItem label="SECTOR CONTEXT" value={signal.sector || 'UNAVAILABLE'} />
+                    <EvidenceItem label="MARKET REGIME" value={signal.regime || signal.hmm_regime_state || 'SIDEWAYS'} />
+                    <EvidenceItem label="SECTOR CONTEXT" value={signal.sector || signal.sector_rrg_quadrant || 'UNAVAILABLE'} />
                     <EvidenceItem label="RELATIVE STRENGTH" value="UNAVAILABLE" />
-                    <EvidenceItem label="VOLUME ANALYSIS" value="UNAVAILABLE" />
+                    <EvidenceItem label="VOLUME ANALYSIS" value={signal.cvd_tape_pressure ? `+${signal.cvd_tape_pressure} CVD` : "UNAVAILABLE"} />
                 </Grid>
 
-                {decision.drivers && decision.drivers.length > 0 && (
+                {(decision.drivers || signal.shap_drivers) && (
                     <Box sx={{ mt: 4 }}>
-                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, mb: 2, display: 'block' }}>KEY DRIVERS</Typography>
-                        <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                            {decision.drivers.map((d: string, i: number) => (
-                            <MuiChip key={i} label={d.toUpperCase()} size="small" sx={{ fontWeight: 900, bgcolor: 'rgba(255,255,255,0.05)', color: '#708090' }} />
+                        <Typography variant="caption" sx={{ color: '#708090', fontWeight: 900, display: 'block', mb: 2 }}>KEY FORENSIC DRIVERS</Typography>
+                        <Stack spacing={1}>
+                            {(decision.drivers || Object.keys(signal.shap_drivers || {}).slice(0, 3)).map((d: string, i: number) => (
+                                <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                                    <MapIcon size={16} color="#00D1FF" style={{ marginTop: 2, flexShrink: 0 }} />
+                                    <Typography variant="body2" sx={{ color: '#cbd5e1', fontWeight: 600 }}>{d}</Typography>
+                                </Box>
                             ))}
                         </Stack>
                     </Box>
                 )}
                 </Paper>
-            ) : <Box sx={{ mb: 4 }}><PremiumOverlay title="UNLOCK EVIDENCE FORENSICS" /></Box>}
+            ) : (
+                <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+                    <ShieldCheck size={32} color="#708090" style={{ margin: '0 auto 16px', opacity: 0.5 }} />
+                    <Typography variant="subtitle2" sx={{ color: '#e2e8f0', fontWeight: 800, mb: 1 }}>EVIDENCE AUDIT LOCKED</Typography>
+                    <Typography variant="body2" sx={{ color: '#94a3b8', mb: 3 }}>Upgrade to TradeMind Pro to view the exact bitwise forensic evidence, institutional volume footprints, and Strategy V2.3 ML node validations behind this signal.</Typography>
+                    <Button variant="outlined" onClick={() => navigate('/pricing')} sx={{ color: '#00D1FF', borderColor: 'rgba(0, 209, 255, 0.3)', fontWeight: 800 }}>UNLOCK PRO FORENSICS</Button>
+                </Paper>
+            )}
 
-            {/* 4. Outcome Forensics (Visible for historical signals) */}
-            {decision.status !== 'ACTIVE' && decision.status !== 'WAITING_FOR_ENTRY' && (
-               <>
-                  <SectionHeader icon={<ShieldCheck size={18} />} title="OUTCOME FORENSICS" />
-                  <Paper sx={{ p: 4, mb: 4, bgcolor: alpha('#10b981', 0.02), border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-                     <Grid container spacing={4}>
-                        <PlanItem label="EXIT PRICE" value={decision.exitPrice ? `₹${decision.exitPrice.toLocaleString()}` : '—'} />
-                        <PlanItem label="REALIZED RETURN" value={`${(decision.realizedReturn || 0).toFixed(2)}%`} color={(decision.realizedReturn || 0) >= 0 ? "#10b981" : "#ef4444"} />
-                        <PlanItem label="NET P&L" value={decision.netPnL ? `₹${decision.netPnL.toLocaleString()}` : '—'} color={(decision.netPnL || 0) >= 0 ? "#10b981" : "#ef4444"} />
-                        <PlanItem label="CLOSED AT" value={decision.closedAt ? new Date(decision.closedAt).toLocaleDateString() : '—'} />
-                     </Grid>
-                     <Divider sx={{ my: 4, opacity: 0.05 }} />
-                     <Grid container spacing={4}>
-                        <PlanItem label="HOLDING PERIOD" value={`${decision.holdingPeriodDays || 0} DAYS`} />
-                        <PlanItem label="MAE" value={decision.mae ? `${decision.mae.toFixed(2)}%` : '—'} />
-                        <PlanItem label="MFE" value={decision.mfe ? `${decision.mfe.toFixed(2)}%` : '—'} />
-                        <PlanItem label="FINAL OUTCOME" value={decision.status} color={getStatusColor(decision.status)} />
-                     </Grid>
-                  </Paper>
-               </>
+            {/* 5. Historical Outcome Module */}
+            {(signal.outcome || signal.status === 'TARGET_HIT' || signal.status === 'STOP_LOSS' || signal.status === 'EXPIRED') && (
+                <>
+                    <SectionHeader icon={<CheckCircle size={18} />} title="OUTCOME FORENSICS" />
+                    <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <Grid container spacing={3} sx={{ mb: 3 }}>
+                            <PlanItem label="EXIT PRICE" value={signal.exit_price ? `₹${signal.exit_price.toLocaleString()}` : '—'} />
+                            <PlanItem label="REALIZED RETURN" value={signal.realized_return !== undefined ? `${signal.realized_return > 0 ? '+' : ''}${signal.realized_return}%` : '—'} color={(signal.realized_return || 0) >= 0 ? "#10b981" : "#ef4444"} />
+                            <PlanItem label="NET PNL" value={signal.net_pnl !== undefined ? `${signal.net_pnl > 0 ? '+' : ''}${signal.net_pnl}%` : '—'} color={(signal.net_pnl || 0) >= 0 ? "#10b981" : "#ef4444"} />
+                            <PlanItem label="CLOSED AT" value={signal.closed_at ? new Date(signal.closed_at).toLocaleDateString() : '—'} />
+                        </Grid>
+                        <Divider sx={{ my: 3, opacity: 0.05 }} />
+                        <Grid container spacing={3}>
+                            <PlanItem label="HOLDING PERIOD" value={signal.holding_period_days ? `${signal.holding_period_days} DAYS` : '—'} />
+                            <PlanItem label="MAE" value={signal.mae ? `${signal.mae}%` : '—'} />
+                            <PlanItem label="MFE" value={signal.mfe ? `${signal.mfe}%` : '—'} />
+                            <PlanItem label="FINAL OUTCOME" value={signal.outcome || signal.status || 'UNAVAILABLE'} color={signal.outcome === 'TARGET_HIT' ? "#10b981" : "#ef4444"} />
+                        </Grid>
+                    </Paper>
+                </>
             )}
 
             {/* 5. Signal Thesis (Signal Intelligence 4.0) */}
