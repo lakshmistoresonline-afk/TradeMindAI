@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Grid, Paper, Stack, Chip, Divider, Skeleton, alpha, Tooltip, Button, LinearProgress } from '@mui/material';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { getEquitySignalDetail, getEquitySignalForensics } from '../api/client';
+import { getEquitySignalDetail, getEquitySignalForensics, getEquityHistory } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { ShieldCheck, HelpCircle, Activity, Target, Clock, ArrowLeft, BarChart2, Briefcase, RefreshCw, Zap, TrendingUp, History, Cpu, Map as MapIcon, CheckCircle } from 'lucide-react';
 import SignalLifecycleTimeline from '../components/Research/shared/SignalLifecycleTimeline';
@@ -46,6 +46,15 @@ export default function SignalDetail() {
                // 4. Fallback to Firestore History Mirror (Closed Signals)
                if (!rawData && firestoreHistory.length > 0) {
                    rawData = firestoreHistory.find((s: any) => s.id === id);
+               }
+
+               // 5. Force re-fetch of history from API if still missing
+               // (Handles hard reloads on history URLs where mirror array hasn't hydrated yet)
+               if (!rawData && id.includes('hist_eq_')) {
+                   const histQuery = await getEquityHistory({ limit: 100 });
+                   if (histQuery?.records?.length > 0) {
+                       rawData = histQuery.records.find((s: any) => s.id === id);
+                   }
                }
 
                if (rawData) {
