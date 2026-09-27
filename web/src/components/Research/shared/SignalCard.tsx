@@ -146,7 +146,25 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
 
         {/* Execution Guidance Banner */}
         <Box sx={{ mt: 2 }}>
-          {isT1Reached ? (
+          {(decision.status === 'TARGET_HIT' || stock.outcome === 'TARGET_HIT') ? (
+            <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                🟢 TARGET HIT — POSITION CLOSED SUCCESSFULLY
+              </Typography>
+            </Box>
+          ) : (decision.status === 'STOP_LOSS' || stock.outcome === 'STOP_LOSS') ? (
+            <Box sx={{ p: 1.2, bgcolor: alpha('#ef4444', 0.15), borderRadius: 1, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+              <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                🔴 STOP LOSS HIT — POSITION CLOSED
+              </Typography>
+            </Box>
+          ) : (decision.status === 'EXPIRED' || stock.outcome === 'EXPIRED') ? (
+            <Box sx={{ p: 1.2, bgcolor: alpha('#f59e0b', 0.15), borderRadius: 1, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+              <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                🟡 TRADE EXPIRED — CLOSED WITHOUT FILL
+              </Typography>
+            </Box>
+          ) : isT1Reached ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 🟢 T1 TOUCHED — BREAKEVEN STOP LOCKED (RISK-FREE RUNNER)
