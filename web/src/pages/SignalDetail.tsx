@@ -28,6 +28,11 @@ export default function SignalDetail() {
                // 1. Check passed location state
                let rawData = location.state?.signal;
 
+               // Validate rawData to ensure it isn't an empty or corrupted object from a bad browser history cache
+               if (rawData && !rawData.id && !rawData.symbol && !rawData.underlyingSymbol) {
+                   rawData = null;
+               }
+
                // 2. Try REST API if location state is missing
                if (!rawData) {
                    rawData = await getEquitySignalDetail(id);
