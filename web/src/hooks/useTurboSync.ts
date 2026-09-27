@@ -12,28 +12,35 @@ export function useTurboSync() {
 
   useEffect(() => {
     // 1. SSE Connection (Backend Authority)
-    const sseUrl = `${API_BASE_URL.replace('/api/v1', '')}/api/v1/stream/signals`;
-    const eventSource = new EventSource(sseUrl);
+    // Only attempt if running on localhost to prevent connection refused spam in production
+    let eventSource: EventSource | null = null;
 
-    eventSource.onopen = () => {
-      setConnectionStatus('ONLINE');
-      console.log("[Turbo-Sync] SSE Connection Established");
-    };
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const sseUrl = `${API_BASE_URL.replace('/api/v1', '')}/api/v1/stream/signals`;
+        eventSource = new EventSource(sseUrl);
 
-    eventSource.onerror = () => {
-      setConnectionStatus('ERROR');
-      console.warn("[Turbo-Sync] SSE Unavailable. Using Firestore Mirror fallback.");
-      eventSource.close();
-    };
+        eventSource.onopen = () => {
+          setConnectionStatus('ONLINE');
+          console.log("[Turbo-Sync] SSE Connection Established");
+        };
 
-    eventSource.addEventListener('opportunity_update', (event: any) => {
-      try {
-        const data = JSON.parse(event.data);
-        setUpdates(data);
-      } catch (err) {
-        console.error("[Turbo-Sync] Failed to parse SSE data:", err);
-      }
-    });
+        eventSource.onerror = () => {
+          setConnectionStatus('ERROR');
+          console.warn("[Turbo-Sync] SSE Unavailable. Using Firestore Mirror fallback.");
+          eventSource?.close();
+        };
+
+        eventSource.addEventListener('opportunity_update', (event: any) => {
+          try {
+            const data = JSON.parse(event.data);
+            setUpdates(data);
+          } catch (err) {
+            console.error("[Turbo-Sync] Failed to parse SSE data:", err);
+          }
+        });
+    } else {
+        setConnectionStatus('ERROR');
+    }
 
     // 2. Firestore Mirror Fallback (V2.3 Hybrid Support)
     // This ensures local signals mirrored to Firestore are visible even if Render is down.
@@ -80,7 +87,9 @@ export function useTurboSync() {
     });
 
     return () => {
-      eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
       unsubscribeSignals();
       unsubscribeHistory();
       unsubscribeMarket();
