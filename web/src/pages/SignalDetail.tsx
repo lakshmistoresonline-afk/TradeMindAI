@@ -111,8 +111,8 @@ export default function SignalDetail() {
                  variant="outlined"
                  sx={{
                    fontWeight: 950, height: 28, borderRadius: 0.5,
-                   borderColor: decision.qualityClass === 'PRIMARY' ? '#10b981' : decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090',
-                   color: decision.qualityClass === 'PRIMARY' ? '#10b981' : decision.qualityClass === 'SELECTIVE' ? '#00D1FF' : '#708090'
+                   borderColor: (decision.qualityClass || signal.quality_class) === 'PRIMARY' ? '#10b981' : (decision.qualityClass || signal.quality_class) === 'SELECTIVE' ? '#00D1FF' : '#708090',
+                   color: (decision.qualityClass || signal.quality_class) === 'PRIMARY' ? '#10b981' : (decision.qualityClass || signal.quality_class) === 'SELECTIVE' ? '#00D1FF' : '#708090'
                  }}
                />
             </Stack>
@@ -203,10 +203,10 @@ export default function SignalDetail() {
             <SectionHeader icon={<Cpu size={18} />} title="STRATEGY V2.5 QUANTITATIVE SHAP FORENSICS & GEX REGIME" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(0, 209, 255, 0.15)', borderRadius: 2 }}>
                <Grid container spacing={3}>
-                  <PlanItem label="NET DEALER GEX" value={`${decision.netDealerGex || -1.8} (-GEX MOMENTUM)`} color="#10b981" />
-                  <PlanItem label="SECTOR RRG QUADRANT" value={decision.sectorRrgQuadrant || 'LEADING'} color="#00D1FF" />
-                  <PlanItem label="CONFORMAL COVERAGE" value={`${decision.conformalCoverage || 92.5}% (CERTIFIED 90%+)`} color="#a855f7" />
-                  <PlanItem label="TOP 5 BBO OIB RATIO" value={`+${decision.orderBookImbalance || 0.52} (BUY DEPTH)`} color="#10b981" />
+                  <PlanItem label="NET DEALER GEX" value={`${decision.netDealerGex || signal.net_dealer_gex || -1.8} (-GEX MOMENTUM)`} color="#10b981" />
+                  <PlanItem label="SECTOR RRG QUADRANT" value={decision.sectorRrgQuadrant || signal.sector_rrg_quadrant || 'LEADING'} color="#00D1FF" />
+                  <PlanItem label="CONFORMAL COVERAGE" value={`${decision.conformalCoverage || signal.conformal_coverage_pct || 92.5}% (CERTIFIED 90%+)`} color="#a855f7" />
+                  <PlanItem label="TOP 5 BBO OIB RATIO" value={`+${decision.orderBookImbalance || signal.order_book_imbalance || 0.52} (BUY DEPTH)`} color="#10b981" />
                </Grid>
                <Divider sx={{ my: 3, opacity: 0.08 }} />
                <Typography variant="caption" sx={{ color: '#00D1FF', fontWeight: 950, mb: 2, display: 'block', letterSpacing: 1 }}>
@@ -234,10 +234,10 @@ export default function SignalDetail() {
             <SectionHeader icon={<Activity size={18} />} title="STRATEGY V2.6 GAUSSIAN HMM REGIME & VENN-ABERS CALIBRATION" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 2 }}>
                <Grid container spacing={3}>
-                  <PlanItem label="HMM MICRO-REGIME" value={decision.hmmRegimeState || 'STEADY_BULL_TREND'} color="#10b981" />
-                  <PlanItem label="INTRADAY CVD PRESSURE" value={`+${decision.cvdTapePressure || 0.48} (TAPE BUYING)`} color="#00D1FF" />
-                  <PlanItem label="DELTA MAX PAIN VECTOR" value={`+${decision.maxPainShiftVector || 15.0} STRIKE SHIFT`} color="#a855f7" />
-                  <PlanItem label="VENN-ABERS CERTIFICATE" value={`${decision.vennAbersLowerProb || 0.72} (GUARANTEED 0.68+)`} color="#10b981" />
+                  <PlanItem label="HMM MICRO-REGIME" value={decision.hmmRegimeState || signal.hmm_regime_state || 'STEADY_BULL_TREND'} color="#10b981" />
+                  <PlanItem label="INTRADAY CVD PRESSURE" value={`+${decision.cvdTapePressure || signal.cvd_tape_pressure || 0.48} (TAPE BUYING)`} color="#00D1FF" />
+                  <PlanItem label="DELTA MAX PAIN VECTOR" value={`+${decision.maxPainShiftVector || signal.max_pain_shift_vector || 15.0} STRIKE SHIFT`} color="#a855f7" />
+                  <PlanItem label="VENN-ABERS CERTIFICATE" value={`${decision.vennAbersLowerProb || signal.venn_abers_lower_prob || 0.72} (GUARANTEED 0.68+)`} color="#10b981" />
                </Grid>
             </Paper>
 
@@ -245,10 +245,10 @@ export default function SignalDetail() {
             <SectionHeader icon={<Zap size={18} />} title="STRATEGY V2.7 APEX VPIN, DIX & PPO RL FORENSICS" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: 2 }}>
                <Grid container spacing={3}>
-                  <PlanItem label="VPIN FLOW TOXICITY" value={`${decision.vpinFlowToxicity || 0.82} (INFORMED FLOW)`} color="#a855f7" />
-                  <PlanItem label="DARK POOL DIX INDEX" value={`+${decision.darkPoolDixIndex || 0.68} (BLOCK ACCUMULATION)`} color="#10b981" />
-                  <PlanItem label="FINBERT FILINGS SENTIMENT" value={`+${decision.finbertNlpSentiment || 0.75} (POSITIVE SHOCK)`} color="#00D1FF" />
-                  <PlanItem label="INTERMARKET ALIGNMENT" value={`+${decision.intermarketCointegrationScore || 0.88} (MACRO ALIGNED)`} color="#10b981" />
+                  <PlanItem label="VPIN FLOW TOXICITY" value={`${decision.vpinFlowToxicity || signal.vpin_flow_toxicity || 0.82} (INFORMED FLOW)`} color="#a855f7" />
+                  <PlanItem label="DARK POOL DIX INDEX" value={`+${decision.darkPoolDixIndex || signal.dark_pool_dix_index || 0.68} (BLOCK ACCUMULATION)`} color="#10b981" />
+                  <PlanItem label="FINBERT FILINGS SENTIMENT" value={`+${decision.finbertNlpSentiment || signal.finbert_nlp_sentiment || 0.75} (POSITIVE SHOCK)`} color="#00D1FF" />
+                  <PlanItem label="INTERMARKET ALIGNMENT" value={`+${decision.intermarketCointegrationScore || signal.intermarket_cointegration_score || 0.88} (MACRO ALIGNED)`} color="#10b981" />
                </Grid>
                <Divider sx={{ my: 3, opacity: 0.08 }} />
                <Box sx={{ p: 2, bgcolor: alpha('#7C3AED', 0.08), borderRadius: 1.5, border: '1px solid rgba(124, 58, 237, 0.2)' }}>
@@ -256,7 +256,7 @@ export default function SignalDetail() {
                      PPO REINFORCEMENT LEARNING TRAILING EXIT POLICY
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#f8fafc', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace' }}>
-                     PPO AGENT STATUS: {decision.ppoRlExitStatus || 'HOLD_DYNAMIC_TRAIL'} — DYNAMIC ATR TRAILING ACTIVE
+                     PPO AGENT STATUS: {decision.ppoRlExitStatus || signal.ppo_rl_exit_status || 'HOLD_DYNAMIC_TRAIL'} — DYNAMIC ATR TRAILING ACTIVE
                   </Typography>
                </Box>
             </Paper>
@@ -265,10 +265,10 @@ export default function SignalDetail() {
             <SectionHeader icon={<ShieldCheck size={18} />} title="STRATEGY V2.8 AUTONOMOUS MULTI-AGENT SWARM & QUANTUM FORENSICS" />
             <Paper sx={{ p: 4, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(0, 209, 255, 0.25)', borderRadius: 2 }}>
                <Grid container spacing={3}>
-                  <PlanItem label="AI SWARM CONSENSUS" value={`${Math.round((decision.agentSwarmConsensusScore || 0.95) * 100)}% (4/4 AGENTS APPROVED)`} color="#00D1FF" />
-                  <PlanItem label="QUANTUM WAVE DENSITY" value={`${decision.quantumDensityProbability || 0.88} (SCHRÖDINGER PROB)`} color="#10b981" />
-                  <PlanItem label="RMT COVARIANCE SCORE" value={`${decision.rmtClusterUncorrelatedScore || 0.92} (NOISE-FILTERED)`} color="#a855f7" />
-                  <PlanItem label="TSALLIS ENTROPY INDEX" value={`${decision.tsallisEntropyExhaustionIndex || 0.18} (LOW ENTROPY TREND)`} color="#10b981" />
+                  <PlanItem label="AI SWARM CONSENSUS" value={`${Math.round((decision.agentSwarmConsensusScore || signal.agent_swarm_consensus_score || 0.95) * 100)}% (4/4 AGENTS APPROVED)`} color="#00D1FF" />
+                  <PlanItem label="QUANTUM WAVE DENSITY" value={`${decision.quantumDensityProbability || signal.quantum_density_probability || 0.88} (SCHRÖDINGER PROB)`} color="#10b981" />
+                  <PlanItem label="RMT COVARIANCE SCORE" value={`${decision.rmtClusterUncorrelatedScore || signal.rmt_cluster_uncorrelated_score || 0.92} (NOISE-FILTERED)`} color="#a855f7" />
+                  <PlanItem label="TSALLIS ENTROPY INDEX" value={`${decision.tsallisEntropyExhaustionIndex || signal.tsallis_entropy_exhaustion_index || 0.18} (LOW ENTROPY TREND)`} color="#10b981" />
                </Grid>
                <Divider sx={{ my: 3, opacity: 0.08 }} />
                <Box sx={{ p: 2, bgcolor: alpha('#00D1FF', 0.08), borderRadius: 1.5, border: '1px solid rgba(0, 209, 255, 0.2)' }}>
@@ -276,7 +276,7 @@ export default function SignalDetail() {
                      LIMIT ORDER BOOK (LOB) QUEUE PRIORITY & SLIPPAGE IMPACT ESTIMATOR
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#f8fafc', fontWeight: 800, fontFamily: 'JetBrains Mono, monospace' }}>
-                     LOB ESTIMATED SLIPPAGE IMPACT: {((decision.lobQueueImpactCost || 0.02) * 100).toFixed(2)}% — NBBO TOUCH TOP-OF-BOOK QUEUE PRIORITY CONFIRMED
+                     LOB ESTIMATED SLIPPAGE IMPACT: {((decision.lobQueueImpactCost || signal.lob_queue_impact_cost || 0.02) * 100).toFixed(2)}% — NBBO TOUCH TOP-OF-BOOK QUEUE PRIORITY CONFIRMED
                   </Typography>
                </Box>
             </Paper>
