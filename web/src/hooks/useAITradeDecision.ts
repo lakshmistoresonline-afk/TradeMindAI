@@ -273,16 +273,16 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     closedAt: ensureUTC(signal.outcome_timestamp || signal.exit_at),
 
     // Signal Intelligence 3.0 Fields
-    predictionId: signal.prediction_id,
+    predictionId: signal.prediction_id || signal.id,
     provenanceId: signal.provenance_id,
     provenanceData: signal.provenance || signal.provenance_json,
     marketContext: signal.market_context || signal.regime_metadata,
     technicalEvidence: signal.technical_evidence || signal.indicators,
     modelEvidence: signal.model_evidence,
-    triggeredAt: ensureUTC(signal.triggered_at || signal.activated_at || signal.entry_timestamp || (status === 'ENTRY_TRIGGERED' || status === 'ACTIVE' ? (signal.created_at || signal.timestamp) : undefined)),
+    triggeredAt: ensureUTC(signal.triggered_at || signal.activated_at || signal.entry_timestamp || (status === 'ENTRY_TRIGGERED' || status === 'ACTIVE' || status === 'TARGET_HIT' || status === 'STOP_LOSS' ? (signal.created_at || signal.timestamp) : undefined)),
     isin: signal.isin || 'NSE_CASH',
     lifecycleEvents: (signal.events || []).map((e: any) => ({ ...e, timestamp: ensureUTC(e.timestamp) })),
-    signalAgeHours: signal.signal_age_hours || (signal.created_at ? (Date.now() - new Date(signal.created_at).getTime()) / (1000 * 60 * 60) : undefined),
+    signalAgeHours: signal.signal_age_hours || (signal.created_at || signal.timestamp ? (Date.now() - new Date(signal.created_at || signal.timestamp).getTime()) / (1000 * 60 * 60) : undefined),
     dataAgeHours: (signal.data_timestamp || signal.timestamp) ? (Date.now() - new Date(signal.data_timestamp || signal.timestamp).getTime()) / (1000 * 60 * 60) : undefined
   };
 };
