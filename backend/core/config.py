@@ -7,6 +7,21 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "TradeMind AI"
 
+    # STRICT PRODUCT BOUNDARY - SIGNAL PROVIDER ONLY (NON-NEGOTIABLE)
+    REAL_TRADING: bool = False
+    LIVE_EXECUTION_ENABLED: bool = False
+    BROKER_ORDER_EXECUTION_ENABLED: bool = False
+
+    @field_validator("REAL_TRADING", "LIVE_EXECUTION_ENABLED", "BROKER_ORDER_EXECUTION_ENABLED", mode="before")
+    @classmethod
+    def enforce_signal_only_boundary(cls, v) -> bool:
+        if v is True or str(v).lower() in ("true", "1", "yes", "on", "enable", "enabled"):
+            raise ValueError(
+                "CRITICAL SECURITY AUDIT FAILURE: TradeMindAI is strictly a signal-provider and market-analysis application. "
+                "REAL_TRADING and order execution capabilities are permanently disabled and cannot be enabled in any environment."
+            )
+        return False
+
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
