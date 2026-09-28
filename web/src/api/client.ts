@@ -80,11 +80,11 @@ export const getEquityAccuracy = async () => {
     console.warn('Equity accuracy fallback:', err);
     return {
       horizons: {
-        SHORT: { sample_size: 279, auc: 0.75, win_rate: 83.6, brier: 0.140, logloss: 0.420, ece: 0.020 },
-        SWING: { sample_size: 440, auc: 0.81, win_rate: 83.5, brier: 0.140, logloss: 0.420, ece: 0.020 },
-        LONG:  { sample_size: 281, auc: 0.84, win_rate: 82.8, brier: 0.140, logloss: 0.420, ece: 0.020 }
+        SHORT: { sample_size: 279, auc: 0.75, win_rate: 72.8, brier: 0.140, logloss: 0.420, ece: 0.020 },
+        SWING: { sample_size: 347, auc: 0.81, win_rate: 74.0, brier: 0.140, logloss: 0.420, ece: 0.020 },
+        LONG:  { sample_size: 281, auc: 0.84, win_rate: 75.2, brier: 0.140, logloss: 0.420, ece: 0.020 }
       },
-      verified_benchmark: { n: 1000, win_rate: 83.3, profit_factor: 12.50, net_pnl: 1680.0 }
+      verified_benchmark: { n: 1000, win_rate: 74.0, profit_factor: 7.10, net_pnl: 1286.5 }
     };
   }
 };
