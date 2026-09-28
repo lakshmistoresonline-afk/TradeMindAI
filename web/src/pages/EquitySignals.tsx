@@ -180,21 +180,30 @@ export default function EquitySignals() {
 
     const uniqueHistory = Array.from(dedupMap.values());
 
-    setHistory(uniqueHistory);
-    setTotalHistory(uniqueHistory.length);
+    // Apply active filter dropdown selections to history summary stats
+    const filteredHistory = uniqueHistory.filter((s: any) => {
+      const matchHorizon = hFilterHorizon === 'ALL' || (s.decision?.timeframe || s.timeframe) === hFilterHorizon;
+      const matchQuality = hFilterQuality === 'ALL' || (s.decision?.qualityClass || s.quality_class) === hFilterQuality;
+      const matchStatus = hFilterStatus === 'ALL' || (s.decision?.status || s.status) === hFilterStatus;
+      const matchDirection = hFilterDirection === 'ALL' || (s.decision?.direction || s.direction) === hFilterDirection;
+      return matchHorizon && matchQuality && matchStatus && matchDirection;
+    });
 
-    const targetHits = uniqueHistory.filter((s: any) => s.decision?.status === 'TARGET_HIT' || s.status === 'TARGET_HIT').length;
-    const stopLosses = uniqueHistory.filter((s: any) => s.decision?.status === 'STOP_LOSS' || s.status === 'STOP_LOSS').length;
-    const expired = uniqueHistory.filter((s: any) => s.decision?.status === 'EXPIRED' || s.status === 'EXPIRED').length;
+    setHistory(filteredHistory);
+    setTotalHistory(filteredHistory.length);
+
+    const targetHits = filteredHistory.filter((s: any) => s.decision?.status === 'TARGET_HIT' || s.status === 'TARGET_HIT').length;
+    const stopLosses = filteredHistory.filter((s: any) => s.decision?.status === 'STOP_LOSS' || s.status === 'STOP_LOSS').length;
+    const expired = filteredHistory.filter((s: any) => s.decision?.status === 'EXPIRED' || s.status === 'EXPIRED').length;
 
     setHistorySummary({
-      total: uniqueHistory.length,
+      total: filteredHistory.length,
       target_hits: targetHits,
       stop_losses: stopLosses,
       expired: expired,
-      other: Math.max(0, uniqueHistory.length - (targetHits + stopLosses + expired))
+      other: Math.max(0, filteredHistory.length - (targetHits + stopLosses + expired))
     });
-  }, [firestoreHistory]);
+  }, [firestoreHistory, hFilterHorizon, hFilterQuality, hFilterStatus, hFilterDirection]);
 
   const allActiveSignalsList = useMemo(() => {
     const rawActive = signals.filter(s => {
