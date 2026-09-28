@@ -153,7 +153,7 @@ export default function Performance() {
   );
 }
 
-function HorizonSection({ title, stats, description, color, horizon = 'SWING' }: any) {
+function HorizonSection({ title, stats, description, color }: any) {
    const hasData = stats && stats.sample_size > 0;
    const navigate = useNavigate();
 
@@ -178,7 +178,7 @@ function HorizonSection({ title, stats, description, color, horizon = 'SWING' }:
             <Button
                 variant="text"
                 size="small"
-                onClick={() => navigate('/signals', { state: { mode: 'HISTORY', horizon } })}
+                onClick={() => navigate('/signals', { state: { mode: 'HISTORY' } })}
                 sx={{ color: '#00D1FF', fontWeight: 950, fontSize: '0.7rem', textTransform: 'none' }}
             >
                 VIEW UNDERLYING SIGNAL HISTORY →

@@ -19,9 +19,10 @@ export default function EquitySignals() {
   useEffect(() => {
     if (location.state?.mode === 'HISTORY') {
       setMode('HISTORY');
-      if (location.state?.horizon) {
-        setHFilterHorizon(location.state.horizon);
-      }
+      setHFilterHorizon('ALL');
+      setHFilterDirection('ALL');
+      setHFilterQuality('ALL');
+      setHFilterStatus('ALL');
     }
   }, [location.state]);
   const [activeTab, setActiveTab] = useState(0); // Default to ALL ACTIVE (index 0)
