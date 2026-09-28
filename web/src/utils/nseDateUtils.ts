@@ -90,21 +90,22 @@ export function formatNSEDateTime(dateInput?: string | Date | null): string {
 export function getSignalStatusMeta(decision: any, stock?: any) {
   const status = decision?.status || stock?.status || 'WAITING_FOR_ENTRY';
   const createdAt = decision?.generatedAt || decision?.createdAt || stock?.created_at || stock?.timestamp;
+  const triggeredAt = decision?.triggeredAt || stock?.triggered_at || stock?.activated_at || stock?.entry_timestamp || (status !== 'WAITING_FOR_ENTRY' && status !== 'GENERATED' ? createdAt : undefined);
 
   let statusChangeTime: string | undefined = undefined;
   let statusLabel: string = 'Status Updated';
 
   if (status === 'ENTRY_TRIGGERED' || status === 'ACTIVE') {
-    statusChangeTime = decision?.triggeredAt || decision?.updatedAt || decision?.validatedAt || stock?.triggered_at || stock?.updated_at;
+    statusChangeTime = triggeredAt || decision?.updatedAt || decision?.validatedAt || stock?.updated_at;
     statusLabel = 'Triggered';
   } else if (status === 'TARGET_HIT') {
-    statusChangeTime = decision?.closedAt || decision?.updatedAt || stock?.outcome_timestamp || stock?.updated_at;
+    statusChangeTime = decision?.closedAt || decision?.updatedAt || stock?.outcome_timestamp || stock?.closed_at || stock?.updated_at;
     statusLabel = 'Target Hit';
   } else if (status === 'STOP_LOSS') {
-    statusChangeTime = decision?.closedAt || decision?.updatedAt || stock?.outcome_timestamp || stock?.updated_at;
+    statusChangeTime = decision?.closedAt || decision?.updatedAt || stock?.outcome_timestamp || stock?.closed_at || stock?.updated_at;
     statusLabel = 'Stop Loss Hit';
   } else if (status === 'EXPIRED') {
-    statusChangeTime = decision?.closedAt || decision?.updatedAt || stock?.outcome_timestamp || stock?.updated_at;
+    statusChangeTime = decision?.closedAt || decision?.updatedAt || stock?.outcome_timestamp || stock?.closed_at || stock?.updated_at;
     statusLabel = 'Expired';
   } else if (status === 'CANCELLED') {
     statusChangeTime = decision?.updatedAt || stock?.updated_at;
@@ -128,6 +129,7 @@ export function getSignalStatusMeta(decision: any, stock?: any) {
 
   return {
     createdAt,
+    triggeredAt,
     hasStatusChanged,
     statusLabel,
     statusChangeTime

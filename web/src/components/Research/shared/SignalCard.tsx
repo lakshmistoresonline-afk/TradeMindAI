@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography, Paper, Grid, Stack, Chip, alpha, LinearProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, InputAdornment, Divider, IconButton, Tooltip } from '@mui/material';
-import { ArrowUpRight, ArrowDownRight, Clock, Calendar, Calculator, Share2, Check } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Clock, Calendar, Calculator, Share2, Check, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AITradeDecision } from '../../../types/domain';
 import { formatNSEDateTime, getSignalStatusMeta } from '../../../utils/nseDateUtils';
@@ -47,7 +47,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
   const stop = isT1Reached ? Math.max(baseStop || 0, Math.round(entry * 1.002 * 100) / 100) : baseStop;
   const conviction = decision.conviction || stock.conviction || 75;
 
-  const { createdAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
+  const { createdAt, triggeredAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
 
   return (
     <Paper
@@ -211,7 +211,15 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
               Created: <span style={{ color: '#f8fafc', fontWeight: 800 }}>{formatNSEDateTime(createdAt)}</span>
             </Typography>
           </Box>
-          {hasStatusChanged && (
+          {triggeredAt && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+              <Zap size={12} color="#f59e0b" />
+              <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace' }}>
+                Triggered: <span style={{ color: '#f59e0b', fontWeight: 800 }}>{formatNSEDateTime(triggeredAt)}</span>
+              </Typography>
+            </Box>
+          )}
+          {hasStatusChanged && statusLabel !== 'Triggered' && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
               <Clock size={12} color="#10b981" />
               <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace' }}>
