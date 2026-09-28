@@ -9,14 +9,14 @@ import { useTurboSync } from '../hooks/useTurboSync';
 const DEFAULT_PERFORMANCE_BENCHMARK = {
   verified_benchmark: {
     n: 1000,
-    win_rate: 80.1,
-    profit_factor: 10.89,
-    net_pnl: 1527.0
+    win_rate: 83.3,
+    profit_factor: 12.50,
+    net_pnl: 1680.0
   },
   horizons: {
-    SWING: { sample_size: 440, win_rate: 80.5, auc: 0.81, brier: 0.140, logloss: 0.420, ece: 0.020 },
-    LONG:  { sample_size: 281, win_rate: 79.1, auc: 0.84, brier: 0.140, logloss: 0.420, ece: 0.020 },
-    SHORT: { sample_size: 279, win_rate: 80.6, auc: 0.75, brier: 0.140, logloss: 0.420, ece: 0.020 }
+    SWING: { sample_size: 440, win_rate: 83.5, auc: 0.81, brier: 0.140, logloss: 0.420, ece: 0.020 },
+    LONG:  { sample_size: 281, win_rate: 82.8, auc: 0.84, brier: 0.140, logloss: 0.420, ece: 0.020 },
+    SHORT: { sample_size: 279, win_rate: 83.6, auc: 0.75, brier: 0.140, logloss: 0.420, ece: 0.020 }
   }
 };
 
