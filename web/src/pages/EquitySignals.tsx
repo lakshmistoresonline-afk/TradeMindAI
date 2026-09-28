@@ -22,7 +22,7 @@ export default function EquitySignals() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('NEWEST');
 
-  // UI State
+  // UI State (Default to GRID view for both Active and History modes)
   const [viewLayout, setViewLayout] = useState<'GRID' | 'TABLE'>('GRID');
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
@@ -64,7 +64,7 @@ export default function EquitySignals() {
 
   // History Pagination & Filters
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [rowsPerPage, setRowsPerPage] = useState(24);
   const [totalHistory, setTotalHistory] = useState(0);
   const [historySummary, setHistorySummary] = useState<any>(null);
 
@@ -268,7 +268,7 @@ export default function EquitySignals() {
          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, ...GRADIENT_ACCENT_BAR }} />
          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
             <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
-               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT, fontSize: { xs: '1.3rem', sm: '2rem' } }}>SIGNAL OPERATIONS TERMINAL</Typography>
+               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: '#fff', fontFamily: MONO_FONT, fontSize: { xs: '1.4rem', sm: '2rem' } }}>SIGNAL OPERATIONS TERMINAL</Typography>
                <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" gap={1} sx={{ mt: 1 }}>
                   <Typography variant="caption" sx={{ fontWeight: 900, color: COLORS.green, display: 'flex', alignItems: 'center', gap: 0.5, fontFamily: MONO_FONT }}>
                      <Activity size={14} /> LIVE SHADOW SCAN (V3.3)
@@ -326,7 +326,7 @@ export default function EquitySignals() {
          </Stack>
 
          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={1}>
-            <FormControl size="small" sx={{ minWidth: 130 }}>
+            <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>RANKING</InputLabel>
                 <Select
                     value={sortBy}
@@ -340,16 +340,14 @@ export default function EquitySignals() {
                 </Select>
             </FormControl>
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5, opacity: 0.1, display: { xs: 'none', sm: 'block' } }} />
-            {mode === 'ACTIVE' && (
-                <Stack direction="row" spacing={0.5}>
-                    <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? COLORS.cyan : COLORS.slateMuted, p: 0.8 }}>
-                        <LayoutGrid size={18} />
-                    </IconButton>
-                    <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? COLORS.cyan : COLORS.slateMuted, p: 0.8 }}>
-                        <ListIcon size={18} />
-                    </IconButton>
-                </Stack>
-            )}
+            <Stack direction="row" spacing={0.5}>
+                <IconButton onClick={() => setViewLayout('GRID')} sx={{ color: viewLayout === 'GRID' ? COLORS.cyan : COLORS.slateMuted, p: 0.8 }}>
+                    <LayoutGrid size={18} />
+                </IconButton>
+                <IconButton onClick={() => setViewLayout('TABLE')} sx={{ color: viewLayout === 'TABLE' ? COLORS.cyan : COLORS.slateMuted, p: 0.8 }}>
+                    <ListIcon size={18} />
+                </IconButton>
+            </Stack>
             <Button
                 variant="outlined"
                 size="small"
@@ -409,7 +407,7 @@ export default function EquitySignals() {
                 </Tabs>
             </Paper>
 
-            {/* 5. Signal Data Presentation */}
+            {/* 5. Active Signal Data Presentation */}
             {loading ? (
                 <Grid container spacing={3}>
                     {[1,2,3,4,5,6].map(i => (
@@ -428,7 +426,7 @@ export default function EquitySignals() {
             ) : (
                 <Box sx={{ width: '100%', overflowX: 'hidden' }}>
                     {finalDisplaySignals.length > 0 ? (
-                        viewLayout === 'GRID' && mode === 'ACTIVE' ? (
+                        viewLayout === 'GRID' ? (
                             <Grid container spacing={2.5}>
                                 {finalDisplaySignals.map((s) => (
                                     <Grid item xs={12} md={6} lg={4} key={s.id}>
@@ -534,118 +532,154 @@ export default function EquitySignals() {
                </Grid>
             </Paper>
 
-            <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE, overflowX: 'auto' }}>
-               <Table sx={{ minWidth: 1000 }}>
-                  <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
-                     <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
-                        <TableCell padding="checkbox" />
-                        <TableCell>DATE</TableCell>
-                        <TableCell>SYMBOL</TableCell>
-                        <TableCell>SIGNAL ID</TableCell>
-                        <TableCell>DIRECTION</TableCell>
-                        <TableCell>HORIZON</TableCell>
-                        <TableCell>QUALITY</TableCell>
-                        <TableCell>ENTRY</TableCell>
-                        <TableCell>EXIT</TableCell>
-                        <TableCell>OUTCOME</TableCell>
-                        <TableCell>RETURN %</TableCell>
-                        <TableCell>PROB</TableCell>
-                        <TableCell align="right">ACTION</TableCell>
-                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                     {loading ? (
-                        [1,2,3,4,5].map(i => (
-                           <TableRow key={i}><TableCell colSpan={13}><Skeleton height={40} /></TableCell></TableRow>
-                        ))
-                     ) : history.length > 0 ? (
-                        history.map((s) => (
-                           <TableRow key={s.id} hover sx={{ ...TABLE_ROW_STYLE }}>
-                              <TableCell padding="checkbox">
-                                  <MuiChip
-                                      size="small"
-                                      onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
-                                      sx={{
-                                          height: 18, width: 18, minWidth: 0, p: 0,
-                                          bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'transparent',
-                                          border: `1px solid ${COLORS.borderLight}`
-                                      }}
-                                  />
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 700, color: COLORS.slateMuted, fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
-                              <TableCell><Typography sx={{ fontWeight: 950, fontFamily: MONO_FONT, fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
-                              <TableCell sx={{ fontSize: '0.6rem', color: COLORS.slateMuted, fontFamily: MONO_FONT }}>{s.id}</TableCell>
-                              <TableCell>
-                                 <MuiChip
-                                    label={s.decision.rating}
-                                    size="small"
-                                    sx={{
-                                        fontWeight: 950, fontSize: '0.55rem', height: 20,
-                                        bgcolor: alpha(s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red, 0.12),
-                                        color: s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red
-                                    }}
-                                 />
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 800, fontSize: '0.65rem' }}>{s.decision.timeframe}</TableCell>
-                              <TableCell>
-                                 <MuiChip
-                                    label={s.decision.qualityClass}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{
-                                        height: 18, fontSize: '0.5rem', fontWeight: 900,
-                                        borderColor: s.decision.qualityClass === 'PRIMARY' ? COLORS.green : s.decision.qualityClass === 'SELECTIVE' ? COLORS.cyan : COLORS.slateMuted,
-                                        color: s.decision.qualityClass === 'PRIMARY' ? COLORS.green : s.decision.qualityClass === 'SELECTIVE' ? COLORS.cyan : COLORS.slateMuted
-                                    }}
-                                 />
-                              </TableCell>
-                              <TableCell sx={{ fontFamily: MONO_FONT, fontSize: '0.8rem' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
-                              <TableCell sx={{ fontFamily: MONO_FONT, fontSize: '0.8rem' }}>{s.decision.exitPrice ? `₹${s.decision.exitPrice.toLocaleString()}` : '—'}</TableCell>
-                              <TableCell><OutcomeBadge outcome={s.decision.status} /></TableCell>
-                              <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? COLORS.green : COLORS.red, fontSize: '0.8rem', fontFamily: MONO_FONT }}>
-                                 {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(2)}%` : '—'}
-                              </TableCell>
-                              <TableCell sx={{ fontWeight: 800, color: COLORS.cyan, fontSize: '0.8rem', fontFamily: MONO_FONT }}>{s.decision?.conviction}%</TableCell>
-                              <TableCell align="right">
-                                 <Stack direction="row" spacing={1} justifyContent="flex-end">
-                                     <Button
+            {/* History Signals Card Grid or Table View */}
+            {viewLayout === 'GRID' ? (
+                <Box>
+                    {finalDisplaySignals.length > 0 ? (
+                        <>
+                            <Grid container spacing={2.5} sx={{ mb: 4 }}>
+                                {finalDisplaySignals.map((s) => (
+                                    <Grid item xs={12} md={6} lg={4} key={s.id}>
+                                        <Box sx={{ position: 'relative', height: '100%' }}>
+                                            <SignalCard stock={s} decision={s.decision} />
+                                        </Box>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                            <TablePagination
+                                component="div"
+                                count={totalHistory}
+                                page={page}
+                                onPageChange={(_, p) => setPage(p)}
+                                rowsPerPage={rowsPerPage}
+                                onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+                                rowsPerPageOptions={[12, 24, 48, 96]}
+                                sx={{ borderTop: `1px solid ${COLORS.borderLight}`, color: COLORS.slateMuted, bgcolor: COLORS.surfaceSlate, borderRadius: 2 }}
+                            />
+                        </>
+                    ) : (
+                        <Paper sx={{ ...GLASS_PANEL_STYLE, py: 15, textAlign: 'center' }}>
+                            <ShieldAlert size={56} color={COLORS.slateMuted} style={{ margin: '0 auto 24px', opacity: 0.3 }} />
+                            <Typography variant="h6" sx={{ fontWeight: 900, color: COLORS.slateMuted, letterSpacing: 1, fontFamily: MONO_FONT }}>
+                                NO HISTORICAL RECORDS MATCHING CURRENT FILTERS
+                            </Typography>
+                        </Paper>
+                    )}
+                </Box>
+            ) : (
+                <TableContainer component={Paper} sx={{ ...GLASS_PANEL_STYLE, overflowX: 'auto' }}>
+                   <Table sx={{ minWidth: 1000 }}>
+                      <TableHead sx={{ bgcolor: 'rgba(255,255,255,0.01)' }}>
+                         <TableRow sx={{ '& th': TABLE_HEAD_CELL_STYLE }}>
+                            <TableCell padding="checkbox" />
+                            <TableCell>DATE</TableCell>
+                            <TableCell>SYMBOL</TableCell>
+                            <TableCell>SIGNAL ID</TableCell>
+                            <TableCell>DIRECTION</TableCell>
+                            <TableCell>HORIZON</TableCell>
+                            <TableCell>QUALITY</TableCell>
+                            <TableCell>ENTRY</TableCell>
+                            <TableCell>EXIT</TableCell>
+                            <TableCell>OUTCOME</TableCell>
+                            <TableCell>RETURN %</TableCell>
+                            <TableCell>PROB</TableCell>
+                            <TableCell align="right">ACTION</TableCell>
+                         </TableRow>
+                      </TableHead>
+                      <TableBody>
+                         {loading ? (
+                            [1,2,3,4,5].map(i => (
+                               <TableRow key={i}><TableCell colSpan={13}><Skeleton height={40} /></TableCell></TableRow>
+                            ))
+                         ) : history.length > 0 ? (
+                            history.map((s) => (
+                               <TableRow key={s.id} hover sx={{ ...TABLE_ROW_STYLE }}>
+                                  <TableCell padding="checkbox">
+                                      <MuiChip
+                                          size="small"
+                                          onClick={(e) => { e.stopPropagation(); toggleCompare(s.id); }}
+                                          sx={{
+                                              height: 18, width: 18, minWidth: 0, p: 0,
+                                              bgcolor: selectedForCompare.includes(s.id) ? COLORS.cyan : 'transparent',
+                                              border: `1px solid ${COLORS.borderLight}`
+                                          }}
+                                      />
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: 700, color: COLORS.slateMuted, fontSize: '0.7rem' }}>{new Date(s.decision?.generatedAt).toLocaleDateString()}</TableCell>
+                                  <TableCell><Typography sx={{ fontWeight: 950, fontFamily: MONO_FONT, fontSize: '0.85rem' }}>{s.symbol}</Typography></TableCell>
+                                  <TableCell sx={{ fontSize: '0.6rem', color: COLORS.slateMuted, fontFamily: MONO_FONT }}>{s.id}</TableCell>
+                                  <TableCell>
+                                     <MuiChip
+                                        label={s.decision.rating}
                                         size="small"
-                                        onClick={() => navigate(`/signals/${s.id}`, { state: { scrollReplay: true } })}
-                                        sx={{ fontWeight: 900, fontSize: '0.65rem', color: COLORS.green }}
-                                     >
-                                         REPLAY
-                                     </Button>
-                                     <Button
+                                        sx={{
+                                            fontWeight: 950, fontSize: '0.55rem', height: 20,
+                                            bgcolor: alpha(s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red, 0.12),
+                                            color: s.decision.rating.includes('BUY') ? COLORS.green : COLORS.red
+                                        }}
+                                     />
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: 800, fontSize: '0.65rem' }}>{s.decision.timeframe}</TableCell>
+                                  <TableCell>
+                                     <MuiChip
+                                        label={s.decision.qualityClass}
                                         size="small"
-                                        onClick={() => navigate(`/signals/${s.id}`)}
-                                        sx={{ fontWeight: 900, fontSize: '0.65rem' }}
-                                     >
-                                         DETAILS
-                                     </Button>
-                                 </Stack>
-                              </TableCell>
-                           </TableRow>
-                        ))
-                     ) : (
-                        <TableRow>
-                           <TableCell colSpan={13} sx={{ py: 10, textAlign: 'center' }}>
-                              <Typography variant="body2" sx={{ color: COLORS.slateMuted, fontWeight: 700 }}>NO HISTORICAL RECORDS MATCHING CURRENT FILTERS</Typography>
-                           </TableCell>
-                        </TableRow>
-                     )}
-                  </TableBody>
-               </Table>
-               <TablePagination
-                  component="div"
-                  count={totalHistory}
-                  page={page}
-                  onPageChange={(_, p) => setPage(p)}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
-                  rowsPerPageOptions={[25, 50, 100]}
-                  sx={{ borderTop: `1px solid ${COLORS.borderLight}`, color: COLORS.slateMuted }}
-               />
-            </TableContainer>
+                                        variant="outlined"
+                                        sx={{
+                                            height: 18, fontSize: '0.5rem', fontWeight: 900,
+                                            borderColor: s.decision.qualityClass === 'PRIMARY' ? COLORS.green : s.decision.qualityClass === 'SELECTIVE' ? COLORS.cyan : COLORS.slateMuted,
+                                            color: s.decision.qualityClass === 'PRIMARY' ? COLORS.green : s.decision.qualityClass === 'SELECTIVE' ? COLORS.cyan : COLORS.slateMuted
+                                        }}
+                                     />
+                                  </TableCell>
+                                  <TableCell sx={{ fontFamily: MONO_FONT, fontSize: '0.8rem' }}>₹{s.decision.entry?.toLocaleString()}</TableCell>
+                                  <TableCell sx={{ fontFamily: MONO_FONT, fontSize: '0.8rem' }}>{s.decision.exitPrice ? `₹${s.decision.exitPrice.toLocaleString()}` : '—'}</TableCell>
+                                  <TableCell><OutcomeBadge outcome={s.decision.status} /></TableCell>
+                                  <TableCell sx={{ fontWeight: 900, color: (s.decision.realizedReturn || 0) >= 0 ? COLORS.green : COLORS.red, fontSize: '0.8rem', fontFamily: MONO_FONT }}>
+                                     {s.decision.realizedReturn !== undefined ? `${s.decision.realizedReturn > 0 ? '+' : ''}${s.decision.realizedReturn.toFixed(2)}%` : '—'}
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: 800, color: COLORS.cyan, fontSize: '0.8rem', fontFamily: MONO_FONT }}>{s.decision?.conviction}%</TableCell>
+                                  <TableCell align="right">
+                                     <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                         <Button
+                                            size="small"
+                                            onClick={() => navigate(`/signals/${s.id}`, { state: { scrollReplay: true } })}
+                                            sx={{ fontWeight: 950, fontSize: '0.65rem', color: COLORS.green }}
+                                         >
+                                             REPLAY
+                                         </Button>
+                                         <Button
+                                            size="small"
+                                            onClick={() => navigate(`/signals/${s.id}`)}
+                                            sx={{ fontWeight: 950, fontSize: '0.65rem' }}
+                                         >
+                                             DETAILS
+                                         </Button>
+                                     </Stack>
+                                  </TableCell>
+                               </TableRow>
+                            ))
+                         ) : (
+                            <TableRow>
+                               <TableCell colSpan={13} sx={{ py: 10, textAlign: 'center' }}>
+                                  <Typography variant="body2" sx={{ color: COLORS.slateMuted, fontWeight: 700 }}>NO HISTORICAL RECORDS MATCHING CURRENT FILTERS</Typography>
+                               </TableCell>
+                            </TableRow>
+                         )}
+                      </TableBody>
+                   </Table>
+                   <TablePagination
+                      component="div"
+                      count={totalHistory}
+                      page={page}
+                      onPageChange={(_, p) => setPage(p)}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+                      rowsPerPageOptions={[25, 50, 100]}
+                      sx={{ borderTop: `1px solid ${COLORS.borderLight}`, color: COLORS.slateMuted }}
+                   />
+                </TableContainer>
+            )}
         </Box>
       )}
 

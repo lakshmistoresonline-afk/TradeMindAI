@@ -149,13 +149,13 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
           {(decision.status === 'TARGET_HIT' || stock.outcome === 'TARGET_HIT') ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
-                🟢 TARGET HIT — POSITION CLOSED SUCCESSFULLY
+                🟢 TARGET HIT — CLOSED ({decision.realizedReturn !== undefined ? `${decision.realizedReturn > 0 ? '+' : ''}${decision.realizedReturn.toFixed(2)}%` : stock.realized_return !== undefined ? `${stock.realized_return > 0 ? '+' : ''}${stock.realized_return}%` : '+8.00%'})
               </Typography>
             </Box>
           ) : (decision.status === 'STOP_LOSS' || stock.outcome === 'STOP_LOSS') ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#ef4444', 0.15), borderRadius: 1, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
               <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
-                🔴 STOP LOSS HIT — POSITION CLOSED
+                🔴 STOP LOSS HIT — CLOSED ({decision.realizedReturn !== undefined ? `${decision.realizedReturn}%` : stock.realized_return !== undefined ? `${stock.realized_return}%` : '-5.00%'})
               </Typography>
             </Box>
           ) : (decision.status === 'EXPIRED' || stock.outcome === 'EXPIRED') ? (
