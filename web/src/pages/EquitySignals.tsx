@@ -347,7 +347,7 @@ export default function EquitySignals() {
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
          <Stack direction="row" spacing={1}>
             <ModeButton active={mode === 'ACTIVE'} onClick={() => { setMode('ACTIVE'); setPage(0); setSearchQuery(''); }}>ACTIVE SIGNALS</ModeButton>
-            <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setPage(0); setSearchQuery(''); }}>SIGNAL HISTORY</ModeButton>
+            <ModeButton active={mode === 'HISTORY'} onClick={() => { setMode('HISTORY'); setHFilterHorizon('ALL'); setHFilterDirection('ALL'); setHFilterQuality('ALL'); setHFilterStatus('ALL'); setPage(0); setSearchQuery(''); }}>SIGNAL HISTORY</ModeButton>
          </Stack>
 
          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={1}>
