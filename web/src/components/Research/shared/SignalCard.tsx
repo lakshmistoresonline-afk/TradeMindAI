@@ -49,6 +49,21 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
 
   const { createdAt, triggeredAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
 
+  const isClosed = decision.status === 'TARGET_HIT' || decision.status === 'STOP_LOSS' || decision.status === 'EXPIRED' || stock.outcome === 'TARGET_HIT' || stock.outcome === 'STOP_LOSS' || stock.outcome === 'EXPIRED';
+  const exitPrice = decision.exitPrice || stock.exit_price || (stock.outcome === 'TARGET_HIT' || decision.status === 'TARGET_HIT' ? target2 : (stock.outcome === 'STOP_LOSS' || decision.status === 'STOP_LOSS' ? stop : current));
+  const displayPrice = isClosed ? exitPrice : current;
+  const priceTileLabel = isClosed ? "EXIT PRICE" : "CURRENT";
+
+  const retPctVal = decision.realizedReturn !== undefined ? decision.realizedReturn : stock.realized_return !== undefined ? stock.realized_return : 8.00;
+  const retPctStr = `${retPctVal > 0 ? '+' : ''}${typeof retPctVal === 'number' ? retPctVal.toFixed(2) : retPctVal}%`;
+
+  let targetHitLabel = `🟢 T2 TARGET HIT (MAIN BASE) — CLOSED (${retPctStr})`;
+  if (retPctVal >= 12.0) {
+    targetHitLabel = `🟢 T3 TARGET HIT (EXTENDED RUNNER) — CLOSED (${retPctStr})`;
+  } else if (retPctVal <= 6.0) {
+    targetHitLabel = `🟢 T1 TARGET HIT (CONSERVATIVE) — CLOSED (${retPctStr})`;
+  }
+
   return (
     <Paper
       elevation={0}
@@ -137,7 +152,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
         <Grid container spacing={1.5}>
           <PriceTile label="ENTRY" value={entry} xs={6} />
-          <PriceTile label="CURRENT" value={current} color={(current && entry) ? (current >= entry ? '#10b981' : '#f43f5e') : '#f8fafc'} xs={6} />
+          <PriceTile label={priceTileLabel} value={displayPrice} color={(displayPrice && entry) ? (displayPrice >= entry ? '#10b981' : '#f43f5e') : '#f8fafc'} xs={6} />
           <PriceTile label="T1 (CONSERVATIVE)" value={target1} color="#10b981" xs={4} />
           <PriceTile label="T2 (MAIN BASE)" value={target2} color="#00D1FF" xs={4} />
           <PriceTile label="T3 (RUNNER)" value={target3} color="#a855f7" xs={4} />
@@ -149,13 +164,13 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
           {(decision.status === 'TARGET_HIT' || stock.outcome === 'TARGET_HIT') ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
               <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
-                🟢 TARGET HIT — CLOSED ({decision.realizedReturn !== undefined ? `${decision.realizedReturn > 0 ? '+' : ''}${decision.realizedReturn.toFixed(2)}%` : stock.realized_return !== undefined ? `${stock.realized_return > 0 ? '+' : ''}${stock.realized_return}%` : '+8.00%'})
+                {targetHitLabel}
               </Typography>
             </Box>
           ) : (decision.status === 'STOP_LOSS' || stock.outcome === 'STOP_LOSS') ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#ef4444', 0.15), borderRadius: 1, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
               <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
-                🔴 STOP LOSS HIT — CLOSED ({decision.realizedReturn !== undefined ? `${decision.realizedReturn}%` : stock.realized_return !== undefined ? `${stock.realized_return}%` : '-5.00%'})
+                🔴 STOP LOSS HIT — CLOSED ({retPctStr})
               </Typography>
             </Box>
           ) : (decision.status === 'EXPIRED' || stock.outcome === 'EXPIRED') ? (
