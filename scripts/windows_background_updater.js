@@ -1,6 +1,6 @@
 /**
  * TradeMind AI: Automatic Windows Background Market Sync Service (Strategy V5.0)
- * Runs continuously every 15 minutes 24/7/365:
+ * Executed every 15 minutes by Windows Task Scheduler / Startup Service:
  * 1. Fetches real live NSE market quotes for all NIFTY-200 stocks via Yahoo Finance API.
  * 2. Regenerates Strategy V5.0 active live signals & historical shadow ledger.
  * 3. Mirrors fresh signals & market heartbeats directly to Firestore Cloud Database.
@@ -11,11 +11,8 @@ const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const UPDATE_INTERVAL_MS = 15 * 60 * 1000; // 15 Minutes (900,000 ms)
 const LOG_FILE_PATH = path.join(__dirname, 'updater.log');
 const PID_FILE_PATH = path.join(__dirname, 'updater.pid');
-
-let isCycleRunning = false;
 
 function log(msg) {
   const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -28,35 +25,9 @@ function log(msg) {
   }
 }
 
-// Ensure single instance process
-function enforceSingleInstance() {
-  if (fs.existsSync(PID_FILE_PATH)) {
-    try {
-      const oldPid = parseInt(fs.readFileSync(PID_FILE_PATH, 'utf8').trim(), 10);
-      if (oldPid && oldPid !== process.pid) {
-        try {
-          process.kill(oldPid, 0);
-          log(`[INFO] Previous updater process PID ${oldPid} is active. Exiting duplicate instance.`);
-          process.exit(0);
-        } catch {
-          // PID is stale
-        }
-      }
-    } catch {}
-  }
-  fs.writeFileSync(PID_FILE_PATH, process.pid.toString(), 'utf8');
-}
-
-async function runUpdateCycle(forceRun = true) {
-  if (isCycleRunning) {
-    log("[SKIP] Previous update cycle is still executing. Skipping concurrent overlap.");
-    return;
-  }
-
-  isCycleRunning = true;
-
+async function runUpdateCycle() {
   log("==========================================================================");
-  log(`Initiating Live Market Sync & Deployment Cycle (Strategy V5.0)...`);
+  log("Initiating 15-Minute Automated Market Sync & Firebase Deployment (V5.0)...");
   log("==========================================================================");
 
   try {
@@ -77,21 +48,11 @@ async function runUpdateCycle(forceRun = true) {
     execSync(`cd "${webDir}" && npx --yes firebase-tools deploy --only hosting --project com-webcraft-trademindai-c8f75`, { stdio: 'inherit' });
     log("✓ Firebase Hosting deployment completed successfully!");
 
-    log("15-Minute Cycle Complete. Next polling check queued in 15 minutes.\n");
+    log("✓ 15-Minute Automated Sync Cycle Completed Successfully.\n");
   } catch (err) {
-    log(`[ERROR] Background update cycle encountered an error: ${err.message}`);
-  } finally {
-    isCycleRunning = false;
+    log(`[ERROR] Update cycle encountered an error: ${err.message}`);
   }
 }
 
-enforceSingleInstance();
-
-log("TradeMind AI Automatic Windows Background Service Initialized (Strategy V5.0).");
-log(`Service configured for continuous 15-minute polling (${UPDATE_INTERVAL_MS / 60000} minutes) 24/7/365.\n`);
-
-// Run initial sync cycle immediately on startup
-runUpdateCycle(true);
-
-// Repeat polling every 15 minutes automatically
-setInterval(() => runUpdateCycle(true), UPDATE_INTERVAL_MS);
+log("TradeMind AI Automatic Windows Background Service Triggered (Strategy V5.0).");
+runUpdateCycle();
