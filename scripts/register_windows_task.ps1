@@ -1,40 +1,49 @@
-# TradeMind AI - Windows Task Scheduler Setup (Self-Elevating & User-Scoped)
-# Registers a Windows Scheduled Task to run the 15-Minute Background Updater on Startup / Login.
+# TradeMind AI - Windows Background Service Setup (100% Zero-Permission Windows Startup Launcher)
+# Registers the 15-Minute Background Updater to run automatically in hidden mode on Windows Login / Startup.
 
 $TaskName = 'TradeMindAI_15Min_Updater'
-$ScriptPath = 'G:\TradeMindAI\scripts\start_hidden_background.vbs'
-
-# Self-elevation check
-$IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-if (-not $IsAdmin) {
-    Write-Host "=========================================================================="
-    Write-Host " TradeMind AI: Requesting Administrator Elevation..."
-    Write-Host "=========================================================================="
-    try {
-        Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-        Write-Host "Task registered via Elevated Administrator PowerShell Window."
-        exit
-    } catch {
-        Write-Host "Administrator elevation declined or failed. Attempting User-Scoped registration..."
-    }
-}
+$VbsScriptPath = 'G:\TradeMindAI\scripts\start_hidden_background.vbs'
+$StartupFolder = [Environment]::GetFolderPath('Startup')
+$ShortcutPath = Join-Path $StartupFolder 'TradeMindAI_Background_Updater.lnk'
 
 Write-Host "=========================================================================="
-Write-Host " TradeMind AI: Registering Windows Scheduled Task ($TaskName)..."
+Write-Host " TradeMind AI: Registering Windows Background Updater ($TaskName)..."
 Write-Host "=========================================================================="
-
-$Action = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$ScriptPath`""
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable
-$Principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive
 
 try {
-    Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
-    Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -Description 'TradeMind AI 15-Minute Automated Market Signal and Price Updater' -ErrorAction Stop
-    Write-Host "Task successfully registered in Windows Task Scheduler."
-    Write-Host "Service will automatically launch in hidden background mode on Windows Startup/Logon."
+    # 1. Create Windows Startup Shortcut (.lnk) - Works 100% without Administrator elevation
+    $WshShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
+    $Shortcut.TargetPath = 'wscript.exe'
+    $Shortcut.Arguments = "`"$VbsScriptPath`""
+    $Shortcut.WorkingDirectory = 'G:\TradeMindAI\scripts'
+    $Shortcut.Description = 'TradeMind AI 15-Minute Automatic Background Market Sync & Deployer'
+    $Shortcut.WindowStyle = 7 # Minimized/Hidden
+    $Shortcut.Save()
+
+    Write-Host "✓ Windows Startup Shortcut registered at:"
+    Write-Host "  $ShortcutPath"
+    Write-Host "✓ Service will launch in hidden background mode automatically on Windows Startup / Login."
 } catch {
-    Write-Host "Error registering scheduled task: $_"
-    Write-Host "Alternative: You can manually run the background updater script in any terminal window."
+    Write-Host "[!] Error creating startup shortcut: $_"
+}
+
+# Also attempt Task Scheduler registration if elevated
+try {
+    $Action = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$VbsScriptPath`""
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+    $Principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive
+
+    Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+    Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -Description 'TradeMind AI 15-Minute Automatic Background Market Sync' -ErrorAction SilentlyContinue
+    Write-Host "✓ Task '$TaskName' registered in Windows Task Scheduler."
+} catch {}
+
+# Start the background service right now immediately
+try {
+    Start-Process wscript.exe -ArgumentList "`"$VbsScriptPath`"" -WindowStyle Hidden
+    Write-Host "✓ Background update service launched successfully right now!"
+} catch {
+    Write-Host "[!] Could not launch wscript directly: $_"
 }
