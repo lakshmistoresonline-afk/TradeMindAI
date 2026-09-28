@@ -161,13 +161,8 @@ export default function EquitySignals() {
   useEffect(() => {
     if (firestoreHistory.length === 0) return;
 
-    const oneYearAgo = Date.now() - (365 * 24 * 60 * 60 * 1000);
-    const fsHistory = firestoreHistory
-      .filter((s: any) => {
-        const genTime = new Date(s.created_at || s.timestamp || 0).getTime();
-        return genTime >= oneYearAgo;
-      })
-      .map((s: any) => mapCanonicalSignal(s));
+    // Include full 10-year historical shadow ledger (2016-2026) without 1-year cutoff truncation
+    const fsHistory = firestoreHistory.map((s: any) => mapCanonicalSignal(s));
 
     // Deduplicate history by stock symbol (guarantees 100% unique symbol cards)
     const dedupMap = new Map<string, any>();
