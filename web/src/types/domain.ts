@@ -126,6 +126,13 @@ export interface AITradeDecision {
   bciRetailCapitulationIndex?: number;  // BCI Smartwatch Retail Capitulation Index (e.g. 99.9%)
   cosmicRaySeuRiskLevel?: string;       // Solar Flare Cosmic Ray Bit-Flip SEU Risk (e.g. NOMINAL)
 
+  // ATR Volatility Scaling & Options Chain OI Geometry
+  atr14Value?: number;                 // 14-day Average True Range (ATR)
+  optionsPcrOi?: number;               // Options Chain Put-Call Ratio (PCR)
+  callWallClearancePct?: number;       // Call Resistance Wall Clearance %
+  mtfTrendAlignmentStatus?: string;    // Multi-Timeframe Trend Sync Status (1D/15m/5m)
+  orderBookDepthOib?: number;          // Level-2 Order Book Imbalance Ratio
+
   primaryCatalyst?: string;
   thesis?: string;
   formattedThesis?: {

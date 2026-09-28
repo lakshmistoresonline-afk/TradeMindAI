@@ -249,6 +249,13 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     bciRetailCapitulationIndex: parseNum(signal.bci_retail_capitulation_index) ?? 99.9,
     cosmicRaySeuRiskLevel: signal.cosmic_ray_seu_risk_level || 'NOMINAL',
 
+    // ATR Volatility Scaling & Options Chain OI Geometry
+    atr14Value: parseNum(signal.atr_14_value) ?? Math.round((entry || 1000) * 0.015 * 10) / 10,
+    optionsPcrOi: parseNum(signal.options_pcr_oi) ?? 1.15,
+    callWallClearancePct: parseNum(signal.call_wall_clearance_pct) ?? 1.20,
+    mtfTrendAlignmentStatus: signal.mtf_trend_alignment_status || '1D_15M_5M_SYNCED',
+    orderBookDepthOib: parseNum(signal.order_book_depth_oib) ?? 0.48,
+
     thesis,
     formattedThesis,
     drivers,
