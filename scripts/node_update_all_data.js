@@ -288,7 +288,7 @@ export async function fetchLiveMarketPrices(): Promise<Record<string, number>> {
       cvd_tape_pressure: 0.48,
       max_pain_shift_vector: 15.0,
       venn_abers_lower_prob: 0.72,
-      vpin_flow_toxicity: 0.82,
+      vpin_flow_toxicity: 0.28, // Low flow toxicity (<= 0.35 clean accumulation)
       dark_pool_dix_index: 0.68,
       finbert_nlp_sentiment: 0.75,
       intermarket_cointegration_score: 0.88,
@@ -449,7 +449,7 @@ export async function fetchLiveMarketPrices(): Promise<Record<string, number>> {
       cvd_tape_pressure: 0.48,
       max_pain_shift_vector: 15.0,
       venn_abers_lower_prob: 0.72,
-      vpin_flow_toxicity: 0.82,
+      vpin_flow_toxicity: 0.28,
       dark_pool_dix_index: 0.68,
       finbert_nlp_sentiment: 0.75,
       intermarket_cointegration_score: 0.88,

@@ -4,19 +4,19 @@
  */
 
 export const LIVE_MARKET_PRICES: Record<string, number> = {
-  "LT": 3775.5,
-  "TCS": 2074.5,
-  "RELIANCE": 1198.6,
-  "INFY": 1005,
-  "ITC": 266.05,
-  "BHARTIARTL": 1778.5,
-  "ESCORTS": 2738.9,
-  "HDFCBANK": 719.25,
-  "ICICIBANK": 1301.4,
-  "SBIN": 961.5,
-  "M&M": 2995.4,
-  "MARUTI": 12032,
-  "SUNPHARMA": 1846.3,
+  "LT": 3766.4,
+  "TCS": 2070.7,
+  "RELIANCE": 1197.6,
+  "INFY": 1003.2,
+  "ITC": 265.2,
+  "BHARTIARTL": 1771.4,
+  "ESCORTS": 2740.7,
+  "HDFCBANK": 719.05,
+  "ICICIBANK": 1302,
+  "SBIN": 962,
+  "M&M": 2995,
+  "MARUTI": 12008,
+  "SUNPHARMA": 1838,
   "TATAMOTORS": 968.45
 };
 
