@@ -159,19 +159,30 @@ export default function EquitySignals() {
       })
       .map((s: any) => mapCanonicalSignal(s));
 
-    setHistory(fsHistory);
-    setTotalHistory(fsHistory.length);
+    // Deduplicate history by stock symbol (guarantees 100% unique symbol cards)
+    const dedupMap = new Map<string, any>();
+    fsHistory.forEach(s => {
+      const sym = (s.symbol || s.underlyingSymbol || '').toUpperCase();
+      if (sym && !dedupMap.has(sym)) {
+        dedupMap.set(sym, s);
+      }
+    });
 
-    const targetHits = fsHistory.filter((s: any) => s.decision?.status === 'TARGET_HIT' || s.status === 'TARGET_HIT').length;
-    const stopLosses = fsHistory.filter((s: any) => s.decision?.status === 'STOP_LOSS' || s.status === 'STOP_LOSS').length;
-    const expired = fsHistory.filter((s: any) => s.decision?.status === 'EXPIRED' || s.status === 'EXPIRED').length;
+    const uniqueHistory = Array.from(dedupMap.values());
+
+    setHistory(uniqueHistory);
+    setTotalHistory(uniqueHistory.length);
+
+    const targetHits = uniqueHistory.filter((s: any) => s.decision?.status === 'TARGET_HIT' || s.status === 'TARGET_HIT').length;
+    const stopLosses = uniqueHistory.filter((s: any) => s.decision?.status === 'STOP_LOSS' || s.status === 'STOP_LOSS').length;
+    const expired = uniqueHistory.filter((s: any) => s.decision?.status === 'EXPIRED' || s.status === 'EXPIRED').length;
 
     setHistorySummary({
-      total: fsHistory.length,
+      total: uniqueHistory.length,
       target_hits: targetHits,
       stop_losses: stopLosses,
       expired: expired,
-      other: Math.max(0, fsHistory.length - (targetHits + stopLosses + expired))
+      other: Math.max(0, uniqueHistory.length - (targetHits + stopLosses + expired))
     });
   }, [firestoreHistory]);
 
