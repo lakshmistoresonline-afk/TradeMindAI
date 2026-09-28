@@ -111,6 +111,7 @@ export default function Performance() {
       {/* 1. PRIMARY: SWING HORIZON */}
       <HorizonSection
         title="PRIMARY: SWING HORIZON"
+        horizon="SWING"
         stats={summary?.horizons?.SWING}
         description="The most robust horizon with confirmed predictive edge. Recommended for institutional swing signals."
         color="#10b981"
@@ -119,6 +120,7 @@ export default function Performance() {
       {/* 2. SELECTIVE: LONG HORIZON */}
       <HorizonSection
         title="SELECTIVE: LONG HORIZON"
+        horizon="LONG"
         stats={summary?.horizons?.LONG}
         description="Exceptional accuracy on qualified symbol-specific models over extended time horizons."
         color="#00D1FF"
@@ -127,6 +129,7 @@ export default function Performance() {
       {/* 3. EXPERIMENTAL: SHORT HORIZON */}
       <HorizonSection
         title="EXPERIMENTAL: SHORT HORIZON"
+        horizon="SHORT"
         stats={summary?.horizons?.SHORT}
         description="Short-term momentum scanning. Validation of consistent predictive edge in high-volatility environments."
         color="#a855f7"
@@ -150,7 +153,7 @@ export default function Performance() {
   );
 }
 
-function HorizonSection({ title, stats, description, color }: any) {
+function HorizonSection({ title, stats, description, color, horizon = 'SWING' }: any) {
    const hasData = stats && stats.sample_size > 0;
    const navigate = useNavigate();
 
@@ -175,7 +178,7 @@ function HorizonSection({ title, stats, description, color }: any) {
             <Button
                 variant="text"
                 size="small"
-                onClick={() => navigate('/signals')}
+                onClick={() => navigate('/signals', { state: { mode: 'HISTORY', horizon } })}
                 sx={{ color: '#00D1FF', fontWeight: 950, fontSize: '0.7rem', textTransform: 'none' }}
             >
                 VIEW UNDERLYING SIGNAL HISTORY →

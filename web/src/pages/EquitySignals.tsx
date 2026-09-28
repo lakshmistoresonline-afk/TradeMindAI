@@ -5,7 +5,7 @@ import { getEquitySignals, getEquityHistory } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import SignalCard from '../components/Research/shared/SignalCard';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MONO_FONT, COLORS, GLASS_PANEL_STYLE, HERO_BANNER_STYLE, GRADIENT_ACCENT_BAR, TABLE_HEAD_CELL_STYLE, TABLE_ROW_STYLE } from '../theme/institutionalTheme';
 
 export default function EquitySignals() {
@@ -13,7 +13,17 @@ export default function EquitySignals() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const location = useLocation();
   const [mode, setMode] = useState<'ACTIVE' | 'HISTORY'>('ACTIVE');
+
+  useEffect(() => {
+    if (location.state?.mode === 'HISTORY') {
+      setMode('HISTORY');
+      if (location.state?.horizon) {
+        setHFilterHorizon(location.state.horizon);
+      }
+    }
+  }, [location.state]);
   const [activeTab, setActiveTab] = useState(0); // Default to ALL ACTIVE (index 0)
   const [signals, setSignals] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
