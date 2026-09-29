@@ -69,7 +69,12 @@ class SystemHealthService:
         }
 
         # 3. Overall Determination
-        critical = ["SQL_Database", "Redis_Cache", "Signal_Ledger"]
+        # In local offline mode, Redis is an optional cache layer
+        from backend.core.config import settings
+        critical = ["SQL_Database", "Signal_Ledger"]
+        if settings.ENVIRONMENT == "production":
+            critical.append("Redis_Cache")
+
         status = "HEALTHY"
         if any(components[c] == "FAILED" for c in critical): status = "FAILED"
         elif any(v != "HEALTHY" for v in components.values()): status = "DEGRADED"
@@ -89,6 +94,7 @@ class SystemHealthService:
             "status": status,
             **get_version_metadata(),
             "pulse": PulseWatchdog.get_status(),
+            "pulse_watchdog": PulseWatchdog.get_status(),
             "components": components,
             "market": {
                 "regime": market_data.get("regime"),

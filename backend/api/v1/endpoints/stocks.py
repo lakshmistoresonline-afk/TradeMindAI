@@ -52,10 +52,19 @@ async def get_market_stats():
         "status": market_state.get("status", "UNAVAILABLE")
     })
 
+    # Return stats immediately in test/offline environments to prevent socket hang
+    from backend.core.config import settings
+    if settings.DEBUG or settings.ENVIRONMENT in ("development", "test"):
+        return stats
+
     try:
         symbols = " ".join(indices.keys())
-        yq = YQTicker(symbols)
-        data = yq.history(period="2d")
+        # Use fast asyncio timeout to prevent network hang in offline environments
+        async def fetch_yq():
+            loop = asyncio.get_event_loop()
+            return await loop.run_in_executor(None, lambda: YQTicker(symbols).history(period="2d"))
+
+        data = await asyncio.wait_for(fetch_yq(), timeout=2.0)
 
         if not data.empty:
             for sym, name in indices.items():

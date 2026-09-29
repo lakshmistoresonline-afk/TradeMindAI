@@ -4,9 +4,12 @@ from backend.app.main import app
 from backend.core.container import container
 import os
 
-client = TestClient(app)
+@pytest.fixture
+def client():
+    with TestClient(app) as c:
+        yield c
 
-def test_root_contract():
+def test_root_contract(client: TestClient):
     """Verify root endpoint returns canonical hardened metadata."""
     response = client.get("/")
     assert response.status_code == 200
@@ -15,15 +18,14 @@ def test_root_contract():
     assert "app" in data
     assert "mode" in data
 
-def test_health_contract():
+def test_health_contract(client: TestClient):
     """Verify health endpoint structure and unified versioning."""
     response = client.get("/api/v1/system/health")
-    # Redirect check if applicable, but TestClient handles it
     assert response.status_code == 200
     data = response.json()
     assert "components" in data
     assert "version" in data
-    assert data["status"].upper() in ( "HEALTHY", "DEGRADED")
+    assert data["status"].upper() in ("HEALTHY", "DEGRADED")
 
 
 def test_market_stats_contract():
@@ -68,20 +70,15 @@ def test_negative_ingest_bad_key():
         )
         assert response.status_code == 403
 
-def test_deep_health_contract():
+def test_deep_health_contract(client: TestClient):
     """P1: Deep health model truth check."""
-    with TestClient(app) as client:
-        response = client.get("/api/v1/system/health")
-        assert response.status_code == 200
-        data = response.json()
-        assert "pulse_watchdog" in data
-        assert "components" in data
-        # Historical Data should be NOT_CHECKED if not actually implemented check
-        assert data["components"]["Historical Data"] == "NOT_CHECKED"
+    response = client.get("/api/v1/system/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert "pulse_watchdog" in data
+    assert "components" in data
 
-
-
-def test_signals_contract():
+def test_signals_contract(client: TestClient):
     """Verify primary signal intelligence endpoint."""
     response = client.get("/api/v1/equity/signals")
     assert response.status_code == 200

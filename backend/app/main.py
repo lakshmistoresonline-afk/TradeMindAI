@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.db.database import Base, engine
 from backend.app.db.seed import seed_local_database
 from backend.app.api import health, ticker, indicators, signals, import_data
+from backend.api.v1.api import api_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("TradeMindAI")
@@ -38,12 +39,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include Modular API Routers
+# Include Canonical V1 API Router and Modular Local Routers
+app.include_router(api_router, prefix="/api/v1")
 app.include_router(health.router)
 app.include_router(ticker.router)
 app.include_router(indicators.router)
 app.include_router(signals.router)
 app.include_router(import_data.router)
+
+from backend.core.postgres import Base as PostgresBase, engine as postgres_engine
 
 @app.on_event("startup")
 def on_startup():
@@ -52,6 +56,7 @@ def on_startup():
     """
     logger.info("[Startup] Verifying non-destructive database tables...")
     Base.metadata.create_all(bind=engine)
+    PostgresBase.metadata.create_all(bind=postgres_engine)
     logger.info("[Startup] Executing safe database seeder check...")
     seed_local_database()
     logger.info("[Startup] TradeMindAI Local Offline Server ready.")
