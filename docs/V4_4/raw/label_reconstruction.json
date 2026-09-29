@@ -1,0 +1,13 @@
+{
+  "labeling_framework": "Triple-Barrier Labeling",
+  "upper_barrier": "Entry + 2.8x ATR(14)",
+  "lower_barrier": "Entry - 2.0x ATR(14)",
+  "time_barrier": "30 Trading Days",
+  "barrier_outcomes": {
+    "label_plus_1": "Upper Barrier Hit First (TARGET_HIT)",
+    "label_minus_1": "Lower Barrier Hit First (STOP_LOSS)",
+    "label_zero": "Time Barrier Expired First (EXPIRED)"
+  },
+  "test_case": "backend/tests/unit/test_outcome_ambiguity.py",
+  "status_classification": "VERIFIED_BY_EXECUTION"
+}

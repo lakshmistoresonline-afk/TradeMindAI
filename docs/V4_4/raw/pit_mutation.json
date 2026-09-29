@@ -1,0 +1,12 @@
+{
+  "feature_family": "Point-in-Time Data Safety",
+  "source_file": "backend/tests/test_point_in_time_integrity.py",
+  "source_function": "test_point_in_time_invariant_enforcement()",
+  "mutation_test_method": "Mutated future rows t+1 through t+10 with +50% price spikes",
+  "feature_difference_at_t": 0,
+  "leakage_detected": false,
+  "test_result": "PASSED (2/2)",
+  "execution_command": "G:\\TradeMindAI\\backend\\venv\\Scripts\\python.exe -m pytest backend/tests/test_point_in_time_integrity.py",
+  "exit_code": 0,
+  "status_classification": "VERIFIED_BY_EXECUTION"
+}

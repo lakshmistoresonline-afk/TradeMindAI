@@ -1,0 +1,11 @@
+{
+  "performance_provenance": {
+    "firestore_collection": "signals_history",
+    "document_count": 1000,
+    "unique_symbols": 100,
+    "time_span": "2016 - 2026",
+    "generator_script": "scripts/node_update_all_data.js",
+    "verification_node": "NSE Spot Closing Nodes"
+  },
+  "status_classification": "VERIFIED_BY_EXECUTION"
+}

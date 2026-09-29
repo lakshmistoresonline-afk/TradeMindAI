@@ -1,0 +1,18 @@
+{
+  "feature": "Intraday CVD Tape Pressure",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "Aggressor Order Flow Tape",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "lookback_period": "5m"
+  },
+  "raw_output": {
+    "cvd_tape_pressure": 0.48,
+    "tape_status": "TAPE_BUYING_ACTIVE"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Verifies aggressive market order buyer sweeps",
+  "test_case": "backend/tests/unit/test_technical.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

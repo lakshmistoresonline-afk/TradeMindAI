@@ -1,0 +1,16 @@
+{
+  "production_pipeline": {
+    "entry_script": "scripts/node_update_all_data.js",
+    "quality_gate": "backend/services/signal_quality_gate.py",
+    "domain_model": "backend/domain/models/ios.py",
+    "database_mirror": "Google Cloud Firestore (signals & signals_history)",
+    "normalizer": "web/src/hooks/useAITradeDecision.ts (mapCanonicalSignal)",
+    "ui_consumers": [
+      "web/src/pages/EquitySignals.tsx",
+      "web/src/pages/SignalDetail.tsx",
+      "web/src/pages/Performance.tsx"
+    ]
+  },
+  "execution_command": "node scripts/node_update_all_data.js",
+  "exit_code": 0
+}

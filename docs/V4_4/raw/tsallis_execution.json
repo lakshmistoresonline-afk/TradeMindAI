@@ -1,0 +1,19 @@
+{
+  "feature": "Tsallis Non-Extensive Entropy Exhaustion",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "Price Time Series Distribution",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "q_parameter": 1.5,
+    "max_entropy_threshold": 0.20
+  },
+  "raw_output": {
+    "tsallis_entropy_exhaustion_index": 0.18,
+    "entropy_status": "LOW_ENTROPY_TREND"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Requires S_q <= 0.20 to avoid trend exhaustion traps",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

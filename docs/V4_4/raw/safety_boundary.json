@@ -1,0 +1,12 @@
+{
+  "feature": "REAL_TRADING Safety Boundary",
+  "source_file": "backend/core/config.py",
+  "class": "Settings",
+  "property": "REAL_TRADING: bool = False",
+  "enforcement_mechanism": "Pydantic field validator (enforce_signal_only_boundary)",
+  "fail_closed_validation": "Raises ValidationError if REAL_TRADING=True",
+  "test_case": "backend/tests/test_safety_boundary.py",
+  "test_result": "PASSED (3/3)",
+  "execution_command": "G:\\TradeMindAI\\backend\\venv\\Scripts\\python.exe -m pytest backend/tests/test_safety_boundary.py",
+  "exit_code": 0
+}

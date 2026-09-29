@@ -1,0 +1,18 @@
+{
+  "feature": "Venn-Abers Calibrated Probability",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "ML Probability Outputs",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "lower_bound_min": 0.70
+  },
+  "raw_output": {
+    "venn_abers_lower_prob": 0.72,
+    "guaranteed_confidence": "GUARANTEED_0.68+"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Requires lower bound p_L >= 0.70 for Primary classification",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

@@ -1,0 +1,17 @@
+{
+  "feature": "Gaussian HMM Regime Classifier",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "NIFTY-200 Return Distributions",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "num_states": 3
+  },
+  "raw_output": {
+    "hmm_regime_state": "STEADY_BULL_TREND"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Classifies micro-regime state",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

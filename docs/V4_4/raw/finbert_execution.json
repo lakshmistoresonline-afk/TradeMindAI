@@ -1,0 +1,18 @@
+{
+  "feature": "FinBERT Corporate Filings Sentiment",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "BSE/NSE Disclosures and Earning Transcripts",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "min_sentiment_threshold": 0.65
+  },
+  "raw_output": {
+    "finbert_nlp_sentiment": 0.75,
+    "sentiment_status": "POSITIVE_SHOCK"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Requires positive sentiment score (>= +0.65)",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

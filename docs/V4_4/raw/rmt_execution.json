@@ -1,0 +1,18 @@
+{
+  "feature": "Random Matrix Theory Covariance Cleaning",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "NIFTY-200 Return Covariance Matrix",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "marcenko_pastur_bound": 1.48
+  },
+  "raw_output": {
+    "rmt_cluster_uncorrelated_score": 0.92,
+    "covariance_status": "NOISE_FILTERED"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Filters correlation noise from asset selection",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

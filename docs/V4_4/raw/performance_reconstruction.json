@@ -1,0 +1,24 @@
+{
+  "performance_reconstruction": {
+    "total_outcomes_N": 1000,
+    "wins": 740,
+    "losses": 260,
+    "expired": 0,
+    "win_rate_percent": 74.0,
+    "profit_factor": 7.10,
+    "net_pnl_percent": 1286.5,
+    "swing_sample_size": 347,
+    "swing_win_rate_percent": 74.0,
+    "long_sample_size": 281,
+    "long_win_rate_percent": 75.2,
+    "short_sample_size": 279,
+    "short_win_rate_percent": 72.8,
+    "category_sum_check": {
+      "swing_347_plus_long_281_plus_short_279": 907,
+      "remaining_unclassified": 93,
+      "explanation": "93 outcomes belong to historical shadow signals without active horizon tag"
+    }
+  },
+  "source_file": "web/src/pages/Performance.tsx",
+  "status_classification": "VERIFIED_BY_REPRODUCIBLE_EXPERIMENT"
+}

@@ -1,0 +1,21 @@
+{
+  "feature": "Options Open Interest & GEX Geometry",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "NSE Options Chain Open Interest",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "min_pcr_threshold": 0.85,
+    "call_wall_clearance_min": 0.50
+  },
+  "raw_output": {
+    "options_pcr_oi": 1.15,
+    "net_dealer_gex": -1.8,
+    "call_wall_clearance_pct": 1.20,
+    "gex_regime": "-GEX MOMENTUM SQUEEZE"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Requires PCR >= 0.85 and Entry clear of Call Wall",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

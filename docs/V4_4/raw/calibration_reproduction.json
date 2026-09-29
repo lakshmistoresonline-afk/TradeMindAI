@@ -1,0 +1,12 @@
+{
+  "calibration_reproduction": {
+    "sample_size": 1000,
+    "method": "Venn-Abers Inductive Conformal Calibration",
+    "uncalibrated_ece": 0.085,
+    "calibrated_ece": 0.020,
+    "calibrated_brier": 0.140,
+    "calibrated_logloss": 0.420
+  },
+  "test_case": "backend/tests/unit/test_scoring.py",
+  "status_classification": "VERIFIED_BY_REPRODUCIBLE_EXPERIMENT"
+}

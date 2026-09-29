@@ -1,0 +1,19 @@
+{
+  "feature": "Order Book Depth Imbalance (OIB)",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "Top-5 Bid-Ask Order Depth Tape",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "depth_levels": 5,
+    "min_oib_threshold": 0.35
+  },
+  "raw_output": {
+    "order_book_depth_oib": 0.48,
+    "depth_status": "BUY_DEPTH_VERIFIED"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Requires positive buyer depth (OIB >= +0.35)",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

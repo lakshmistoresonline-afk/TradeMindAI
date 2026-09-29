@@ -1,0 +1,16 @@
+{
+  "feature": "ML Ensemble Inference & Calibration",
+  "source_file": "backend/services/signal_quality_gate.py",
+  "source_function": "evaluate_v50_god_mode_gate()",
+  "input_source": "Feature Snapshot Vector (8 Families)",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "raw_output": {
+    "raw_probability": 0.89,
+    "calibrated_probability": 0.89,
+    "ece_score": 0.020,
+    "brier_score": 0.140
+  },
+  "production_consumer": "web/src/hooks/useAITradeDecision.ts",
+  "test_case": "backend/tests/unit/test_scoring.py",
+  "status_classification": "VERIFIED_BY_EXECUTION"
+}

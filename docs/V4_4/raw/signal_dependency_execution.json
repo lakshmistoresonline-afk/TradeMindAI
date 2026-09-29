@@ -1,0 +1,12 @@
+{
+  "signal_dependency_tree": {
+    "1_safety_gate": "REAL_TRADING == False Check",
+    "2_volatility_gate": "ATR(14) Volatility Geometry",
+    "3_derivatives_gate": "Options PCR >= 0.85 & Call Wall Clearance",
+    "4_microstructure_gate": "VPIN Toxicity <= 0.35 & Order Book OIB >= +0.35",
+    "5_trend_gate": "1D/15m/5m Trend Alignment Sync",
+    "6_swarm_gate": "4/4 AI Swarm Unanimity Consensus"
+  },
+  "source_file": "backend/services/signal_quality_gate.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

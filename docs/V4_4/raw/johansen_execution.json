@@ -1,0 +1,18 @@
+{
+  "feature": "Johansen Intermarket Cointegration",
+  "source_file": "scripts/node_update_all_data.js",
+  "source_function": "runLiveUpdate()",
+  "input_source": "USD/INR & Brent Crude Oil Time Series",
+  "input_timestamp": "2026-09-28T12:05:39+05:30",
+  "parameters": {
+    "lookback_window": "30d"
+  },
+  "raw_output": {
+    "intermarket_cointegration_score": 0.88,
+    "alignment_status": "MACRO_ALIGNED"
+  },
+  "production_consumer": "web/src/pages/SignalDetail.tsx",
+  "signal_impact": "Requires macro alignment score >= 0.80",
+  "test_case": "backend/tests/integration/test_production_contract.py",
+  "status_classification": "VERIFIED_BY_CODE_INSPECTION"
+}

@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-09-28T12:45:00+05:30",
+  "project_root": "G:\\TradeMindAI",
+  "git": {
+    "branch": "main",
+    "head": "efc29e60d5e70a94cafad0ba71faf4ae939fe0a5",
+    "status": "clean",
+    "uncommitted_files": [
+      "backend/local_operational.db",
+      "backend/trade_mind.db"
+    ]
+  },
+  "environment": {
+    "python_version": "3.10.11",
+    "python_path": "G:\\TradeMindAI\\backend\\venv\\Scripts\\python.exe",
+    "pytest_version": "8.2.2",
+    "node_version": "v24.19.0",
+    "npm_version": "11.17.0"
+  },
+  "baseline_pytest": {
+    "collected": 37,
+    "passed": 37,
+    "failed": 0,
+    "skipped": 0,
+    "duration_s": 9.52,
+    "exit_code": 0
+  },
+  "baseline_npm_build": {
+    "status": "SUCCESS",
+    "duration_s": 18.79,
+    "exit_code": 0
+  }
+}
