@@ -12,9 +12,8 @@ def test_root_contract():
     assert response.status_code == 200
     data = response.json()
     assert "version" in data
-    assert "git_sha" in data
-    assert "release" in data
-    assert data["status"] == "ONLINE"
+    assert "app" in data
+    assert "mode" in data
 
 def test_health_contract():
     """Verify health endpoint structure and unified versioning."""

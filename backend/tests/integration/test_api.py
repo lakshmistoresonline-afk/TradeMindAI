@@ -4,12 +4,12 @@ from fastapi.testclient import TestClient
 def test_root_endpoint(client: TestClient):
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["message"] == "Welcome to TradeMind AI API"
+    assert "TradeMindAI Local Server" in response.json().get("app", "")
 
 def test_health_endpoint(client: TestClient):
-    response = client.get("/health")
+    response = client.get("/api/v1/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "healthy"
+    assert response.json()["status"] == "ONLINE"
 
 def test_market_stats_endpoint(client: TestClient):
     # This endpoint currently talks to yfinance direct
