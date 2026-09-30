@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-09-28T14:30:00+05:30",
+  "firebase_hosting_dir": "web/dist",
+  "build_command": "npm run build",
+  "build_exit_code": 0,
+  "dist_exists": true,
+  "classification": "BUILD_ONLY"
+}

@@ -1,0 +1,8 @@
+{
+  "production_model_selection": {
+    "primary_selector": "backend/services/signal_quality_gate.py",
+    "mechanism": "Symbol + Direction + Timeframe lookup in registry directory",
+    "fallback": "Default fallback ensemble prediction if symbol artifact missing",
+    "status": "VERIFIED_BY_CODE_INSPECTION"
+  }
+}

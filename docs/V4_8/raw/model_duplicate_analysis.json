@@ -1,0 +1,6 @@
+{
+  "total_files": 10696,
+  "duplicate_content_files": 6185,
+  "unique_content_hashes": 4511,
+  "analysis": "Identical binary copy files generated across multiple training timestamp runs."
+}

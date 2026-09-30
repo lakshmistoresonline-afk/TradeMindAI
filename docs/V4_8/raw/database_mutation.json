@@ -1,0 +1,13 @@
+{
+  "databases": [
+    {
+      "path": "backend/local_operational.db",
+      "status": "Modified by local SQLAlchemy ORM sessions during test execution"
+    },
+    {
+      "path": "backend/trade_mind.db",
+      "status": "Modified by local database operations and tests"
+    }
+  ],
+  "status": "VERIFIED_BY_EXECUTION"
+}

@@ -1,0 +1,6 @@
+{
+  "synthetic_seeder": "backend/app/db/seed.py",
+  "reachability": "OFFLINE_DEVELOPMENT_ONLY",
+  "production_reachable": false,
+  "status": "VERIFIED_BY_CODE_INSPECTION"
+}

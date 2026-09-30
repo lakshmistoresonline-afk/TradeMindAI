@@ -1,0 +1,8 @@
+{
+  "model_schema_integrity": {
+    "feature_vector_size": 32,
+    "scaling": "Robust Z-Score",
+    "missing_value_handling": "Explicit missingness semantics / fallback defaults",
+    "status": "VERIFIED_BY_CODE_INSPECTION"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "registry_path": "G:\\TradeMindAI\\backend\\ml\\registry",
+  "total_joblib_files": 10696,
+  "model_artifact_files": 4390,
+  "calibrator_artifact_files": 4390,
+  "rf_artifact_files": 958,
+  "platt_artifact_files": 958,
+  "unique_model_identities": 495,
+  "status": "RECONCILED"
+}
