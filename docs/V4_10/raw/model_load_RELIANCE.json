@@ -1,0 +1,9 @@
+{
+  "symbol": "RELIANCE",
+  "artifact_path": "backend\\ml\\registry\\RELIANCE_SHORT_model_v2.3_202609121324.joblib",
+  "filename": "RELIANCE_SHORT_model_v2.3_202609121324.joblib",
+  "size_bytes": 781209,
+  "sha256": "0699c7eb4e5e6e247ce4099941bcba02f1f0b8401b8f1c6a193c04ab0b41d2ae",
+  "load_success": true,
+  "model_class": "<class 'sklearn.ensemble._forest.ExtraTreesClassifier'>"
+}

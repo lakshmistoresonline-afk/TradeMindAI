@@ -1,0 +1,15 @@
+{
+  "symbol": "HDFCBANK",
+  "filename": "HDFCBANK_SHORT_model_v2.3_202609121322.joblib",
+  "input_shape": [
+    1,
+    40
+  ],
+  "predict_proba_output": [
+    [
+      0.2709417344607397,
+      0.7290582655392602
+    ]
+  ],
+  "inference_success": true
+}

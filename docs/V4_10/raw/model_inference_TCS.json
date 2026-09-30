@@ -1,0 +1,15 @@
+{
+  "symbol": "TCS",
+  "filename": "TCS_SHORT_model_v2.3_202609121324.joblib",
+  "input_shape": [
+    1,
+    40
+  ],
+  "predict_proba_output": [
+    [
+      0.3088418616927821,
+      0.6911581383072177
+    ]
+  ],
+  "inference_success": true
+}

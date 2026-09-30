@@ -1,0 +1,9 @@
+{
+  "symbol": "TCS",
+  "artifact_path": "backend\\ml\\registry\\TCS_SHORT_model_v2.3_202609121324.joblib",
+  "filename": "TCS_SHORT_model_v2.3_202609121324.joblib",
+  "size_bytes": 778169,
+  "sha256": "88316e145a9b373810a6a542b004c2756592ae752483d91c429e671d65bcde4a",
+  "load_success": true,
+  "model_class": "<class 'sklearn.ensemble._forest.ExtraTreesClassifier'>"
+}

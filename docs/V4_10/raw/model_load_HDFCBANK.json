@@ -1,0 +1,9 @@
+{
+  "symbol": "HDFCBANK",
+  "artifact_path": "backend\\ml\\registry\\HDFCBANK_SHORT_model_v2.3_202609121322.joblib",
+  "filename": "HDFCBANK_SHORT_model_v2.3_202609121322.joblib",
+  "size_bytes": 802489,
+  "sha256": "978ee8ab7471929d693b3d6d30b279c1b99a767a7acb2a493bce5c138edd50d5",
+  "load_success": true,
+  "model_class": "<class 'sklearn.ensemble._forest.ExtraTreesClassifier'>"
+}

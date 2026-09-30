@@ -1,0 +1,15 @@
+{
+  "symbol": "RELIANCE",
+  "filename": "RELIANCE_SHORT_model_v2.3_202609121324.joblib",
+  "input_shape": [
+    1,
+    40
+  ],
+  "predict_proba_output": [
+    [
+      0.2250629813223521,
+      0.774937018677648
+    ]
+  ],
+  "inference_success": true
+}
