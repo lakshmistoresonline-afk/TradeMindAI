@@ -1,0 +1,18 @@
+{
+  "symbol": "HDFCBANK",
+  "artifact": "HDFCBANK_SHORT_model_v2.3_202609121322.joblib",
+  "classes": [
+    0,
+    1
+  ],
+  "predict_proba": [
+    [
+      0.33609577599265295,
+      0.6639042240073468
+    ]
+  ],
+  "prediction": [
+    1
+  ],
+  "status": "REAL_MODEL_INFERENCE_EXECUTED"
+}

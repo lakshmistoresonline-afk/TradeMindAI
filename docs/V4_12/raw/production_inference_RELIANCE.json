@@ -1,0 +1,18 @@
+{
+  "symbol": "RELIANCE",
+  "artifact": "RELIANCE_SHORT_model_v2.3_202609121324.joblib",
+  "classes": [
+    0,
+    1
+  ],
+  "predict_proba": [
+    [
+      0.22961246021650428,
+      0.7703875397834961
+    ]
+  ],
+  "prediction": [
+    1
+  ],
+  "status": "REAL_MODEL_INFERENCE_EXECUTED"
+}

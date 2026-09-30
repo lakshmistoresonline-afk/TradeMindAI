@@ -1,0 +1,18 @@
+{
+  "symbol": "TCS",
+  "artifact": "TCS_SHORT_model_v2.3_202609121324.joblib",
+  "classes": [
+    0,
+    1
+  ],
+  "predict_proba": [
+    [
+      0.1387469700855219,
+      0.861253029914478
+    ]
+  ],
+  "prediction": [
+    1
+  ],
+  "status": "REAL_MODEL_INFERENCE_EXECUTED"
+}

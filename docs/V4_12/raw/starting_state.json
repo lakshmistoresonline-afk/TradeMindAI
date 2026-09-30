@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-09-28T17:00:00+05:30",
+  "working_directory": "G:\\TradeMindAI",
+  "git": {
+    "branch": "main",
+    "head": "5f93df227e127e1d8591e4f3042326efbc3a36ce",
+    "status": "clean"
+  },
+  "environment": {
+    "python_version": "3.10.11",
+    "sklearn_version": "1.7.2",
+    "joblib_version": "1.6.0"
+  },
+  "status": "STARTING_STATE_CAPTURED"
+}

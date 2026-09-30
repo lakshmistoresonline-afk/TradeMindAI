@@ -1,0 +1,5 @@
+{
+  "final_signal_function": "backend/services/signal_quality_gate.py",
+  "feature_function": "backend/analysis/technical.py:TechnicalAnalysis.calculate_indicators",
+  "market_data_function": "yfinance.download / Ticker.history"
+}
