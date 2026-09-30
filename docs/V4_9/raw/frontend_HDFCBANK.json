@@ -1,0 +1,6 @@
+{
+  "component": "SignalCard.tsx",
+  "normalizer": "mapCanonicalSignal()",
+  "terminology": "INVALIDATION LEVEL",
+  "status": "FRONTEND_CONSUMPTION_VERIFIED"
+}

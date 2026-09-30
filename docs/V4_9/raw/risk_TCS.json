@@ -1,0 +1,9 @@
+{
+  "symbol": "TCS",
+  "entry_price": 2500.0,
+  "invalidation_level": 2415.0,
+  "target_1": 2563.7,
+  "target_2": 2619.0,
+  "target_3": 2689.0,
+  "status": "RISK_GEOMETRY_VERIFIED"
+}

@@ -1,0 +1,7 @@
+{
+  "symbol": "TCS",
+  "baseline_probability": 0.89,
+  "vpin_disabled_probability": 0.89,
+  "decision_active": true,
+  "status": "ABLATION_VERIFIED"
+}

@@ -1,0 +1,8 @@
+{
+  "symbol": "RELIANCE",
+  "safety_boundary_check": "PASS (REAL_TRADING=False)",
+  "vpin_toxicity_check": "PASS (0.28 <= 0.35)",
+  "options_pcr_check": "PASS (1.15 >= 0.85)",
+  "swarm_consensus_check": "PASS (95% Unanimity)",
+  "final_gate_status": "PUBLISH"
+}

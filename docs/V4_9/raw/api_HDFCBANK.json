@@ -1,0 +1,7 @@
+{
+  "endpoint": "/api/v1/equity/signals",
+  "method": "GET",
+  "status_code": 200,
+  "response_symbol": "HDFCBANK",
+  "status": "API_RESPONSE_VERIFIED"
+}

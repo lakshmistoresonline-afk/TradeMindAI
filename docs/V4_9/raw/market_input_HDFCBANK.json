@@ -1,0 +1,9 @@
+{
+  "symbol": "HDFCBANK",
+  "timestamp": "2026-09-30T11:01:52.030712+00:00",
+  "source": "Yahoo Finance API (.NS)",
+  "interval": "15m",
+  "row_count": 180,
+  "status": "REAL_MARKET_DATA_ACQUIRED",
+  "sha256": "217ebb9095ca2591d5b0825f4a4c509d23f0faed62a862448256c56aba8221cf"
+}

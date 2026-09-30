@@ -1,0 +1,6 @@
+{
+  "symbol": "HDFCBANK",
+  "mutation_applied": "Future price spike +50% at t+1",
+  "feature_difference_at_t": 0,
+  "status": "PIT_MUTATION_VERIFIED"
+}

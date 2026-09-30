@@ -1,0 +1,7 @@
+{
+  "symbol": "HDFCBANK",
+  "model_family": "ExtraTreesClassifier",
+  "raw_probability": 0.89,
+  "calibrated_probability": 0.89,
+  "status": "MODEL_INFERENCE_EXECUTED"
+}

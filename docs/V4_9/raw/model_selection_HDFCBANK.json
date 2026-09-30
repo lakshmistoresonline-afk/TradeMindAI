@@ -1,0 +1,8 @@
+{
+  "symbol": "HDFCBANK",
+  "direction": "LONG",
+  "timeframe": "SWING",
+  "selector": "backend/services/signal_quality_gate.py",
+  "selected_artifact": "HDFCBANK_SWING_model_v2.3.joblib",
+  "status": "MODEL_SELECTION_VERIFIED"
+}

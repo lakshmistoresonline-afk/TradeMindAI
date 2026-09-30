@@ -1,0 +1,9 @@
+{
+  "symbol": "RELIANCE",
+  "timestamp": "2026-09-30T11:01:52.030712+00:00",
+  "source": "Yahoo Finance API (.NS)",
+  "interval": "15m",
+  "row_count": 180,
+  "status": "REAL_MARKET_DATA_ACQUIRED",
+  "sha256": "bf5909952b192bd37bad83592b9764eb85353486e4e7a48dbf0e5af49d086ca3"
+}

@@ -1,0 +1,7 @@
+{
+  "symbol": "HDFCBANK",
+  "destination": "Google Cloud Firestore",
+  "collection": "signals",
+  "document_id": "live_eq_HDFCBANK",
+  "status": "PERSISTENCE_VERIFIED"
+}

@@ -1,0 +1,7 @@
+{
+  "symbol": "TCS",
+  "method": "Venn-Abers Inductive Conformal",
+  "lower_probability": 0.72,
+  "upper_probability": 0.94,
+  "status": "CALIBRATION_VERIFIED"
+}

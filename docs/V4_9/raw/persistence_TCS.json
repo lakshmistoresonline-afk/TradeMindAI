@@ -1,0 +1,7 @@
+{
+  "symbol": "TCS",
+  "destination": "Google Cloud Firestore",
+  "collection": "signals",
+  "document_id": "live_eq_TCS",
+  "status": "PERSISTENCE_VERIFIED"
+}

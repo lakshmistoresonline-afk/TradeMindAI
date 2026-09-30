@@ -1,0 +1,24 @@
+{
+  "symbol": "RELIANCE",
+  "timestamp": "2026-09-30T11:01:52.030712+00:00",
+  "feature_count": 32,
+  "features": {
+    "ema_20": 2540.5,
+    "ema_50": 2510.0,
+    "rsi_14": 62.4,
+    "atr_14": 42.5,
+    "vpin_flow_toxicity": 0.28,
+    "order_book_depth_oib": 0.48,
+    "venn_abers_lower_prob": 0.72,
+    "hmm_regime_state": "STEADY_BULL_TREND",
+    "finbert_nlp_sentiment": 0.75,
+    "intermarket_cointegration_score": 0.88,
+    "rmt_cluster_uncorrelated_score": 0.92,
+    "tsallis_entropy_exhaustion_index": 0.18,
+    "agent_swarm_consensus_score": 0.95,
+    "net_dealer_gex": -1.8,
+    "options_pcr_oi": 1.15
+  },
+  "status": "FEATURE_VECTOR_CAPTURED",
+  "sha256": "d4ea334f88fa8d09ca00e7f8f4e57181e78db8fed47729f9987c20e9f84fe02e"
+}
