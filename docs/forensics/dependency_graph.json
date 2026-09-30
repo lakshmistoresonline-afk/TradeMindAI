@@ -1,0 +1,11 @@
+{
+  "pipeline_nodes": [
+    "Yahoo Finance API",
+    "scripts/node_update_all_data.js",
+    "backend/services/signal_quality_gate.py",
+    "Google Cloud Firestore (signals & signals_history)",
+    "web/src/hooks/useAITradeDecision.ts",
+    "web/src/pages/EquitySignals.tsx"
+  ],
+  "authoritative_path_status": "VERIFIED"
+}

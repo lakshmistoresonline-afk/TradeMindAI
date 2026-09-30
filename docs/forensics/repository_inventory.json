@@ -1,0 +1,16 @@
+{
+  "project_root": "G:\\TradeMindAI",
+  "git_branch": "main",
+  "git_head": "efc29e60d5e77c6b84668e2897c139f684e86bad",
+  "file_categories": {
+    "SOURCE": 142,
+    "TEST": 18,
+    "CONFIG": 24,
+    "DATABASE": 2,
+    "MODEL_ARTIFACT": 130,
+    "SCRIPT": 15,
+    "DOCUMENTATION": 48,
+    "DEPLOYMENT": 8,
+    "ANDROID": 35
+  }
+}

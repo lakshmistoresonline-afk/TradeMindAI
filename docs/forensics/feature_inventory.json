@@ -1,0 +1,17 @@
+{
+  "advanced_features": [
+    "VPIN Flow Toxicity",
+    "Venn-Abers Calibration",
+    "Gaussian HMM Regime",
+    "FinBERT NLP Sentiment",
+    "Johansen Cointegration",
+    "Random Matrix Theory",
+    "Tsallis Entropy",
+    "4-Agent Swarm Consensus",
+    "Net Dealer GEX",
+    "Options PCR",
+    "Order Book OIB",
+    "Intraday CVD"
+  ],
+  "status": "VERIFIED_BY_CODE_INSPECTION"
+}

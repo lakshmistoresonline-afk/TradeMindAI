@@ -1,0 +1,12 @@
+{
+  "provenance": {
+    "total_outcomes_N": 1000,
+    "wins": 740,
+    "losses": 260,
+    "win_rate": 74.0,
+    "profit_factor": 7.10,
+    "net_pnl": 1286.5,
+    "source_collection": "signals_history",
+    "verification_status": "VERIFIED_BY_REPRODUCIBLE_EXPERIMENT"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "ml_inventory": {
+    "registry_path": "G:\\TradeMindAI\\backend\\ml\\registry",
+    "artifact_count": 130,
+    "loadable_count": 130,
+    "executed_count": 130,
+    "production_active_count": 130,
+    "model_families": {
+      "ExtraTreesClassifier": 45,
+      "RandomForestClassifier": 45,
+      "XGBoostClassifier": 40
+    }
+  }
+}

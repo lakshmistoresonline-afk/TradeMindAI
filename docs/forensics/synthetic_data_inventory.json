@@ -1,0 +1,7 @@
+{
+  "synthetic_data_audit": {
+    "historical_shadow_ledger": "Generated via historical backtesting matrix across NIFTY-200 symbols (2016-2026)",
+    "real_live_quotes": "Fetched via Yahoo Finance API (`.NS`) and saved to livePrices.ts",
+    "mock_data_status": "Strictly isolated to offline development fallbacks; production uses Firestore mirror."
+  }
+}

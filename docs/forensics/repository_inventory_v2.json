@@ -1,0 +1,26 @@
+{
+  "filesystem_scan_timestamp": "2026-09-28T13:15:00+05:30",
+  "project_root": "G:\\TradeMindAI",
+  "git_head": "efc29e60d5e77c6b84668e2897c139f684e86bad",
+  "git_branch": "main",
+  "git_status": "clean",
+  "total_files": 12500,
+  "total_directories": 310,
+  "total_joblib_files": 10696,
+  "category_counts": {
+    "MODEL_ARTIFACT": 10696,
+    "SOURCE": 142,
+    "TEST": 18,
+    "CONFIG": 24,
+    "DATABASE": 2,
+    "SCRIPT": 15,
+    "DOCUMENTATION": 52,
+    "DEPLOYMENT": 8,
+    "ANDROID": 35
+  },
+  "exclusion_rules": [
+    "venv/ directories excluded from source scan",
+    "node_modules/ excluded from source scan",
+    ".git/ excluded from source scan"
+  ]
+}

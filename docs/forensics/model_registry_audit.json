@@ -1,0 +1,12 @@
+{
+  "total_joblib_files": 10696,
+  "model_artifact_files": 4390,
+  "calibrator_artifact_files": 4390,
+  "rf_artifact_files": 958,
+  "platt_artifact_files": 958,
+  "other_artifact_files": 0,
+  "unrecognized_artifact_files": 0,
+  "duplicate_content_files": 6185,
+  "duplicate_symbol_horizon_files": 3895,
+  "unique_model_identities": 495
+}
