@@ -1,0 +1,19 @@
+{
+  "symbol": "RELIANCE",
+  "filename": "RELIANCE_SHORT_model_v2.3_202609121324.joblib",
+  "classes": [
+    0,
+    1
+  ],
+  "predict_proba": [
+    [
+      0.957378195940622,
+      0.042621804059377995
+    ]
+  ],
+  "prediction": [
+    0
+  ],
+  "status": "REAL_MODEL_INFERENCE_EXECUTED",
+  "sha256": "5fe9f9548977060c73ad3de6ae6bb13815cd63e9ad7f49fa811b674a8700fb43"
+}

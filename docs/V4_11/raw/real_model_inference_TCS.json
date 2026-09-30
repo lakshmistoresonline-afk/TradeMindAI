@@ -1,0 +1,19 @@
+{
+  "symbol": "TCS",
+  "filename": "TCS_SHORT_model_v2.3_202609121324.joblib",
+  "classes": [
+    0,
+    1
+  ],
+  "predict_proba": [
+    [
+      0.608321532434347,
+      0.39167846756565317
+    ]
+  ],
+  "prediction": [
+    0
+  ],
+  "status": "REAL_MODEL_INFERENCE_EXECUTED",
+  "sha256": "f0ca4dfd787947f7123d0ba8a5a8aeece4d77d39a6abd9ea1959a9aa159d7569"
+}

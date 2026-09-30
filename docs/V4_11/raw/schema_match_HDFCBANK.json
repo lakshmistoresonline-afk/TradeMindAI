@@ -1,0 +1,8 @@
+{
+  "symbol": "HDFCBANK",
+  "expected_count": 40,
+  "actual_count": 40,
+  "feature_names_match": true,
+  "order_match": true,
+  "status": "EXACT_MATCH"
+}

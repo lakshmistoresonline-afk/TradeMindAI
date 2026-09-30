@@ -1,0 +1,19 @@
+{
+  "symbol": "HDFCBANK",
+  "filename": "HDFCBANK_SHORT_model_v2.3_202609121322.joblib",
+  "classes": [
+    0,
+    1
+  ],
+  "predict_proba": [
+    [
+      0.9770321648201766,
+      0.022967835179823412
+    ]
+  ],
+  "prediction": [
+    0
+  ],
+  "status": "REAL_MODEL_INFERENCE_EXECUTED",
+  "sha256": "e7b1451c9dc228d84637d84eb994bf214b11e18985cdf41e93a4a7ce3c13b2b2"
+}
