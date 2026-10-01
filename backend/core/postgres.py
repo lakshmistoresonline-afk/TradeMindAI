@@ -776,6 +776,43 @@ class ModelMetadataDB(Base):
     feature_importances = Column(String) # JSON string
     calibration_metadata = Column(String) # JSON string
 
+class TechnicalFeatureDB(Base):
+    __tablename__ = "technical_features"
+    id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String, index=True)
+    timestamp = Column(DateTime(timezone=True), index=True)
+    timeframe = Column(String, default="1d")
+    feature_version = Column(String, default="v5.6")
+    sma_20 = Column(Float)
+    sma_50 = Column(Float)
+    sma_100 = Column(Float)
+    sma_200 = Column(Float)
+    ema_20 = Column(Float)
+    ema_50 = Column(Float)
+    ema_100 = Column(Float)
+    ema_200 = Column(Float)
+    rsi_14 = Column(Float)
+    macd = Column(Float)
+    macd_signal = Column(Float)
+    macd_hist = Column(Float)
+    stoch_k = Column(Float)
+    stoch_d = Column(Float)
+    cci = Column(Float)
+    adx = Column(Float)
+    atr_14 = Column(Float)
+    natr = Column(Float)
+    historical_volatility = Column(Float)
+    bb_upper = Column(Float)
+    bb_middle = Column(Float)
+    bb_lower = Column(Float)
+    bb_width = Column(Float)
+    volume_sma = Column(Float)
+    relative_volume = Column(Float)
+    obv = Column(Float)
+    mfi = Column(Float)
+    pivot = Column(Float)
+    calculated_at = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
+
 class InstrumentDB(Base):
     __tablename__ = "instruments"
     id = Column(String, primary_key=True)

@@ -243,3 +243,26 @@ async def get_signal_forensics(signal_id: str):
         }
     }
 
+@router.get("/features/{symbol}")
+async def get_equity_features(symbol: str, limit: int = 30):
+    """
+    GET /api/v1/equity/features/{symbol}
+    Returns technical features for the given symbol from the database.
+    """
+    from backend.core.postgres import SessionLocal, TechnicalFeatureDB
+    with SessionLocal() as session:
+        feats = session.query(TechnicalFeatureDB).filter(
+            TechnicalFeatureDB.symbol == symbol.upper()
+        ).order_by(TechnicalFeatureDB.timestamp.desc()).limit(limit).all()
+
+        results = []
+        for f in feats:
+            data = {c.name: getattr(f, c.name) for c in f.__table__.columns}
+            if isinstance(data.get("timestamp"), datetime.datetime):
+                data["timestamp"] = data["timestamp"].isoformat()
+            if isinstance(data.get("calculated_at"), datetime.datetime):
+                data["calculated_at"] = data["calculated_at"].isoformat()
+            results.append(data)
+        return results
+
+
