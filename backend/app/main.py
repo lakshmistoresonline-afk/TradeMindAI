@@ -57,8 +57,13 @@ def on_startup():
     logger.info("[Startup] Verifying non-destructive database tables...")
     Base.metadata.create_all(bind=engine)
     PostgresBase.metadata.create_all(bind=postgres_engine)
-    logger.info("[Startup] Executing safe database seeder check...")
-    seed_local_database()
+
+    seed_allowed = os.getenv("SEED_DATA_ALLOWED", "false").lower() == "true"
+    if seed_allowed:
+        logger.info("[Startup] Executing safe database seeder check (SEED_DATA_ALLOWED=true)...")
+        seed_local_database()
+    else:
+        logger.info("[Startup] Seed data skipped (SEED_DATA_ALLOWED=false fail-closed guard).")
     logger.info("[Startup] TradeMindAI Local Offline Server ready.")
 
 @app.get("/")
