@@ -7,6 +7,7 @@ Incorporates modular routers and non-destructive database auto-seeding on startu
 """
 
 import logging
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
