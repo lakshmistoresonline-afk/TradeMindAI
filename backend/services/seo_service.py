@@ -6,11 +6,11 @@ class SEOService:
     METADATA = {
         "home": {
             "title": "TradeMind AI — Evidence-Driven Signal Intelligence for Indian Equities",
-            "description": "Discover institutional-grade NIFTY-200 market signals. Auditable evidence and historical transparency for professional investors."
+            "description": "Discover institutional-grade NIFTY-500 market signals. Auditable evidence and historical transparency for professional investors."
         },
         "signals": {
             "title": "Live Equity Signals — TradeMind AI",
-            "description": "Active momentum signals across NIFTY-200 universe. Full structural evidence and machine-learning thesis."
+            "description": "Active momentum signals across NIFTY-500 universe. Full structural evidence and machine-learning thesis."
         },
         "performance": {
             "title": "Historical Signal Track Record — TradeMind AI",

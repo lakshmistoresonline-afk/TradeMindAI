@@ -28,7 +28,7 @@ async def get_market_stats():
     indices = {
         "^NSEI": "NIFTY 50",
         "^CNX100": "NIFTY 100",
-        "^CNX200": "NIFTY 200",
+        "^CNX500": "NIFTY 500",
         "^INDIAVIX": "India VIX"
     }
     stats = {}

@@ -226,7 +226,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
               Created: <span style={{ color: '#f8fafc', fontWeight: 800 }}>{formatNSEDateTime(createdAt)}</span>
             </Typography>
           </Box>
-          {triggeredAt && (
+          {triggeredAt && decision.status !== 'WAITING_FOR_ENTRY' && decision.status !== 'GENERATED' && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
               <Zap size={12} color="#f59e0b" />
               <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace' }}>

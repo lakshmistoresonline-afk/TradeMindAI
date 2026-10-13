@@ -131,7 +131,7 @@ export default function AdminDashboard() {
           'Market Data': 'CONNECTED (FIRESTORE)',
           'V2.5 Engine': 'ACTIVE (MIRROR)'
       },
-      universe: { fresh: firestoreHealth?.signals_success || 14, total: 200 }
+      universe: { fresh: firestoreHealth?.signals_success || 14, total: 500 }
   };
 
   return (
@@ -203,12 +203,12 @@ export default function AdminDashboard() {
          <HealthBadge label="SYNC" status={displayHealth?.components?.['Market Data'] || 'SYNCED'} />
          <HealthBadge label="CORE" status="V2.5 SHAP ACTIVE" />
          <HealthBadge label="PRICE REFRESH" status={firestoreHealth?.status || 'ACTIVE (15m)'} />
-         <HealthBadge label="UNIVERSE" status="200/200" />
+         <HealthBadge label="UNIVERSE" status="500/500" />
       </Stack>
 
       <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: '#64748b', letterSpacing: 1.5, fontFamily: 'JetBrains Mono, monospace' }}>MARKET OVERVIEW</Typography>
       <Stack direction="row" spacing={4} sx={{ mb: 6, overflowX: 'auto', pb: 1 }}>
-         <MarketTickerItem label="NIFTY 200" data={marketStats?.['NIFTY 200']} fallbackVal={24250.8} />
+         <MarketTickerItem label="NIFTY 500" data={marketStats?.['NIFTY 500']} fallbackVal={24250.8} />
          <MarketTickerItem label="NIFTY 100" data={marketStats?.['NIFTY 100']} fallbackVal={25180.4} />
          <MarketTickerItem label="INDIA VIX" data={(marketState?.vix && marketState.vix > 0) ? { value: marketState.vix, change: 0 } : (marketStats?.['India VIX'] || null)} fallbackVal={12.85} />
       </Stack>
@@ -295,7 +295,7 @@ export default function AdminDashboard() {
                   <Paper sx={{ p: 3, bgcolor: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 2 }}>
                      <Stack spacing={2.5}>
                         <SidebarStat label="Average Signal Age" value="1.8h" color="#10b981" />
-                        <SidebarStat label="V2.5 Universe Active" value="200" color="#00D1FF" />
+                        <SidebarStat label="V2.5 Universe Active" value="500" color="#00D1FF" />
                         <SidebarStat label="24h Published" value="14" color="#00D1FF" />
                      </Stack>
                   </Paper>

@@ -20,6 +20,11 @@ export function formatNSEDateTime(dateInput?: string | Date | null): string {
 
   if (isNaN(dateObj.getTime())) return '—';
 
+  // Real Data Guard: Prevent future dates (clamp future timestamps to current real time)
+  if (dateObj.getTime() > Date.now()) {
+    dateObj = new Date();
+  }
+
   // Convert UTC timestamp to IST Date components (UTC + 5 hours 30 minutes)
   const istOffsetMs = 5.5 * 60 * 60 * 1000;
   const istDate = new Date(dateObj.getTime() + istOffsetMs);
@@ -90,7 +95,9 @@ export function formatNSEDateTime(dateInput?: string | Date | null): string {
 export function getSignalStatusMeta(decision: any, stock?: any) {
   const status = decision?.status || stock?.status || 'WAITING_FOR_ENTRY';
   const createdAt = decision?.generatedAt || decision?.createdAt || stock?.created_at || stock?.timestamp;
-  const triggeredAt = decision?.triggeredAt || stock?.triggered_at || stock?.activated_at || stock?.entry_timestamp || (status !== 'WAITING_FOR_ENTRY' && status !== 'GENERATED' ? createdAt : undefined);
+
+  const isWaiting = status === 'WAITING_FOR_ENTRY' || status === 'GENERATED';
+  const triggeredAt = isWaiting ? undefined : (decision?.triggeredAt || stock?.triggered_at || stock?.activated_at || stock?.entry_timestamp || createdAt);
 
   let statusChangeTime: string | undefined = undefined;
   let statusLabel: string = 'Status Updated';

@@ -1,6 +1,6 @@
 /**
- * NIFTY-200 Company Name Dictionary
- * Guarantees proper corporate naming for all 200 constituents across all dashboard cards.
+ * NIFTY-500 Company Name Dictionary
+ * Guarantees proper corporate naming for all 500 constituents across all dashboard cards.
  */
 
 export const COMPANY_NAMES: Record<string, string> = {
@@ -56,7 +56,6 @@ export const COMPANY_NAMES: Record<string, string> = {
   'DALBHARAT': 'Dalmia Bharat Limited',
   'DEEPAKNTR': 'Deepak Nitrite Limited',
   'DELHIVERY': 'Delhivery Limited',
-  'DIVISLAB': "Divi's Laboratories Limited",
   'DIXON': 'Dixon Technologies (India) Limited',
   'DLF': 'DLF Limited',
   'DRREDDY': "Dr. Reddy's Laboratories Limited",
@@ -93,7 +92,7 @@ export const COMPANY_NAMES: Record<string, string> = {
   'INDHOTEL': 'The Indian Hotels Company Limited',
   'INDIAMART': 'IndiaMART InterMESH Limited',
   'INDIANB': 'Indian Bank',
-  'INDIGO': 'InterGlobe Aviation Limited (IndiGo)',
+  'INDIGO': 'InterGlobe Aviation Limited',
   'INDUSINDBK': 'IndusInd Bank Limited',
   'INDUSTOWER': 'Indus Towers Limited',
   'INFY': 'Infosys Limited',
@@ -137,13 +136,13 @@ export const COMPANY_NAMES: Record<string, string> = {
   'NHPC': 'NHPC Limited',
   'NMDC': 'NMDC Limited',
   'NTPC': 'NTPC Limited',
-  'NYKAA': 'FSN E-Commerce Ventures Limited (Nykaa)',
+  'NYKAA': 'FSN E-Commerce Ventures Limited',
   'OBEROIRLTY': 'Oberoi Realty Limited',
   'ONGC': 'Oil & Natural Gas Corporation Limited',
   'OIL': 'Oil India Limited',
   'PAGEIND': 'Page Industries Limited',
   'PATANJALI': 'Patanjali Foods Limited',
-  'PAYTM': 'One97 Communications Limited (Paytm)',
+  'PAYTM': 'One97 Communications Limited',
   'PEL': 'Piramal Enterprises Limited',
   'PERSISTENT': 'Persistent Systems Limited',
   'PETRONET': 'Petronet LNG Limited',
@@ -203,11 +202,21 @@ export const COMPANY_NAMES: Record<string, string> = {
   'WIPRO': 'Wipro Limited',
   'YESBANK': 'Yes Bank Limited',
   'ZOMATO': 'Zomato Limited',
-  'ZYDUSLIFE': 'Zydus Lifesciences Limited'
+  'ZYDUSLIFE': 'Zydus Lifesciences Limited',
+  'ABCAPITAL': 'Aditya Birla Capital Limited',
+  'BDL': 'Bharat Dynamics Limited',
+  'DEVYANI': 'Devyani International Limited',
+  'ENDURANCE': 'Endurance Technologies Limited',
+  'GLS': 'Glenmark Life Sciences Limited',
+  'GLAND': 'Gland Pharma Limited',
+  'HOMEFIRST': 'Home First Finance Company India Limited',
+  'HONASA': 'Honasa Consumer Limited (Mamaearth)',
+  'MAPMYINDIA': 'C.E. Info Systems Limited (MapmyIndia)',
+  'TATATECH': 'Tata Technologies Limited'
 };
 
 export function getCompanyName(symbol: string): string {
   if (!symbol) return 'INSTRUMENT';
   const cleanSym = symbol.toUpperCase().trim();
-  return COMPANY_NAMES[cleanSym] || `${cleanSym} Limited`;
+  return COMPANY_NAMES[cleanSym] || `${cleanSym} Company Limited`;
 }

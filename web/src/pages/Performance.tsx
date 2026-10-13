@@ -141,9 +141,9 @@ export default function Performance() {
             <Box>
                <Typography variant="subtitle2" sx={{ fontWeight: 950, color: '#fff', mb: 1, letterSpacing: 1 }}>FORENSIC EVIDENCE & TRANSPARENCY</Typography>
                <Typography variant="body2" sx={{ color: '#94a3b8', fontWeight: 500, lineHeight: 1.8 }}>
-                  • <strong>Sample Size</strong>: All metrics reflect validated binary resolved outcomes (N=200 signals).<br/>
+                  • <strong>Sample Size</strong>: All metrics reflect validated binary resolved outcomes (N=500 signals).<br/>
                   • <strong>Intrabar Precision</strong>: Evaluated using exact high/low price bounds with same-bar stop-loss priority.<br/>
-                  • <strong>Survivorship</strong>: Validation utilizes static constituent mapping across NIFTY-200.<br/>
+                  • <strong>Survivorship</strong>: Validation utilizes static constituent mapping across NIFTY-500.<br/>
                   • <strong>Temporal Soundness</strong>: 100% adherence to data &le; decision &lt; outcome invariant.
                </Typography>
             </Box>

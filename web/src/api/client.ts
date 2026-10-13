@@ -67,8 +67,8 @@ export const getEquityPerformance = async () => {
     const response = await apiClient.get('/equity/performance', { timeout: 15000 });
     return response.data;
   } catch (err) {
-    console.warn('Equity performance fallback:', err);
-    return { sample_size: 50, wins: 36, losses: 14, win_rate: 72.0, profit_factor: 3.25, expectancy: 2.85, net_pnl: 142.5, brier_score: 0.18 };
+    console.error('Equity performance fetch failed:', err);
+    return { sample_size: 0, wins: 0, losses: 0, win_rate: 0.0, profit_factor: 0.0, expectancy: 0.0, net_pnl: 0.0, brier_score: 0.0 };
   }
 };
 
@@ -77,14 +77,14 @@ export const getEquityAccuracy = async () => {
     const response = await apiClient.get('/equity/accuracy', { timeout: 15000 });
     return response.data;
   } catch (err) {
-    console.warn('Equity accuracy fallback:', err);
+    console.error('Equity accuracy fetch failed:', err);
     return {
       horizons: {
-        SHORT: { sample_size: 279, auc: 0.75, win_rate: 72.8, brier: 0.140, logloss: 0.420, ece: 0.020 },
-        SWING: { sample_size: 347, auc: 0.81, win_rate: 74.0, brier: 0.140, logloss: 0.420, ece: 0.020 },
-        LONG:  { sample_size: 281, auc: 0.84, win_rate: 75.2, brier: 0.140, logloss: 0.420, ece: 0.020 }
+        SHORT: { sample_size: 0, auc: 0.0, win_rate: 0.0, brier: 0.0, logloss: 0.0, ece: 0.0 },
+        SWING: { sample_size: 0, auc: 0.0, win_rate: 0.0, brier: 0.0, logloss: 0.0, ece: 0.0 },
+        LONG:  { sample_size: 0, auc: 0.0, win_rate: 0.0, brier: 0.0, logloss: 0.0, ece: 0.0 }
       },
-      verified_benchmark: { n: 1000, win_rate: 74.0, profit_factor: 7.10, net_pnl: 1286.5 }
+      verified_benchmark: { n: 0, win_rate: 0.0, profit_factor: 0.0, net_pnl: 0.0 }
     };
   }
 };
@@ -94,7 +94,7 @@ export const getEquityMarketState = async () => {
     const response = await apiClient.get('/equity/market', { timeout: 10000 });
     return response.data;
   } catch (err) {
-    return { regime: "BULL", risk_mode: "RISK_ON", sentiment_score: 0.72, volatility_index: 14.5 };
+    return { regime: "UNKNOWN", risk_mode: "UNKNOWN", sentiment_score: 0.0, volatility_index: 0.0 };
   }
 };
 

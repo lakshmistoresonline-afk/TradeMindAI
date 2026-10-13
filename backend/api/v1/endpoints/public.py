@@ -11,7 +11,7 @@ async def get_seo_metadata(page: str):
 async def get_public_config():
     return {
         "version": "1.4.0",
-        "universe": "NIFTY-200",
+        "universe": "NIFTY-500",
         "strategy": "V2.2 FROZEN",
         "real_trading": False
     }

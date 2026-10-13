@@ -47,6 +47,10 @@ class TradingSignal(Base):
     signal_type = Column(String(20), nullable=False) # STRONG_BUY, BUY, HOLD, SELL, STRONG_SELL
     confidence = Column(Float, nullable=False) # 0.0 - 100.0
     sentiment_score = Column(Float, default=0.0)
+    meta_probability = Column(Float, default=0.75)
+    cvd_score = Column(Float, default=0.0)
+    pcr_ratio = Column(Float, default=1.0)
+    sector_rs = Column(Float, default=1.0)
     drivers_json = Column(Text) # JSON string of key drivers
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 

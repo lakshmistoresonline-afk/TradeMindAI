@@ -28,7 +28,7 @@ export default function Methodology() {
          <section>
             <Typography variant="h5" sx={{ fontWeight: 900, mb: 3 }}>1. Universe Selection</Typography>
             <Typography sx={{ color: '#708090', lineHeight: 1.8 }}>
-               TradeMind AI monitors the **NIFTY-200** universe, representing the top 200 liquid constituents of the National Stock Exchange of India.
+               TradeMind AI monitors the **NIFTY-500** universe, representing the top 500 liquid constituents of the National Stock Exchange of India.
                The universe is rebalanced monthly to align with official NSE index membership updates.
             </Typography>
          </section>

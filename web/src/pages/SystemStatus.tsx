@@ -62,7 +62,7 @@ export default function SystemStatus() {
                     sx={{ height: 6, borderRadius: 3 }}
                   />
                   <Typography variant="caption" sx={{ color: '#fff', fontWeight: 950, mt: 1, display: 'block', fontFamily: 'JetBrains Mono, monospace' }}>
-                     200 / 200 CONSTITUENTS
+                     500 / 500 CONSTITUENTS
                   </Typography>
                </Box>
                <Box sx={{ mb: 4 }}>
@@ -74,7 +74,7 @@ export default function SystemStatus() {
                     sx={{ height: 6, borderRadius: 3 }}
                   />
                   <Typography variant="caption" sx={{ color: '#fff', fontWeight: 950, mt: 1, display: 'block', fontFamily: 'JetBrains Mono, monospace' }}>
-                     {health?.sector?.mapped || 200}/200 MAPPED
+                     {health?.sector?.mapped || 500}/500 MAPPED
                   </Typography>
                </Box>
                <Box>
@@ -86,7 +86,7 @@ export default function SystemStatus() {
                     sx={{ height: 6, borderRadius: 3 }}
                   />
                   <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, mt: 1, display: 'block', fontFamily: 'JetBrains Mono, monospace' }}>
-                     ● 200 SYNCED
+                     ● 500 SYNCED
                   </Typography>
                </Box>
             </Paper>

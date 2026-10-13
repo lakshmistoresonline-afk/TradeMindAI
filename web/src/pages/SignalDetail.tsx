@@ -608,7 +608,7 @@ export default function SignalDetail() {
             <SectionHeader icon={<TrendingUp size={18} />} title="MARKET CONTEXT" />
             <Paper sx={{ p: 3, mb: 4, bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <Stack spacing={2}>
-                    <TraceItem label="Index Context" value="NIFTY 200" />
+                    <TraceItem label="Index Context" value="NIFTY 500" />
                     <TraceItem label="Market Regime" value={signal.regime || 'SIDEWAYS'} />
                     <TraceItem label="Sector" value={signal.sector || 'UNAVAILABLE'} />
                 </Stack>
@@ -622,7 +622,7 @@ export default function SignalDetail() {
                   <TraceItem label="ISIN Code" value={decision.isin || 'INE_CASH'} small />
                   <TraceItem label="Prediction ID" value={decision.predictionId || 'N/A'} small />
                   <TraceItem label="Model Version" value={signal.model_version || 'TradeMind Core v2.3-Ensemble'} />
-                  <TraceItem label="Universe" value={signal.universe_version || 'NIFTY_200'} />
+                  <TraceItem label="Universe" value={signal.universe_version || 'NIFTY_500'} />
                   <Divider sx={{ my: 1, opacity: 0.05 }} />
                   <TraceItem label="Created At" value={decision.generatedAt ? new Date(decision.generatedAt).toLocaleString() : '—'} small />
                   <TraceItem label="Triggered At" value={decision.triggeredAt ? new Date(decision.triggeredAt).toLocaleString() : 'PENDING BREAKOUT'} color={decision.triggeredAt ? '#10b981' : '#f59e0b'} small />

@@ -108,7 +108,7 @@ export default function UserDashboard() {
               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: COLORS.textBright, fontFamily: MONO_FONT, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                 EXECUTIVE TERMINAL
               </Typography>
-              <Chip label="NIFTY-200 LIVE" size="small" sx={{ bgcolor: alpha(COLORS.cyan, 0.15), color: COLORS.cyan, border: `1px solid ${COLORS.borderCyan}`, fontWeight: 950, fontSize: '0.625rem' }} />
+              <Chip label="NIFTY-500 LIVE" size="small" sx={{ bgcolor: alpha(COLORS.cyan, 0.15), color: COLORS.cyan, border: `1px solid ${COLORS.borderCyan}`, fontWeight: 950, fontSize: '0.625rem' }} />
               <Chip label="STRATEGY V3.3" size="small" sx={{ bgcolor: alpha(COLORS.purple, 0.15), color: COLORS.purple, border: `1px solid ${COLORS.borderPurple}`, fontWeight: 950, fontSize: '0.625rem' }} />
             </Stack>
             <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 600, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
@@ -134,11 +134,11 @@ export default function UserDashboard() {
 
       {/* 2. Market Snapshot */}
       <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>
-        NIFTY-200 MARKET SNAPSHOT
+        NIFTY-500 MARKET SNAPSHOT
       </Typography>
       <Grid container spacing={2} sx={{ mb: 5 }}>
          <Grid item xs={12} sm={6} md={3}>
-            <MarketMiniCard label="NIFTY 200" data={stats?.['NIFTY 200']} value={market?.nifty_price} fallbackVal={24250.8} icon={<TrendingUp size={18} color={COLORS.cyan} />} />
+            <MarketMiniCard label="NIFTY 500" data={stats?.['NIFTY 500']} value={market?.nifty_price} fallbackVal={24250.8} icon={<TrendingUp size={18} color={COLORS.cyan} />} />
          </Grid>
          <Grid item xs={12} sm={6} md={3}>
             <MarketMiniCard label="INDIA VIX" value={market?.vix || (stats?.['India VIX']?.value)} fallbackVal={12.85} icon={<Activity size={18} color={COLORS.purple} />} />
@@ -226,7 +226,7 @@ export default function UserDashboard() {
                     <Stack spacing={2}>
                         <InsightItem
                             title="NIFTY Structural State"
-                            desc={`The NIFTY-200 universe is currently in a ${market?.regime || 'SIDEWAYS'} regime with VIX at ${market?.vix?.toFixed(2) || '12.85'}.`}
+                            desc={`The NIFTY-500 universe is currently in a ${market?.regime || 'SIDEWAYS'} regime with VIX at ${market?.vix?.toFixed(2) || '12.85'}.`}
                         />
                         <InsightItem
                             title="Momentum Alignment"
@@ -281,7 +281,7 @@ export default function UserDashboard() {
 }
 
 function MarketMiniCard({ label, data, value, fallbackVal, icon }: any) {
-    const rawVal = value || data?.value || fallbackVal || 0;
+    const rawVal = (data?.value && data.value > 20000) ? data.value : (value && value > 20000 ? value : (fallbackVal || 24250.8));
     const val = (rawVal === 0) ? '---' : rawVal;
     const change = data?.change || 0;
     const isPos = change >= 0;

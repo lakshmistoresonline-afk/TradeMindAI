@@ -203,7 +203,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                      color="#10b981"
                      dot={true}
                    />
-                   <HeaderStatus label="UNIVERSE" value="NIFTY 200 CANONICAL" color="#00D1FF" />
+                   <HeaderStatus label="UNIVERSE" value="NIFTY 500 CANONICAL" color="#00D1FF" />
                    <HeaderStatus label="ENGINE" value="V2.6 HMM & CVD" color="#a855f7" />
                 </Stack>
               )}
@@ -382,7 +382,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   TRADEMIND TERMINAL V2.3
                </Typography>
                <Typography variant="caption" sx={{ color: '#475569', fontWeight: 700, fontSize: '0.55rem' }}>
-                  NIFTY-200 Quantitative Intelligence
+                  NIFTY-500 Quantitative Intelligence
                </Typography>
             </Box>
           </Box>

@@ -59,7 +59,7 @@ export default function Landing() {
             lineHeight: 1.4,
             fontFamily: MONO_FONT
           }}>
-            EVIDENCE-DRIVEN SIGNAL INTELLIGENCE FOR NIFTY-200 EQUITIES
+            EVIDENCE-DRIVEN SIGNAL INTELLIGENCE FOR NIFTY-500 EQUITIES
           </Typography>
 
           <Typography variant="body1" sx={{
@@ -103,7 +103,7 @@ export default function Landing() {
             <PillarItem
               icon={<Search size={28} color={COLORS.cyan} />}
               title="DISCOVER"
-              text="Identify institutional momentum breakouts across the NIFTY-200 universe."
+              text="Identify institutional momentum breakouts across the NIFTY-500 universe."
             />
           </Grid>
           <Grid item xs={12} md={3}>

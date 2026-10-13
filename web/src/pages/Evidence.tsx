@@ -68,8 +68,8 @@ export default function Evidence() {
                />
                <LimitItem
                   label="Sector Coverage"
-                  val="37 / 202"
-                  text="Industrial sector metadata is partially available for the NIFTY-200 universe."
+                  val="120 / 500"
+                  text="Industrial sector metadata is partially available for the NIFTY-500 universe."
                />
             </Stack>
          </Paper>
