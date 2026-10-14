@@ -21,14 +21,19 @@ class LocalMarketDataService:
     @staticmethod
     def get_historical_data(symbol: str, limit: int = 180) -> pd.DataFrame:
         """
-        Retrieves historical OHLCV data for a given symbol directly from local DB.
+        Retrieves historical OHLCV data for a given symbol directly from local DB,
+        selecting the most recent N observations and returning them in ascending chronological order.
         """
         query_sql = text("""
             SELECT timestamp, open, high, low, close, volume
-            FROM app_market_data
-            WHERE UPPER(symbol) = UPPER(:symbol)
+            FROM (
+                SELECT timestamp, open, high, low, close, volume
+                FROM app_market_data
+                WHERE UPPER(symbol) = UPPER(:symbol)
+                ORDER BY timestamp DESC
+                LIMIT :limit
+            ) sub
             ORDER BY timestamp ASC
-            LIMIT :limit
         """)
 
         try:

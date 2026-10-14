@@ -25,19 +25,23 @@ app = FastAPI(
     description="100% Offline Local Quantitative Signal & TA Engine"
 )
 
-# Enable CORS for local and production deployment
+# Enable CORS with strict environment separation
+is_prod = os.getenv("ENVIRONMENT") == "production"
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "https://com-webcraft-trademindai-c8f75.web.app"
+]
+if not is_prod:
+    allowed_origins.append("*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:8000",
-        "https://com-webcraft-trademindai-c8f75.web.app",
-        "*"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 # Include Canonical V1 API Router and Modular Local Routers

@@ -99,7 +99,7 @@ export default function EquitySignals() {
     setError(null);
     try {
       if (mode === 'ACTIVE') {
-        const signalsData = await getEquitySignals({ limit: 100 });
+        const signalsData = await getEquitySignals({ limit: 1000 });
         const normalized = (Array.isArray(signalsData) ? signalsData : []).map((s: any) => mapCanonicalSignal(s));
         if (normalized.length > 0) {
             setSignals(prev => {

@@ -3,10 +3,11 @@
 TradeMindAI: Safe Non-Destructive Local Database Seeder
 ================================================================================
 Checks table content before populating sample historical OHLCV data if empty.
-Ensures zero data loss for existing local tables and records.
+Fails closed if SEED_DATA_ALLOWED is false in production environments.
 """
 
 import datetime
+import os
 import numpy as np
 import logging
 from backend.app.db.database import engine, Base, SessionLocal
@@ -21,14 +22,20 @@ SEED_SYMBOLS = [
 
 def seed_local_database():
     """
-    Safely verifies and populates local database if empty.
+    Safely verifies and populates local database if empty, with strict SEED_DATA_ALLOWED guard.
     """
+    seed_allowed = os.getenv("SEED_DATA_ALLOWED", "false").lower() == "true"
+    is_production = os.getenv("ENVIRONMENT") == "production" or os.getenv("RAILWAY_ENVIRONMENT") is not None
+
+    if is_production and not seed_allowed:
+        logger.warning("[Local Seed] Refusing to seed synthetic data in production environment (SEED_DATA_ALLOWED=false).")
+        return
+
     logger.info("[Local Seed] Verifying database schema...")
     Base.metadata.create_all(bind=engine)
 
     session = SessionLocal()
     try:
-        # Check if MarketData already has content
         existing_count = session.query(MarketData).count()
         if existing_count > 0:
             logger.info(f"[Local Seed] Database already contains {existing_count} MarketData records. Skipping seed.")
@@ -40,10 +47,8 @@ def seed_local_database():
 
         for sym in SEED_SYMBOLS:
             base_p = 500.0 + (hash(sym) % 2500)
-            # Add Watchlist entry
             session.add(Watchlist(symbol=sym))
 
-            # Generate 180 daily price bars per symbol
             for day in range(180):
                 dt = now - datetime.timedelta(days=(180 - day))
                 variation = (np.sin(day / 15.0) * 12.0) + ((day % 5) - 2) * 1.5
@@ -58,11 +63,10 @@ def seed_local_database():
                     volume=round(500000 + (day * 1500), 2)
                 ))
 
-            # Add sample news article for sentiment analysis
             session.add(NewsArticle(
                 symbol=sym,
                 title=f"{sym} reports strong quarterly earnings and robust revenue growth.",
-                content=f"Quarterly financial results for {sym} exceeded institutional expectations with robust margin expansion and strong order book pipeline.",
+                content=f"Quarterly financial results for {sym} exceeded institutional expectations with robust margin expansion.",
                 published_at=now - datetime.timedelta(days=2),
                 sentiment_score=0.85
             ))

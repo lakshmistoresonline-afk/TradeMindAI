@@ -22,7 +22,7 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const results = await Promise.allSettled([
-        getEquitySignals({ limit: 100 }),
+        getEquitySignals({ limit: 1000 }),
         getEquityPerformance(),
         getEquityMarketState(),
         getMarketStats(),

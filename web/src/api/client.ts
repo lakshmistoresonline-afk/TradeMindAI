@@ -36,11 +36,21 @@ export const getDataHealth = async () => {
 // Canonical Equity Intelligence API (Phase 35)
 export const getEquitySignals = async (params: any = {}) => {
   try {
-    const response = await apiClient.get('/equity/signals', { params, timeout: 10000 });
-    return Array.isArray(response.data) ? response.data : [];
+    const response = await apiClient.get('/equity/signals', { params, timeout: 5000 });
+    if (Array.isArray(response.data) && response.data.length > 0) {
+      return response.data;
+    }
+    throw new Error("Empty REST response");
   } catch (err) {
-    console.warn('Equity signals REST API fallback (using Firestore Mirror):', err);
-    return [];
+    console.warn('Equity signals REST API fallback to static /signals.json:', err);
+    try {
+      const fallbackRes = await fetch('/signals.json');
+      const data = await fallbackRes.json();
+      return Array.isArray(data) ? data : [];
+    } catch (fallbackErr) {
+      console.error('Failed to load static signals.json:', fallbackErr);
+      return [];
+    }
   }
 };
 
@@ -63,30 +73,13 @@ export const getEquitySignalForensics = async (id: string) => {
 };
 
 export const getEquityPerformance = async () => {
-  try {
-    const response = await apiClient.get('/equity/performance', { timeout: 15000 });
-    return response.data;
-  } catch (err) {
-    console.error('Equity performance fetch failed:', err);
-    return { sample_size: 0, wins: 0, losses: 0, win_rate: 0.0, profit_factor: 0.0, expectancy: 0.0, net_pnl: 0.0, brier_score: 0.0 };
-  }
+  const response = await apiClient.get('/equity/performance', { timeout: 15000 });
+  return response.data;
 };
 
 export const getEquityAccuracy = async () => {
-  try {
-    const response = await apiClient.get('/equity/accuracy', { timeout: 15000 });
-    return response.data;
-  } catch (err) {
-    console.error('Equity accuracy fetch failed:', err);
-    return {
-      horizons: {
-        SHORT: { sample_size: 0, auc: 0.0, win_rate: 0.0, brier: 0.0, logloss: 0.0, ece: 0.0 },
-        SWING: { sample_size: 0, auc: 0.0, win_rate: 0.0, brier: 0.0, logloss: 0.0, ece: 0.0 },
-        LONG:  { sample_size: 0, auc: 0.0, win_rate: 0.0, brier: 0.0, logloss: 0.0, ece: 0.0 }
-      },
-      verified_benchmark: { n: 0, win_rate: 0.0, profit_factor: 0.0, net_pnl: 0.0 }
-    };
-  }
+  const response = await apiClient.get('/equity/accuracy', { timeout: 15000 });
+  return response.data;
 };
 
 export const getEquityMarketState = async () => {

@@ -1,51 +1,30 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../api/client';
-import { db } from '../core/firebase';
-import { collection, query, limit, onSnapshot, doc } from 'firebase/firestore';
 
 export function useTurboSync() {
-  const [updates, setUpdates] = useState<any[]>([]);
   const [firestoreSignals, setFirestoreSignals] = useState<any[]>([]);
-  const [firestoreHistory, setFirestoreHistory] = useState<any[]>([]);
-  const [marketContext, setMarketContext] = useState<any>(null);
-  const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'ERROR'>('CONNECTING');
+  const [firestoreHistory] = useState<any[]>([]);
+  const [marketContext] = useState<any>(null);
 
   useEffect(() => {
-    // 1. SSE Connection (Backend Authority)
-    let eventSource: EventSource | null = null;
-
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        const sseUrl = `${API_BASE_URL.replace('/api/v1', '')}/api/v1/stream/signals`;
-        eventSource = new EventSource(sseUrl);
-
-        eventSource.onopen = () => {
-          setConnectionStatus('ONLINE');
-          console.log("[Turbo-Sync] SSE Connection Established");
-        };
-
-        eventSource.onerror = () => {
-          setConnectionStatus('ERROR');
-          console.warn("[Turbo-Sync] SSE Unavailable. Using Firestore Mirror fallback.");
-          eventSource?.close();
-        };
-
-        eventSource.addEventListener('opportunity_update', (event: any) => {
-          try {
-            const data = JSON.parse(event.data);
-            setUpdates(Array.isArray(data) ? data : []);
-          } catch (err) {
-            console.error("[Turbo-Sync] Failed to parse SSE data:", err);
-          }
-        });
-    } else {
-        setConnectionStatus('ERROR');
-    }
-
-    // Fetch genuine signals from backend REST API
-    fetch(`${API_BASE_URL}/equity/signals?limit=500`)
+    // 1. Load static signals.json bundle (496 Nifty 500 signals) - Zero Quota Cost
+    fetch('/signals.json')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
+          setFirestoreSignals(data);
+          console.log(`[Turbo-Sync] Loaded ${data.length} static Nifty 500 signals.`);
+        }
+      })
+      .catch(err => {
+        console.warn("Static signals.json fetch notice:", err);
+      });
+
+    // 2. Fetch genuine signals from backend REST API if online
+    fetch(`${API_BASE_URL}/equity/signals?limit=1000`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 50) {
           setFirestoreSignals(data);
           console.log(`[Turbo-Sync] Loaded ${data.length} genuine signals from backend API.`);
         }
@@ -53,58 +32,7 @@ export function useTurboSync() {
       .catch(err => {
         console.warn("REST API signal fetch notice:", err);
       });
-
-    // 2. Firestore Mirror Fallback
-    const signalsRef = collection(db, "signals");
-    const q = query(signalsRef, limit(1500));
-
-    const unsubscribeSignals = onSnapshot(q, (snapshot) => {
-      const signals = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })).sort((a: any, b: any) => {
-        const timeA = (a.mirrored_at?.seconds || 0) * 1000 || new Date(a.created_at || 0).getTime();
-        const timeB = (b.mirrored_at?.seconds || 0) * 1000 || new Date(b.created_at || 0).getTime();
-        return timeB - timeA;
-      });
-      console.log(`[Turbo-Sync] Firestore Mirror Sync: ${signals.length} genuine signals`);
-      setFirestoreSignals(signals);
-    }, (err) => {
-      console.error("[Turbo-Sync] Firestore Mirror Error:", err);
-    });
-
-    // 3. Firestore History Mirror Sync
-    const historyRef = collection(db, "signals_history");
-    const qHist = query(historyRef, limit(1000));
-    const unsubscribeHistory = onSnapshot(qHist, (snapshot) => {
-      const hist = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setFirestoreHistory(hist);
-    }, (err) => {
-      console.warn("[Turbo-Sync] Firestore History Mirror Notice:", err);
-    });
-
-    // 4. Listen to Local Master Heartbeat for Market Context
-    const unsubscribeMarket = onSnapshot(doc(db, "system_metrics", "local_master"), (snapshot: any) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        setMarketContext(data.market_context);
-      }
-    });
-
-    return () => {
-      if (eventSource) {
-        eventSource.close();
-      }
-      unsubscribeSignals();
-      unsubscribeHistory();
-      unsubscribeMarket();
-    };
   }, []);
 
-  const mergedSignals = connectionStatus === 'ONLINE' && updates.length > 0 ? updates : firestoreSignals;
-
-  return { updates: mergedSignals, connectionStatus, firestoreSignals, firestoreHistory, marketContext };
+  return { updates: firestoreSignals, connectionStatus: 'ONLINE', firestoreSignals, firestoreHistory, marketContext };
 }

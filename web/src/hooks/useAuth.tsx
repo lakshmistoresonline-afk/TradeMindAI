@@ -11,13 +11,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const ADMIN_EMAILS = [
-  "admin@trademind.ai",
-  "admin@trademindai.com",
-  "lakshmistoresonline@gmail.com",
-  "user@trademindai.com" // For testing admin dashboard
-];
-
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAdmin: false,
@@ -35,18 +28,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      setIsAdmin(currentUser?.email ? ADMIN_EMAILS.includes(currentUser.email) : false);
-
-      // Simulate entitlement check
-      const premiumFlag = localStorage.getItem(`tm_premium_${currentUser?.uid}`);
-      setIsPremium(!!premiumFlag || ADMIN_EMAILS.includes(currentUser?.email || ''));
 
       if (currentUser) {
-        // Set Bearer token for all subsequent API calls
-        const token = await currentUser.getIdToken();
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        try {
+          const token = await currentUser.getIdToken();
+          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+          // Fetch server-side entitlements and roles
+          const subRes = await apiClient.get('/user/subscription');
+          setIsPremium(subRes.data?.plan_id && subRes.data.plan_id !== 'FREE');
+          setIsAdmin(!!subRes.data?.isAdmin);
+        } catch (e) {
+          console.warn("Entitlement fetch notice:", e);
+          setIsPremium(false);
+          setIsAdmin(false);
+        }
       } else {
         delete apiClient.defaults.headers.common['Authorization'];
+        setIsPremium(false);
+        setIsAdmin(false);
       }
 
       setLoading(false);
