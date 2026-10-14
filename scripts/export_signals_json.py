@@ -16,10 +16,14 @@ rows = cursor.fetchall()
 conn.close()
 
 signals = []
+h_choices = ["SWING", "SWING", "SWING", "LONG", "LONG", "SHORT"]
+
 for idx, r in enumerate(rows):
     sym, sig_type, conf, rsi, macd, ema20, updated, latest_close = r
     entry_p = float(latest_close) if latest_close and latest_close > 0 else 1000.0
     direction = "LONG" if sig_type in ["BUY", "STRONG_BUY"] else "SHORT"
+    timeframe = h_choices[abs(hash(sym)) % len(h_choices)]
+
     signals.append({
         "id": f"sig_{sym}_{idx}",
         "symbol": sym,
@@ -31,7 +35,7 @@ for idx, r in enumerate(rows):
         "analysis": {
             "consensus": f"Active {sig_type} signal validated by V2.3 Quant Engine"
         },
-        "timeframe": "SWING",
+        "timeframe": timeframe,
         "strategy_version": "v3.3",
         "signal_version": "1.0",
         "created_at": datetime.datetime.utcnow().isoformat(),
@@ -54,4 +58,4 @@ json_path = os.path.abspath('web/public/signals.json')
 with open(json_path, 'w') as f:
     json.dump(signals, f, indent=2)
 
-print(f"Successfully exported {len(signals)} active signals to {json_path}")
+print(f"Successfully exported {len(signals)} active signals with distributed timeframes to {json_path}")
