@@ -61,4 +61,4 @@ class LocalMarketDataService:
                 df = pd.read_sql_query(query_sql, conn)
             return df["symbol"].tolist()
         except Exception:
-            return ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"]
+            return []

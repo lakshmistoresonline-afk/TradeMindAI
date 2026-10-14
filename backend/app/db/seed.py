@@ -3,7 +3,7 @@
 TradeMindAI: Safe Non-Destructive Local Database Seeder
 ================================================================================
 Checks table content before populating sample historical OHLCV data if empty.
-Fails closed if SEED_DATA_ALLOWED is false in production environments.
+Refuses synthetic fixture insertion in production and staging environments unconditionally.
 """
 
 import datetime
@@ -22,13 +22,13 @@ SEED_SYMBOLS = [
 
 def seed_local_database():
     """
-    Safely verifies and populates local database if empty, with strict SEED_DATA_ALLOWED guard.
+    Safely verifies and populates local database if empty, with absolute production/staging refusal guard.
     """
-    seed_allowed = os.getenv("SEED_DATA_ALLOWED", "false").lower() == "true"
-    is_production = os.getenv("ENVIRONMENT") == "production" or os.getenv("RAILWAY_ENVIRONMENT") is not None
+    env = str(os.getenv("ENVIRONMENT") or "").lower()
+    is_production_or_staging = env in ("production", "staging") or os.getenv("RAILWAY_ENVIRONMENT") is not None
 
-    if is_production and not seed_allowed:
-        logger.warning("[Local Seed] Refusing to seed synthetic data in production environment (SEED_DATA_ALLOWED=false).")
+    if is_production_or_staging:
+        logger.error("[Local Seed] CRITICAL: Refusing synthetic fixture insertion in production or staging environment.")
         return
 
     logger.info("[Local Seed] Verifying database schema...")

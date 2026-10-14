@@ -35,23 +35,8 @@ export const getDataHealth = async () => {
 
 // Canonical Equity Intelligence API (Phase 35)
 export const getEquitySignals = async (params: any = {}) => {
-  try {
-    const response = await apiClient.get('/equity/signals', { params, timeout: 5000 });
-    if (Array.isArray(response.data) && response.data.length > 0) {
-      return response.data;
-    }
-    throw new Error("Empty REST response");
-  } catch (err) {
-    console.warn('Equity signals REST API fallback to static /signals.json:', err);
-    try {
-      const fallbackRes = await fetch('/signals.json');
-      const data = await fallbackRes.json();
-      return Array.isArray(data) ? data : [];
-    } catch (fallbackErr) {
-      console.error('Failed to load static signals.json:', fallbackErr);
-      return [];
-    }
-  }
+  const response = await apiClient.get('/equity/signals', { params, timeout: 10000 });
+  return Array.isArray(response.data) ? response.data : [];
 };
 
 export const getEquitySignalDetail = async (id: string) => {

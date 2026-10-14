@@ -25,16 +25,13 @@ app = FastAPI(
     description="100% Offline Local Quantitative Signal & TA Engine"
 )
 
-# Enable CORS with strict environment separation
-is_prod = os.getenv("ENVIRONMENT") == "production"
+# Enable CORS with explicit authorized origins (no wildcard with credentials in any environment)
 allowed_origins = [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://localhost:8000",
     "https://com-webcraft-trademindai-c8f75.web.app"
 ]
-if not is_prod:
-    allowed_origins.append("*")
 
 app.add_middleware(
     CORSMiddleware,

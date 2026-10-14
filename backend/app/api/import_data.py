@@ -3,7 +3,7 @@
 TradeMindAI: Data Import API Endpoint
 ================================================================================
 POST /api/v1/data/import: Upload custom CSV/JSON tick/candle data directly into
-local database tables with strict administrative checks, size limits, and validation.
+local database tables with strict administrative checks, chunked size limits, and validation.
 """
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
@@ -30,14 +30,28 @@ async def import_custom_data(
     """
     Imports CSV or JSON tick/OHLCV data directly into database tables with validation.
     Expected columns: symbol, timestamp, open, high, low, close, volume.
-    Protected by administrative access.
+    Protected by administrative access and chunked size enforcement.
     """
     if not file.filename or not file.filename.lower().endswith(('.csv', '.json')):
         raise HTTPException(status_code=400, detail="Only CSV and JSON file uploads are supported.")
 
-    content = await file.read()
-    if len(content) > MAX_FILE_SIZE_BYTES:
-        raise HTTPException(status_code=413, detail="File size exceeds the 10MB upload limit.")
+    # Read in bounded chunks to enforce 10MB size limit securely while streaming
+    total_size = 0
+    chunks = []
+    chunk_size = 64 * 1024  # 64 KB
+    try:
+        while True:
+            chunk = await file.read(chunk_size)
+            if not chunk:
+                break
+            total_size += len(chunk)
+            if total_size > MAX_FILE_SIZE_BYTES:
+                raise HTTPException(status_code=413, detail="File size exceeds the 10MB upload limit.")
+            chunks.append(chunk)
+    finally:
+        await file.close()
+
+    content = b"".join(chunks)
 
     try:
         if file.filename.lower().endswith('.csv'):
