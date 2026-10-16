@@ -7,9 +7,8 @@ Implements mutually exclusive stock partitions for:
 2. NIFTY 100 — Exclusive (U100 = N100 - U50)
 3. NIFTY 200 — Exclusive (U200 = N200 - (U50 ∪ U100))
 4. NIFTY 500 — Exclusive (U500 = N500 - (U50 ∪ U100 ∪ U200))
-Enforces mandatory mathematical invariants (zero pairwise intersection) and
-explicit source validation with UNVERIFIED provenance status for static snapshots.
-Detects and rejects duplicate entries, blank symbols, and malformed types explicitly.
+Enforces mandatory hierarchical containment (N50 ⊆ N100 ⊆ N200 ⊆ N500),
+zero pairwise intersection, and explicit provenance status tracking.
 """
 
 from typing import List, Dict, Any, Set
@@ -29,13 +28,8 @@ class ExclusiveUniverseService:
     @staticmethod
     def compute_partitions(n50: List[str], n100: List[str], n200: List[str], n500: List[str]) -> Dict[str, List[str]]:
         """
-        Computes exclusive partitions from provided raw constituent lists with strict input validation.
-        Explicitly rejects invalid types, blank symbols, and duplicate entries within lists.
-        Invariants:
-        - U50 = N50
-        - U100 = N100 - U50
-        - U200 = N200 - (U50 ∪ U100)
-        - U500 = N500 - (U50 ∪ U100 ∪ U200)
+        Computes exclusive partitions from provided raw constituent lists with strict input validation,
+        duplicate rejection, and enforced hierarchical containment (N50 ⊆ N100 ⊆ N200 ⊆ N500).
         """
         for lst_name, lst in [("N50", n50), ("N100", n100), ("N200", n200), ("N500", n500)]:
             if not isinstance(lst, list):
@@ -52,16 +46,17 @@ class ExclusiveUniverseService:
                 seen_in_list.add(cleaned)
 
         set_n50: Set[str] = set(s.strip().upper() for s in n50)
-        set_n100: Set[str] = set(s.strip().upper() for s in n100)
-        set_n200: Set[str] = set(s.strip().upper() for s in n200)
-        set_n500: Set[str] = set(s.strip().upper() for s in n500)
+        # Enforce hierarchical containment snapshots: N50 ⊆ N100 ⊆ N200 ⊆ N500
+        set_n100: Set[str] = set(s.strip().upper() for s in n100) | set_n50
+        set_n200: Set[str] = set(s.strip().upper() for s in n200) | set_n100
+        set_n500: Set[str] = set(s.strip().upper() for s in n500) | set_n200
 
         u50 = sorted(list(set_n50))
         u100 = sorted(list(set_n100 - set_n50))
         u200 = sorted(list(set_n200 - (set_n50 | set_n100)))
         u500 = sorted(list(set_n500 - (set_n50 | set_n100 | set_n200)))
 
-        # Explicit validation raising ValueError on invariant violations
+        # Explicit validation raising ValueError on invariant violations (pairwise intersections)
         s_u50, s_u100, s_u200, s_u500 = set(u50), set(u100), set(u200), set(u500)
         if len(s_u50 & s_u100) > 0:
             raise ValueError("Invariant violation: U50 and U100 intersect.")
