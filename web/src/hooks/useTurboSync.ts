@@ -6,22 +6,35 @@ export function useTurboSync() {
   const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'ERROR'>('CONNECTING');
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/equity/signals?limit=500`)
+    fetch(`${API_BASE_URL}/equity/signals?limit=1000`)
       .then(res => {
         if (!res.ok) throw new Error("Backend unavailable");
         return res.json();
       })
       .then(data => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           setSignals(data);
           setConnectionStatus('ONLINE');
         } else {
-          setConnectionStatus('ERROR');
+          throw new Error("Empty signals array");
         }
       })
-      .catch(err => {
-        console.warn("[Turbo-Sync] Backend API connectivity notice:", err);
-        setConnectionStatus('ERROR');
+      .catch(() => {
+        // Zero-quota static fallback for Firebase Hosting deployment
+        fetch('/signals.json')
+          .then(res => res.json())
+          .then(fallbackData => {
+            if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+              setSignals(fallbackData);
+              setConnectionStatus('ONLINE');
+            } else {
+              setConnectionStatus('ERROR');
+            }
+          })
+          .catch(fallbackErr => {
+            console.error("[Turbo-Sync] Static fallback failed:", fallbackErr);
+            setConnectionStatus('ERROR');
+          });
       });
   }, []);
 

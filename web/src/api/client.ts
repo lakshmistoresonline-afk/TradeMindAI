@@ -58,13 +58,43 @@ export const getEquitySignalForensics = async (id: string) => {
 };
 
 export const getEquityPerformance = async () => {
-  const response = await apiClient.get('/equity/performance', { timeout: 15000 });
-  return response.data;
+  try {
+    const response = await apiClient.get('/equity/performance', { timeout: 10000 });
+    if (response.data && response.data.verified_benchmark && response.data.verified_benchmark.n > 0) {
+      return response.data;
+    }
+    throw new Error("Empty performance response");
+  } catch (err) {
+    console.warn('Equity performance REST API fallback to static /performance.json:', err);
+    try {
+      const fallbackRes = await fetch('/performance.json');
+      const data = await fallbackRes.json();
+      return data || { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
+    } catch (fallbackErr) {
+      console.error('Failed to load static performance.json:', fallbackErr);
+      return { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
+    }
+  }
 };
 
 export const getEquityAccuracy = async () => {
-  const response = await apiClient.get('/equity/accuracy', { timeout: 15000 });
-  return response.data;
+  try {
+    const response = await apiClient.get('/equity/accuracy', { timeout: 10000 });
+    if (response.data && response.data.verified_benchmark && response.data.verified_benchmark.n > 0) {
+      return response.data;
+    }
+    throw new Error("Empty accuracy response");
+  } catch (err) {
+    console.warn('Equity accuracy REST API fallback to static /performance.json:', err);
+    try {
+      const fallbackRes = await fetch('/performance.json');
+      const data = await fallbackRes.json();
+      return data || { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
+    } catch (fallbackErr) {
+      console.error('Failed to load static performance.json:', fallbackErr);
+      return { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
+    }
+  }
 };
 
 export const getEquityMarketState = async () => {
@@ -78,10 +108,21 @@ export const getEquityMarketState = async () => {
 
 export const getEquityHistory = async (params: any = {}) => {
   try {
-    const response = await apiClient.get('/equity/history', { params, timeout: 20000 });
-    return response.data;
+    const response = await apiClient.get('/equity/history', { params, timeout: 10000 });
+    if (response.data && Array.isArray(response.data.records) && response.data.records.length > 0) {
+      return response.data;
+    }
+    throw new Error("Empty history response");
   } catch (err) {
-    return { records: [], total: 0, summary: { total: 0, target_hits: 0, stop_losses: 0, expired: 0 } };
+    console.warn('Equity history REST API fallback to static /signals_history.json:', err);
+    try {
+      const fallbackRes = await fetch('/signals_history.json');
+      const data = await fallbackRes.json();
+      return data || { records: [], total: 0, summary: { total: 0, target_hits: 0, stop_losses: 0, expired: 0 } };
+    } catch (fallbackErr) {
+      console.error('Failed to load static signals_history.json:', fallbackErr);
+      return { records: [], total: 0, summary: { total: 0, target_hits: 0, stop_losses: 0, expired: 0 } };
+    }
   }
 };
 

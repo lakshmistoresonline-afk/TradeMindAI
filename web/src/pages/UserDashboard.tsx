@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, alpha, Skeleton, Tabs, Tab, Button, Chip } from '@mui/material';
-import { Zap, ShieldCheck, ArrowRight, PieChart, Activity, TrendingUp, Cpu } from 'lucide-react';
+import { Zap, ShieldCheck, ArrowRight, PieChart, Activity, TrendingUp, Cpu, Database } from 'lucide-react';
 import { getMarketStats, getEquitySignals, getEquityMarketState } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
@@ -115,20 +115,31 @@ export default function UserDashboard() {
               Auditable quantitative intelligence, institutional order flow, and Strategy V3.3 Master Edition signals.
             </Typography>
           </Box>
-          <Chip
-            icon={<Activity size={14} color={isOnline ? COLORS.green : COLORS.amber} />}
-            label={isOnline ? '🟢 LOCAL SERVER CONNECTED' : '🟡 OFFLINE CLIENT MODE'}
-            size="medium"
-            sx={{
-              fontWeight: 950,
-              fontSize: '0.675rem',
-              px: 1,
-              height: 32,
-              bgcolor: isOnline ? alpha(COLORS.green, 0.12) : alpha(COLORS.amber, 0.12),
-              color: isOnline ? COLORS.green : COLORS.amber,
-              border: `1px solid ${isOnline ? alpha(COLORS.green, 0.3) : alpha(COLORS.amber, 0.3)}`
-            }}
-          />
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<Database size={16} />}
+              onClick={() => navigate('/universes')}
+              sx={{ fontWeight: 950, borderColor: COLORS.borderCyan, color: COLORS.cyan, bgcolor: alpha(COLORS.cyan, 0.05) }}
+            >
+              Stock Universes
+            </Button>
+            <Chip
+              icon={<Activity size={14} color={isOnline ? COLORS.green : COLORS.amber} />}
+              label={isOnline ? '🟢 LOCAL SERVER CONNECTED' : '🟡 OFFLINE CLIENT MODE'}
+              size="medium"
+              sx={{
+                fontWeight: 950,
+                fontSize: '0.675rem',
+                px: 1,
+                height: 32,
+                bgcolor: isOnline ? alpha(COLORS.green, 0.12) : alpha(COLORS.amber, 0.12),
+                color: isOnline ? COLORS.green : COLORS.amber,
+                border: `1px solid ${isOnline ? alpha(COLORS.green, 0.3) : alpha(COLORS.amber, 0.3)}`
+              }}
+            />
+          </Stack>
         </Box>
       </Box>
 
@@ -257,6 +268,12 @@ export default function UserDashboard() {
         <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>PRODUCT DIRECTORY</Typography>
         <Grid container spacing={3}>
            <ToolCard
+              icon={<Database size={22} color={COLORS.cyan} />}
+              title="Stock Universes"
+              desc="Explore the 4 exclusive NIFTY stock tiers (50, 100, 200, 500) with verified mutual exclusion."
+              onClick={() => navigate('/universes')}
+           />
+           <ToolCard
               icon={<ShieldCheck size={22} color={COLORS.green} />}
               title="Evidence Ledger"
               desc="Audit the bitwise forensic evidence behind our active signal generation."
@@ -306,7 +323,7 @@ function MarketMiniCard({ label, data, value, fallbackVal, icon }: any) {
 
 function ToolCard({ icon, title, desc, onClick }: any) {
     return (
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} sm={6} md={3}>
             <Paper
                 onClick={onClick}
                 sx={{
@@ -314,6 +331,7 @@ function ToolCard({ icon, title, desc, onClick }: any) {
                     p: 3,
                     cursor: 'pointer',
                     transition: 'all 0.2s ease-in-out',
+                    height: '100%',
                     '&:hover': {
                       borderColor: COLORS.cyan,
                       transform: 'translateY(-2px)',

@@ -1,14 +1,25 @@
-from typing import Annotated, TypedDict, List, Dict, Any, Optional
-from langchain_groq import ChatGroq
-from langgraph.graph import StateGraph, END
-from backend.core.config import settings
-from pydantic import BaseModel, Field
+import math
 import json
 import time
+from typing import Annotated, TypedDict, List, Dict, Any, Optional
+
+try:
+    from langchain_groq import ChatGroq
+except ImportError:
+    ChatGroq = None
+
+try:
+    from langgraph.graph import StateGraph, END
+except ImportError:
+    StateGraph = None
+    END = None
+
+from backend.core.config import settings
+from pydantic import BaseModel, Field
 
 class AgentResponse(BaseModel):
     agent_name: str
-    signal: str # BUY, SELL, HOLD
+    signal: str # BUY, SELL, HOLD, UNAVAILABLE
     confidence: float # 0-1
     reasons: List[str]
     risks: List[str]
@@ -40,7 +51,7 @@ class BaseAgent:
                 temperature=0.1
             )
             print(f"   [+] {self.name} initialized with Local LLM (Ollama: {settings.OLLAMA_MODEL})")
-        else:
+        elif ChatGroq is not None:
             self.primary_model = "llama-3.3-70b-versatile"
             self.fallback_model = "llama-3.1-8b-instant"
 
@@ -50,36 +61,34 @@ class BaseAgent:
                 temperature=0.1,
                 max_retries=3
             )
+        else:
+            self.llm = None
 
     def use_fallback(self):
-        if not settings.USE_LOCAL_LLM:
+        if not settings.USE_LOCAL_LLM and ChatGroq is not None and self.llm is not None:
             self.llm.model_name = self.fallback_model
 
     def call_llm(self, prompt: str) -> Optional[Dict[str, Any]]:
+        if self.llm is None:
+            return None
+
         retries = 0
         while retries < 2:
             try:
                 response = self.llm.invoke(prompt)
                 content = response.content
 
-                # Force extract JSON block if code or text is wrapping it
                 import re
-                # Vision 2.2: Ultra-aggressive JSON extraction
                 json_match = re.search(r'(\{.*\})', content, re.DOTALL)
                 if json_match:
                     json_str = json_match.group(1)
-
-                    # 1. Standardize quotes
                     json_str = json_str.replace("'", '"')
-
-                    # 2. Repair common LLM syntax errors
                     json_str = re.sub(r',\s*\}', '}', json_str)
                     json_str = re.sub(r',\s*\]', ']', json_str)
                     json_str = re.sub(r'(?<!\\)\n', '\\\\n', json_str)
 
                     try:
                         data = json.loads(json_str)
-                        # Sanitize numeric fields to prevent NaN leaking
                         for key in ['entry', 'target', 'stop_loss', 'conviction']:
                             if key in data:
                                 try:
@@ -173,12 +182,33 @@ class ContextAgent(BaseAgent):
 class ConsensusAgent(BaseAgent):
     def __init__(self): super().__init__("ConsensusLead")
     def analyze(self, state: AgentState):
-        # Resilient price detection
         indicators = state.get('technical_data', {}).get('indicators', {})
-        current_price = indicators.get('last_price') or indicators.get('Close') or state.get('last_price', 'Unknown')
+        current_price = indicators.get('last_price') or indicators.get('Close') or state.get('last_price', None)
         regime = state.get('regime', 'NEUTRAL')
 
-        # Use a template to avoid f-string escaping hell with complex JSON
+        entry_val = None
+        if current_price is not None and isinstance(current_price, (int, float)) and math.isfinite(current_price) and current_price > 0:
+            entry_val = float(current_price)
+
+        def make_unavailable_response(reason_msg: str) -> str:
+            return json.dumps({
+                "status": "UNAVAILABLE",
+                "rating": "UNAVAILABLE",
+                "conviction": 0,
+                "thesis": reason_msg,
+                "entry": entry_val,
+                "target": None,
+                "stop_loss": None,
+                "risk_reward": None,
+                "timeframe": "SWING",
+                "agent_debate": [],
+                "error": "LLM_PROVIDER_UNAVAILABLE"
+            })
+
+        if self.llm is None:
+            state['consensus'] = make_unavailable_response("LLM provider or dependency unavailable. No trade parameters generated.")
+            return state
+
         template = """
         Final synthesis for {symbol}. CURRENT PRICE: {current_price}
         CURRENT MARKET REGIME: {regime}
@@ -218,17 +248,17 @@ class ConsensusAgent(BaseAgent):
 
         prompt = template.format(
             symbol=state['symbol'],
-            current_price=current_price,
+            current_price=entry_val if entry_val is not None else "Unknown",
             regime=regime,
             reports=state['recommendations']
         )
+
         retries = 0
         while retries < 2:
             try:
                 response = self.llm.invoke(prompt)
                 content = response.content
 
-                # Verify it looks like JSON
                 import re
                 start = content.find('{')
                 end = content.rfind('}')
@@ -241,18 +271,8 @@ class ConsensusAgent(BaseAgent):
                 if "429" in str(e) and retries == 0:
                     self.use_fallback(); retries += 1; continue
                 else:
-                    # Provide a data-complete fallback to prevent NaN in UI
-                    fallback_price = float(current_price) if isinstance(current_price, (int, float)) else 0.0
-                    fallback = {
-                        "rating": "HOLD",
-                        "conviction": 50,
-                        "thesis": "Consensus engine currently under high load. Using price-action baseline.",
-                        "entry": fallback_price,
-                        "target": fallback_price * 1.05 if fallback_price > 0 else 0,
-                        "stop_loss": fallback_price * 0.97 if fallback_price > 0 else 0,
-                        "timeframe": "SWING",
-                        "agent_debate": []
-                    }
-                    state['consensus'] = json.dumps(fallback)
+                    state['consensus'] = make_unavailable_response(f"Consensus generation error: {str(e)[:100]}")
                     return state
+
+        state['consensus'] = make_unavailable_response("Failed to generate valid consensus output from LLM.")
         return state

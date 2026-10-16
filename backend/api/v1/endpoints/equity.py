@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from backend.core.auth import get_current_user
 from typing import List, Dict, Any, Optional
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 from backend.core.container import container
 from backend.domain.models.ios import LiveSignal
 from backend.services.signal_ledger_service import SignalLedgerService
@@ -13,94 +13,127 @@ import datetime
 import json
 import math
 
+try:
+    from sklearn.metrics import roc_auc_score
+except ImportError:
+    roc_auc_score = None
+
 router = APIRouter()
+
+def is_eligible_buy(obj: Any) -> bool:
+    """
+    Canonical BUY eligibility predicate.
+    Validates direction, rating, and signal_rating independently.
+    Rejects missing, unknown, conflicting, SELL, or SHORT values.
+    """
+    if not obj:
+        return False
+
+    direction = getattr(obj, "direction", None) or (obj.get("direction") if isinstance(obj, dict) else None)
+    rating = getattr(obj, "rating", None) or (obj.get("rating") if isinstance(obj, dict) else None)
+    signal_rating = getattr(obj, "signal_rating", None) or (obj.get("signal_rating") if isinstance(obj, dict) else None)
+
+    if not direction:
+        return False
+
+    dir_upper = str(direction).upper()
+    if dir_upper != "LONG":
+        return False
+
+    ratings_to_check = []
+    if rating is not None:
+        ratings_to_check.append(str(rating).upper())
+    if signal_rating is not None:
+        ratings_to_check.append(str(signal_rating).upper())
+
+    if not ratings_to_check:
+        return False
+
+    for r in ratings_to_check:
+        if "SELL" in r or "SHORT" in r or r not in ("BUY", "STRONG_BUY"):
+            return False
+
+    return True
+
+def calculate_auc_with_ties(y_true: List[float], y_prob: List[float]) -> Optional[float]:
+    """
+    Calculates Wilcoxon-Mann-Whitney AUC with proper average rank correction for ties.
+    Requirements:
+    1. Reject mismatched array lengths and insufficient sample sizes (< 2).
+    2. Reject invalid labels, non-numeric probabilities, NaN, infinity, and probabilities outside [0, 1].
+    3. Return None when valid observations do not contain both outcome classes.
+    4. Return 0.5 for tied scores when both classes are present.
+    5. Preserve correct average-rank tie handling in manual fallback.
+    """
+    if not y_true or not y_prob or len(y_true) != len(y_prob) or len(y_true) < 2:
+        return None
+
+    for y, p in zip(y_true, y_prob):
+        if y not in (0.0, 1.0):
+            return None
+        if p is None or not isinstance(p, (int, float)) or not math.isfinite(p) or not (0.0 <= p <= 1.0):
+            return None
+
+    n1 = sum(1 for y in y_true if y == 1.0)
+    n0 = sum(1 for y in y_true if y == 0.0)
+    if n1 == 0 or n0 == 0:
+        return None
+
+    if len(set(y_prob)) <= 1:
+        return 0.5
+
+    if roc_auc_score is not None:
+        try:
+            return round(float(roc_auc_score(y_true, y_prob)), 3)
+        except Exception:
+            pass
+
+    indexed = sorted(enumerate(zip(y_prob, y_true)), key=lambda x: x[1][0])
+    ranks = [0.0] * len(y_true)
+    i = 0
+    while i < len(indexed):
+        j = i
+        while j < len(indexed) and indexed[j][1][0] == indexed[i][1][0]:
+            j += 1
+        avg_rank = (i + 1 + j) / 2.0
+        for k in range(i, j):
+            ranks[indexed[k][0]] = avg_rank
+        i = j
+
+    sum_ranks_pos = sum(ranks[idx] for idx, (_, y) in enumerate(zip(y_prob, y_true)) if y == 1.0)
+    u = sum_ranks_pos - (n1 * (n1 + 1)) / 2.0
+    return round(u / (n1 * n0), 3)
 
 @router.get("/signals", response_model=List[LiveSignal])
 async def get_equity_signals(
     status: Optional[str] = None,
     symbol: Optional[str] = None,
-    limit: int = 500
+    limit: int = Query(500, le=1000)
 ):
     """
-    Returns complete authoritative BUY-only signal records from PostgreSQL or SQLite cache.
+    Returns complete authoritative BUY-only signal records from PostgreSQL ledger.
     """
-    db_signals = []
     try:
         from backend.core.postgres import SessionLocal, LiveSignalDB
         with SessionLocal() as session:
-            query = session.query(LiveSignalDB).filter(LiveSignalDB.direction == "LONG")
+            db_signals = session.query(LiveSignalDB).order_by(LiveSignalDB.timestamp.desc()).all()
+            eligible = [s for s in db_signals if is_eligible_buy(s)]
+
             if status:
-                query = query.filter(LiveSignalDB.status == status)
+                eligible = [s for s in eligible if s.status == status]
             if symbol:
-                query = query.filter(LiveSignalDB.symbol == symbol)
-            db_signals = query.order_by(LiveSignalDB.timestamp.desc()).limit(limit).all()
-            if db_signals:
-                return [container.ios_repo._map_db_to_live_signal(s) for s in db_signals]
+                eligible = [s for s in eligible if s.symbol.upper() == symbol.upper()]
+
+            return [container.ios_repo._map_db_to_live_signal(s) for s in eligible[:limit]]
     except Exception as e:
         print(f"Postgres signal fetch error: {e}")
-
-    # Fallback to local SQLite trade_mind.db app_signal_cache joined with latest market data
-    try:
-        import sqlite3
-        import os
-        import datetime
-        db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "trade_mind.db"))
-        if os.path.exists(db_path):
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT c.symbol, c.signal_type, c.confidence, c.rsi_14, c.macd_val, c.ema_20, c.last_updated,
-                       (SELECT m.close FROM app_market_data m WHERE m.symbol = c.symbol ORDER BY m.timestamp DESC LIMIT 1) as latest_close
-                FROM app_signal_cache c
-                LIMIT ?
-            """, (limit,))
-            rows = cursor.fetchall()
-            conn.close()
-
-            h_choices = ["SWING", "SWING", "SWING", "LONG", "LONG", "SHORT"]
-            fallback_signals = []
-            for idx, r in enumerate(rows):
-                sym, sig_type, conf, rsi, macd, ema20, updated, latest_close = r
-                entry_p = float(latest_close) if latest_close and latest_close > 0 else 1000.0
-                timeframe = h_choices[abs(hash(sym)) % len(h_choices)]
-                fallback_signals.append(LiveSignal(
-                    id=f"sig_{sym}_{idx}",
-                    symbol=sym,
-                    company_name=f"{sym} Corporation Limited",
-                    exchange="NSE",
-                    direction="LONG",
-                    rating=sig_type,
-                    status="ACTIVE",
-                    analysis={"consensus": f"Active {sig_type} signal validated by V2.3 Quant Engine"},
-                    timeframe=timeframe,
-                    strategy_version="v3.3",
-                    signal_version="1.0",
-                    created_at=datetime.datetime.utcnow(),
-                    timestamp=datetime.datetime.utcnow(),
-                    entry_price=round(entry_p, 2),
-                    target_price_1=round(entry_p * 1.05, 2),
-                    target_price_2=round(entry_p * 1.08, 2),
-                    target_price_3=round(entry_p * 1.13, 2),
-                    stop_price=round(entry_p * 0.95, 2),
-                    current_price=round(entry_p * 1.005, 2),
-                    confidence=float(conf),
-                    opportunity_score=float(conf),
-                    raw_probability=float(conf) / 100.0,
-                    calibrated_probability=float(conf) / 100.0,
-                    risk_reward_ratio=2.65
-                ))
-            if fallback_signals:
-                return fallback_signals
-    except Exception as sqlite_err:
-        print(f"SQLite fallback error: {sqlite_err}")
-
-    return []
+        raise HTTPException(status_code=503, detail="Authoritative signal ledger temporarily unavailable.")
 
 @router.get("/signals/{signal_id}", response_model=LiveSignal)
 async def get_signal_detail(signal_id: str):
     signal = await SignalLedgerService.get_signal(signal_id)
-    if not signal:
-        raise HTTPException(status_code=404, detail="Signal not found")
+    if not signal or not is_eligible_buy(signal):
+        raise HTTPException(status_code=404, detail="Signal not found or not eligible")
     return signal
 
 @router.get("/signals/{signal_id}/explanation")
@@ -108,8 +141,12 @@ def get_signal_explanation(signal_id: str):
     """
     Explainability (Why this signal?).
     """
-    from backend.core.postgres import SessionLocal, IntelligenceSynthesisDB
+    from backend.core.postgres import SessionLocal, IntelligenceSynthesisDB, ShadowSignalDB
     with SessionLocal() as session:
+        sig = session.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()
+        if not sig or not is_eligible_buy(sig):
+            raise HTTPException(status_code=404, detail="Signal not found or not eligible")
+
         res = session.query(IntelligenceSynthesisDB).filter(IntelligenceSynthesisDB.id == signal_id).first()
         if res:
             data = {c.name: getattr(res, c.name) for c in res.__table__.columns}
@@ -123,119 +160,185 @@ def get_signal_explanation(signal_id: str):
 async def get_equity_accuracy():
     """
     GET /api/v1/equity/accuracy
-    Returns authoritative accuracy forensics calculated dynamically from real Nifty 500 price history in trade_mind.db.
-    """
-    horizons_report = {}
-    try:
-        import sqlite3
-        import os
-        db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "trade_mind.db"))
-        if os.path.exists(db_path):
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT symbol, close FROM app_market_data ORDER BY timestamp ASC")
-            rows = cursor.fetchall()
-            conn.close()
-
-            from collections import defaultdict
-            sym_prices = defaultdict(list)
-            for sym, close in rows:
-                sym_prices[sym].append(close)
-
-            for h_name, period in [("SHORT", 5), ("SWING", 30), ("LONG", 90)]:
-                rets = []
-                brier_sum = 0.0
-                for sym, prices in sym_prices.items():
-                    if len(prices) > period:
-                        for i in range(period, len(prices), period):
-                            ret = (prices[i] - prices[i-period]) / prices[i-period] * 100.0
-                            rets.append(ret)
-                            outcome = 1.0 if ret > 0 else 0.0
-                            prob = 0.72 # empirical model probability
-                            brier_sum += (prob - outcome) ** 2
-
-                wins = sum(1 for r in rets if r > 0)
-                total = len(rets) if rets else 1
-                win_rate = round(wins / total * 100, 2)
-                brier_score = round(brier_sum / total, 4) if total > 0 else 0.14
-                auc_val = round(0.5 + (win_rate / 200.0), 2)
-                ece_val = round(abs(0.72 - (wins / total)), 4) if total > 0 else 0.02
-                log_loss = round(- (0.72 * math.log(max(0.01, win_rate/100)) + (0.28 * math.log(max(0.01, 1 - win_rate/100)))), 3)
-
-                horizons_report[h_name] = {
-                    "sample_size": total,
-                    "auc": auc_val,
-                    "win_rate": win_rate,
-                    "brier": brier_score,
-                    "logloss": log_loss,
-                    "ece": ece_val
-                }
-@router.get("/accuracy")
-async def get_equity_accuracy():
-    """
-    Returns accuracy forensics calculated strictly from persisted predictions and resolved outcomes.
+    Returns rigorous accuracy forensics calculated strictly from genuine persisted predictions and resolved outcomes.
+    Enforces strict status rules: INSUFFICIENT_EVIDENCE, PARTIALLY_VERIFIED, VERIFIED based on coverage & AUC.
     """
     horizons_report = {}
     try:
         from backend.core.postgres import SessionLocal, ShadowSignalDB
         with SessionLocal() as session:
             for h_name in ["SHORT", "SWING", "LONG"]:
-                resolved = session.query(ShadowSignalDB).filter(
+                all_records = session.query(ShadowSignalDB).filter(
                     ShadowSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"]),
-                    or_(ShadowSignalDB.signal_type == h_name, ShadowSignalDB.timeframe == h_name)
+                    ShadowSignalDB.signal_type == h_name
                 ).all()
 
-                total = len(resolved)
-                if total == 0:
-                    horizons_report[h_name] = {"sample_size": 0, "auc": 0.0, "win_rate": 0.0, "brier": 0.0, "logloss": 0.0, "ece": 0.0}
+                eligible_records = [r for r in all_records if is_eligible_buy(r)]
+                total_resolved_outcomes = len(eligible_records)
+
+                directional_outcomes = [s for s in eligible_records if s.status in ["TARGET_HIT", "STOP_LOSS"]]
+                eligible_count = len(directional_outcomes)
+
+                if eligible_count == 0:
+                    horizons_report[h_name] = {
+                        "sample_size": total_resolved_outcomes,
+                        "total_resolved_outcomes": total_resolved_outcomes,
+                        "eligible_directional_outcomes": 0,
+                        "valid_prediction_pairs": 0,
+                        "prediction_coverage": 0.0,
+                        "auc": None,
+                        "win_rate": None,
+                        "brier": None,
+                        "logloss": None,
+                        "ece": None,
+                        "status": "INSUFFICIENT_EVIDENCE",
+                        "reason": "No eligible directional resolved outcomes (TARGET_HIT / STOP_LOSS) found for this horizon."
+                    }
                     continue
 
-                wins = sum(1 for s in resolved if s.status == "TARGET_HIT")
-                win_rate = round(wins / total * 100.0, 2)
+                wins = sum(1 for s in directional_outcomes if s.status == "TARGET_HIT")
+                win_rate = round(wins / eligible_count * 100.0, 2)
+
+                brier_total = 0.0
+                logloss_total = 0.0
+                valid_pairs_count = 0
+                bins = [[] for _ in range(10)]
+                y_true = []
+                y_prob = []
+                EPS = 1e-15
+
+                for s in directional_outcomes:
+                    prob = s.calibrated_probability if s.calibrated_probability is not None else s.raw_probability
+                    if prob is not None and isinstance(prob, (int, float)) and math.isfinite(prob) and 0.0 <= prob <= 1.0:
+                        actual = 1.0 if s.status == "TARGET_HIT" else 0.0
+                        brier_total += (prob - actual) ** 2
+
+                        p_clamped = max(EPS, min(1.0 - EPS, prob))
+                        logloss_total += - (actual * math.log(p_clamped) + (1.0 - actual) * math.log(1.0 - p_clamped))
+
+                        bin_idx = min(9, int(prob * 10))
+                        bins[bin_idx].append((prob, actual))
+                        y_true.append(actual)
+                        y_prob.append(prob)
+                        valid_pairs_count += 1
+
+                prediction_coverage = round(valid_pairs_count / eligible_count, 4) if eligible_count > 0 else 0.0
+
+                if valid_pairs_count == 0:
+                    horizons_report[h_name] = {
+                        "sample_size": total_resolved_outcomes,
+                        "total_resolved_outcomes": total_resolved_outcomes,
+                        "eligible_directional_outcomes": eligible_count,
+                        "valid_prediction_pairs": 0,
+                        "prediction_coverage": prediction_coverage,
+                        "auc": None,
+                        "win_rate": win_rate,
+                        "brier": None,
+                        "logloss": None,
+                        "ece": None,
+                        "status": "INSUFFICIENT_EVIDENCE",
+                        "reason": "Resolved outcomes present but missing valid finite prediction probabilities in [0, 1]."
+                    }
+                    continue
+
+                brier_score = round(brier_total / valid_pairs_count, 4)
+                logloss = round(logloss_total / valid_pairs_count, 4)
+
+                ece_total = 0.0
+                for b in bins:
+                    if len(b) > 0:
+                        b_acc = sum(act for _, act in b) / len(b)
+                        b_conf = sum(pr for pr, _ in b) / len(b)
+                        ece_total += (len(b) / valid_pairs_count) * abs(b_acc - b_conf)
+                ece = round(ece_total, 4)
+
+                auc = calculate_auc_with_ties(y_true, y_prob)
+
+                # Strict status assignment rules:
+                # - INSUFFICIENT_EVIDENCE: if eligible_count == 0 or valid_pairs_count == 0
+                # - PARTIALLY_VERIFIED: if auc is None or prediction_coverage < 1.0
+                # - VERIFIED: only when auc is not None and prediction_coverage == 1.0
+                if auc is None or prediction_coverage < 1.0:
+                    horizon_status = "PARTIALLY_VERIFIED"
+                    reason = "AUC uncomputable or prediction coverage incomplete (< 100%)." if auc is None else "Prediction coverage incomplete (< 100%)."
+                else:
+                    horizon_status = "VERIFIED"
+                    reason = None
+
                 horizons_report[h_name] = {
-                    "sample_size": total,
-                    "auc": 0.75,
+                    "sample_size": total_resolved_outcomes,
+                    "total_resolved_outcomes": total_resolved_outcomes,
+                    "eligible_directional_outcomes": eligible_count,
+                    "valid_prediction_pairs": valid_pairs_count,
+                    "prediction_coverage": prediction_coverage,
+                    "auc": auc,
                     "win_rate": win_rate,
-                    "brier": 0.14,
-                    "logloss": 0.41,
-                    "ece": 0.02
+                    "brier": brier_score,
+                    "logloss": logloss,
+                    "ece": ece,
+                    "status": horizon_status,
+                    "reason": reason
                 }
     except Exception as e:
         print(f"Accuracy report error: {e}")
-
-    if not horizons_report:
-        for h in ["SHORT", "SWING", "LONG"]:
-            horizons_report[h] = {"sample_size": 0, "auc": 0.0, "win_rate": 0.0, "brier": 0.0, "logloss": 0.0, "ece": 0.0}
+        raise HTTPException(status_code=503, detail="Authoritative accuracy ledger temporarily unavailable.")
 
     perf = await get_equity_performance()
+
+    has_fully_verified_horizon = any(h.get("status") == "VERIFIED" for h in horizons_report.values())
+    has_partially_verified = any(h.get("status") == "PARTIALLY_VERIFIED" for h in horizons_report.values())
+
+    if has_fully_verified_horizon and perf.get("status") == "VERIFIED":
+        benchmark_status = "VERIFIED"
+    elif has_fully_verified_horizon or has_partially_verified or perf.get("status") == "VERIFIED":
+        benchmark_status = "PARTIALLY_VERIFIED"
+    else:
+        benchmark_status = "INSUFFICIENT_EVIDENCE"
 
     return {
         "horizons": horizons_report,
         "verified_benchmark": {
             "n": perf.get("sample_size", 0),
-            "win_rate": perf.get("win_rate", 0.0),
-            "profit_factor": perf.get("profit_factor", 0.0),
-            "net_pnl": perf.get("net_pnl", 0.0)
+            "win_rate": perf.get("win_rate"),
+            "profit_factor": perf.get("profit_factor"),
+            "net_pnl": perf.get("net_pnl"),
+            "status": benchmark_status
         }
     }
 
 @router.get("/performance")
 async def get_equity_performance():
     """
-    Returns performance metrics calculated strictly from canonical persisted resolved signal ledger outcomes.
+    Returns performance metrics calculated strictly from canonical persisted resolved BUY signal ledger outcomes.
     """
     try:
         from backend.core.postgres import SessionLocal, ShadowSignalDB
         with SessionLocal() as session:
-            resolved = session.query(ShadowSignalDB).filter(ShadowSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"])).all()
+            all_resolved = session.query(ShadowSignalDB).filter(
+                ShadowSignalDB.status.in_(["TARGET_HIT", "STOP_LOSS", "EXPIRED"])
+            ).all()
+
+            resolved = [r for r in all_resolved if is_eligible_buy(r)]
             if not resolved:
-                return {"sample_size": 0, "wins": 0, "losses": 0, "win_rate": 0.0, "profit_factor": 0.0, "expectancy": 0.0, "net_pnl": 0.0, "brier_score": 0.0}
+                return {
+                    "sample_size": 0,
+                    "wins": 0,
+                    "losses": 0,
+                    "win_rate": None,
+                    "profit_factor": None,
+                    "expectancy": None,
+                    "net_pnl": None,
+                    "brier_score": None,
+                    "status": "INSUFFICIENT_EVIDENCE",
+                    "reason": "Ledger is reachable but contains no eligible resolved BUY records."
+                }
 
             signals_data = [{c.name: getattr(s, c.name) for c in s.__table__.columns} for s in resolved]
-            return ResearchMetricsService.calculate_performance_metrics(signals_data)
+            metrics = ResearchMetricsService.calculate_performance_metrics(signals_data)
+            return metrics
     except Exception as e:
         print(f"Performance calculation error: {e}")
-        return {"sample_size": 0, "wins": 0, "losses": 0, "win_rate": 0.0, "profit_factor": 0.0, "expectancy": 0.0, "net_pnl": 0.0, "brier_score": 0.0}
+        raise HTTPException(status_code=503, detail="Authoritative performance ledger temporarily unavailable.")
 
 @router.get("/market")
 @cache(expire=300)
@@ -265,69 +368,64 @@ async def get_equity_history(
     horizon: Optional[str] = None,
     quality: Optional[str] = None,
     status: Optional[str] = None,
-    direction: Optional[str] = None,
-    page: int = 1,
-    limit: int = 500,
+    page: int = Query(1, ge=1),
+    limit: int = Query(500, ge=1, le=1000),
     user: dict = Depends(get_current_user)
 ):
     """
-    Returns 1-Year historical signal records from the shadow_signals ledger.
+    Returns 1-Year historical signal records from the shadow_signals ledger (strictly BUY-only).
+    Preserves source direction without unconditional overwrites.
     """
     from backend.core.postgres import SessionLocal, ShadowSignalDB
     with SessionLocal() as session:
-        query = session.query(ShadowSignalDB)
+        all_records = session.query(ShadowSignalDB).filter(
+            ShadowSignalDB.status != "ACTIVE"
+        ).all()
 
-        if symbol and symbol != "ALL":
-            query = query.filter(or_(ShadowSignalDB.symbol.ilike(f"%{symbol}%"), ShadowSignalDB.id.ilike(f"%{symbol}%")))
-        if horizon and horizon != "ALL":
-            query = query.filter(ShadowSignalDB.signal_type == horizon)
-        if quality and quality != "ALL":
-            query = query.filter(ShadowSignalDB.quality_class == quality)
-        if direction and direction != "ALL":
-            if direction == "LONG":
-                query = query.filter(or_(ShadowSignalDB.direction == "LONG", ShadowSignalDB.signal_rating == "BUY"))
-            else:
-                query = query.filter(or_(ShadowSignalDB.direction == "SHORT", ShadowSignalDB.signal_rating == "SELL"))
-        if status and status != "ALL":
-            query = query.filter(ShadowSignalDB.status == status)
-        else:
-            query = query.filter(ShadowSignalDB.status != "ACTIVE")
+        eligible_records = [r for r in all_records if is_eligible_buy(r)]
 
-        # User Requirement: Database retains full 10Y history, UI showcases ONLY Last 1 Year (\le 365 days)
         one_year_ago = datetime.datetime.utcnow() - datetime.timedelta(days=365)
-        query = query.filter(ShadowSignalDB.created_at >= one_year_ago)
-        base_query = session.query(ShadowSignalDB).filter(
-            ShadowSignalDB.status != "ACTIVE",
-            ShadowSignalDB.created_at >= one_year_ago
-        )
+        one_year_records = [r for r in eligible_records if r.created_at and r.created_at >= one_year_ago]
 
-        total = query.count()
+        target_hits_1y = sum(1 for r in one_year_records if r.status == "TARGET_HIT")
+        stop_losses_1y = sum(1 for r in one_year_records if r.status == "STOP_LOSS")
+        expired_1y = sum(1 for r in one_year_records if r.status == "EXPIRED")
+        total_1y = len(one_year_records)
 
-        # Summary for filtered set
-        target_hits = base_query.filter(ShadowSignalDB.status == "TARGET_HIT").count()
-        stop_losses = base_query.filter(ShadowSignalDB.status == "STOP_LOSS").count()
-        expired = base_query.filter(ShadowSignalDB.status == "EXPIRED").count()
-        total_1y = base_query.count()
+        filtered = one_year_records
+        if symbol and symbol != "ALL":
+            sym_upper = symbol.upper()
+            filtered = [r for r in filtered if r.symbol and (sym_upper in r.symbol.upper() or sym_upper in r.id.upper())]
+        if horizon and horizon != "ALL":
+            filtered = [r for r in filtered if (r.signal_type == horizon or r.timeframe == horizon)]
+        if quality and quality != "ALL":
+            filtered = [r for r in filtered if r.quality_class == quality]
+        if status and status != "ALL":
+            filtered = [r for r in filtered if r.status == status]
 
-        db_signals = query.order_by(ShadowSignalDB.created_at.desc()).offset((page-1)*limit).limit(limit).all()
+        filtered_total = len(filtered)
+
+        offset = (page - 1) * limit
+        paged_records = filtered[offset:offset + limit]
 
         results = []
-        for s in db_signals:
+        for s in paged_records:
             data = {c.name: getattr(s, c.name) for c in s.__table__.columns}
             for k, v in data.items():
                 if isinstance(v, datetime.datetime): data[k] = v.isoformat()
             data["timeframe"] = data.get("signal_type") or data.get("timeframe") or "SWING"
-            data["direction"] = data.get("signal_rating") or data.get("direction")
+            # Preserve stored direction unchanged
+            data["direction"] = s.direction
             results.append(data)
 
         return {
             "records": results,
-            "total": total_1y,
+            "total": filtered_total,
             "summary": {
                 "total": total_1y,
-                "target_hits": target_hits,
-                "stop_losses": stop_losses,
-                "expired": expired
+                "target_hits": target_hits_1y,
+                "stop_losses": stop_losses_1y,
+                "expired": expired_1y
             }
         }
 
@@ -338,8 +436,8 @@ async def get_signal_forensics(signal_id: str):
     Reconstructs complete timeline and evidence for a specific signal.
     """
     signal = await SignalLedgerService.get_signal(signal_id)
-    if not signal:
-        raise HTTPException(status_code=404, detail="Signal not found")
+    if not signal or not is_eligible_buy(signal):
+        raise HTTPException(status_code=404, detail="Signal not found or not eligible")
 
     provenance = await container.ios_repo.get_signal_provenance(signal_id)
     explanation = get_signal_explanation(signal_id)
@@ -381,5 +479,3 @@ async def get_equity_features(symbol: str, limit: int = 30):
                 data["calculated_at"] = data["calculated_at"].isoformat()
             results.append(data)
         return results
-
-

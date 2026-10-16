@@ -49,18 +49,32 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
 
   const { createdAt, triggeredAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
 
-  const isClosed = decision.status === 'TARGET_HIT' || decision.status === 'STOP_LOSS' || decision.status === 'EXPIRED' || stock.outcome === 'TARGET_HIT' || stock.outcome === 'STOP_LOSS' || stock.outcome === 'EXPIRED';
-  const exitPrice = decision.exitPrice || stock.exit_price || (stock.outcome === 'TARGET_HIT' || decision.status === 'TARGET_HIT' ? target2 : (stock.outcome === 'STOP_LOSS' || decision.status === 'STOP_LOSS' ? stop : current));
+  const status = decision.status || stock.outcome || stock.status || 'ACTIVE';
+  const isClosed = status === 'TARGET_HIT' || status === 'STOP_LOSS' || status === 'EXPIRED';
+
+  // Strict mathematical exit price calculation (STOP_LOSS exits at stop level unless gap open)
+  let exitPrice = decision.exitPrice || stock.exit_price;
+  if (!exitPrice) {
+    if (status === 'TARGET_HIT') {
+      exitPrice = target2 || target1 || entry * 1.08;
+    } else if (status === 'STOP_LOSS') {
+      exitPrice = stop || entry * 0.95;
+    } else {
+      exitPrice = current;
+    }
+  }
+
   const displayPrice = isClosed ? exitPrice : current;
   const priceTileLabel = isClosed ? "EXIT PRICE" : "CURRENT";
 
-  const retPctVal = decision.realizedReturn !== undefined ? decision.realizedReturn : stock.realized_return !== undefined ? stock.realized_return : 8.00;
-  const retPctStr = `${retPctVal > 0 ? '+' : ''}${typeof retPctVal === 'number' ? retPctVal.toFixed(2) : retPctVal}%`;
+  // Exact mathematically derived realized return percentage
+  const realizedPct = isClosed && entry > 0 ? ((exitPrice - entry) / entry) * 100 : 0;
+  const retPctStr = `${realizedPct >= 0 ? '+' : ''}${realizedPct.toFixed(2)}%`;
 
   let targetHitLabel = `🟢 T2 TARGET HIT (MAIN BASE) — CLOSED (${retPctStr})`;
-  if (retPctVal >= 12.0) {
+  if (realizedPct >= 12.0) {
     targetHitLabel = `🟢 T3 TARGET HIT (EXTENDED RUNNER) — CLOSED (${retPctStr})`;
-  } else if (retPctVal <= 6.0) {
+  } else if (realizedPct <= 6.0) {
     targetHitLabel = `🟢 T1 TARGET HIT (CONSERVATIVE) — CLOSED (${retPctStr})`;
   }
 
@@ -148,7 +162,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         </Box>
       </Box>
 
-      {/* 2. Metric Price Grid Zone (3-Target Profit Geometry & Hardened Stop Loss) */}
+      {/* 2. Metric Price Grid Zone */}
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
         <Grid container spacing={1.5}>
           <PriceTile label="ENTRY" value={entry} xs={6} />
@@ -156,50 +170,50 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
           <PriceTile label="T1 (CONSERVATIVE)" value={target1} color="#10b981" xs={4} />
           <PriceTile label="T2 (MAIN BASE)" value={target2} color="#00D1FF" xs={4} />
           <PriceTile label="T3 (RUNNER)" value={target3} color="#a855f7" xs={4} />
-          <PriceTile label={isT1Reached ? "INVALIDATION (BREAKEVEN LOCKED)" : "INVALIDATION LEVEL"} value={stop} color={isT1Reached ? "#10b981" : "#f43f5e"} xs={12} />
+          <PriceTile label={isT1Reached ? "STOP LOSS (BREAKEVEN LOCKED)" : "STOP LOSS"} value={stop} color={isT1Reached ? "#10b981" : "#f43f5e"} xs={12} />
         </Grid>
 
         {/* Execution Guidance Banner */}
         <Box sx={{ mt: 2 }}>
-          {(decision.status === 'TARGET_HIT' || stock.outcome === 'TARGET_HIT') ? (
+          {status === 'TARGET_HIT' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 {targetHitLabel}
               </Typography>
             </Box>
-          ) : (decision.status === 'STOP_LOSS' || stock.outcome === 'STOP_LOSS') ? (
+          ) : status === 'STOP_LOSS' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#ef4444', 0.15), borderRadius: 1, border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-              <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
-                🔴 INVALIDATION LEVEL HIT — CLOSED ({retPctStr})
+              <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                🔴 STOP LOSS HIT — CLOSED ({retPctStr})
               </Typography>
             </Box>
-          ) : (decision.status === 'EXPIRED' || stock.outcome === 'EXPIRED') ? (
+          ) : status === 'EXPIRED' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#f59e0b', 0.15), borderRadius: 1, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-              <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 🟡 SIGNAL EXPIRED — CLOSED WITHOUT FILL
               </Typography>
             </Box>
           ) : isT1Reached ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.15), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
-                🟢 T1 TOUCHED — BREAKEVEN INVALIDATION LOCKED
+              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+                🟢 T1 TOUCHED — BREAKEVEN STOP LOSS LOCKED
               </Typography>
             </Box>
-          ) : decision.status === 'ENTRY_TRIGGERED' ? (
+          ) : status === 'ENTRY_TRIGGERED' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#10b981', 0.1), borderRadius: 1, border: '1px solid rgba(16, 185, 129, 0.25)' }}>
-              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 🟢 ENTRY TRIGGERED — BREAKOUT CONFIRMED
               </Typography>
             </Box>
-          ) : decision.status === 'WAITING_FOR_ENTRY' ? (
+          ) : status === 'WAITING_FOR_ENTRY' ? (
             <Box sx={{ p: 1.2, bgcolor: alpha('#f59e0b', 0.1), borderRadius: 1, border: '1px solid rgba(245, 158, 11, 0.25)' }}>
-              <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ color: '#f59e0b', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 🟡 WAITING FOR BREAKOUT TRIGGER
               </Typography>
             </Box>
           ) : (
             <Box sx={{ p: 1.2, bgcolor: alpha('#06b6d4', 0.1), borderRadius: 1, border: '1px solid rgba(6, 182, 212, 0.25)' }}>
-              <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 950, display: 'flex', alignItems: 'center', gap: 0.8, fontSize: '0.65rem' }}>
+              <Typography variant="caption" sx={{ color: '#06b6d4', fontWeight: 950, display: 'flex', items: 'center', gap: 0.8, fontSize: '0.65rem' }}>
                 🔵 TRADE IN PROGRESS — ACTIVE
               </Typography>
             </Box>
@@ -226,7 +240,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
               Created: <span style={{ color: '#f8fafc', fontWeight: 800 }}>{formatNSEDateTime(createdAt)}</span>
             </Typography>
           </Box>
-          {triggeredAt && decision.status !== 'WAITING_FOR_ENTRY' && decision.status !== 'GENERATED' && (
+          {triggeredAt && status !== 'WAITING_FOR_ENTRY' && status !== 'GENERATED' && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
               <Zap size={12} color="#f59e0b" />
               <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 700, fontSize: '0.625rem', fontFamily: 'JetBrains Mono, monospace' }}>

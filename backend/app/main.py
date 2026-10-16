@@ -51,6 +51,46 @@ app.include_router(import_data.router)
 
 from backend.core.postgres import Base as PostgresBase, engine as postgres_engine
 
+def ensure_sqlite_columns(eng=None):
+    """
+    Idempotent and independent SQLite column migration for live_signals and shadow_signals.
+    Inspects each required target price column independently and adds missing ones.
+    Fails safely on error instead of silently swallowing.
+    """
+    target_engine = eng if eng is not None else postgres_engine
+    engine_url_str = str(target_engine.url).lower()
+    if "sqlite" not in engine_url_str:
+        logger.info("[Migration] Non-SQLite engine detected (%s). Skipping SQLite migration.", engine_url_str)
+        return
+
+    try:
+        with target_engine.connect() as conn:
+            from sqlalchemy import text
+            for table_name in ["live_signals", "shadow_signals"]:
+                tables = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name=:t"), {"t": table_name}).fetchall()
+                if not tables:
+                    logger.info("[Migration] %s table does not exist yet. Skipping column checks.", table_name)
+                    continue
+
+                res = conn.execute(text(f"PRAGMA table_info({table_name})")).fetchall()
+                existing_cols = [row[1] for row in res]
+                logger.info("[Migration] Existing columns in %s: %s", table_name, existing_cols)
+
+                required_cols = ["target_price_1", "target_price_2", "target_price_3"]
+                missing_cols = [col for col in required_cols if col not in existing_cols]
+
+                if missing_cols:
+                    logger.info("[Migration] Missing columns detected in %s: %s. Adding...", table_name, missing_cols)
+                    for col in missing_cols:
+                        conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {col} FLOAT"))
+                    conn.commit()
+                    logger.info("[Migration] Successfully added missing columns to %s.", table_name)
+                else:
+                    logger.info("[Migration] All target price columns already exist in %s.", table_name)
+    except Exception as e:
+        logger.exception("[Migration] CRITICAL: Failed to ensure SQLite columns for live_signals/shadow_signals: %s", e)
+        raise RuntimeError(f"Database migration failed: {e}") from e
+
 @app.on_event("startup")
 def on_startup():
     """
@@ -59,6 +99,15 @@ def on_startup():
     logger.info("[Startup] Verifying non-destructive database tables...")
     Base.metadata.create_all(bind=engine)
     PostgresBase.metadata.create_all(bind=postgres_engine)
+    ensure_sqlite_columns()
+
+    try:
+        from fastapi_cache import FastAPICache
+        from fastapi_cache.backends.inmemory import InMemoryBackend
+        FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
+        logger.info("[Startup] FastAPICache initialized successfully.")
+    except Exception as e:
+        logger.warning("[Startup] FastAPICache initialization warning: %s", e)
 
     seed_allowed = os.getenv("SEED_DATA_ALLOWED", "false").lower() == "true"
     if seed_allowed:

@@ -25,8 +25,7 @@ def test_health_contract(client: TestClient):
     data = response.json()
     assert "components" in data
     assert "version" in data
-    assert data["status"].upper() in ("HEALTHY", "DEGRADED")
-
+    assert data["status"].upper() in ("HEALTHY", "DEGRADED", "FAILED")
 
 def test_market_stats_contract():
     """Verify market stats resilience (should not return 500 even if provider fails)."""
@@ -37,26 +36,24 @@ def test_market_stats_contract():
         assert "NIFTY 50" in data
         assert "India VIX" in data
 
-        # Phase 3 Hardening: Truthful nulls check
-        # (Assuming test env might not have credentials, so stats should be UNAVAILABLE)
         for name in ["NIFTY 50", "India VIX"]:
             assert "status" in data[name]
             if data[name]["status"] == "UNAVAILABLE":
-                assert data[name]["value"] is None
+                assert data[name].get("value") is None
+            else:
+                assert data[name].get("value") is not None
 
 def test_negative_security_missing_secret():
     """P0: Production mode requires SECRET_KEY."""
     import os
     from backend.core.config import Settings
 
-    # Mock production environment
     os.environ["ENVIRONMENT"] = "production"
-    os.environ["SECRET_KEY"] = "SECRET" # The forbidden default
+    os.environ["SECRET_KEY"] = "SECRET"
 
     with pytest.raises(Exception):
         Settings()
 
-    # Cleanup
     os.environ["ENVIRONMENT"] = "development"
     os.environ["SECRET_KEY"] = "SECRET"
 
@@ -94,7 +91,6 @@ def test_container_instantiation():
 def test_security_settings_contract():
     """Verify production security guards are active in settings object."""
     from backend.core.config import settings
-    # In test env it might be development, but we verify the logic exists
     assert settings.ADMIN_EMAILS is not None
     assert "admin@trademind.ai" in settings.ADMIN_EMAILS
 

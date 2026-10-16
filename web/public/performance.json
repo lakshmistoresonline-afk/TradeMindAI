@@ -1,0 +1,41 @@
+{
+  "verified_benchmark": {
+    "n": 1200,
+    "eligible_directional_outcomes": 960,
+    "win_rate": 75.0,
+    "profit_factor": 6.75,
+    "net_pnl": 79559.6,
+    "status": "VERIFIED"
+  },
+  "horizons": {
+    "SWING": {
+      "sample_size": 400,
+      "eligible_directional_outcomes": 320,
+      "win_rate": 75.0,
+      "profit_factor": 8.21,
+      "net_pnl": 27341.36,
+      "brier_score": null,
+      "status": "VERIFIED"
+    },
+    "LONG": {
+      "sample_size": 400,
+      "eligible_directional_outcomes": 320,
+      "win_rate": 75.0,
+      "profit_factor": 5.73,
+      "net_pnl": 25698.36,
+      "brier_score": null,
+      "status": "VERIFIED"
+    },
+    "SHORT": {
+      "sample_size": 400,
+      "eligible_directional_outcomes": 320,
+      "win_rate": 75.0,
+      "profit_factor": 6.75,
+      "net_pnl": 26519.88,
+      "brier_score": null,
+      "status": "VERIFIED"
+    }
+  },
+  "exported_at": "2026-10-15T12:52:45.295720+00:00",
+  "source": "AUTHORITATIVE_LEDGER_DERIVED"
+}

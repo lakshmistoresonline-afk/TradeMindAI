@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Stack, Tab, Tabs, Button, Divider, InputBase, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Chip as MuiChip, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuery, useTheme, alpha } from '@mui/material';
 import { ShieldAlert, RefreshCw, Search, Activity, Info, Clock, CheckCircle, XCircle, AlertCircle, LayoutGrid, List as ListIcon, Columns, Upload } from 'lucide-react';
-import { getEquitySignals, getEquityHistory } from '../api/client';
+import { getEquitySignals, getEquityHistory, apiClient } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import SignalCard from '../components/Research/shared/SignalCard';
@@ -32,6 +32,42 @@ export default function EquitySignals() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('NEWEST');
+
+  // NIFTY Universe Tier Filter State
+  const [universeConstituents, setUniverseConstituents] = useState<Record<string, Set<string>>>({});
+  const [selectedUniverse, setSelectedUniverse] = useState<string>('ALL');
+
+  useEffect(() => {
+    apiClient.get('/universes').then(async (res) => {
+      if (Array.isArray(res.data)) {
+        const map: Record<string, Set<string>> = {};
+        for (const u of res.data) {
+          try {
+            const constRes = await apiClient.get(`/universes/${u.id}/constituents`, { params: { limit: 500 } });
+            if (constRes.data && Array.isArray(constRes.data.constituents)) {
+              map[u.id] = new Set(constRes.data.constituents.map((c: any) => c.symbol.toUpperCase()));
+            }
+          } catch {}
+        }
+        setUniverseConstituents(map);
+      }
+    }).catch(e => console.warn("Failed to load universe constituent maps:", e));
+  }, []);
+
+  const matchesUniverse = (symbol: string) => {
+    if (selectedUniverse === 'ALL') return true;
+    const symUpper = (symbol || '').toUpperCase();
+    const set = universeConstituents[selectedUniverse];
+    return set ? set.has(symUpper) : true;
+  };
+
+  const niftyTiers = useMemo(() => [
+    { label: 'ALL NIFTY (500)', value: 'ALL' },
+    { label: 'NIFTY 50', value: 'NIFTY_50' },
+    { label: 'NIFTY 100 — Exclusive', value: 'NIFTY_100_EXCL' },
+    { label: 'NIFTY 200 — Exclusive', value: 'NIFTY_200_EXCL' },
+    { label: 'NIFTY 500 — Exclusive', value: 'NIFTY_500_EXCL' }
+  ], []);
 
   // UI State (Default to GRID view for both Active and History modes)
   const [viewLayout, setViewLayout] = useState<'GRID' | 'TABLE'>('GRID');
@@ -203,6 +239,8 @@ export default function EquitySignals() {
 
   const allActiveSignalsList = useMemo(() => {
     const rawActive = signals.filter(s => {
+      if (!matchesUniverse(s.symbol || s.underlyingSymbol)) return false;
+
       const status = (s.decision?.status || s.status || '').toUpperCase();
       const isActive = ['ACTIVE', 'WAITING_FOR_ENTRY', 'ENTRY_TRIGGERED'].includes(status);
       if (!isActive) return false;
@@ -216,7 +254,7 @@ export default function EquitySignals() {
       if (genTime > 0) {
         const horizon = (s.decision?.timeframe || s.timeframe || 'SWING').toUpperCase();
         const maxAgeHours = horizon === 'SHORT' ? 168 : horizon === 'SWING' ? 720 : 8760;
-        const ageHours = (Date.now() - genTime) / (1000 * 60 * 60);
+        const ageHours = Math.abs((Date.now() - genTime) / (1000 * 60 * 60));
         if (ageHours > maxAgeHours) return false;
       }
       return true;
@@ -224,7 +262,7 @@ export default function EquitySignals() {
 
     rawActive.sort((a, b) => {
       const timeA = new Date(a.decision?.generatedAt || a.created_at || 0).getTime();
-      const timeB = new Date(b.decision?.generatedAt || b.created_at || 0).getTime();
+      const timeB = new Date(b.decision?.generatedAt || a.created_at || 0).getTime();
       return timeB - timeA;
     });
 
@@ -237,7 +275,7 @@ export default function EquitySignals() {
     });
 
     return Array.from(dedupMap.values());
-  }, [signals]);
+  }, [signals, selectedUniverse, universeConstituents]);
 
   const counts = useMemo(() => {
     return {
@@ -352,6 +390,20 @@ export default function EquitySignals() {
          </Stack>
 
          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" gap={1}>
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+                <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>NIFTY UNIVERSE</InputLabel>
+                <Select
+                    value={selectedUniverse}
+                    label="NIFTY UNIVERSE"
+                    onChange={(e) => setSelectedUniverse(e.target.value)}
+                    sx={{ height: 38, bgcolor: COLORS.surfaceSlate, color: 'white', fontWeight: 800, fontSize: '0.7rem', '& .MuiOutlinedInput-notchedOutline': { borderColor: COLORS.borderLight } }}
+                >
+                    {niftyTiers.map(t => (
+                        <MenuItem key={t.value} value={t.value} sx={{ fontSize: '0.7rem', fontWeight: 700 }}>{t.label}</MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
             <FormControl size="small" sx={{ minWidth: 140 }}>
                 <InputLabel sx={{ color: COLORS.slateMuted, fontSize: '0.65rem', fontWeight: 900 }}>RANKING</InputLabel>
                 <Select

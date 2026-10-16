@@ -4,7 +4,11 @@ def create_ai_workflow():
     """
     Consolidated Institutional AI Workflow for Rate Limit Efficiency.
     """
-    from langgraph.graph import StateGraph, END
+    try:
+        from langgraph.graph import StateGraph, END
+    except ImportError:
+        return None
+
     from backend.ai.agents import (
         MarketAgent, CompanyAgent, ContextAgent, ConsensusAgent
     )

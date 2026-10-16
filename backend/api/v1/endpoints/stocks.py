@@ -45,11 +45,12 @@ async def get_market_stats():
     # 1. Integrate VIX from authorative state
     vix_val = market_state.get("vix")
     obs_ts = market_state.get("observation_timestamp")
+    vix_status = "HEALTHY" if vix_val is not None and vix_val > 0 else market_state.get("status", "UNAVAILABLE")
     stats["India VIX"].update({
         "value": vix_val,
         "provider_timestamp": obs_ts,
         "freshness": market_state.get("freshness", "UNAVAILABLE"),
-        "status": market_state.get("status", "UNAVAILABLE")
+        "status": vix_status
     })
 
     # Return stats immediately in test/offline environments to prevent socket hang
