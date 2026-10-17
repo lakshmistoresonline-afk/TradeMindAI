@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON, UniqueConstraint, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
@@ -230,6 +230,9 @@ class OpportunityDB(Base):
 
 class LiveSignalDB(Base):
     __tablename__ = "live_signals"
+    __table_args__ = (
+        Index('idx_unique_active_signal', 'symbol', 'timeframe', unique=True, sqlite_where=(Column('status') == 'ACTIVE'), postgresql_where=(Column('status') == 'ACTIVE')),
+    )
     id = Column(String, primary_key=True, index=True)
     symbol = Column(String, index=True)
     company_name = Column(String)

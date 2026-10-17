@@ -3,7 +3,7 @@ import { API_BASE_URL } from '../api/client';
 
 export function useTurboSync() {
   const [signals, setSignals] = useState<any[]>([]);
-  const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'ERROR'>('CONNECTING');
+  const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'OFFLINE_FALLBACK' | 'ERROR'>('CONNECTING');
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/equity/signals?limit=1000`)
@@ -20,13 +20,13 @@ export function useTurboSync() {
         }
       })
       .catch(() => {
-        // Zero-quota static fallback for Firebase Hosting deployment
+        // Zero-quota static fallback for Firebase Hosting deployment (Marked explicitly as OFFLINE_FALLBACK)
         fetch('/signals.json')
           .then(res => res.json())
           .then(fallbackData => {
             if (Array.isArray(fallbackData) && fallbackData.length > 0) {
               setSignals(fallbackData);
-              setConnectionStatus('ONLINE');
+              setConnectionStatus('OFFLINE_FALLBACK');
             } else {
               setConnectionStatus('ERROR');
             }

@@ -124,10 +124,18 @@ export default function EquitySignals() {
             direction: hFilterDirection !== 'ALL' ? hFilterDirection : undefined
         };
         const historyData = await getEquityHistory(params);
-        if (historyData && Array.isArray(historyData.records) && historyData.records.length > 0) {
-            const records = historyData.records.map((r: any) => mapCanonicalSignal(r));
-            setHistory(records);
-            setTotalHistory(historyData.total || 0);
+        if (historyData && Array.isArray(historyData.records)) {
+            const normalized = historyData.records.map((r: any) => mapCanonicalSignal(r));
+            const filtered = normalized.filter((s: any) => {
+              const dir = (s.decision?.direction || s.direction || '').toUpperCase();
+              const matchHorizon = hFilterHorizon === 'ALL' || (s.decision?.timeframe || s.timeframe) === hFilterHorizon;
+              const matchQuality = hFilterQuality === 'ALL' || (s.decision?.qualityClass || s.quality_class) === hFilterQuality;
+              const matchStatus = hFilterStatus === 'ALL' || (s.decision?.status || s.status) === hFilterStatus;
+              const matchDirection = hFilterDirection === 'ALL' || dir === hFilterDirection;
+              return matchHorizon && matchQuality && matchStatus && matchDirection;
+            });
+            setHistory(filtered);
+            setTotalHistory(historyData.total || filtered.length);
             setHistorySummary(historyData.summary || null);
         }
       }
@@ -178,10 +186,11 @@ export default function EquitySignals() {
 
     // Apply active filter dropdown selections to history summary stats
     const filteredHistory = uniqueHistory.filter((s: any) => {
+      const dir = (s.decision?.direction || s.direction || '').toUpperCase();
       const matchHorizon = hFilterHorizon === 'ALL' || (s.decision?.timeframe || s.timeframe) === hFilterHorizon;
       const matchQuality = hFilterQuality === 'ALL' || (s.decision?.qualityClass || s.quality_class) === hFilterQuality;
       const matchStatus = hFilterStatus === 'ALL' || (s.decision?.status || s.status) === hFilterStatus;
-      const matchDirection = hFilterDirection === 'ALL' || (s.decision?.direction || s.direction) === hFilterDirection;
+      const matchDirection = hFilterDirection === 'ALL' || dir === hFilterDirection;
       return matchHorizon && matchQuality && matchStatus && matchDirection;
     });
 

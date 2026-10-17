@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Box, Typography, Grid, Paper, Stack, alpha, Skeleton, Tabs, Tab, Button, Chip } from '@mui/material';
-import { Zap, ShieldCheck, ArrowRight, PieChart, Activity, TrendingUp, Cpu, Database } from 'lucide-react';
-import { getMarketStats, getEquitySignals, getEquityMarketState } from '../api/client';
+import { ShieldCheck, ArrowRight, PieChart, Activity, Cpu, Database } from 'lucide-react';
+import { getEquitySignals } from '../api/client';
 import { mapCanonicalSignal } from '../hooks/useAITradeDecision';
 import { useTurboSync } from '../hooks/useTurboSync';
 import { useBackendHealth } from '../hooks/useBackendHealth';
@@ -12,8 +12,6 @@ import { MONO_FONT, COLORS, HERO_BANNER_STYLE, GRADIENT_ACCENT_BAR, GLASS_PANEL_
 export default function UserDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<any>(null);
-  const [market, setMarket] = useState<any>(null);
   const [signals, setSignals] = useState<any[]>([]);
   const [tab, setTab] = useState(0);
 
@@ -23,12 +21,7 @@ export default function UserDashboard() {
   const fetchData = async () => {
     setLoading(true);
 
-    const marketStatsPromise = getMarketStats();
-    const marketStatePromise = getEquityMarketState();
     const signalsPromise = getEquitySignals({ limit: 12 });
-
-    marketStatsPromise.then(data => setStats(data)).catch(e => console.error("Stats Error:", e));
-    marketStatePromise.then(data => setMarket(data)).catch(e => console.error("Market Error:", e));
 
     try {
       const signalsData = await signalsPromise;
@@ -69,7 +62,7 @@ export default function UserDashboard() {
     });
 
     if (marketContext) {
-        setMarket(marketContext);
+        // market context updated if needed
     }
   }, [firestoreSignals, marketContext]);
 
@@ -108,11 +101,11 @@ export default function UserDashboard() {
               <Typography variant="h4" sx={{ fontWeight: 950, letterSpacing: -1, color: COLORS.textBright, fontFamily: MONO_FONT, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
                 EXECUTIVE TERMINAL
               </Typography>
-              <Chip label="NIFTY-500 LIVE" size="small" sx={{ bgcolor: alpha(COLORS.cyan, 0.15), color: COLORS.cyan, border: `1px solid ${COLORS.borderCyan}`, fontWeight: 950, fontSize: '0.625rem' }} />
+              <Chip label="BUY-ONLY SIGNALS" size="small" sx={{ bgcolor: alpha(COLORS.cyan, 0.15), color: COLORS.cyan, border: `1px solid ${COLORS.borderCyan}`, fontWeight: 950, fontSize: '0.625rem' }} />
               <Chip label="STRATEGY V3.3" size="small" sx={{ bgcolor: alpha(COLORS.purple, 0.15), color: COLORS.purple, border: `1px solid ${COLORS.borderPurple}`, fontWeight: 950, fontSize: '0.625rem' }} />
             </Stack>
             <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 600, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
-              Auditable quantitative intelligence, institutional order flow, and Strategy V3.3 Master Edition signals.
+              Authoritative institutional signal provider terminal. BUY-only multi-horizon setups with zero live execution.
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
@@ -143,44 +136,7 @@ export default function UserDashboard() {
         </Box>
       </Box>
 
-      {/* 2. Market Snapshot */}
-      <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>
-        NIFTY-500 MARKET SNAPSHOT
-      </Typography>
-      <Grid container spacing={2} sx={{ mb: 5 }}>
-         <Grid item xs={12} sm={6} md={3}>
-            <MarketMiniCard label="NIFTY 500" data={stats?.['NIFTY 500']} value={market?.nifty_price} fallbackVal={24250.8} icon={<TrendingUp size={18} color={COLORS.cyan} />} />
-         </Grid>
-         <Grid item xs={12} sm={6} md={3}>
-            <MarketMiniCard label="INDIA VIX" value={market?.vix || (stats?.['India VIX']?.value)} fallbackVal={12.85} icon={<Activity size={18} color={COLORS.purple} />} />
-         </Grid>
-         <Grid item xs={12} sm={6} md={3}>
-            <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, height: '100%' }}>
-               <Typography variant="caption" sx={{ color: COLORS.slateMuted, fontWeight: 950, mb: 1, display: 'block', letterSpacing: 1 }}>REGIME STATE</Typography>
-               <Chip
-                  label={market?.regime || 'SIDEWAYS'}
-                  size="small"
-                  sx={{
-                    fontWeight: 950,
-                    px: 1,
-                    bgcolor: market?.regime === 'BULL' ? alpha(COLORS.green, 0.15) : (market?.regime === 'BEAR' ? alpha(COLORS.red, 0.15) : alpha(COLORS.cyan, 0.15)),
-                    color: market?.regime === 'BULL' ? COLORS.green : (market?.regime === 'BEAR' ? COLORS.red : COLORS.cyan),
-                    border: `1px solid ${market?.regime === 'BULL' ? alpha(COLORS.green, 0.3) : (market?.regime === 'BEAR' ? alpha(COLORS.red, 0.3) : alpha(COLORS.cyan, 0.3))}`
-                  }}
-               />
-            </Paper>
-         </Grid>
-         <Grid item xs={12} sm={6} md={3}>
-            <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, height: '100%' }}>
-               <Typography variant="caption" sx={{ color: COLORS.slateMuted, fontWeight: 950, mb: 1, display: 'block', letterSpacing: 1 }}>DATA FEED INTEGRITY</Typography>
-               <Typography variant="body2" sx={{ fontWeight: 950, color: COLORS.green, fontFamily: MONO_FONT }}>
-                  ● LIVE FEED ACTIVE (100% CONSENSUS)
-               </Typography>
-            </Paper>
-         </Grid>
-      </Grid>
-
-      {/* 3. Today's Top Signals */}
+      {/* 2. Today's Top Signals */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6" sx={{ fontWeight: 950, letterSpacing: -0.5, fontFamily: MONO_FONT, fontSize: { xs: '1rem', sm: '1.25rem' } }}>TOP QUANTITATIVE OPPORTUNITIES</Typography>
         <Button onClick={() => navigate('/signals')} endIcon={<ArrowRight size={16} />} sx={{ color: COLORS.cyan, fontWeight: 950, fontSize: '0.75rem' }}>VIEW TERMINAL →</Button>
@@ -210,69 +166,28 @@ export default function UserDashboard() {
              </Grid>
            ))}
         </Grid>
+      ) : filteredSignals.length === 0 ? (
+        <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'rgba(15,23,42,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 950, color: COLORS.textBright, mb: 1 }}>No Active BUY Signals for this Horizon</Typography>
+          <Typography variant="body2" sx={{ color: COLORS.slateMuted, mb: 3 }}>All signals adhere to strict Strategy V3.3 buy-only and trend quality gates.</Typography>
+          <Button variant="outlined" onClick={() => navigate('/signals')} sx={{ color: COLORS.cyan, borderColor: COLORS.borderCyan, fontWeight: 950 }}>Browse All Signals</Button>
+        </Paper>
       ) : (
         <Grid container spacing={3}>
-           {filteredSignals.map(s => (
-              <Grid item xs={12} md={4} key={s.id}>
-                 <SignalCard stock={s} decision={s.decision} />
-              </Grid>
-           ))}
-           {filteredSignals.length === 0 && (
-              <Grid item xs={12}>
-                 <Paper sx={{ ...GLASS_PANEL_STYLE, py: 8, textAlign: 'center' }}>
-                    <Typography sx={{ color: COLORS.slateMuted, fontWeight: 800 }}>No current {['SWING', 'SHORT', 'LONG'][tab]} signals meeting conviction threshold.</Typography>
-                 </Paper>
-              </Grid>
-           )}
+          {filteredSignals.map(sig => (
+            <Grid item xs={12} md={4} key={sig.id}>
+              <SignalCard stock={sig} decision={sig.decision} />
+            </Grid>
+          ))}
         </Grid>
       )}
 
-      {/* 4. Market Insights Feed */}
-      <Box sx={{ mt: 6 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>MARKET INSIGHTS & REGIME</Typography>
+      {/* 3. Terminal Navigation Tools */}
+      <Box sx={{ mt: 8 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>
+          INSTITUTIONAL QUANT TOOLS
+        </Typography>
         <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
-                <Paper sx={{ ...GLASS_PANEL_STYLE, p: 3.5 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 950, mb: 2.5, fontFamily: MONO_FONT }}>SIGNAL REGIME CONTEXT</Typography>
-                    <Stack spacing={2}>
-                        <InsightItem
-                            title="NIFTY Structural State"
-                            desc={`The NIFTY-500 universe is currently in a ${market?.regime || 'SIDEWAYS'} regime with VIX at ${market?.vix?.toFixed(2) || '12.85'}.`}
-                        />
-                        <InsightItem
-                            title="Momentum Alignment"
-                            desc="Institutional order flow indicates sector rotation dynamics currently aligned with Strategy V3.3 quantitative ensemble nodes."
-                        />
-                    </Stack>
-                </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-                <Paper sx={{ ...GLASS_PANEL_STYLE, p: 0, overflow: 'hidden' }}>
-                    <Box sx={{ p: 2.5, bgcolor: alpha(COLORS.purpleDark, 0.2), borderBottom: `1px solid ${COLORS.borderPurple}` }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 950, color: 'white', letterSpacing: 1, fontFamily: MONO_FONT }}>INSTITUTIONAL PRO ACCESS</Typography>
-                    </Box>
-                    <Box sx={{ p: 3, textAlign: 'center' }}>
-                        <Zap size={32} color={COLORS.purple} style={{ marginBottom: 12 }} />
-                        <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 700, mb: 2.5 }}>
-                            Unlock algorithmic sector strength analysis, multi-agent AI debates, and institutional order flow metrics.
-                        </Typography>
-                        <Button variant="outlined" color="secondary" onClick={() => navigate('/pricing')} sx={{ fontWeight: 950, px: 3, borderColor: COLORS.purple }}>GO PRO</Button>
-                    </Box>
-                </Paper>
-            </Grid>
-        </Grid>
-      </Box>
-
-      {/* 5. Quick Directory */}
-      <Box sx={{ mt: 6 }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 950, mb: 2, color: COLORS.slateMuted, letterSpacing: 1.5, fontFamily: MONO_FONT }}>PRODUCT DIRECTORY</Typography>
-        <Grid container spacing={3}>
-           <ToolCard
-              icon={<Database size={22} color={COLORS.cyan} />}
-              title="Stock Universes"
-              desc="Explore the 4 exclusive NIFTY stock tiers (50, 100, 200, 500) with verified mutual exclusion."
-              onClick={() => navigate('/universes')}
-           />
            <ToolCard
               icon={<ShieldCheck size={22} color={COLORS.green} />}
               title="Evidence Ledger"
@@ -297,61 +212,34 @@ export default function UserDashboard() {
   );
 }
 
-function MarketMiniCard({ label, data, value, fallbackVal, icon }: any) {
-    const rawVal = (data?.value && data.value > 20000) ? data.value : (value && value > 20000 ? value : (fallbackVal || 24250.8));
-    const val = (rawVal === 0) ? '---' : rawVal;
-    const change = data?.change || 0;
-    const isPos = change >= 0;
-
-    return (
-        <Paper sx={{ ...GLASS_PANEL_STYLE, p: 2.5, height: '100%' }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                <Typography variant="caption" sx={{ color: COLORS.slateMuted, fontWeight: 950, letterSpacing: 1 }}>{label}</Typography>
-                {icon}
-            </Stack>
-            <Stack direction="row" spacing={1.5} alignItems="baseline">
-                <Typography sx={{ fontWeight: 950, fontSize: '1.25rem', fontFamily: MONO_FONT }}>{typeof val === 'number' ? val.toLocaleString() : val}</Typography>
-                {data && rawVal !== 0 && (
-                    <Typography sx={{ fontWeight: 950, fontSize: '0.75rem', color: isPos ? COLORS.green : COLORS.red }}>
-                        {isPos ? '+' : ''}{change}%
-                    </Typography>
-                )}
-            </Stack>
-        </Paper>
-    );
-}
-
 function ToolCard({ icon, title, desc, onClick }: any) {
-    return (
-        <Grid item xs={12} sm={6} md={3}>
-            <Paper
-                onClick={onClick}
-                sx={{
-                    ...GLASS_PANEL_STYLE,
-                    p: 3,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease-in-out',
-                    height: '100%',
-                    '&:hover': {
-                      borderColor: COLORS.cyan,
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 10px 25px -10px rgba(0, 209, 255, 0.25)'
-                    }
-                }}
-            >
-                <Box sx={{ mb: 1.5 }}>{icon}</Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 950, mb: 0.5, fontFamily: MONO_FONT }}>{title}</Typography>
-                <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 600, fontSize: '0.8rem' }}>{desc}</Typography>
-            </Paper>
-        </Grid>
-    );
-}
-
-function InsightItem({ title, desc }: any) {
-    return (
-        <Box sx={{ p: 2, bgcolor: 'rgba(2, 6, 23, 0.5)', borderRadius: 1.5, border: '1px solid rgba(255,255,255,0.04)' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 950, color: COLORS.cyan, mb: 0.5, fontFamily: MONO_FONT }}>{title}</Typography>
-            <Typography variant="body2" sx={{ color: COLORS.slateText, fontWeight: 500, fontSize: '0.825rem' }}>{desc}</Typography>
-        </Box>
-    );
+  return (
+    <Grid item xs={12} md={4}>
+       <Paper
+         onClick={onClick}
+         sx={{
+            ...GLASS_PANEL_STYLE,
+            p: 3,
+            height: '100%',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+               borderColor: alpha(COLORS.cyan, 0.4),
+               transform: 'translateY(-2px)',
+               bgcolor: alpha(COLORS.cyan, 0.02)
+            }
+         }}
+       >
+          <Stack direction="row" spacing={2} alignItems="flex-start">
+             <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: alpha(COLORS.cyan, 0.08), border: `1px solid ${alpha(COLORS.cyan, 0.15)}` }}>
+                {icon}
+             </Box>
+             <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 950, color: COLORS.textBright, mb: 0.5 }}>{title}</Typography>
+                <Typography variant="body2" sx={{ color: COLORS.slateMuted, fontWeight: 600, lineHeight: 1.5 }}>{desc}</Typography>
+             </Box>
+          </Stack>
+       </Paper>
+    </Grid>
+  );
 }

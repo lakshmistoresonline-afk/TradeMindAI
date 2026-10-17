@@ -10,6 +10,7 @@ import logging
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from backend.app.db.database import Base, engine
 from backend.app.db.seed import seed_local_database
@@ -91,6 +92,34 @@ def ensure_sqlite_columns(eng=None):
         logger.exception("[Migration] CRITICAL: Failed to ensure SQLite columns for live_signals/shadow_signals: %s", e)
         raise RuntimeError(f"Database migration failed: {e}") from e
 
+def ensure_active_signal_idempotency_index():
+    """
+    Safely inspects existing active records for duplicate (symbol, timeframe) pairs,
+    reports conflicts without deleting data, and creates the unique index if clean.
+    """
+    try:
+        with engine.connect() as conn:
+            tables = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='live_signals'")).fetchall()
+            if not tables:
+                return
+
+            dups = conn.execute(text(
+                "SELECT symbol, timeframe, COUNT(*) as cnt FROM live_signals WHERE status = 'ACTIVE' GROUP BY symbol, timeframe HAVING cnt > 1"
+            )).fetchall()
+
+            if dups:
+                dup_list = [dict(row._mapping) for row in dups]
+                logger.error("[Migration] CRITICAL: Existing duplicate active signals found for (symbol, timeframe): %s", dup_list)
+                raise RuntimeError(f"Database migration blocked: Existing duplicate active signals found: {dup_list}. Manual reconciliation required.")
+
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_active_signal ON live_signals (symbol, timeframe) WHERE status = 'ACTIVE'"))
+            conn.commit()
+            logger.info("[Migration] Database partial unique index 'idx_unique_active_signal' verified successfully.")
+    except Exception as e:
+        if "Database migration blocked" in str(e):
+            raise e
+        logger.warning("[Migration] Active signal unique index verification notice: %s", e)
+
 @app.on_event("startup")
 def on_startup():
     """
@@ -100,6 +129,7 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
     PostgresBase.metadata.create_all(bind=postgres_engine)
     ensure_sqlite_columns()
+    ensure_active_signal_idempotency_index()
 
     try:
         from fastapi_cache import FastAPICache

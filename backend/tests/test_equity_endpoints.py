@@ -11,7 +11,7 @@ class MockColumn:
         self.name = name
 
 class MockSignalDB:
-    def __init__(self, status, signal_type="SWING", direction="LONG", rating="BUY", signal_rating=None, net_pnl=5.0, calibrated_probability=0.8, raw_probability=None, created_at=None, symbol="RELIANCE"):
+    def __init__(self, status, signal_type="SWING", direction="LONG", rating="BUY", signal_rating=None, net_pnl=5.0, calibrated_probability=0.8, raw_probability=None, created_at=None, symbol="RELIANCE", outcome_verified=True, evaluation_mode="LIVE"):
         self.status = status
         self.signal_type = signal_type
         self.direction = direction
@@ -22,6 +22,8 @@ class MockSignalDB:
         self.raw_probability = raw_probability if raw_probability is not None else calibrated_probability
         self.created_at = created_at
         self.symbol = symbol
+        self.outcome_verified = outcome_verified
+        self.evaluation_mode = evaluation_mode
         self.__table__ = type("Table", (), {
             "columns": [
                 MockColumn("status"),
@@ -33,7 +35,9 @@ class MockSignalDB:
                 MockColumn("calibrated_probability"),
                 MockColumn("raw_probability"),
                 MockColumn("created_at"),
-                MockColumn("symbol")
+                MockColumn("symbol"),
+                MockColumn("outcome_verified"),
+                MockColumn("evaluation_mode")
             ]
         })()
 

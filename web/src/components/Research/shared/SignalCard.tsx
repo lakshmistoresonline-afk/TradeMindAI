@@ -19,7 +19,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
   const [riskPct, setRiskPct] = useState<number>(1.0);
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/signals/${decision.id}`;
+    const url = `${window.location.origin}/signals/${decision?.id || ''}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -27,33 +27,34 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
 
   if (!decision) return null;
 
+  const st = stock || {};
   const isBuy = decision.rating?.includes('BUY');
-  const entry = decision.entry || stock.entry_price || stock.entry || 0;
+  const entry = decision.entry || st.entry_price || st.entry || 0;
   const target1 = decision.target1 || decision.target || (entry > 0 ? Math.round(entry * 1.05 * 100) / 100 : undefined);
   const target2 = decision.target2 || decision.target || (entry > 0 ? Math.round(entry * 1.08 * 100) / 100 : undefined);
   const target3 = decision.target3 || decision.target || (entry > 0 ? Math.round(entry * 1.13 * 100) / 100 : undefined);
 
-  const current = decision.normalizedCurrentPrice || stock.current_price || stock.price || entry;
+  const current = decision.normalizedCurrentPrice || st.current_price || st.price || entry;
   const isT1Reached = target1 && current >= target1;
 
   // Multi-tier fallback for Stop Loss (Guarantees Stop Loss level is never missing; ratchets to breakeven if T1 touched)
   const baseStop = decision.stopLoss ??
-                   (stock as any)?.stop_price ??
-                   (stock as any)?.stop_loss ??
-                   (stock as any)?.stopLoss ??
-                   (stock as any)?.stop_loss_price ??
+                   st.stop_price ??
+                   st.stop_loss ??
+                   st.stopLoss ??
+                   st.stop_loss_price ??
                    (entry > 0 ? Math.round(entry * 0.95 * 100) / 100 : undefined);
 
   const stop = isT1Reached ? Math.max(baseStop || 0, Math.round(entry * 1.002 * 100) / 100) : baseStop;
-  const conviction = decision.conviction || stock.conviction || 75;
+  const conviction = decision.conviction || st.conviction || 75;
 
-  const { createdAt, triggeredAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, stock);
+  const { createdAt, triggeredAt, hasStatusChanged, statusLabel, statusChangeTime } = getSignalStatusMeta(decision, st);
 
-  const status = decision.status || stock.outcome || stock.status || 'ACTIVE';
+  const status = decision.status || st.outcome || st.status || 'ACTIVE';
   const isClosed = status === 'TARGET_HIT' || status === 'STOP_LOSS' || status === 'EXPIRED';
 
   // Strict mathematical exit price calculation (STOP_LOSS exits at stop level unless gap open)
-  let exitPrice = decision.exitPrice || stock.exit_price;
+  let exitPrice = decision.exitPrice || st.exit_price;
   if (!exitPrice) {
     if (status === 'TARGET_HIT') {
       exitPrice = target2 || target1 || entry * 1.08;
@@ -115,10 +116,10 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 950, color: '#f8fafc', letterSpacing: -0.5, fontFamily: 'JetBrains Mono, monospace' }}>
-              {stock.symbol}
+              {st.symbol || 'SYMBOL'}
             </Typography>
             <Typography variant="caption" sx={{ color: '#cbd5e1', fontWeight: 600, display: 'block', mt: 0.2 }}>
-              {stock.company_name || stock.name || getCompanyName(stock.symbol)}
+              {st.company_name || st.name || getCompanyName(st.symbol || '')}
             </Typography>
           </Box>
           <Chip
@@ -278,7 +279,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
             </Button>
             <Button
               size="small"
-              onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: stock, decision } })}
+              onClick={() => navigate(`/signals/${decision.id}`, { state: { signal: st, decision } })}
               sx={{
                 color: '#06b6d4',
                 fontWeight: 950,
@@ -297,7 +298,7 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
       {/* 4. Position Sizer Risk Calculator Modal */}
       <Dialog open={isCalcOpen} onClose={() => setIsCalcOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { bgcolor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' } }}>
          <DialogTitle sx={{ fontWeight: 950, color: '#fff', fontSize: '0.95rem' }}>
-            POSITION RISK SIZER — {stock.symbol}
+            POSITION RISK SIZER — {st.symbol || 'SYMBOL'}
          </DialogTitle>
          <DialogContent>
             <Stack spacing={2.5} sx={{ mt: 1 }}>

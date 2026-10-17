@@ -9,6 +9,7 @@ from backend.core.postgres import LiveSignalDB, ShadowSignalDB, SessionLocal
 from backend.core.database import db_client
 from backend.domain.models.ios import LiveSignal
 from backend.core.container import container
+from backend.services.signal_eligibility import is_eligible_buy
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -20,7 +21,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 class SignalLedgerService:
     """
-    Authoritative Signal Ledger Service.
+    Authoritative Signal Ledger Service (Atomic Idempotency & BUY-Only Enforced).
     Neon/Postgres is the authority. Firestore is a mirror.
     """
 
@@ -28,17 +29,48 @@ class SignalLedgerService:
     async def create_signal(signal: LiveSignal, session: Optional[Session] = None) -> LiveSignal:
         """
         Atomically creates a signal in Neon and mirrors to Firestore.
+        Enforces BUY-only eligibility and persistence-level idempotency by symbol and timeframe,
+        allowing distinct horizons (SHORT, SWING, LONG) to coexist.
         """
+        if not is_eligible_buy(signal):
+            raise ValueError("Signal violates BUY-only eligibility policy and cannot be persisted.")
+
         db = session or SessionLocal()
         try:
+            tf = getattr(signal, "timeframe", None)
+            if not tf and hasattr(signal, "decision") and signal.decision:
+                tf = getattr(signal.decision, "timeframe", "SWING")
+            if not tf:
+                tf = "SWING"
+
+            # Check for existing active duplicate for same symbol and timeframe (idempotency)
+            existing = db.query(LiveSignalDB).filter(
+                LiveSignalDB.symbol == signal.symbol,
+                LiveSignalDB.timeframe == tf,
+                LiveSignalDB.status == "ACTIVE"
+            ).first()
+            if existing:
+                print(f"[SignalLedger] Idempotency: Active signal for {signal.symbol} ({tf}) already exists. Returning existing record.")
+                return container.ios_repo._map_db_to_live_signal(existing)
+
             # 1. Neon Persistence
             signal_data = signal.model_dump()
 
             # Handle JSON fields for SQLAlchemy
             if "provenance" in signal_data and signal_data["provenance"]:
-                signal_data["provenance"] = json.dumps(signal_data["provenance"], cls=CustomJSONEncoder)
-            if "events" in signal_data and signal_data["events"]:
-                signal_data["events"] = json.dumps([e.model_dump() for e in signal.events], cls=CustomJSONEncoder)
+                if isinstance(signal_data["provenance"], dict):
+                    signal_data["provenance"] = json.dumps(signal_data["provenance"], cls=CustomJSONEncoder)
+            else:
+                signal_data["provenance"] = json.dumps({}, cls=CustomJSONEncoder)
+
+            if "events" in signal_data:
+                evs = signal_data["events"]
+                if isinstance(evs, list):
+                    signal_data["events"] = json.dumps([e.model_dump() if hasattr(e, "model_dump") else e for e in evs], cls=CustomJSONEncoder)
+                else:
+                    signal_data["events"] = json.dumps([], cls=CustomJSONEncoder)
+            else:
+                signal_data["events"] = json.dumps([], cls=CustomJSONEncoder)
 
             db_obj = LiveSignalDB(**{k: v for k, v in signal_data.items() if hasattr(LiveSignalDB, k)})
             db.add(db_obj)
@@ -66,7 +98,7 @@ class SignalLedgerService:
             db.commit()
             db.refresh(db_obj)
 
-            # 2. Firestore Mirror (P1 Hardening: Run in thread to avoid blocking loop)
+            # 2. Firestore Mirror (Only on genuine new successful PostgreSQL insertion)
             if db_client:
                 import asyncio
                 def run_mirror():
@@ -74,7 +106,6 @@ class SignalLedgerService:
                         mirror_data = signal.model_dump()
                         mirror_data["mirrored_at"] = datetime.datetime.now(timezone.utc).isoformat()
                         mirror_data["source_neon_id"] = signal.id
-                        # Firestore client is often synchronous in python admin SDK
                         db_client.collection("signals").document(signal.id).set(mirror_data)
                     except Exception as e:
                         print(f"[SignalLedger] Mirror failed for {signal.id}: {e}")
@@ -85,6 +116,30 @@ class SignalLedgerService:
 
         except Exception as e:
             db.rollback()
+            err_str = str(e).lower()
+            is_unique_violation = (
+                "unique constraint failed" in err_str or
+                "integrityerror" in type(e).__name__.lower() or
+                "duplicate key value violates unique constraint" in err_str or
+                "idx_unique_active_signal" in err_str
+            )
+            if is_unique_violation:
+                tf = getattr(signal, "timeframe", None)
+                if not tf and hasattr(signal, "decision") and signal.decision:
+                    tf = getattr(signal.decision, "timeframe", "SWING")
+                if not tf:
+                    tf = "SWING"
+
+                existing = db.query(LiveSignalDB).filter(
+                    LiveSignalDB.symbol == signal.symbol,
+                    LiveSignalDB.timeframe == tf,
+                    LiveSignalDB.status == "ACTIVE"
+                ).first()
+                if existing:
+                    print(f"[SignalLedger] Precise atomic idempotency: Duplicate active signal for {signal.symbol} ({tf}) caught via DB constraint. Returning existing persisted record.")
+                    return container.ios_repo._map_db_to_live_signal(existing)
+
+            # Unrelated integrity errors propagate normally and are not swallowed
             raise e
         finally:
             if not session:
@@ -104,7 +159,6 @@ class SignalLedgerService:
             # 1. Immutability Protection (Phase 3 Final Truth Lock)
             TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED", "AMBIGUOUS"]
             if db_obj.status in TERMINAL_STATES:
-                # Only allow updating metadata or events, not core levels or outcomes
                 RESTRICTED_FIELDS = [
                     "symbol", "direction", "asset_class", "instrument_id",
                     "entry_price", "target_price", "stop_price", "profit_pct",
@@ -128,7 +182,6 @@ class SignalLedgerService:
 
             db_obj.updated_at = datetime.datetime.now(timezone.utc)
             db.commit()
-
 
             # Mirror to Firestore (P1 Hardening: Run in thread to avoid blocking loop)
             if db_client:
@@ -154,12 +207,10 @@ class SignalLedgerService:
     async def get_signal(signal_id: str) -> Optional[LiveSignal]:
         db = SessionLocal()
         try:
-            # 1. Check Live signals (Active)
             db_obj = db.query(LiveSignalDB).filter(LiveSignalDB.id == signal_id).first()
             if db_obj:
                 return container.ios_repo._map_db_to_live_signal(db_obj)
 
-            # 2. Check Shadow signals (History)
             db_obj_h = db.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()
             if db_obj_h:
                 return container.ios_repo._map_db_to_live_signal(db_obj_h)
