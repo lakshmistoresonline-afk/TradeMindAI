@@ -58,7 +58,20 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
               <Typography variant="h6" sx={{ fontWeight: 950, fontFamily: 'JetBrains Mono', letterSpacing: -0.5, color: '#fff' }}>{stock.symbol}</Typography>
               <Typography variant="caption" sx={{ color: '#708090', fontWeight: 800, textTransform: 'uppercase', display: 'block', mt: 0.2 }}>{stock.company_name || stock.name || 'INSTRUMENT'}</Typography>
            </Box>
-           <Box sx={{ textAlign: 'right' }}>
+           <Stack direction="row" spacing={1} alignItems="center">
+              <Chip
+                label={decision.timeframe || stock.timeframe || 'SWING'}
+                size="small"
+                sx={{
+                  fontWeight: 900,
+                  fontSize: '0.65rem',
+                  bgcolor: 'rgba(255,255,255,0.06)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 0.5,
+                  height: 24
+                }}
+              />
               <Chip
                 label={isBuy ? 'LONG ▲' : 'SHORT ▼'}
                 size="small"
@@ -71,7 +84,7 @@ export default function LiveSignalCard({ stock, decision, variant = 'TECHNICAL' 
                   px: 1
                 }}
               />
-           </Box>
+           </Stack>
         </Box>
 
         <Stack direction="row" spacing={1.5} sx={{ mt: 2.5 }}>

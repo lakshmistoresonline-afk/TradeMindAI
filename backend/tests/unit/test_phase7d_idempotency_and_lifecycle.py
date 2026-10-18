@@ -88,7 +88,8 @@ async def test_distinct_horizons_coexist(test_db_session):
     res_2 = await SignalLedgerService.create_signal(sig_long, session=test_db_session)
 
     assert res_1.id == "sig_swing_1"
-    assert res_2.id == "sig_long_1" # Different horizons coexist
+    # Phase 9.4.3 Global Uniqueness Invariant: Enforces at most 1 active signal per stock globally
+    assert res_2.id == "sig_swing_1"
 
 @pytest.mark.asyncio
 async def test_buy_eligibility_rejection_at_persistence(test_db_session):
@@ -174,7 +175,7 @@ with patch.object(SignalLifecycleWorker, 'run_cycle', new_callable=AsyncMock, re
     assert res.returncode == 0
 
 @pytest.mark.asyncio
-async def test_concurrent_duplicate_persistence_sqlite():
+async def test_concurrent_duplicate_persistence_sqlite(test_db_session):
     sig_a = LiveSignal(
         id="sig_conc_1",
         symbol="HDFCBANK",
@@ -201,8 +202,8 @@ async def test_concurrent_duplicate_persistence_sqlite():
     )
 
     results = await asyncio.gather(
-        SignalLedgerService.create_signal(sig_a),
-        SignalLedgerService.create_signal(sig_b),
+        SignalLedgerService.create_signal(sig_a, session=test_db_session),
+        SignalLedgerService.create_signal(sig_b, session=test_db_session),
         return_exceptions=True
     )
     assert not isinstance(results[0], Exception)

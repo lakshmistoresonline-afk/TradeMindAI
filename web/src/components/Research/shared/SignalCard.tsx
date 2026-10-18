@@ -122,19 +122,33 @@ export default function SignalCard({ stock, decision }: SignalCardProps) {
               {st.company_name || st.name || getCompanyName(st.symbol || '')}
             </Typography>
           </Box>
-          <Chip
-            icon={isBuy ? <ArrowUpRight size={14} color="#10b981" /> : <ArrowDownRight size={14} color="#f43f5e" />}
-            label={isBuy ? 'LONG ▲' : 'SHORT ▼'}
-            size="small"
-            sx={{
-              fontWeight: 950,
-              bgcolor: alpha(isBuy ? '#10b981' : '#f43f5e', 0.12),
-              color: isBuy ? '#10b981' : '#f43f5e',
-              border: `1px solid ${alpha(isBuy ? '#10b981' : '#f43f5e', 0.3)}`,
-              borderRadius: 1,
-              px: 0.5
-            }}
-          />
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Chip
+              label={st.decision?.timeframe || st.timeframe || 'SWING'}
+              size="small"
+              sx={{
+                fontWeight: 900,
+                fontSize: '0.65rem',
+                bgcolor: 'rgba(255,255,255,0.06)',
+                color: '#cbd5e1',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 1
+              }}
+            />
+            <Chip
+              icon={isBuy ? <ArrowUpRight size={14} color="#10b981" /> : <ArrowDownRight size={14} color="#f43f5e" />}
+              label={isBuy ? 'LONG ▲' : 'SHORT ▼'}
+              size="small"
+              sx={{
+                fontWeight: 950,
+                bgcolor: alpha(isBuy ? '#10b981' : '#f43f5e', 0.12),
+                color: isBuy ? '#10b981' : '#f43f5e',
+                border: `1px solid ${alpha(isBuy ? '#10b981' : '#f43f5e', 0.3)}`,
+                borderRadius: 1,
+                px: 0.5
+              }}
+            />
+          </Stack>
         </Box>
 
         {/* Confidence Progress Gauge */}

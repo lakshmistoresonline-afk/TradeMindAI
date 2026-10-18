@@ -94,7 +94,7 @@ export function formatNSEDateTime(dateInput?: string | Date | null): string {
  */
 export function getSignalStatusMeta(decision: any, stock?: any) {
   const status = decision?.status || stock?.status || 'WAITING_FOR_ENTRY';
-  const createdAt = decision?.generatedAt || decision?.createdAt || stock?.created_at || stock?.timestamp;
+  const createdAt = stock?.signal_timestamp || stock?.created_at || decision?.createdAt || decision?.generatedAt || stock?.timestamp;
 
   const isWaiting = status === 'WAITING_FOR_ENTRY' || status === 'GENERATED';
   const triggeredAt = isWaiting ? undefined : (decision?.triggeredAt || stock?.triggered_at || stock?.activated_at || stock?.entry_timestamp || createdAt);

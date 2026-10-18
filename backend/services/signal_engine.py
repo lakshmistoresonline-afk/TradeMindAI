@@ -48,8 +48,64 @@ class SignalEngine:
                 eval_time - datetime.timedelta(days=14),
                 eval_time
             )
-        if not features_list:
-            return None
+
+        if not features_list or len(features_list) == 0:
+            # Dynamic on-the-fly feature calculation fallback from recent prices
+            recent_prices = await container.repository.get_recent_prices(symbol, limit=60)
+            if not recent_prices or len(recent_prices) < 20:
+                return None
+
+            import pandas as pd
+            import numpy as np
+            df = pd.DataFrame([{
+                'date': p.date,
+                'open': float(p.open),
+                'high': float(p.high),
+                'low': float(p.low),
+                'close': float(p.close),
+                'volume': float(p.volume)
+            } for p in recent_prices])
+            df.sort_values('date', inplace=True)
+            df['close_s'] = df['close']
+            df['ema_20'] = df['close_s'].ewm(span=20, adjust=False).mean()
+            df['ema_50'] = df['close_s'].ewm(span=50, adjust=False).mean()
+            df['ema_200'] = df['close_s'].ewm(span=200, adjust=False).mean()
+            df['sma_20'] = df['close_s'].rolling(window=20).mean()
+
+            high_low = df['high'] - df['low']
+            high_close = np.abs(df['high'] - df['close_s'].shift())
+            low_close = np.abs(df['low'] - df['close_s'].shift())
+            tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+            df['ATR'] = tr.rolling(window=14).mean()
+
+            delta = df['close_s'].diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+            rs = gain / (loss + 1e-9)
+            df['RSI'] = 100 - (100 / (1 + rs))
+            df = df.fillna(0)
+
+            last_row = df.iloc[-1]
+            last_features = {
+                "Close": float(last_row['close']),
+                "close": float(last_row['close']),
+                "Open": float(last_row['open']),
+                "High": float(last_row['high']),
+                "Low": float(last_row['low']),
+                "Volume": float(last_row['volume']),
+                "ema_20": float(last_row['ema_20']),
+                "ema_50": float(last_row['ema_50']),
+                "ema_200": float(last_row['ema_200']),
+                "sma_20": float(last_row['sma_20']),
+                "ATR": float(last_row['ATR'] if last_row['ATR'] > 0 else last_row['close'] * 0.02),
+                "RSI": float(last_row['RSI'] if last_row['RSI'] > 0 else 50.0)
+            }
+            class DynamicFeatureVector:
+                def __init__(self, dt, feats):
+                    self.date = dt
+                    self.features = feats
+            features_list = [DynamicFeatureVector(last_row['date'], last_features)]
+
         last_features = features_list[-1].features
 
         # 3. Model Inference (Champion Model specialized for timeframe/horizon)
@@ -131,6 +187,8 @@ class SignalEngine:
         last_feature_date = features_list[-1].date
         if last_feature_date.tzinfo is None:
              last_feature_date = last_feature_date.replace(tzinfo=timezone.utc)
+        if eval_time.tzinfo is None:
+             eval_time = eval_time.replace(tzinfo=timezone.utc)
 
         if (eval_time - last_feature_date).total_seconds() > 432000:
             rejection_reason = "STALE_MARKET_DATA"

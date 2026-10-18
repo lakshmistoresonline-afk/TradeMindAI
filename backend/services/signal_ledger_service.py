@@ -1,3 +1,4 @@
+import os
 import datetime
 from datetime import timezone
 import uuid
@@ -35,6 +36,9 @@ class SignalLedgerService:
         if not is_eligible_buy(signal):
             raise ValueError("Signal violates BUY-only eligibility policy and cannot be persisted.")
 
+        if "PYTEST_CURRENT_TEST" in os.environ and session is None:
+            raise RuntimeError("Unisolated database session detected during pytest execution! Explicit test session fixture is required.")
+
         db = session or SessionLocal()
         try:
             tf = getattr(signal, "timeframe", None)
@@ -43,14 +47,13 @@ class SignalLedgerService:
             if not tf:
                 tf = "SWING"
 
-            # Check for existing active duplicate for same symbol and timeframe (idempotency)
+            # Global Uniqueness Invariant: Enforce at most ONE active signal per stock globally across all timeframes and strategies
             existing = db.query(LiveSignalDB).filter(
                 LiveSignalDB.symbol == signal.symbol,
-                LiveSignalDB.timeframe == tf,
                 LiveSignalDB.status == "ACTIVE"
             ).first()
             if existing:
-                print(f"[SignalLedger] Idempotency: Active signal for {signal.symbol} ({tf}) already exists. Returning existing record.")
+                print(f"[SignalLedger] Global Uniqueness Invariant: Active signal for {signal.symbol} already exists (timeframe: {existing.timeframe}). Returning existing active record.")
                 return container.ios_repo._map_db_to_live_signal(existing)
 
             # 1. Neon Persistence
@@ -124,19 +127,12 @@ class SignalLedgerService:
                 "idx_unique_active_signal" in err_str
             )
             if is_unique_violation:
-                tf = getattr(signal, "timeframe", None)
-                if not tf and hasattr(signal, "decision") and signal.decision:
-                    tf = getattr(signal.decision, "timeframe", "SWING")
-                if not tf:
-                    tf = "SWING"
-
                 existing = db.query(LiveSignalDB).filter(
                     LiveSignalDB.symbol == signal.symbol,
-                    LiveSignalDB.timeframe == tf,
                     LiveSignalDB.status == "ACTIVE"
                 ).first()
                 if existing:
-                    print(f"[SignalLedger] Precise atomic idempotency: Duplicate active signal for {signal.symbol} ({tf}) caught via DB constraint. Returning existing persisted record.")
+                    print(f"[SignalLedger] Global Uniqueness Invariant: Duplicate active signal for {signal.symbol} caught via DB constraint. Returning existing persisted record.")
                     return container.ios_repo._map_db_to_live_signal(existing)
 
             # Unrelated integrity errors propagate normally and are not swallowed

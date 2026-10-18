@@ -97,7 +97,7 @@ export const normalizeAITradeDecision = (signal: any): AITradeDecision => {
     stopLoss,
     normalizedCurrentPrice: current,
     realizedReturn,
-    generatedAt: signal.timestamp || signal.created_at || new Date().toISOString(),
+    generatedAt: signal.signal_timestamp || signal.created_at || signal.timestamp || new Date().toISOString(),
     drivers,
     formattedThesis,
     exitPrice: parseNum(signal.exit_price),

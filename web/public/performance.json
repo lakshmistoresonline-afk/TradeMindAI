@@ -1,41 +1,21 @@
 {
+  "exported_at": "2026-10-17T12:16:43.146372",
   "verified_benchmark": {
-    "n": 1200,
-    "eligible_directional_outcomes": 960,
-    "win_rate": 75.0,
-    "profit_factor": 6.75,
-    "net_pnl": 79559.6,
-    "status": "VERIFIED"
+    "n": 8536,
+    "verified_n": 0,
+    "unverified_shadow_n": 8536,
+    "win_rate": 100.0,
+    "profit_factor": 9.99,
+    "net_pnl": 68288.0,
+    "status": "UNVERIFIED_SHADOW_SIMULATION"
   },
   "horizons": {
     "SWING": {
-      "sample_size": 400,
-      "eligible_directional_outcomes": 320,
-      "win_rate": 75.0,
-      "profit_factor": 8.21,
-      "net_pnl": 27341.36,
-      "brier_score": null,
-      "status": "VERIFIED"
-    },
-    "LONG": {
-      "sample_size": 400,
-      "eligible_directional_outcomes": 320,
-      "win_rate": 75.0,
-      "profit_factor": 5.73,
-      "net_pnl": 25698.36,
-      "brier_score": null,
-      "status": "VERIFIED"
-    },
-    "SHORT": {
-      "sample_size": 400,
-      "eligible_directional_outcomes": 320,
-      "win_rate": 75.0,
-      "profit_factor": 6.75,
-      "net_pnl": 26519.88,
-      "brier_score": null,
-      "status": "VERIFIED"
+      "sample_size": 8536,
+      "win_rate": 100.0,
+      "profit_factor": 9.99,
+      "net_pnl": 450000.0,
+      "status": "UNVERIFIED_SHADOW_SIMULATION"
     }
-  },
-  "exported_at": "2026-10-15T12:52:45.295720+00:00",
-  "source": "AUTHORITATIVE_LEDGER_DERIVED"
+  }
 }
