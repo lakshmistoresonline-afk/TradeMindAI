@@ -1,6 +1,6 @@
 """
 ================================================================================
-TradeMindAI: Phase 9.4.76 Evidence-Based Audit CSV Generator & Readiness Engine
+TradeMindAI: Phase 9.4.77 Evidence-Based Audit CSV Generator & Readiness Engine
 ================================================================================
 Generates:
 1. READINESS_AUDIT.csv (All 6 V2.2 indicators finite & verified per symbol)
@@ -18,6 +18,7 @@ import sys
 import csv
 import json
 import math
+import uuid
 import shutil
 import tempfile
 import hashlib
@@ -108,7 +109,8 @@ def prepare_reconciled_daily_bars(db_bars: list) -> tuple:
                 (b.volume is not None and (not is_finite_number(b.volume) or b.volume < 0))):
                 has_invalid_geometry = True
 
-            if b.source is None or str(b.source).strip() == "":
+            # Unverified provenance check: null, empty, or unauthenticated string label
+            if b.source is None or str(b.source).strip() == "" or str(b.source).strip().startswith("UNVERIFIED"):
                 has_unverified_provenance = True
 
         if has_invalid_geometry:
@@ -396,7 +398,7 @@ def file_sha256(filepath: str) -> str:
 
 def generate_audit_csvs_isolated(session, symbols: list, output_dir: str):
     """
-    Explicitly injected isolated audit generator entry point with atomic staging & publication.
+    Explicitly injected isolated audit generator entry point with atomic staging & versioned publication.
     Requires explicit session, symbol universe, and output_dir dependencies.
     Raises ValueError immediately if dependencies are missing, preventing any production fallback.
     """
@@ -411,7 +413,9 @@ def generate_audit_csvs_isolated(session, symbols: list, output_dir: str):
 
     now_utc = datetime.now(timezone.utc)
 
-    # Task 4: Generate into a unique temporary staging directory first
+    # Task 2 / Phase 2: Unique, Collision-Resistant Staging & Report Set ID
+    unique_set_uuid = uuid.uuid4().hex[:12].upper()
+    report_set_id = f"SET_{unique_set_uuid}_{int(now_utc.timestamp())}"
     staging_dir = tempfile.mkdtemp(prefix="trademind_audit_staging_")
 
     try:
@@ -587,7 +591,6 @@ def generate_audit_csvs_isolated(session, symbols: list, output_dir: str):
             writer.writerows(ohlcv_csv_rows)
 
         # Atomic Manifest Creation in Staging
-        report_set_id = f"SET_{int(now_utc.timestamp())}"
         manifest_data = {
             "report_set_id": report_set_id,
             "schema_version": "v2.2-ISO",
@@ -616,17 +619,19 @@ def generate_audit_csvs_isolated(session, symbols: list, output_dir: str):
         with open(stg_manifest_path, "w", encoding="utf-8") as f:
             json.dump(manifest_data, f, indent=2)
 
-        # Phase 2: Atomic Report Set Publication Architecture
-        # 1. Create an immutable versioned report set directory inside output_dir
+        # Phase 2 / Task 2: Truly Atomic Report Set Publication Architecture
+        # 1. Create a collision-resistant, immutable versioned directory inside output_dir
         versioned_set_dir = os.path.join(output_dir, report_set_id)
-        os.makedirs(versioned_set_dir, exist_ok=True)
+        if os.path.exists(versioned_set_dir):
+            raise RuntimeError(f"Report set ID collision detected: {versioned_set_dir} already exists.")
+        os.makedirs(versioned_set_dir, exist_ok=False)
 
         for fname in ["READINESS_AUDIT.csv", "SYMBOL_RESOLUTION_AUDIT.csv", "DUPLICATE_RECONCILIATION.csv", "CROSS_SOURCE_RECONCILIATION.csv", "OHLCV_QUALITY_AUDIT.csv", "AUDIT_REPORT_MANIFEST.json"]:
             s_path = os.path.join(staging_dir, fname)
             v_path = os.path.join(versioned_set_dir, fname)
             shutil.copy2(s_path, v_path)
 
-        # 2. Write active report set pointer
+        # 2. Write active report set pointer atomically
         active_pointer_data = {
             "active_report_set_id": report_set_id,
             "schema_version": "v2.2-ISO",
@@ -651,7 +656,7 @@ def generate_audit_csvs_isolated(session, symbols: list, output_dir: str):
     finally:
         shutil.rmtree(staging_dir, ignore_errors=True)
 
-def generate_phase_9_4_76_audit_csvs(scan_execution_log=None):
+def generate_phase_9_4_77_audit_csvs(scan_execution_log=None):
     """Default entry point for canonical production environment."""
     reports_dir = os.path.join(base_dir, "reports")
     with SessionLocal() as session:
@@ -662,68 +667,69 @@ def generate_phase_9_4_76_audit_csvs(scan_execution_log=None):
         )
 
 # Backward-compatible function alias exports
-generate_phase_9_4_11_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_12_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_13_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_15_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_18_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_19_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_20_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_21_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_22_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_23_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_24_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_25_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_26_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_27_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_28_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_29_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_30_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_31_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_32_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_33_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_34_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_35_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_36_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_37_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_38_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_39_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_40_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_41_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_42_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_43_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_44_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_45_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_46_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_47_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_48_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_49_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_50_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_51_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_52_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_53_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_54_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_55_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_56_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_57_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_58_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_59_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_60_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_61_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_62_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_63_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_64_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_65_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_66_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_67_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_68_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_69_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_70_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_71_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_72_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_73_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_74_audit_csvs = generate_phase_9_4_76_audit_csvs
-generate_phase_9_4_75_audit_csvs = generate_phase_9_4_76_audit_csvs
+generate_phase_9_4_11_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_12_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_13_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_15_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_18_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_19_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_20_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_21_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_22_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_23_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_24_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_25_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_26_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_27_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_28_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_29_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_30_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_31_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_32_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_33_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_34_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_35_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_36_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_37_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_38_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_39_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_40_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_41_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_42_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_43_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_44_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_45_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_46_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_47_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_48_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_49_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_50_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_51_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_52_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_53_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_54_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_55_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_56_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_57_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_58_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_59_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_60_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_61_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_62_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_63_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_64_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_65_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_66_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_67_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_68_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_69_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_70_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_71_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_72_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_73_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_74_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_75_audit_csvs = generate_phase_9_4_77_audit_csvs
+generate_phase_9_4_76_audit_csvs = generate_phase_9_4_77_audit_csvs
 
 if __name__ == "__main__":
-    generate_phase_9_4_76_audit_csvs()
+    generate_phase_9_4_77_audit_csvs()

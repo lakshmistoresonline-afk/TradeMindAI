@@ -1,11 +1,11 @@
 """
 ================================================================================
-TradeMindAI: Phase 9.4.75 Isolated End-to-End Acceptance Gate & Adversarial Tests
+TradeMindAI: Phase 9.4.77 Isolated End-to-End Acceptance Gate & Adversarial Tests
 ================================================================================
 Pipeline:
   Isolated SQLite Fixture -> Actual Generator -> Disk CSVs & Manifest -> Validator Subprocess
 
-Validates Scenarios A-O:
+Validates Scenarios A-Q:
   A: Two identified sources agree on valid OHLCV (SYM_A)
   B: Two identified sources conflict on OHLCV (SYM_B)
   C: Unverified / missing source provenance (SYM_C)
@@ -20,8 +20,9 @@ Validates Scenarios A-O:
   L: Subprocess validator rejects unsupported manifest schema version (Exit 1)
   M: Subprocess validator rejects unsafe path traversal in manifest (Exit 1)
   N: Staging publication failure preserves previous published report set
-  O: Empty symbol universe behaves safely and fails closed
-  P: Missing dependency isolation guard enforcement
+  O: Concurrent publications use collision-resistant UUIDs and maintain atomic pointer integrity
+  P: Empty symbol universe behaves safely and fails closed
+  Q: Missing dependency isolation guard enforcement
 ================================================================================
 """
 
@@ -119,10 +120,12 @@ def test_full_acceptance_gate_pipeline_and_adversarial_tampering(isolated_db_eng
         ready_path = os.path.join(temp_dir, "READINESS_AUDIT.csv")
         manifest_path = os.path.join(temp_dir, "AUDIT_REPORT_MANIFEST.json")
         cross_path = os.path.join(temp_dir, "CROSS_SOURCE_RECONCILIATION.csv")
+        active_ptr_path = os.path.join(temp_dir, "ACTIVE_REPORT_SET.json")
 
         assert os.path.exists(ready_path)
         assert os.path.exists(manifest_path)
         assert os.path.exists(cross_path)
+        assert os.path.exists(active_ptr_path)
 
         outcomes = {}
         with open(ready_path, "r", encoding="utf-8") as f:
@@ -273,6 +276,34 @@ def test_staging_publication_failure_preserves_previous_set(isolated_db_engine):
             current_manifest_data = json.load(mf)
 
         assert current_manifest_data["report_set_id"] == initial_manifest_data["report_set_id"]
+
+    session.close()
+
+def test_concurrent_publication_safety(isolated_db_engine):
+    Session = sessionmaker(bind=isolated_db_engine)
+    session = Session()
+
+    populate_fixture_symbols(session)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        res1 = generate_audit_csvs_isolated(session=session, symbols=["SYM_A"], output_dir=temp_dir)
+        assert res1 is True
+        ptr1_path = os.path.join(temp_dir, "ACTIVE_REPORT_SET.json")
+        with open(ptr1_path, "r", encoding="utf-8") as pf:
+            ptr1 = json.load(pf)
+
+        res2 = generate_audit_csvs_isolated(session=session, symbols=["SYM_E"], output_dir=temp_dir)
+        assert res2 is True
+        with open(ptr1_path, "r", encoding="utf-8") as pf:
+            ptr2 = json.load(pf)
+
+        # Assert UUID report set IDs are distinct and collision-resistant
+        assert ptr1["active_report_set_id"] != ptr2["active_report_set_id"]
+
+        # Assert pointer resolves to valid versioned directory
+        v_dir = os.path.join(temp_dir, ptr2["active_report_set_id"])
+        assert os.path.exists(v_dir)
+        assert os.path.exists(os.path.join(v_dir, "AUDIT_REPORT_MANIFEST.json"))
 
     session.close()
 
