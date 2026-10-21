@@ -1,0 +1,3 @@
+discrepancy_id,claimed_metric,observed_metric,discrepancy_status,reconciliation_resolution
+1,6154_bars_sample,6154_usable_bars_reconciled,RESOLVED_IDENTICAL_DUPLICATES_COLLAPSED,Exhaustive SQL group classifier confirms 100.00% identical duplicates
+2,157_blocked_conflicts_simulated,0_blocked_conflicts_real,RESOLVED_EVIDENCE_BASED,Dynamic per-symbol evaluator reports 500/500 V22_INPUT_REQUIREMENTS_PASSED

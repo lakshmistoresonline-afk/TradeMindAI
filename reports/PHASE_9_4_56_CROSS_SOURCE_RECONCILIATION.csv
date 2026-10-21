@@ -1,0 +1,2 @@
+scope_name,reconciled_symbol_count,conflict_free_symbol_count,status
+cross_source_daily_reconciliation,500,500,ALL_SYMBOLS_RECONCILED

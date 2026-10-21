@@ -51,12 +51,25 @@ class LocalIndicatorService:
         df["macd_signal"] = df["macd"].ewm(span=9, adjust=False).mean()
         df["macd_hist"] = df["macd"] - df["macd_signal"]
 
-        # 4. Bollinger Bands (20, 2)
+        # 4. Bollinger Bands (20, 2) and SMA 20
         sma_20 = close.rolling(window=20).mean()
         std_20 = close.rolling(window=20).std()
         df["bb_upper"] = sma_20 + (std_20 * 2.0)
         df["bb_lower"] = sma_20 - (std_20 * 2.0)
         df["bb_middle"] = sma_20
+        df["sma_20"] = sma_20
+
+        # 5. Average True Range (ATR 14)
+        if "high" in df.columns and "low" in df.columns:
+            high = df["high"]
+            low = df["low"]
+            prev_close = close.shift(1)
+            tr = pd.concat([
+                high - low,
+                (high - prev_close).abs(),
+                (low - prev_close).abs()
+            ], axis=1).max(axis=1)
+            df["atr_14"] = tr.rolling(window=14).mean()
 
         # Replace NaN with 0.0 for clean JSON output
         df.fillna(0.0, inplace=True)

@@ -1,0 +1,7 @@
+metric_name,count_value,metric_semantics
+total_table_rows,4337761,Total records in historical_prices table
+duplicate_groups_count,809251,"Groups with >1 record for same (symbol, date, source)"
+total_participating_rows,2209286,Total rows belonging to duplicate groups
+excess_duplicate_rows,1400035,"Excess rows beyond 1 record per (symbol, date, source) tuple"
+sample_identical_duplicates_pct,100.0%,Percentage of duplicate groups with exact identical OHLCV values
+sample_conflicting_duplicates_pct,0.0%,Percentage of duplicate groups with differing OHLCV values

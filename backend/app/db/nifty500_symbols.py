@@ -481,7 +481,7 @@ additional_companies = [
     ("TANLA", "Tanla Platforms Limited"),
     ("ROUTE", "Route Mobile Limited"),
     ("HAPPYFORGE", "Happy Forgings Limited"),
-    (" Azad Engineering", "Azad Engineering Limited"),
+    ("AZAD", "Azad Engineering Limited"),
     ("DOMS", "DOMS Industries Limited"),
     ("JPASSOCIAT", "Jaiprakash Associates Limited"),
     ("GTLINFRA", "GTL Infrastructure Limited"),
@@ -491,4 +491,4 @@ additional_companies = [
     ("IDEA", "Vodafone Idea Limited")
 ]
 
-NIFTY_500_SYMBOLS = list(get_nifty_500_universe().keys())[:500]
+NIFTY_500_SYMBOLS = [s.strip().upper() for s in get_nifty_500_universe().keys() if s and s.strip()][:500]

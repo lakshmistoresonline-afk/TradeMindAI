@@ -1,0 +1,10 @@
+metric_name,count_value,audit_scope,metric_semantics
+total_table_rows,4337761,FULL_TABLE_100_PCT,Total records in historical_prices table
+direct_sql_distinct_keys,2937726,FULL_TABLE_100_PCT,Direct SELECT COUNT(*) FROM (SELECT DISTINCT) SQL query
+math_crosscheck_unique_keys,2937726,FULL_TABLE_100_PCT,Arithmetic cross-check: total_rows - excess_rows
+duplicate_key_groups_count,809251,FULL_TABLE_100_PCT,Groups with >1 row for same key
+total_participating_rows,2209286,FULL_TABLE_100_PCT,Total rows in duplicate groups
+excess_duplicate_rows,1400035,FULL_TABLE_100_PCT,Excess rows beyond 1 record per key
+exhaustive_identical_groups,809251,FULL_TABLE_100_PCT,Duplicate groups with exact identical OHLCV values (100.00%)
+exhaustive_conflicting_groups,0,FULL_TABLE_100_PCT,Duplicate groups with differing OHLCV values (0.00%)
+exhaustive_indeterminate_groups,0,FULL_TABLE_100_PCT,Duplicate groups containing nulls/precision errors (0.00%)

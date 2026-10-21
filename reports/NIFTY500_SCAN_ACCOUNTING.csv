@@ -1,0 +1,2 @@
+run_id,scan_status,reason,timestamp
+NONE,NOT_RUN,No live production scan execution authorized during this audit turn.,2026-10-21T02:15:13.411849+00:00
