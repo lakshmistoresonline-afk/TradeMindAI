@@ -1,0 +1,15 @@
+validation_check,error_count,status
+null_symbol_count,0,PASSED
+null_date_count,0,PASSED
+null_open_count,0,PASSED
+null_high_count,0,PASSED
+null_low_count,0,PASSED
+null_close_count,0,PASSED
+null_volume_count,0,PASSED
+geometric_high_low_errors,0,PASSED
+geometric_high_open_errors,0,PASSED
+geometric_high_close_errors,0,PASSED
+geometric_low_open_errors,0,PASSED
+geometric_low_close_errors,0,PASSED
+non_positive_price_errors,0,PASSED
+negative_volume_errors,0,PASSED
