@@ -165,13 +165,31 @@ class MLService:
         return metadata
 
     async def predict_with_champion(self, symbol: str, feature_vector: Dict[str, float], horizon: str = "SWING", champion: Optional[ModelMetadata] = None, save: bool = True) -> Dict[str, Any]:
+        from backend.core.config import settings
         if champion is None:
             champion = await self.repository.get_champion_model(symbol, horizon=horizon)
 
         model_path = os.path.join(self.model_dir, champion.name) if champion else ""
         if not champion or not os.path.exists(model_path):
-            # Universal Resilience: Fallback to high-conviction baseline predictor
-            return self._generate_mock_prediction(symbol, horizon, champion.version if champion else "v2.2-universal-fallback")
+            # Task 8: Restrict mock ML predictions strictly to test/dev mode when explicitly allowed
+            allow_mock = os.getenv("ALLOW_MOCK_ML_PREDICTIONS", "false").lower() == "true" or settings.ENVIRONMENT in ["test", "development"]
+            if allow_mock:
+                return self._generate_mock_prediction(symbol, horizon, champion.version if champion else "v2.2-local-mock")
+            else:
+                return {
+                    "prediction": "UNAVAILABLE",
+                    "confidence": 0.0,
+                    "model_version": champion.version if champion else "UNAVAILABLE",
+                    "is_calibrated": False,
+                    "metadata": {
+                        "status": "MODEL_UNAVAILABLE",
+                        "reason": f"No valid ML champion model file found for {symbol} ({horizon})",
+                        "calibrated_probability_up": 0.0,
+                        "raw_probability_up": 0.0,
+                        "is_calibrated": False,
+                        "mock_generated": False
+                    }
+                }
 
         model = joblib.load(model_path)
         calibrator = None

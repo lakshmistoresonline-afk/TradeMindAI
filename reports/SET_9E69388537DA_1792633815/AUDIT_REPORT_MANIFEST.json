@@ -1,0 +1,24 @@
+{
+  "report_set_id": "SET_9E69388537DA_1792633815",
+  "schema_version": "v2.2-ISO",
+  "generated_at": "2026-10-22T01:50:15.044937+00:00",
+  "total_symbols_evaluated": 500,
+  "symbols_v22_ready": 210,
+  "symbols_reconciled_clean": 210,
+  "symbols_insufficient_history": 0,
+  "symbols_duplicate_conflicts": 156,
+  "symbols_unverified_provenance": 0,
+  "symbols_invalid_ohlcv": 0,
+  "symbols_no_data": 134,
+  "overall_reconciliation_status": "RECONCILIATION_ISSUES_DETECTED",
+  "overall_ohlcv_quality_status": "ALL_OHLCV_GEOMETRY_PASSED",
+  "overall_provenance_status": "ALL_PROVENANCE_IDENTIFIED",
+  "overall_v22_readiness_status": "READINESS_ISSUES_DETECTED",
+  "files": {
+    "READINESS_AUDIT.csv": "c029e1c8e463d8385419bad41216939ec99db264c7970f3e1844caca22649982",
+    "SYMBOL_RESOLUTION_AUDIT.csv": "3986fda6c05b96cf08e43c026dbfd5e02c8ec11c74cdd4ee3e61a6b7c4e05a42",
+    "DUPLICATE_RECONCILIATION.csv": "cd2c642291aa85b6b8b586b65f10e0d2d959eb56111b4666a33bb2096123fed9",
+    "CROSS_SOURCE_RECONCILIATION.csv": "63e51a5bdc566bf74e935318e3e16f0a31e1e7187cb09a8a959140c47cf4a1c3",
+    "OHLCV_QUALITY_AUDIT.csv": "12886d39e00534032e42407d414e1c79399d5cb26e9f9b7a8a2f38128ecaade5"
+  }
+}
