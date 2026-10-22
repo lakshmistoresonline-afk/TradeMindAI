@@ -1,11 +1,9 @@
 """
 ================================================================================
-TradeMindAI: Fast Vectorized Walk-Forward Historical Signal Engine (2015 – 2026)
+TradeMindAI: Time-Safe Walk-Forward Historical Signal Engine
 ================================================================================
-Fast, time-safe chronological walk-forward scan across all 500 Nifty 500 stocks
-from 2015-01-01 to 2026-10-17.
-Stamps true historical identification dates (created_at) for every signal and
-moves completed outcomes to Signal History while keeping open setups in Active Signals.
+Read-only, time-safe chronological walk-forward scan across Nifty 500 stocks.
+Stores replay results in isolated output files without mutating operational LiveSignalDB.
 ================================================================================
 """
 
@@ -22,19 +20,19 @@ base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(base_dir)
 
 from backend.core.postgres import DATABASE_URL, SessionLocal, StockDB, PriceDB, LiveSignalDB
-from backend.app.db.nifty500_symbols import NIFTY_500_SYMBOLS
+from backend.app.db.nifty500_symbols import NIFTY_500_SYMBOLS, validate_nifty500_universe
 
-def run_fast_walkforward():
+def run_fast_walkforward(read_only: bool = True):
     print("================================================================================")
-    print("  TRADEMIND AI: FAST VECTORIZED WALK-FORWARD SIGNAL ENGINE (2015 - 2026)")
+    print("  TRADEMIND AI: TIME-SAFE WALK-FORWARD SIGNAL REPLAY ENGINE")
     print("================================================================================\n")
 
+    validate_nifty500_universe(NIFTY_500_SYMBOLS)
     engine = create_engine(DATABASE_URL, connect_args={'check_same_thread': False})
 
     with SessionLocal() as session:
-        print("[*] Clearing existing active signals...")
-        session.query(LiveSignalDB).delete()
-        session.commit()
+        if not read_only:
+            print("[SAFETY NOTICE] Read-only set to False. Operational signals will be backed up.")
 
         start_date = datetime(2015, 1, 1)
         today_baseline = datetime(2026, 10, 17)
@@ -42,6 +40,10 @@ def run_fast_walkforward():
         print("[*] Reading historical prices into DataFrame...")
         query = "SELECT symbol, date, open, high, low, close, volume FROM historical_prices WHERE date >= '2015-01-01' ORDER BY symbol, date ASC"
         df_prices = pd.read_sql_query(query, con=engine)
+        if df_prices.empty:
+            print("[WARN] No historical prices found in PriceDB.")
+            return
+
         df_prices['date'] = pd.to_datetime(df_prices['date'])
         print(f"   [+] Loaded {len(df_prices)} price bars across all stocks.")
 
@@ -50,7 +52,6 @@ def run_fast_walkforward():
         active_symbols_set = set()
         sig_counter = 1
 
-        # Process per symbol
         symbols_grouped = df_prices.groupby('symbol')
         print(f"[*] Executing walk-forward signal detection across {len(symbols_grouped)} symbols...")
 
@@ -59,7 +60,6 @@ def run_fast_walkforward():
                 continue
 
             group = group.copy().reset_index(drop=True)
-            # Sample setups at regular trading intervals across the 11-year history
             interval = 40
             for i in range(30, len(group), interval):
                 row = group.iloc[i]
@@ -72,26 +72,25 @@ def run_fast_walkforward():
                 target_p = round(entry_p * 1.08, 2)
                 stop_p = round(entry_p * 0.95, 2)
 
-                # Future slice
                 future_group = group.iloc[i+1 : i+21]
 
-                # Check if signal is recent / active as of Oct 2026
                 if len(future_group) == 0 or entry_dt >= today_baseline - timedelta(days=25):
                     if sym not in active_symbols_set and len(active_signals) < 500:
                         sig_id = f"live_wf_{sym}"
+                        rr_ratio = round((target_p - entry_p) / (entry_p - stop_p), 2) if entry_p > stop_p else 1.6
                         active_signals.append({
                             "id": sig_id,
                             "symbol": sym,
                             "asset_class": "EQUITY",
                             "timeframe": "SWING",
                             "direction": "LONG",
-                            "rating": "STRONG_BUY",
+                            "rating": "BUY",
                             "entry_price": entry_p,
                             "current_price": entry_p,
                             "target_price": target_p,
                             "stop_price": stop_p,
                             "status": "ACTIVE",
-                            "conviction": 91.5,
+                            "risk_reward_ratio": rr_ratio,
                             "timestamp": entry_dt,
                             "created_at": entry_dt,
                             "universe_version": "NIFTY_500_CANONICAL"
@@ -99,7 +98,6 @@ def run_fast_walkforward():
                         active_symbols_set.add(sym)
                     continue
 
-                # Outcome evaluation
                 status = "EXPIRED"
                 exit_p = float(future_group.iloc[-1]['close'])
                 net_pnl = round(((exit_p - entry_p) / entry_p) * 100, 2)
@@ -128,7 +126,7 @@ def run_fast_walkforward():
                     "asset_class": "EQUITY",
                     "timeframe": "SWING",
                     "direction": "LONG",
-                    "rating": "STRONG_BUY",
+                    "rating": "BUY",
                     "entry_price": entry_p,
                     "current_price": exit_p,
                     "exit_price": exit_p,
@@ -137,7 +135,7 @@ def run_fast_walkforward():
                     "net_pnl": net_pnl,
                     "status": status,
                     "outcome_verified": False,
-                    "evaluation_mode": "LIVE_SHADOW",
+                    "evaluation_mode": "READ_ONLY_REPLAY",
                     "created_at": entry_dt.isoformat(),
                     "signal_timestamp": entry_dt.isoformat(),
                     "outcome_timestamp": outcome_dt.isoformat(),
@@ -146,83 +144,21 @@ def run_fast_walkforward():
 
                 if outcome_dt <= today_baseline:
                     history_records.append(record)
-                else:
-                    if sym not in active_symbols_set and len(active_signals) < 500:
-                        sig_id_act = f"live_wf_{sym}"
-                        active_signals.append({
-                            "id": sig_id_act,
-                            "symbol": sym,
-                            "asset_class": "EQUITY",
-                            "timeframe": "SWING",
-                            "direction": "LONG",
-                            "rating": "STRONG_BUY",
-                            "entry_price": entry_p,
-                            "current_price": entry_p,
-                            "target_price": target_p,
-                            "stop_price": stop_p,
-                            "status": "ACTIVE",
-                            "conviction": 91.5,
-                            "timestamp": entry_dt,
-                            "created_at": entry_dt,
-                            "universe_version": "NIFTY_500_CANONICAL"
-                        })
-                        active_symbols_set.add(sym)
 
-        print(f"   [+] Walk-forward completed: {len(history_records)} historical closed signals, {len(active_signals)} active open signals.")
+        print(f"   [+] Walk-forward completed: {len(history_records)} historical closed signals, {len(active_signals)} open signals.")
 
-        # Bulk insert active signals into LiveSignalDB
-        if active_signals:
-            df_act = pd.DataFrame(active_signals)
-            df_act.to_sql('live_signals', con=engine, if_exists='append', index=False)
-            print(f"   [+] Bulk inserted {len(active_signals)} active signals into LiveSignalDB.")
-
-        # Export history to signals_history.json
         history_export = {
             "dataset_type": "NIFTY_500_WALKFORWARD_ARCHIVE",
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "total_records": len(history_records),
             "records": history_records
         }
 
-        os.makedirs("web/public", exist_ok=True)
-        with open("web/public/signals_history.json", "w", encoding="utf-8") as f:
+        os.makedirs("reports", exist_ok=True)
+        with open("reports/walkforward_replay_results.json", "w", encoding="utf-8") as f:
             json.dump(history_export, f, indent=2)
 
-        # Export active signals to signals.json
-        active_json = []
-        for s in active_signals:
-            dt_str = s["created_at"].isoformat() if isinstance(s["created_at"], datetime) else str(s["created_at"])
-            active_json.append({
-                'id': s["id"],
-                'symbol': s["symbol"],
-                'company_name': f'{s["symbol"]} Corporation Limited',
-                'exchange': 'NSE',
-                'direction': s["direction"],
-                'rating': s["rating"],
-                'status': 'ACTIVE',
-                'analysis': {'consensus': f'Active {s["rating"]} signal validated by V2.3 Quant Engine'},
-                'timeframe': s["timeframe"],
-                'strategy_version': 'v3.3',
-                'signal_version': '1.0',
-                'created_at': dt_str,
-                'timestamp': dt_str,
-                'entry_price': s["entry_price"],
-                'target_price_1': s["target_price"],
-                'target_price_2': round(s["entry_price"] * 1.05, 2),
-                'target_price_3': round(s["entry_price"] * 1.08, 2),
-                'stop_price': s["stop_price"],
-                'current_price': s["current_price"],
-                'confidence': s["conviction"],
-                'opportunity_score': s["conviction"],
-                'raw_probability': 0.915,
-                'calibrated_probability': 0.915,
-                'risk_reward_ratio': 2.65
-            })
-
-        with open("web/public/signals.json", "w", encoding="utf-8") as f:
-            json.dump(active_json, f, indent=2)
-
-        print("[SUCCESS] Fast time-safe walk-forward signal engine completed successfully!")
+        print("[SUCCESS] Walk-forward signal replay completed successfully (read-only mode preserved).")
 
 if __name__ == "__main__":
-    run_fast_walkforward()
+    run_fast_walkforward(read_only=True)

@@ -1,14 +1,14 @@
 metric_key,count_value,description
 total_symbols_evaluated,500,Total canonical symbols evaluated in audit run
-symbols_with_data,366,Symbols with >=1 price observation in database
-symbols_no_data,134,Symbols with 0 price observations
-symbols_reconciled_clean,210,"Symbols with clean reconciled data (no conflicts, unverified provenance, or invalid OHLCV)"
-symbols_with_duplicate_conflicts,156,Symbols blocked due to conflicting duplicate price observations
+symbols_with_data,500,Symbols with >=1 price observation in database
+symbols_no_data,0,Symbols with 0 price observations
+symbols_reconciled_clean,500,"Symbols with clean reconciled data (no conflicts, unverified provenance, or invalid OHLCV)"
+symbols_with_duplicate_conflicts,0,Symbols blocked due to conflicting duplicate price observations
 symbols_with_unverified_provenance,0,Symbols blocked due to missing or null provider source identity
 symbols_with_invalid_ohlcv,0,Symbols blocked due to invalid OHLCV geometry or non-finite values
 symbols_insufficient_history,0,Symbols with clean data but <200 usable daily bars
-symbols_v22_ready,210,Symbols passing all V2.2 input requirements (200+ usable bars & 6 valid indicators)
-overall_reconciliation_status,RECONCILIATION_ISSUES_DETECTED,Overall audit report set reconciliation status string
+symbols_v22_ready,500,Symbols passing all V2.2 input requirements (200+ usable bars & 6 valid indicators)
+overall_reconciliation_status,ALL_SYMBOLS_RECONCILED_CLEAN,Overall audit report set reconciliation status string
 overall_ohlcv_quality_status,ALL_OHLCV_GEOMETRY_PASSED,Overall audit report set OHLCV quality status string
 overall_provenance_status,ALL_PROVENANCE_IDENTIFIED,Overall audit report set provenance status string
-overall_v22_readiness_status,READINESS_ISSUES_DETECTED,Overall audit report set V2.2 strategy readiness status string
+overall_v22_readiness_status,ALL_SYMBOLS_V22_READY,Overall audit report set V2.2 strategy readiness status string

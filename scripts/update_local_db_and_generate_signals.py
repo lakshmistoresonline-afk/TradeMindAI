@@ -34,6 +34,11 @@ load_dotenv(os.path.join(base_dir, 'backend', '.env'))
 db_path = os.path.join(base_dir, 'backend', 'local_operational.db')
 local_db_url = f'sqlite:///{db_path}'
 
+env = str(os.getenv("ENVIRONMENT") or "").lower()
+if env in ("production", "staging") or os.getenv("RAILWAY_ENVIRONMENT") is not None:
+    print("[CRITICAL] Refusing local DB update script in production or staging environment.")
+    sys.exit(1)
+
 print('================================================================================')
 print('  TRADEMIND AI: NIFTY-200 LOCAL DB UPDATER & SIGNAL ENGINE (V2.3)  ')
 print('================================================================================\n')

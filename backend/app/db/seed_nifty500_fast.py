@@ -18,6 +18,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Nifty500FastSeeder")
 
 def populate_nifty500_fast():
+    env = str(os.getenv("ENVIRONMENT") or "").lower()
+    if env in ("production", "staging") or os.getenv("RAILWAY_ENVIRONMENT") is not None:
+        logger.error("[Fast Seeder] CRITICAL: Refusing synthetic fixture insertion in production or staging environment.")
+        return
+
     db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "trade_mind.db"))
     logger.info(f"[Fast Seeder] Connecting to SQLite database at {db_path}...")
     conn = sqlite3.connect(db_path)

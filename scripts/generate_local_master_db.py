@@ -14,6 +14,11 @@ load_dotenv('backend/.env')
 db_path = os.path.join(base_dir, 'backend', 'local_operational.db')
 local_db_url = f'sqlite:///{db_path}'
 
+env = str(os.getenv("ENVIRONMENT") or "").lower()
+if env in ("production", "staging") or os.getenv("RAILWAY_ENVIRONMENT") is not None:
+    print("[CRITICAL] Refusing local master seed generation in production or staging environment.")
+    sys.exit(1)
+
 print('=== TRADEMIND AI LOCAL OPERATIONAL DB GENERATOR & SEEDER ===\n')
 print(f'[*] Initializing Local SQLite Database at: {db_path}')
 

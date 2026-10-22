@@ -8,7 +8,7 @@ null_close_count,0,PASSED
 null_volume_count,0,PASSED
 geometric_high_low_errors,0,PASSED
 geometric_high_open_errors,0,PASSED
-geometric_high_close_errors,0,PASSED
+geometric_high_close_errors,1,FAILED
 geometric_low_open_errors,0,PASSED
 geometric_low_close_errors,0,PASSED
 non_positive_price_errors,0,PASSED

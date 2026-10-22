@@ -1,0 +1,4 @@
+symbol,issue_type,affected_dates_or_range,evidence,action_taken,remaining_status
+AZAD,DUPLICATE_CONFLICT,2023-12-28,Centralized alias resolution maps ' Azad Engineering' whitespace variation to AZAD causing duplicate observation key,Aliased in nifty500_symbols.py; reconcile daily bars collapses identical values or flags conflicts,RECONCILED_ALIAS_MAPPING
+NO_DATA_134_SYMBOLS,NO_DATA,2015-01-01 to 2026-10-17,Synthetic N500_* filler symbols removed from nifty500_symbols.py universe; no historical prices in PriceDB,Removed synthetic fillers; authentic yfinance backfill scheduled,BLOCKED_NO_DATA
+CONFLICT_156_SYMBOLS,DUPLICATE_CONFLICT,2015-01-01 to 2026-10-17,Multiple price sources stored in historical_prices for same symbol and date with differing close prices,prepare_reconciled_daily_bars detects cross-source conflicts and blocks readiness fail-closed,BLOCKED_DUPLICATE_CONFLICT

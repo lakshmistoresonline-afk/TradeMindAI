@@ -22,7 +22,13 @@ logger = logging.getLogger("Nifty500Seeder")
 def populate_nifty500_history():
     """
     Populates historical daily OHLCV bars from 2015-01-01 to present for all Nifty 500 stocks.
+    Strictly refuses execution in production or staging environments.
     """
+    env = str(os.getenv("ENVIRONMENT") or "").lower()
+    if env in ("production", "staging") or os.getenv("RAILWAY_ENVIRONMENT") is not None:
+        logger.error("[Nifty500 Seeder] CRITICAL: Refusing synthetic fixture insertion in production or staging environment.")
+        return
+
     logger.info("[Nifty500 Seeder] Initializing database schema and WAL mode...")
     Base.metadata.create_all(bind=engine)
 

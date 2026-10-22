@@ -1,0 +1,5 @@
+source_label,total_records,evidence_classification,integrity_status,root_cause,quarantine_status
+NIFTY500_BULK_2015,1334934,BULK_SYNTHETIC_SINE_WAVE,UNTRUSTED_FABRICATED,Legacy bulk generation with sinusoidal variation (np.sin),QUARANTINED_PENDING_RECOVERY
+YFINANCE_AUTHENTIC,396283,MIXED_AUTHENTIC_AND_DETERMINISTIC,UNTRUSTED_NEED_AUDIT,Some rows inserted via yfinance adapter; others generated deterministically in fast_complete_backfill.py,QUARANTINED_PENDING_RECOVERY
+YFinance_10Y_Canonical,395640,CANONICAL_SEED_HISTORICAL,VERIFIED_BASELINE,Seeded 10-year historical price matrix,RETAINED_BASELINE
+BACKFILL_2015_CANONICAL,200489,HISTORICAL_CANONICAL_BACKFILL,VERIFIED_BASELINE,Historical price coverage backfill for Nifty 200,RETAINED_BASELINE
