@@ -1,7 +1,7 @@
 import asyncio
-import json
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from sse_starlette.sse import EventSourceResponse
+from backend.core.config import settings
 from backend.core.container import container
 
 router = APIRouter()
@@ -11,7 +11,13 @@ async def stream_signals(request: Request):
     """
     Server-Sent Events (SSE) for Real-Time Signal Updates.
     Vision 2.3: Durable connection with heartbeat.
+    Fails closed when QUARANTINE_ACTIVE=True.
     """
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Signal streaming endpoints are currently quarantined pending authentic market data verification."
+        )
     async def event_generator():
         while True:
             # Check for disconnect

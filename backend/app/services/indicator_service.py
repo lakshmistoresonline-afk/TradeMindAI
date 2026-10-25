@@ -35,7 +35,7 @@ class LocalIndicatorService:
         if len(df) >= 200:
             df["ema_200"] = close.ewm(span=200, adjust=False).mean()
         else:
-            df["ema_200"] = close.ewm(span=len(df), adjust=False).mean()
+            df["ema_200"] = np.nan
 
         # 2. Relative Strength Index (RSI 14)
         delta = close.diff()
@@ -71,8 +71,6 @@ class LocalIndicatorService:
             ], axis=1).max(axis=1)
             df["atr_14"] = tr.rolling(window=14).mean()
 
-        # Replace NaN with 0.0 for clean JSON output
-        df.fillna(0.0, inplace=True)
         return df
 
     @staticmethod
@@ -85,17 +83,22 @@ class LocalIndicatorService:
             return {}
 
         last = df_ta.iloc[-1]
+        def _fmt(key):
+            val = last.get(key) if hasattr(last, "get") else None
+            return round(float(val), 2) if val is not None and pd.notna(val) else None
+
         return {
             "symbol": str(df_ta.get("symbol", pd.Series([""])).iloc[-1] if "symbol" in df_ta.columns else ""),
-            "close": float(last["close"]),
-            "rsi_14": round(float(last["rsi_14"]), 2),
-            "macd": round(float(last["macd"]), 2),
-            "macd_signal": round(float(last["macd_signal"]), 2),
-            "macd_hist": round(float(last["macd_hist"]), 2),
-            "ema_20": round(float(last["ema_20"]), 2),
-            "ema_50": round(float(last["ema_50"]), 2),
-            "ema_200": round(float(last["ema_200"]), 2),
-            "bb_upper": round(float(last["bb_upper"]), 2),
-            "bb_lower": round(float(last["bb_lower"]), 2),
-            "bb_middle": round(float(last["bb_middle"]), 2)
+            "close": float(last["close"]) if "close" in last and pd.notna(last["close"]) else 0.0,
+            "rsi_14": _fmt("rsi_14"),
+            "macd": _fmt("macd"),
+            "macd_signal": _fmt("macd_signal"),
+            "macd_hist": _fmt("macd_hist"),
+            "ema_20": _fmt("ema_20"),
+            "ema_50": _fmt("ema_50"),
+            "ema_200": _fmt("ema_200"),
+            "bb_upper": _fmt("bb_upper"),
+            "bb_lower": _fmt("bb_lower"),
+            "bb_middle": _fmt("bb_middle"),
+            "atr_14": _fmt("atr_14")
         }

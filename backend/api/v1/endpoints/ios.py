@@ -26,6 +26,13 @@ async def get_market_regime():
 
 @router.get("/opportunities")
 async def get_opportunities(limit: int = 20):
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Market opportunity API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     try:
         active = await container.ios_repo.get_active_opportunities(limit=limit)
         if not active:
@@ -50,6 +57,13 @@ async def get_opportunities(limit: int = 20):
 
 @router.get("/signals/live")
 async def get_live_signals_audit(limit: int = 100):
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Live signals API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     import math
     from fastapi.encoders import jsonable_encoder
 

@@ -60,40 +60,20 @@ export const getEquitySignalForensics = async (id: string) => {
 export const getEquityPerformance = async () => {
   try {
     const response = await apiClient.get('/equity/performance', { timeout: 10000 });
-    if (response.data && response.data.verified_benchmark && response.data.verified_benchmark.n > 0) {
-      return response.data;
-    }
-    throw new Error("Empty performance response");
-  } catch (err) {
-    console.warn('Equity performance REST API fallback to static /performance.json:', err);
-    try {
-      const fallbackRes = await fetch('/performance.json');
-      const data = await fallbackRes.json();
-      return data || { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
-    } catch (fallbackErr) {
-      console.error('Failed to load static performance.json:', fallbackErr);
-      return { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
-    }
+    return response.data;
+  } catch (err: any) {
+    console.warn('Equity performance API unavailable/quarantined:', err?.response?.data?.detail || err.message);
+    throw err;
   }
 };
 
 export const getEquityAccuracy = async () => {
   try {
     const response = await apiClient.get('/equity/accuracy', { timeout: 10000 });
-    if (response.data && response.data.verified_benchmark && response.data.verified_benchmark.n > 0) {
-      return response.data;
-    }
-    throw new Error("Empty accuracy response");
-  } catch (err) {
-    console.warn('Equity accuracy REST API fallback to static /performance.json:', err);
-    try {
-      const fallbackRes = await fetch('/performance.json');
-      const data = await fallbackRes.json();
-      return data || { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
-    } catch (fallbackErr) {
-      console.error('Failed to load static performance.json:', fallbackErr);
-      return { verified_benchmark: { n: 0, win_rate: 0, profit_factor: 0, net_pnl: 0 }, horizons: {} };
-    }
+    return response.data;
+  } catch (err: any) {
+    console.warn('Equity accuracy API unavailable/quarantined:', err?.response?.data?.detail || err.message);
+    throw err;
   }
 };
 
@@ -113,7 +93,11 @@ export const getEquityHistory = async (params: any = {}) => {
       return response.data;
     }
     throw new Error("Empty history response");
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.response?.status === 503) {
+      console.warn('Equity history REST API quarantined (503), suppressing static fallback.');
+      throw err;
+    }
     console.warn('Equity history REST API fallback to static /signals_history.json:', err);
     try {
       const fallbackRes = await fetch('/signals_history.json');

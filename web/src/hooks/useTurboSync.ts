@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../api/client';
+import { getEquitySignals } from '../api/client';
 
 export function useTurboSync() {
   const [signals, setSignals] = useState<any[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<'CONNECTING' | 'ONLINE' | 'OFFLINE_FALLBACK' | 'ERROR'>('CONNECTING');
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/equity/signals?limit=1000`)
-      .then(res => {
-        if (!res.ok) throw new Error("Backend API unavailable");
-        return res.json();
-      })
+    getEquitySignals({ limit: 1000 })
       .then(data => {
         if (Array.isArray(data)) {
           setSignals(data);
@@ -20,21 +16,17 @@ export function useTurboSync() {
         }
       })
       .catch((err) => {
-        console.warn("[Turbo-Sync] Live API unavailable, checking static offline cache:", err);
-        fetch('/signals.json')
-          .then(res => res.json())
-          .then(fallbackData => {
-            if (Array.isArray(fallbackData)) {
-              setSignals(fallbackData);
-              setConnectionStatus('OFFLINE_FALLBACK');
-            } else {
-              setConnectionStatus('ERROR');
-            }
-          })
-          .catch(fallbackErr => {
-            console.error("[Turbo-Sync] Static fallback failed:", fallbackErr);
-            setConnectionStatus('ERROR');
-          });
+        const status = err?.response?.status;
+        const isQuarantined = status === 503 || (err.message && (err.message.includes("503") || err.message.includes("Quarantined")));
+        if (isQuarantined) {
+          console.warn("[Turbo-Sync] Quarantine active (503); suppressing offline fallback.");
+          setConnectionStatus('ERROR');
+          setSignals([]);
+          return;
+        }
+        console.warn("[Turbo-Sync] Live API unavailable:", err);
+        setConnectionStatus('ERROR');
+        setSignals([]);
       });
   }, []);
 

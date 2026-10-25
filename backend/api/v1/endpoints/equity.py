@@ -79,7 +79,15 @@ async def get_equity_signals(
 ):
     """
     Returns complete authoritative BUY-only signal records from PostgreSQL ledger.
+    Fails closed when QUARANTINE_ACTIVE=True to prevent untrusted signal exposure.
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Signal API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     try:
         from backend.core.postgres import SessionLocal, LiveSignalDB
         with SessionLocal() as session:
@@ -92,12 +100,21 @@ async def get_equity_signals(
                 eligible = [s for s in eligible if s.symbol.upper() == symbol.upper()]
 
             return [container.ios_repo._map_db_to_live_signal(s) for s in eligible[:limit]]
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Postgres signal fetch error: {e}")
         raise HTTPException(status_code=503, detail="Authoritative signal ledger temporarily unavailable.")
 
 @router.get("/signals/{signal_id}", response_model=LiveSignal)
 async def get_signal_detail(signal_id: str):
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Signal API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     signal = await SignalLedgerService.get_signal(signal_id)
     if not signal or not is_eligible_buy(signal):
         raise HTTPException(status_code=404, detail="Signal not found or not eligible")
@@ -108,6 +125,13 @@ def get_signal_explanation(signal_id: str):
     """
     Explainability (Why this signal?).
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Signal API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     from backend.core.postgres import SessionLocal, IntelligenceSynthesisDB, ShadowSignalDB
     with SessionLocal() as session:
         sig = session.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()
@@ -130,6 +154,13 @@ async def get_equity_accuracy():
     Returns rigorous accuracy forensics calculated strictly from genuine persisted predictions and resolved outcomes.
     Enforces strict status rules: INSUFFICIENT_EVIDENCE, PARTIALLY_VERIFIED, VERIFIED based on coverage & AUC.
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Accuracy API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     horizons_report = {}
     try:
         from backend.core.postgres import SessionLocal, ShadowSignalDB
@@ -277,7 +308,15 @@ async def get_equity_accuracy():
 async def get_equity_performance():
     """
     Returns performance metrics calculated strictly from canonical persisted resolved BUY signal ledger outcomes.
+    Fails closed when QUARANTINE_ACTIVE=True to prevent untrusted performance metric exposure.
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Performance API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     try:
         from backend.core.postgres import SessionLocal, ShadowSignalDB
         with SessionLocal() as session:
@@ -310,6 +349,13 @@ async def get_equity_performance():
 @router.get("/market")
 @cache(expire=300)
 async def get_market_state():
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Market state API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     from backend.services.market_data_service import MarketDataService
     return await MarketDataService.get_market_state()
 
@@ -318,11 +364,13 @@ def get_strategy_status():
     from backend.services.market_calendar import MarketCalendar
     from backend.core.config import settings
 
+    is_quarantined = getattr(settings, "QUARANTINE_ACTIVE", True)
     return {
         "strategy": "trademind-equity-v2.2",
         "universe": "NIFTY 500",
         "mode": "SHADOW_SIGNAL",
-        "status": "ONLINE",
+        "status": "QUARANTINED" if is_quarantined else "ONLINE",
+        "quarantine_active": is_quarantined,
         "freeze_status": "FROZEN",
         "environment": settings.ENVIRONMENT,
         "market_open": MarketCalendar.is_market_open(),
@@ -339,6 +387,16 @@ async def get_equity_history(
     limit: int = Query(500, ge=1, le=1000),
     user: dict = Depends(get_current_user)
 ):
+    """
+    Returns 1-Year historical signal records from the shadow_signals ledger (strictly BUY-only).
+    Fails closed when QUARANTINE_ACTIVE=True to prevent untrusted historical signal exposure.
+    """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Signal history API endpoints are currently quarantined pending authentic market data verification."
+        )
     """
     Returns 1-Year historical signal records from the shadow_signals ledger (strictly BUY-only).
     Preserves source direction without unconditional overwrites.
@@ -401,7 +459,15 @@ async def get_signal_forensics(signal_id: str):
     """
     Forensic Reconstruction (Phase 4).
     Reconstructs complete timeline and evidence for a specific signal.
+    Fails closed when QUARANTINE_ACTIVE=True to prevent untrusted signal exposure.
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Signal API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     signal = await SignalLedgerService.get_signal(signal_id)
     if not signal or not is_eligible_buy(signal):
         raise HTTPException(status_code=404, detail="Signal not found or not eligible")
@@ -430,7 +496,15 @@ async def get_equity_features(symbol: str, limit: int = 30):
     """
     GET /api/v1/equity/features/{symbol}
     Returns technical features for the given symbol from the database.
+    Fails closed when QUARANTINE_ACTIVE=True.
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Equity feature API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     from backend.core.postgres import SessionLocal, TechnicalFeatureDB
     with SessionLocal() as session:
         feats = session.query(TechnicalFeatureDB).filter(

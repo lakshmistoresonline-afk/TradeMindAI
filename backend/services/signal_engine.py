@@ -50,8 +50,8 @@ class SignalEngine:
             )
 
         if not features_list or len(features_list) == 0:
-            # Dynamic on-the-fly feature calculation fallback from recent prices
-            recent_prices = await container.repository.get_recent_prices(symbol, limit=60)
+            # Dynamic time-safe feature calculation fallback from recent prices as of eval_time
+            recent_prices = await container.repository.get_recent_prices(symbol, limit=250, as_of_date=eval_time)
             if not recent_prices or len(recent_prices) < 20:
                 return None
 

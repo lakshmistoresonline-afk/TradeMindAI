@@ -84,6 +84,13 @@ async def get_universe_signals(
     symbols = set(partitions[universe_id])
 
     # Query active/historical signals from database ledger matching symbols
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Universe signal API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     from backend.core.postgres import SessionLocal, ShadowSignalDB
     from backend.api.v1.endpoints.equity import is_eligible_buy
 

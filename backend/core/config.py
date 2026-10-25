@@ -12,6 +12,19 @@ class Settings(BaseSettings):
     LIVE_EXECUTION_ENABLED: bool = False
     BROKER_ORDER_EXECUTION_ENABLED: bool = False
 
+    # CENTRAL FAIL-CLOSED QUARANTINE CONTROL (DEFAULT: TRUE)
+    QUARANTINE_ACTIVE: bool = True
+
+    @field_validator("QUARANTINE_ACTIVE", mode="before")
+    @classmethod
+    def validate_quarantine_setting(cls, v, info) -> bool:
+        if v is False or str(v).lower() in ("false", "0", "no", "off", "disable", "disabled"):
+            raise ValueError(
+                "CRITICAL SECURITY AUDIT FAILURE: QUARANTINE_ACTIVE is permanently active and cannot be disabled in "
+                "any environment until authentic market data recovery is certified."
+            )
+        return True
+
     @field_validator("REAL_TRADING", "LIVE_EXECUTION_ENABLED", "BROKER_ORDER_EXECUTION_ENABLED", mode="before")
     @classmethod
     def enforce_signal_only_boundary(cls, v) -> bool:

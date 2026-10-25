@@ -15,7 +15,15 @@ router = APIRouter(prefix="/api/v1", tags=["Indicators"])
 def get_indicators(symbol: str, limit: int = Query(180, ge=20, le=1000)):
     """
     Calculates RSI, MACD, EMAs, and Bollinger Bands on demand from local DB price records.
+    Fails closed when QUARANTINE_ACTIVE=True.
     """
+    from backend.core.config import settings
+    if getattr(settings, "QUARANTINE_ACTIVE", True):
+        raise HTTPException(
+            status_code=503,
+            detail="QUARANTINED: Indicator API endpoints are currently quarantined pending authentic market data verification."
+        )
+
     df = LocalMarketDataService.get_historical_data(symbol, limit)
     if df.empty:
         raise HTTPException(status_code=404, detail=f"No local market data found for symbol '{symbol}'")

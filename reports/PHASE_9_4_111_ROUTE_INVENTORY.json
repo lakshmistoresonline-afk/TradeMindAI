@@ -1,0 +1,343 @@
+{
+  "schema_version": "v2.2-ISO",
+  "total_registered_openapi_paths": 47,
+  "total_inventoried_routes": 48,
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/db-audit",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/evaluation",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/logs",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/shadow-analytics",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/stats",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/data/import",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/accuracy",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/features/{symbol}",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/history",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/market",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/performance",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/signals",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/signals/{signal_id}",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/signals/{signal_id}/explanation",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/signals/{signal_id}/forensics",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/equity/status",
+      "classification": "NON_SENSITIVE_STATUS_ENDPOINT",
+      "enforcement_guard": "RETURNS_QUARANTINE_ACTIVE_TRUE",
+      "test_status": "PASS_STATUS_200"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/indicators/{symbol}",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ios/opportunities",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ios/regime",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ios/signals/live",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/market-data/ingest",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/market-data/status",
+      "classification": "NON_SENSITIVE_STATUS_ENDPOINT",
+      "enforcement_guard": "RETURNS_QUARANTINE_ACTIVE_TRUE",
+      "test_status": "PASS_STATUS_200"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/public/config",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/public/seo/{page}",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/signals/{symbol}",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stocks/",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stocks/market-stats",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stocks/{symbol}",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stocks/{symbol}/ltp",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stocks/{symbol}/option-chain",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stream/signals",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/symbols",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/system/health/",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ticker/{symbol}",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/universes/",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/universes/{universe_id}/constituents",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/universes/{universe_id}/signals",
+      "classification": "PROTECTED_SIGNAL_OR_DERIVED_DATA",
+      "enforcement_guard": "FAIL_CLOSED_HTTP_503",
+      "test_status": "PASS_HTTP_503"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/user/b2b/request",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/user/referrals",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/user/referrals",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/user/subscription",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/user/upgrade",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/user/watchlist",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/user/watchlist/{symbol}",
+      "classification": "UNRELATED_OPERATIONAL_ENDPOINT",
+      "enforcement_guard": "UNRESTRICTED",
+      "test_status": "NOT_APPLICABLE"
+    }
+  ]
+}

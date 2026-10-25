@@ -140,7 +140,12 @@ export default function EquitySignals() {
         }
       }
     } catch (e: any) {
-      console.warn("REST API sync notice (using Firestore Mirror fallback):", e);
+      console.warn("REST API sync notice:", e);
+      if (e?.response?.status === 503 || e?.message?.includes("503") || e?.message?.includes("QUARANTINED")) {
+        setError("Market Data Quarantine Active: Signal Terminal is paused pending provider data authenticity verification.");
+        setSignals([]);
+        setHistory([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -151,9 +156,8 @@ export default function EquitySignals() {
   }, [mode, page, rowsPerPage, hFilterHorizon, hFilterQuality, hFilterStatus, hFilterDirection]);
 
   useEffect(() => {
-    if (firestoreSignals.length === 0) return;
+    if (firestoreSignals.length === 0 || (error && error.includes("Quarantine"))) return;
 
-    setError(null);
     const fsSignals = firestoreSignals.map(s => ({ ...mapCanonicalSignal(s), _isFirestore: true }));
 
     setSignals(prev => {
@@ -165,10 +169,10 @@ export default function EquitySignals() {
             new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime()
         );
     });
-  }, [firestoreSignals]);
+  }, [firestoreSignals, error]);
 
   useEffect(() => {
-    if (firestoreHistory.length === 0) return;
+    if (firestoreHistory.length === 0 || (error && error.includes("Quarantine"))) return;
 
     // Include full 10-year historical shadow ledger (2016-2026) without 1-year cutoff truncation
     const fsHistory = firestoreHistory.map((s: any) => mapCanonicalSignal(s));
@@ -352,6 +356,26 @@ export default function EquitySignals() {
             </Stack>
          </Box>
       </Box>
+
+      {/* Quarantine Alert Banner */}
+      {error && (
+        <Box sx={{
+          mb: 4, p: 2.5, borderRadius: 2,
+          bgcolor: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.4)',
+          display: 'flex', alignItems: 'center', gap: 2
+        }}>
+          <ShieldAlert color="#ef4444" size={24} />
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#ef4444', fontFamily: MONO_FONT }}>
+              MARKET DATA QUARANTINE ACTIVE
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#f87171', fontSize: '0.8rem', mt: 0.5 }}>
+              {error}
+            </Typography>
+          </Box>
+        </Box>
+      )}
 
       {/* 2. Mode Switch & Controls */}
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>

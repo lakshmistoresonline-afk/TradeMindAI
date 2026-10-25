@@ -80,9 +80,12 @@ class HybridStockRepository(IStockRepository):
             if to_add: pg.bulk_save_objects(to_add)
             pg.commit()
 
-    async def get_recent_prices(self, symbol: str, limit: int = 250) -> List[StockPrice]:
+    async def get_recent_prices(self, symbol: str, limit: int = 250, as_of_date: Optional[datetime] = None) -> List[StockPrice]:
         with self.session_factory() as pg:
-            prices = pg.query(PriceDB).filter(PriceDB.symbol == symbol).order_by(PriceDB.date.desc()).limit(limit).all()
+            query = pg.query(PriceDB).filter(PriceDB.symbol == symbol)
+            if as_of_date:
+                query = query.filter(PriceDB.date <= as_of_date)
+            prices = query.order_by(PriceDB.date.desc()).limit(limit).all()
             results = []
             for p in prices:
                 p_data = {c.name: getattr(p, c.name) for c in p.__table__.columns}
@@ -290,6 +293,11 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 ModelMetadataDB.is_champion == True,
                 ModelMetadataDB.horizon == horizon
             ).order_by(ModelMetadataDB.last_trained.desc()).first()
+            if not r:
+                r = pg.query(ModelMetadataDB).filter(
+                    ModelMetadataDB.is_champion == True,
+                    ModelMetadataDB.horizon == horizon
+                ).order_by(ModelMetadataDB.last_trained.desc()).first()
             return self._map_db_to_model_metadata(r) if r else None
 
     async def get_model_history(self, symbol: str, limit: int = 10) -> List[ModelMetadata]:
@@ -310,6 +318,8 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
             if data.get(col) and isinstance(data[col], str):
                 try: data[col] = json.loads(data[col])
                 except: pass
+            if not data.get(col) or not isinstance(data[col], dict):
+                data[col] = {}
         return ModelMetadata(**data)
 
     async def save_ml_dataset(self, dataset: MLDataset) -> None:
