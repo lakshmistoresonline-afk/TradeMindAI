@@ -1,48 +1,64 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# Ensure the app can find the backend package
-export PYTHONPATH=$PYTHONPATH:/app
-export SERVICE_TYPE=${SERVICE_TYPE:-api}
+export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}/app"
+export SERVICE_TYPE="${SERVICE_TYPE:-api}"
 
-echo "[*] BOOTSTRAP: Detected SERVICE_TYPE='$SERVICE_TYPE'"
+log() {
+    printf '%s %s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" "$*"
+}
 
-# --- PRODUCTION CONFIGURATION VALIDATION (Phase 7.3) ---
-if [ "$ENVIRONMENT" = "production" ]; then
-    echo "--- PRODUCTION CONFIGURATION VALIDATION ---"
-    if [ -z "$POSTGRES_URL" ]; then
-        echo "[!] CRITICAL ERROR: POSTGRES_URL is missing in production environment."
-        exit 1
-    fi
-    if [ -z "$REDIS_URL" ]; then
-        echo "[!] CRITICAL ERROR: REDIS_URL is missing in production environment."
-        exit 1
-    fi
-    echo "ENVIRONMENT: production"
-    echo "DATABASE: PostgreSQL (Authoritative)"
-    echo "SERVICE_TYPE: $SERVICE_TYPE"
-    echo "[+] Configuration Validated."
+fail() {
+    log "FATAL: $*"
+    exit 1
+}
+
+if [[ "${ENVIRONMENT:-development}" == "production" ]]; then
+    [[ "$SERVICE_TYPE" == "api" ]] \
+        || fail "Only SERVICE_TYPE=api is permitted in production."
+
+    [[ -n "${POSTGRES_URL:-}" ]] \
+        || fail "POSTGRES_URL is required in production."
+
+    [[ -n "${REDIS_URL:-}" ]] \
+        || fail "REDIS_URL is required in production."
+
+    [[ -n "${SECRET_KEY:-}" ]] \
+        || fail "SECRET_KEY is required in production."
+
+    [[ "${SECRET_KEY}" != "SECRET" ]] \
+        || fail "The default signing secret is prohibited."
+
+    [[ "${#SECRET_KEY}" -ge 32 ]] \
+        || fail "SECRET_KEY must be at least 32 characters."
+
+    [[ -n "${MARKET_DATA_INGEST_KEY:-}" ]] \
+        || fail "MARKET_DATA_INGEST_KEY is required."
+
+    [[ "${MARKET_DATA_INGEST_KEY}" != "LOCAL_ONLY_DEV_KEY" ]] \
+        || fail "The development ingest key is prohibited."
+
+    [[ "${#MARKET_DATA_INGEST_KEY}" -ge 32 ]] \
+        || fail "MARKET_DATA_INGEST_KEY must be at least 32 characters."
+
+    [[ "${POSTGRES_URL}" == postgresql://* \
+        || "${POSTGRES_URL}" == postgresql+psycopg2://* ]] \
+        || fail "Production POSTGRES_URL must use PostgreSQL."
 fi
 
-# --- ZERO RAILWAY WORKER ENFORCEMENT (Phase 7.8 Correction) ---
-if [ "$ENVIRONMENT" = "production" ]; then
-    if [ "$SERVICE_TYPE" != "api" ]; then
-        echo "[!] CRITICAL ERROR: RAILWAY_BACKGROUND_EXECUTION_DISABLED"
-        echo "    Role '$SERVICE_TYPE' is forbidden in the cloud environment."
-        echo "    Railway is reserved ONLY for API/Web serving."
-        echo "    All heavy processing must run manually on local Windows infrastructure."
-        exit 1
-    fi
-fi
+PORT="${PORT:-8000}"
 
-# Note: Celery worker/beat branches removed to prevent accidental cloud execution.
-# Background tasks are preserved in the codebase for local manual execution only.
+[[ "$PORT" =~ ^[0-9]+$ ]] \
+    || fail "PORT must be an integer."
 
-# --- PRODUCTION SCHEMA MANAGEMENT (TEMPORARILY BYPASSED) ---
-if [ "$ENVIRONMENT" = "production" ]; then
-    echo "[*] AUDIT: Bypassing Alembic migrations for final synchronization..."
-fi
+(( PORT >= 1 && PORT <= 65535 )) \
+    || fail "PORT must be between 1 and 65535."
 
-echo "Starting FastAPI API..."
+log "Starting TradeMindAI API on port ${PORT}."
 
-PORT=${PORT:-8000}
-uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-keep-alive 60
+exec python -m uvicorn backend.app.main:app \
+    --host 0.0.0.0 \
+    --port "$PORT" \
+    --workers 1 \
+    --timeout-keep-alive 15 \
+    --timeout-graceful-shutdown 25
