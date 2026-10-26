@@ -1,50 +1,71 @@
-# V2.3.2 Final Build (Python 3.11 for optimal compatibility)
-FROM python:3.11-slim
+# ==============================================================================
+# TradeMindAI Hardened Multi-Stage Dockerfile (TM-01 & TM-10)
+# ==============================================================================
 
-# Set environment variables for non-interactive installs and memory safety
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
+FROM python:3.11-slim AS builder
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
-    PYTHONPATH=/app
+    PYTHONDONTWRITEBYTECODE=1
 
-WORKDIR /app
+WORKDIR /build
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Install specific numerical stack versions
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install "numpy==1.26.4" "pandas==2.2.2" "numba==0.59.1" "tqdm" "scikit-learn==1.5.0" "psycopg2-binary==2.9.12"
+COPY backend/requirements.txt ./requirements.txt
 
-# Copy requirements first for better caching
-COPY backend/requirements.txt ./
-RUN pip install -r requirements.txt
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && python -m pip install --prefix=/install \
+       "numpy==1.26.4" \
+       "pandas==2.2.2" \
+       "numba==0.59.1" \
+       "scikit-learn==1.5.0" \
+       "psycopg2-binary==2.9.12" \
+    && python -m pip install --prefix=/install \
+       -r requirements.txt \
+    && python -m pip install --prefix=/install \
+       --no-deps pandas-ta
 
-# Install pandas-ta without triggering dependency resolution
-RUN pip install pandas-ta --no-deps
 
-# Copy entire backend source explicitly
-COPY backend/ backend/
+FROM python:3.11-slim AS runtime
 
-# Copy alembic.ini from root
-COPY alembic.ini ./alembic.ini
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PIP_NO_CACHE_DIR=1
 
-# Copy scripts for universe and other shared modules
-COPY scripts/ scripts/
+WORKDIR /app
 
-# Copy docs for freeze manifest
-COPY docs/ docs/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libgomp1 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system app \
+    && useradd --system --gid app \
+       --home-dir /app --no-create-home app
 
-# Ensure start script is executable and create non-root user for security (TM-10)
-RUN chmod +x backend/start.sh && \
-    useradd -u 10001 -m trademind && \
-    chown -R trademind:trademind /app
+COPY --from=builder /install /usr/local
 
-USER trademind
+COPY backend/ /app/backend/
+COPY scripts/ /app/scripts/
+COPY docs/ /app/docs/
+COPY alembic.ini /app/alembic.ini
 
-# Run using the start script
-CMD ["backend/start.sh"]
+RUN chmod 0555 /app/backend/start.sh \
+    && chown -R root:root /app \
+    && find /app -type d -exec chmod 0555 {} \; \
+    && find /app -type f -exec chmod 0444 {} \; \
+    && chmod 0555 /app/backend/start.sh
+
+USER app:app
+
+EXPOSE 8000
+
+STOPSIGNAL SIGTERM
+
+CMD ["bash", "/app/backend/start.sh"]
