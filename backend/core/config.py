@@ -1,5 +1,14 @@
+"""
+================================================================================
+TradeMindAI: Hardened Configuration & Security Settings (SEC-01 & TM-03)
+================================================================================
+Permanent product boundary: signals only, never order execution.
+Requires production signing key and ingest key, removes placeholder LLM credentials.
+================================================================================
+"""
+
 import os
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -7,36 +16,42 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "TradeMind AI"
 
-    # STRICT PRODUCT BOUNDARY - SIGNAL PROVIDER ONLY (NON-NEGOTIABLE)
+    # Permanent product boundary: signals only, never order execution.
     REAL_TRADING: bool = False
     LIVE_EXECUTION_ENABLED: bool = False
     BROKER_ORDER_EXECUTION_ENABLED: bool = False
-
-    # CENTRAL FAIL-CLOSED QUARANTINE CONTROL (DEFAULT: TRUE)
     QUARANTINE_ACTIVE: bool = True
+
+    @field_validator(
+        "REAL_TRADING",
+        "LIVE_EXECUTION_ENABLED",
+        "BROKER_ORDER_EXECUTION_ENABLED",
+        mode="before",
+    )
+    @classmethod
+    def enforce_signal_only_boundary(cls, value) -> bool:
+        if isinstance(value, bool):
+            enabled = value
+        else:
+            enabled = str(value).strip().lower() in {
+                "true", "1", "yes", "on", "enable", "enabled"
+            }
+        if enabled:
+            raise ValueError(
+                "TradeMindAI is a signal-provider application. "
+                "Order execution capabilities are permanently disabled."
+            )
+        return False
 
     @field_validator("QUARANTINE_ACTIVE", mode="before")
     @classmethod
     def validate_quarantine_setting(cls, v, info) -> bool:
         if v is False or str(v).lower() in ("false", "0", "no", "off", "disable", "disabled"):
             raise ValueError(
-                "CRITICAL SECURITY AUDIT FAILURE: QUARANTINE_ACTIVE is permanently active and cannot be disabled in "
-                "any environment until authentic market data recovery is certified."
+                "CRITICAL SECURITY AUDIT FAILURE: QUARANTINE_ACTIVE is permanently active and cannot be disabled."
             )
         return True
 
-    @field_validator("REAL_TRADING", "LIVE_EXECUTION_ENABLED", "BROKER_ORDER_EXECUTION_ENABLED", mode="before")
-    @classmethod
-    def enforce_signal_only_boundary(cls, v) -> bool:
-        if v is True or str(v).lower() in ("true", "1", "yes", "on", "enable", "enabled"):
-            raise ValueError(
-                "CRITICAL SECURITY AUDIT FAILURE: TradeMindAI is strictly a signal-provider and market-analysis application. "
-                "REAL_TRADING and order execution capabilities are permanently disabled and cannot be enabled in any environment."
-            )
-        return False
-
-    # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
-    # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
@@ -61,17 +76,17 @@ class Settings(BaseSettings):
         return v
 
     FIREBASE_PROJECT_ID: str = "com-webcraft-trademindai-c8f75"
-    GROQ_API_KEY: str = "YOUR_GROQ_API_KEY"
+    GROQ_API_KEY: Optional[str] = None
 
     # Vision 2.2: Local LLM Support (Ollama)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "qwen3:1.7b" # Exact tag for your installed 1.7B version
+    OLLAMA_MODEL: str = "qwen3:1.7b"
     USE_LOCAL_LLM: bool = False
 
     GROWW_API_KEY: Optional[str] = None
     GROWW_BASE_URL: str = "https://api.groww.in/v1"
 
-    MARKET_DATA_PROVIDER: str = "yfinance" # or "groww"
+    MARKET_DATA_PROVIDER: str = "yfinance"
     DEFAULT_RISK_REWARD: float = 2.5
 
     SECRET_KEY: str = "SECRET"
@@ -80,8 +95,8 @@ class Settings(BaseSettings):
     @classmethod
     def validate_secret_key(cls, v: str, info) -> str:
         if info.data.get("ENVIRONMENT") == "production":
-            if v == "SECRET":
-                raise ValueError("CRITICAL: SECRET_KEY must be set in production environment via environment variables. Cannot use default 'SECRET'.")
+            if v == "SECRET" or not v:
+                raise ValueError("CRITICAL: SECRET_KEY must be set in production environment via environment variables.")
             if len(v) < 32:
                  raise ValueError("CRITICAL: production SECRET_KEY is too weak (< 32 chars). Security audit failure.")
         return v
@@ -92,29 +107,17 @@ class Settings(BaseSettings):
     @classmethod
     def validate_ingest_key(cls, v: str, info) -> str:
         if info.data.get("ENVIRONMENT") == "production":
-            if v == "LOCAL_ONLY_DEV_KEY":
-                raise ValueError("CRITICAL: MARKET_DATA_INGEST_KEY must be set in production. Cannot use development default.")
+            if v == "LOCAL_ONLY_DEV_KEY" or not v:
+                raise ValueError("CRITICAL: MARKET_DATA_INGEST_KEY must be set in production.")
             if len(v) < 16:
                 raise ValueError("CRITICAL: MARKET_DATA_INGEST_KEY is too weak for production.")
         return v
 
-
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
-
-    # Production Identity (Phase 3)
     GIT_SHA: str = os.getenv("RENDER_GIT_COMMIT", "LOCAL_HEAD")
-
-    # FINAL DELIVERY HARDENING: Admin Security
-    ADMIN_EMAILS: List[str] = ["admin@trademind.ai", "admin@trademindai.com", "lakshmistoresonline@gmail.com"]
-
-    # V2.3 Shadow Mode (Workstream 11)
-    V23_MIN_CALIBRATED_PROBABILITY: float = 0.60
-    V23_RSI_EXHAUSTION_ENABLED: bool = False
-    V23_RSI_LONG_THRESHOLD: float = 75.0
-    V23_RSI_SHORT_THRESHOLD: float = 25.0
+    ADMIN_EMAILS: List[str] = []
 
     model_config = SettingsConfigDict(case_sensitive=True, env_file=".env", extra="ignore")
 
 settings = Settings()
-
