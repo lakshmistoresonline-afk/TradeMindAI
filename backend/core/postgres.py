@@ -3,34 +3,59 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
 import os
+from urllib.parse import urlparse, urlunparse
 from .config import settings
 
-# --- DATABASE URL RESOLUTION ---
-# 1. Try environment variables
-DATABASE_URL = os.getenv("POSTGRES_URL") or os.getenv("DATABASE_URL")
+def sanitize_db_url(url: str | None) -> str:
+    if not url:
+        return "<EMPTY>"
+    try:
+        parsed = urlparse(url)
+        if parsed.password:
+            user = parsed.username or ""
+            host = parsed.hostname or ""
+            port = f":{parsed.port}" if parsed.port else ""
+            netloc = f"{user}:***@{host}{port}"
+            parsed = parsed._replace(netloc=netloc)
+        return urlunparse(parsed)
+    except Exception:
+        return "<REDACTED_URL>"
 
-# 2. Check for Production/Railway environment
+# --- DATABASE URL RESOLUTION & FAIL-CLOSED VALIDATION ---
+db_url_env = os.getenv("POSTGRES_URL")
+db_url_alt = os.getenv("DATABASE_URL")
+
+if db_url_env and db_url_alt and db_url_env.strip() != db_url_alt.strip():
+    raise ValueError(
+        f"CRITICAL SECURITY AUDIT FAILURE: Conflicting database URLs detected between POSTGRES_URL ({sanitize_db_url(db_url_env)}) "
+        f"and DATABASE_URL ({sanitize_db_url(db_url_alt)})."
+    )
+
+DATABASE_URL = db_url_env or db_url_alt
+
 is_railway = os.getenv("RAILWAY_ENVIRONMENT") is not None
-is_production = is_railway or os.getenv("ENVIRONMENT") == "production"
+is_production = is_railway or os.getenv("ENVIRONMENT", "").lower() == "production" or getattr(settings, "ENVIRONMENT", "") == "production"
 
-if not DATABASE_URL or "sqlite" in DATABASE_URL.lower():
-    if not is_production:
-        # Development Fallback (SQLite)
+if is_production:
+    if not DATABASE_URL:
+        raise ValueError("CRITICAL SECURITY AUDIT FAILURE: Production environment requires a valid PostgreSQL URL (POSTGRES_URL or DATABASE_URL). None provided.")
+    if "sqlite" in DATABASE_URL.lower():
+        raise ValueError(f"CRITICAL SECURITY AUDIT FAILURE: SQLite is strictly prohibited in production environments (got {sanitize_db_url(DATABASE_URL)}).")
+else:
+    if not DATABASE_URL or "sqlite" in DATABASE_URL.lower():
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         db_path = os.path.join(base_dir, "backend", "local_operational.db")
         DATABASE_URL = f"sqlite:///{db_path}"
-    else:
-        # Production with no URL is an error
-        print("[!] CRITICAL: Production mode detected but NO POSTGRES_URL provided.")
 
 from sqlalchemy import create_engine
 engine_args = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
-    "connect_args": {"connect_timeout": 10}
 }
-if "sqlite" in DATABASE_URL:
-    engine_args = {"connect_args": {"check_same_thread": False}}
+if "sqlite" in DATABASE_URL.lower():
+    engine_args["connect_args"] = {"check_same_thread": False}
+else:
+    engine_args["connect_args"] = {"connect_timeout": 10}
 
 engine = create_engine(DATABASE_URL, **engine_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -232,6 +257,7 @@ class LiveSignalDB(Base):
     __tablename__ = "live_signals"
     __table_args__ = (
         Index('idx_unique_active_signal', 'symbol', 'timeframe', unique=True, sqlite_where=(Column('status') == 'ACTIVE'), postgresql_where=(Column('status') == 'ACTIVE')),
+        UniqueConstraint('symbol', 'strategy_version', 'direction', 'decision_timestamp', name='_symbol_strategy_direction_ts_uc'),
     )
     id = Column(String, primary_key=True, index=True)
     symbol = Column(String, index=True)
@@ -374,10 +400,6 @@ class LiveSignalDB(Base):
     price_source = Column(String)
     price_adjustment_factor = Column(Float, default=1.0)
     normalized_current_price = Column(Float)
-
-    __table_args__ = (
-        UniqueConstraint('symbol', 'strategy_version', 'direction', 'decision_timestamp', name='_symbol_strategy_direction_ts_uc'),
-    )
 
     mfe = Column(Float) # Legacy
     mae = Column(Float) # Legacy
@@ -870,7 +892,6 @@ from .config import settings
 
 @event.listens_for(LiveSignalDB, 'before_insert')
 def guard_live_signal(mapper, connection, target):
-    # Part 4/34: Environment Guard
     if settings.ENVIRONMENT in ["production", "shadow"] and target.evaluation_mode == "TEST":
         raise ValueError(f"CRITICAL: Rejected TEST signal insertion into {settings.ENVIRONMENT} database.")
 
