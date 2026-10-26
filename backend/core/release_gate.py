@@ -3,7 +3,8 @@
 TradeMindAI: Hardened Fail-Closed Release Gate (REL-02 & TM-08)
 ================================================================================
 Centralizes the final release decision so missing, stale, failed, naive-timestamp,
-or unhashed evidence cannot produce a READY result. Deterministic and independent.
+unhashed, or empty-evidence/empty-policy evaluations cannot produce a READY result.
+Deterministic, collision-safe, and independent.
 ================================================================================
 """
 
@@ -38,6 +39,10 @@ class ReleasePolicy:
     require_matching_git_sha: bool = True
     evidence_root: Optional[str] = None
 
+    def __post_init__(self):
+        if not self.required_evidence:
+            raise ValueError("CRITICAL SECURITY AUDIT FAILURE: Release policy cannot have empty required_evidence.")
+
 @dataclass(frozen=True)
 class ReleaseDecision:
     status: str
@@ -57,7 +62,6 @@ class ReleaseGateEvaluator:
     def _normalize_timestamp(self, ts_str: str) -> Optional[datetime]:
         if not isinstance(ts_str, str):
             return None
-        # Reject naive timestamp strings lacking explicit timezone offset (Z, +, or offset dash)
         has_tz = "Z" in ts_str or "+" in ts_str[10:] or (("-" in ts_str[10:]) and not ts_str.endswith("Z"))
         if not has_tz:
             return None
@@ -86,7 +90,11 @@ class ReleaseGateEvaluator:
             if not self.policy.required_evidence:
                 blockers.append("CRITICAL RELEASE GATE FAILURE: Release policy defines zero required evidence items.")
 
-            for ev in evidence_items:
+            items_list = list(evidence_items)
+            if not items_list:
+                blockers.append("CRITICAL RELEASE GATE FAILURE: Evidence collection is empty; cannot authorize release.")
+
+            for ev in items_list:
                 if not ev or not ev.name:
                     blockers.append("Encountered null or malformed evidence entry.")
                     continue

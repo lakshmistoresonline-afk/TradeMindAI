@@ -80,7 +80,7 @@ def test_release_gate_evaluator_git_sha_mismatch():
     policy = ReleasePolicy(required_evidence=("unit_tests",))
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
 
-    ev1 = Evidence(name="unit_tests", passed=True, git_sha="wrongsha", generated_at=now.isoformat())
+    ev1 = Evidence(name="unit_tests", passed=True, git_sha="2bd7478bce2df25fd9bc224a956eaad11e6ff539", generated_at=now.isoformat())
 
     decision = evaluator.evaluate([ev1], evaluated_at=now)
     assert decision.status == "NOT_READY"

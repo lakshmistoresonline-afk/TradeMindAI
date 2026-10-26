@@ -77,16 +77,15 @@ def test_adversarial_10_duplicate_evidence_names():
     sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
     policy = ReleasePolicy(required_evidence=("tests",))
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
-    ev1 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat())
-    ev2 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat())
+    ev1 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z")
+    ev2 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z")
     decision = evaluator.evaluate([ev1, ev2], evaluated_at=now)
     assert decision.status == "NOT_READY"
     assert any("Duplicate evidence name" in b for b in decision.blockers)
 
 def test_adversarial_11_invalid_git_sha():
-    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
     with pytest.raises(ValueError, match="Invalid reference Git SHA format"):
-        ReleaseGateEvaluator(ReleasePolicy(required_evidence=()), current_git_sha="not-a-sha")
+        ReleaseGateEvaluator(ReleasePolicy(required_evidence=("tests",)), current_git_sha="not-a-sha")
 
 def test_adversarial_13_missing_artifact(tmp_path):
     now = datetime.now(timezone.utc)
@@ -94,7 +93,7 @@ def test_adversarial_13_missing_artifact(tmp_path):
     policy = ReleasePolicy(required_evidence=("tests",), evidence_root=str(tmp_path))
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
     missing_art = tmp_path / "nonexistent.json"
-    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(), artifact_path=str(missing_art), artifact_sha256="abc123sha256")
+    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z", artifact_path=str(missing_art), artifact_sha256="abc123sha256")
     decision = evaluator.evaluate([ev], evaluated_at=now)
     assert decision.status == "NOT_READY"
     assert any("missing or unreadable" in b for b in decision.blockers)
@@ -106,7 +105,7 @@ def test_adversarial_14_artifact_hash_mismatch(tmp_path):
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
     art = tmp_path / "art.json"
     art.write_text("content")
-    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(), artifact_path=str(art), artifact_sha256="wronghash")
+    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z", artifact_path=str(art), artifact_sha256="wronghash")
     decision = evaluator.evaluate([ev], evaluated_at=now)
     assert decision.status == "NOT_READY"
     assert any("hash mismatch" in b for b in decision.blockers)
@@ -118,16 +117,11 @@ def test_adversarial_15_missing_mandatory_evidence():
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
     decision = evaluator.evaluate([], evaluated_at=now)
     assert decision.status == "NOT_READY"
-    assert any("Missing required evidence item" in b for b in decision.blockers)
+    assert any("Evidence collection is empty" in b or "Missing required evidence item" in b for b in decision.blockers)
 
-def test_adversarial_empty_required_evidence():
-    now = datetime.now(timezone.utc)
-    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
-    policy = ReleasePolicy(required_evidence=())
-    evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
-    decision = evaluator.evaluate([], evaluated_at=now)
-    assert decision.status == "NOT_READY"
-    assert any("zero required evidence items" in b for b in decision.blockers)
+def test_adversarial_empty_required_evidence_policy():
+    with pytest.raises(ValueError, match="Release policy cannot have empty required_evidence"):
+        ReleasePolicy(required_evidence=())
 
 def test_adversarial_naive_evidence_timestamp():
     now = datetime.now(timezone.utc)
