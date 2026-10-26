@@ -39,9 +39,12 @@ COPY scripts/ scripts/
 # Copy docs for freeze manifest
 COPY docs/ docs/
 
-# Ensure start script is executable
-RUN chmod +x backend/start.sh
+# Ensure start script is executable and create non-root user for security (TM-10)
+RUN chmod +x backend/start.sh && \
+    useradd -u 10001 -m trademind && \
+    chown -R trademind:trademind /app
 
+USER trademind
 
 # Run using the start script
 CMD ["backend/start.sh"]

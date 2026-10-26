@@ -16,7 +16,9 @@ services:
       - "6379:6379"
 
   api:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -28,16 +30,6 @@ services:
     depends_on:
       - db
       - redis
-
-# worker:
-#   build: ./backend
-#   command: celery -A backend.workers.tasks.celery_app worker --loglevel=info
-#   environment:
-#     - DATABASE_URL=postgresql://user:password@db/trademind
-#     - REDIS_URL=redis://redis:6379/0
-#   depends_on:
-#     - db
-#     - redis
 
   web:
     build: ./web
