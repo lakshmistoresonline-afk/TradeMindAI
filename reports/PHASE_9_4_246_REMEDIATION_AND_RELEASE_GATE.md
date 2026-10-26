@@ -1,4 +1,4 @@
-# Phase 9.4.246 Remediation and Release Gate Report
+# Phase 9.4.246 Master Autonomous Remediation and Release Gate Report
 
 ## 1. Executive Release Verdict
 
@@ -14,7 +14,7 @@
 - **Checked-Out HEAD**: `1bd7478bce2df25fd9bc224a956eaad11e6ff539` (up to date with `origin/main`)
 - **Branch**: `main`
 - **Active Report Set Pointer**: `reports/ACTIVE_REPORT_SET.json` $\rightarrow$ `SET_F9C02637EC04_1792649091`
-- **Git Status Summary**: Modifications made in `backend/core/postgres.py`, `backend/app/db/database.py`, and unit tests in `backend/tests/unit/test_database_hardening.py`. Zero database writes or git commits performed.
+- **Git Status Summary**: Modifications made in `backend/core/postgres.py`, `backend/app/db/database.py`, `scripts/data/fast_complete_backfill.py`, `scripts/data/reconcile_and_backfill_nifty500.py`, and unit tests in `backend/tests/unit/test_database_hardening.py`. Zero database writes or git commits performed.
 
 ---
 
