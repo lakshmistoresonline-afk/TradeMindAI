@@ -3,40 +3,96 @@ version: '3.8'
 services:
   db:
     image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: trademind
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: trademind
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=trademind
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U trademind -d trademind
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - internal
 
   redis:
     image: redis:7
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
+    command:
+      - sh
+      - -c
+      - 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'redis-cli --no-auth-warning -a "$$REDIS_PASSWORD" ping | grep -q PONG'
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - internal
 
   api:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    ports:
-      - "8000:8000"
+    restart: unless-stopped
+    init: true
     environment:
-      - DATABASE_URL=postgresql://user:password@db/trademind
-      - REDIS_URL=redis://redis:6379/0
-      - ENVIRONMENT=development
-      - SECRET_KEY=local-dev-secret-key-32-chars-long
-      - MARKET_DATA_INGEST_KEY=local-dev-ingest-key
+      ENVIRONMENT: production
+      DEBUG: "false"
+      POSTGRES_URL: ${POSTGRES_URL:?Set POSTGRES_URL}
+      REDIS_URL: ${REDIS_URL:?Set REDIS_URL}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+      MARKET_DATA_INGEST_KEY: ${MARKET_DATA_INGEST_KEY:?Set MARKET_DATA_INGEST_KEY}
+      SEED_DATA_ALLOWED: "false"
+    ports:
+      - "127.0.0.1:8000:8000"
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/livez', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    stop_grace_period: 30s
+    networks:
+      - internal
 
   web:
     build: ./web
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+    networks:
+      - internal
 
 volumes:
   postgres_data:
+  redis_data:
+
+networks:
+  internal:
+    driver: bridge
