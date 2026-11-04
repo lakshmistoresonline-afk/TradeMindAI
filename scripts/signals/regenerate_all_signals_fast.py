@@ -102,8 +102,8 @@ def fast_regenerate():
             "records": replay_records
         }
 
-        os.makedirs("web/public", exist_ok=True)
-        with open("web/public/signals_history.json", "w", encoding="utf-8") as f:
+        os.makedirs("backend/data", exist_ok=True)
+        with open("backend/data/signals_history.json", "w", encoding="utf-8") as f:
             json.dump(history_export, f, indent=2)
 
         perf_export = {

@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'backend/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy-backend.yml'
 
 env:
   PROJECT_ID: com-webcraft-trademindai-c8f75
@@ -42,27 +44,27 @@ jobs:
       - name: Run Backend Tests & Record Evidence
         run: |
           mkdir -p reports/ci_evidence
-          pytest backend/tests/unit/ -v
-          python -c "import json, datetime; json.dump({'name': 'backend_tests', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}, open('reports/ci_evidence/backend_tests.json', 'w'))"
+          pytest backend/tests/unit/ -v > reports/ci_evidence/backend_tests.log 2>&1
+          python -c "import json, datetime, hashlib, pathlib; p = pathlib.Path('reports/ci_evidence/backend_tests.log'); sha = hashlib.sha256(p.read_bytes()).hexdigest(); json.dump({'name': 'backend_tests', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'artifact_path': str(p), 'artifact_sha256': sha, 'github_run_id': '${{ github.run_id }}', 'github_run_attempt': '${{ github.run_attempt }}'}, open('reports/ci_evidence/backend_tests.json', 'w'))"
 
       - name: Run Frontend Lint & Record Evidence
         run: |
-          cd web && npm run lint || true
-          python -c "import json, datetime; json.dump({'name': 'frontend_lint', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}, open('reports/ci_evidence/frontend_lint.json', 'w'))"
+          cd web && npm run lint > ../reports/ci_evidence/frontend_lint.log 2>&1
+          python -c "import json, datetime, hashlib, pathlib; p = pathlib.Path('reports/ci_evidence/frontend_lint.log'); sha = hashlib.sha256(p.read_bytes()).hexdigest(); json.dump({'name': 'frontend_lint', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'artifact_path': str(p), 'artifact_sha256': sha, 'github_run_id': '${{ github.run_id }}', 'github_run_attempt': '${{ github.run_attempt }}'}, open('reports/ci_evidence/frontend_lint.json', 'w'))"
 
       - name: Run Frontend Tests & Record Evidence
         run: |
-          cd web && npm test
-          python -c "import json, datetime; json.dump({'name': 'frontend_tests', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}, open('reports/ci_evidence/frontend_tests.json', 'w'))"
+          cd web && npm test > ../reports/ci_evidence/frontend_tests.log 2>&1
+          python -c "import json, datetime, hashlib, pathlib; p = pathlib.Path('reports/ci_evidence/frontend_tests.log'); sha = hashlib.sha256(p.read_bytes()).hexdigest(); json.dump({'name': 'frontend_tests', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'artifact_path': str(p), 'artifact_sha256': sha, 'github_run_id': '${{ github.run_id }}', 'github_run_attempt': '${{ github.run_attempt }}'}, open('reports/ci_evidence/frontend_tests.json', 'w'))"
 
       - name: Run Frontend Build & Record Evidence
         run: |
-          cd web && npm run build
-          python -c "import json, datetime; json.dump({'name': 'frontend_build', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}, open('reports/ci_evidence/frontend_build.json', 'w'))"
+          cd web && npm run build > ../reports/ci_evidence/frontend_build.log 2>&1
+          python -c "import json, datetime, hashlib, pathlib; p = pathlib.Path('reports/ci_evidence/frontend_build.log'); sha = hashlib.sha256(p.read_bytes()).hexdigest(); json.dump({'name': 'frontend_build', 'passed': True, 'git_sha': '${{ github.sha }}', 'generated_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'artifact_path': str(p), 'artifact_sha256': sha, 'github_run_id': '${{ github.run_id }}', 'github_run_attempt': '${{ github.run_attempt }}'}, open('reports/ci_evidence/frontend_build.json', 'w'))"
 
       - name: Run Mandatory Full CI Release Gate
         run: |
-          python scripts/ci_release_gate.py --git-sha "${{ github.sha }}" --required-evidence "backend_tests,frontend_lint,frontend_tests,frontend_build"
+          python scripts/ci_release_gate.py --git-sha "${{ github.sha }}" --github-run-id "${{ github.run_id }}" --github-run-attempt "${{ github.run_attempt }}" --required-evidence "backend_tests,frontend_lint,frontend_tests,frontend_build"
 
       - name: Google Auth
         uses: 'google-github-actions/auth@v2'

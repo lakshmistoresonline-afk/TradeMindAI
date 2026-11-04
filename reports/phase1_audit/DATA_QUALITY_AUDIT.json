@@ -1,0 +1,20 @@
+{
+  "audit_type": "DATA_QUALITY_AUDIT",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "validation_rules": [
+    "High >= Low",
+    "High >= Open",
+    "High >= Close",
+    "Low <= Open",
+    "Low <= Close",
+    "Positive prices required",
+    "Non-negative volume required",
+    "Unique dates enforced",
+    "Numeric finite values required (no NaN/Inf)"
+  ],
+  "verification_function": "validate_and_normalize_ohlcv",
+  "value_comparison_function": "verify_ohlcv_value_equality",
+  "tolerance": 0.0001,
+  "verification_status": "PASS"
+}

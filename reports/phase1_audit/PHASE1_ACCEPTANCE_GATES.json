@@ -1,0 +1,20 @@
+{
+  "audit_type": "PHASE1_ACCEPTANCE_GATES",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "gates": {
+    "Gate 1": {"description": "Verified effective-date NIFTY 500 universe", "status": "PASS"},
+    "Gate 2": {"description": "All 500 constituents correctly identified", "status": "BLOCKED"},
+    "Gate 3": {"description": "All required instrument mappings verified", "status": "PASS"},
+    "Gate 4": {"description": "Historical ingestion coverage measured per stock", "status": "PASS"},
+    "Gate 5": {"description": "Intraday ingestion coverage measured per stock", "status": "PASS"},
+    "Gate 6": {"description": "No unexplained missing or duplicate records", "status": "PASS"},
+    "Gate 7": {"description": "OHLCV and timestamp validation passed", "status": "PASS"},
+    "Gate 8": {"description": "Provider errors and stale data correctly detected", "status": "PASS"},
+    "Gate 9": {"description": "Idempotency and recovery tests passed", "status": "PASS"},
+    "Gate 10": {"description": "No synthetic market data in production paths", "status": "PASS"},
+    "Gate 11": {"description": "BAGMANE transition evidence reconciled", "status": "BLOCKED"},
+    "Gate 12": {"description": "Independent end-to-end data audit passed", "status": "PASS"}
+  },
+  "overall_verdict": "BLOCKED — REQUIRED DATA OR AUTHORIZATION EVIDENCE MISSING"
+}

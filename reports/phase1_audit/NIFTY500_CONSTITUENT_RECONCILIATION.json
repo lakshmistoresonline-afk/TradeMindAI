@@ -1,0 +1,18 @@
+{
+  "audit_type": "NIFTY500_CONSTITUENT_RECONCILIATION",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "expected_total": 500,
+  "verified_active": 499,
+  "unresolved_count": 1,
+  "unresolved_symbols": [
+    {
+      "symbol": "BAGMANE",
+      "status": "UNLISTED_ON_PROVIDER_API",
+      "provider": "yfinance",
+      "provider_ticker": "BAGMANE.NS",
+      "resolution_requirement": "Official NSE constituent transition record"
+    }
+  ],
+  "verification_status": "PARTIAL_BLOCKED"
+}

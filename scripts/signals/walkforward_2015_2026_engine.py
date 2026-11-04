@@ -210,8 +210,8 @@ def run_walkforward_engine():
         "records": history_records
     }
 
-    os.makedirs("web/public", exist_ok=True)
-    with open("web/public/signals_history.json", "w", encoding="utf-8") as f:
+    os.makedirs("backend/data", exist_ok=True)
+    with open("backend/data/signals_history.json", "w", encoding="utf-8") as f:
         json.dump(history_export, f, indent=2)
 
     # 5. Export active signals to web/public/signals.json

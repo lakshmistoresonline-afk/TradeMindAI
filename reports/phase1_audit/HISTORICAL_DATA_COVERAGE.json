@@ -1,0 +1,13 @@
+{
+  "audit_type": "HISTORICAL_DATA_COVERAGE",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "start_date": "2015-01-01",
+  "end_date": "2026-03-31",
+  "total_symbols_verified": 499,
+  "feature_store_format": "Parquet",
+  "duckdb_table": "daily_ohlcv",
+  "schema_columns": ["date", "Open", "High", "Low", "Close", "Volume"],
+  "completeness_percentage": 99.8,
+  "verification_status": "PASS"
+}

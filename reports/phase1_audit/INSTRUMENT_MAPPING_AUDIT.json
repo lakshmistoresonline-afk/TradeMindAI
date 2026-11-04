@@ -1,0 +1,16 @@
+{
+  "audit_type": "INSTRUMENT_MAPPING_AUDIT",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "symbol_aliases": {
+    "L&TFH": "LTF.NS",
+    "M&M": "M&M.NS",
+    "M&MFIN": "M&MFIN.NS",
+    "BAJAJ-AUTO": "BAJAJ-AUTO.NS",
+    "L&T": "LT.NS",
+    "TATAMOTORS-DVR": "TATAMTRDVR.NS"
+  },
+  "mapping_rule": "Canonical symbol formatted with .NS suffix unless explicitly aliased in SYMBOL_ALIAS_MAP",
+  "duplicate_mapping_count": 0,
+  "verification_status": "PASS"
+}

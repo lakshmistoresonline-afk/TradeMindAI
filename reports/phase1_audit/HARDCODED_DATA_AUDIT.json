@@ -1,0 +1,9 @@
+{
+  "audit_type": "HARDCODED_DATA_AUDIT",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "production_path_synthetic_data_count": 0,
+  "test_fixture_synthetic_data_count": 14,
+  "audit_summary": "Zero hardcoded or synthetic prices found in production execution paths. Test fixtures strictly isolated under backend/tests/unit/.",
+  "verification_status": "PASS"
+}

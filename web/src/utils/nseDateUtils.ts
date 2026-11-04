@@ -32,9 +32,9 @@ export function formatNSEDateTime(dateInput?: string | Date | null): string {
   let year = istDate.getUTCFullYear();
   let month = istDate.getUTCMonth(); // 0-indexed (0-11)
   let day = istDate.getUTCDate();
-  let hours = istDate.getUTCHours();
-  let minutes = istDate.getUTCMinutes();
-  let dayOfWeek = istDate.getUTCDay(); // 0 = Sun, 6 = Sat
+  const hours = istDate.getUTCHours();
+  const minutes = istDate.getUTCMinutes();
+  const dayOfWeek = istDate.getUTCDay(); // 0 = Sun, 6 = Sat
 
   // 1. Weekend Adjustment (Saturday = 6, Sunday = 0) -> Shift to preceding Friday
   if (dayOfWeek === 6) {

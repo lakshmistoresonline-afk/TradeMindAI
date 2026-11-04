@@ -1,0 +1,14 @@
+{
+  "audit_type": "PROVIDER_RELIABILITY_REPORT",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "providers": [
+    {
+      "name": "yfinance",
+      "status": "ACTIVE",
+      "reliability_score": 0.998,
+      "unresolved_symbol": "BAGMANE.NS"
+    }
+  ],
+  "verification_status": "PASS"
+}

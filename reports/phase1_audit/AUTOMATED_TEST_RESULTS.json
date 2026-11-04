@@ -1,0 +1,25 @@
+{
+  "audit_type": "AUTOMATED_TEST_RESULTS",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "total_collected": 281,
+  "passed": 279,
+  "skipped": 2,
+  "failed": 0,
+  "errors": 0,
+  "test_suites": [
+    {
+      "name": "test_ingestion_transaction_safety.py",
+      "collected": 20,
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "name": "test_mutation_guard.py",
+      "collected": 16,
+      "passed": 16,
+      "failed": 0
+    }
+  ],
+  "verification_status": "PASS"
+}

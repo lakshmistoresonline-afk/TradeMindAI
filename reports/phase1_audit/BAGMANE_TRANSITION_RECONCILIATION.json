@@ -1,0 +1,10 @@
+{
+  "audit_type": "BAGMANE_TRANSITION_RECONCILIATION",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "symbol": "BAGMANE",
+  "provider_ticker": "BAGMANE.NS",
+  "status": "UNLISTED_ON_PROVIDER_API",
+  "resolution_action": "Preserved in BLOCKED state. Requires official exchange constituent transition documentation before updating universe definition.",
+  "verification_status": "BLOCKED"
+}

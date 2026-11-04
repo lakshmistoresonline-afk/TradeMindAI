@@ -1,0 +1,26 @@
+{
+  "audit_type": "STORAGE_INTEGRITY_REPORT",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "dual_store": {
+    "duckdb_path": "backend/data/analytical.duckdb",
+    "feature_store_dir": "backend/data/features/",
+    "checkpoint_path": "backend/data/ingestion_checkpoint.json",
+    "journal_path": "backend/data/ingestion_journal.json"
+  },
+  "crash_recovery": {
+    "supported_boundaries": [
+      "POST_STAGING",
+      "POST_INTENT_JOURNAL",
+      "PRE_DUCKDB_COMMIT",
+      "POST_DUCKDB_COMMIT",
+      "POST_COMMITTED_JOURNAL",
+      "POST_PARQUET_PROMOTION",
+      "POST_PROMOTED_JOURNAL",
+      "POST_CHECKPOINT_SAVE",
+      "DURING_RECOVERY"
+    ],
+    "process_isolation": "3-process architecture (Process A Crash -> Process B OS Recovery -> Process C OS Verification & Idempotency)"
+  },
+  "verification_status": "PASS"
+}

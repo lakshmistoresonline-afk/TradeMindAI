@@ -212,10 +212,10 @@ def test_write_export_payload_replace_failure_preserves_destination_and_cleans_t
     # Destination file MUST remain byte-for-byte identical to original
     assert target_out.read_bytes() == initial_bytes
 
-    # Temporary json files in destination directory MUST be cleaned up
-    temp_json_files = list(tmp_path.glob("*.json"))
-    assert len(temp_json_files) == 1
-    assert temp_json_files[0].name == "test_replace_failure_destination.json"
+    # Assert that ONLY the original destination file exists in tmp_path (no leftover temporary files of any suffix)
+    all_files = list(tmp_path.iterdir())
+    assert len(all_files) == 1
+    assert all_files[0].resolve() == target_out.resolve()
 
 def test_run_duckdb_signal_engine_orchestration_mocked(tmp_path, monkeypatch):
     import duckdb
@@ -226,41 +226,44 @@ def test_run_duckdb_signal_engine_orchestration_mocked(tmp_path, monkeypatch):
 
     # Create an in-memory DuckDB connection fixture
     con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE daily_ohlcv (
-            symbol VARCHAR, date VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, volume DOUBLE
-        )
-    """)
+    try:
+        con.execute("""
+            CREATE TABLE daily_ohlcv (
+                symbol VARCHAR, date VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, volume DOUBLE
+            )
+        """)
 
-    # Populate 35 bars for symbol 'MOCK' to pass minimum history
-    dates = pd.date_range("2026-01-01", periods=35, freq="D")
-    for d in dates:
-        con.execute("INSERT INTO daily_ohlcv VALUES (?, ?, 100.0, 105.0, 95.0, 102.0, 5000.0)", ["MOCK", d.strftime("%Y-%m-%d")])
+        # Populate 35 bars for symbol 'MOCK' to pass minimum history
+        dates = pd.date_range("2026-01-01", periods=35, freq="D")
+        for d in dates:
+            con.execute("INSERT INTO daily_ohlcv VALUES (?, ?, 100.0, 105.0, 95.0, 102.0, 5000.0)", ["MOCK", d.strftime("%Y-%m-%d")])
 
-    monkeypatch.setattr(generate_walkforward_signals_duckdb, "duckdb_path", dummy_db)
+        monkeypatch.setattr(generate_walkforward_signals_duckdb, "duckdb_path", dummy_db)
 
-    # Mock duckdb.connect to return in-memory con
-    def mock_connect(*args, **kwargs):
-        return con
+        # Mock duckdb.connect to return in-memory con
+        def mock_connect(*args, **kwargs):
+            return con
 
-    monkeypatch.setattr("duckdb.connect", mock_connect)
+        monkeypatch.setattr("duckdb.connect", mock_connect)
 
-    # Mock write_export_payload to capture call without writing live files
-    written_calls = []
-    def mock_write(payload, output_path=None):
-        written_calls.append((payload, output_path))
-        return tmp_path / "mock_out.json"
+        # Mock write_export_payload to capture call without writing live files
+        written_calls = []
+        def mock_write(payload, output_path=None):
+            written_calls.append((payload, output_path))
+            return tmp_path / "mock_out.json"
 
-    monkeypatch.setattr(generate_walkforward_signals_duckdb, "write_export_payload", mock_write)
+        monkeypatch.setattr(generate_walkforward_signals_duckdb, "write_export_payload", mock_write)
 
-    # Execute engine orchestration on mock in-memory connection
-    generate_walkforward_signals_duckdb.run_duckdb_signal_engine()
+        # Execute engine orchestration on mock in-memory connection
+        generate_walkforward_signals_duckdb.run_duckdb_signal_engine()
 
-    assert len(written_calls) == 1
-    captured_payload, _ = written_calls[0]
-    assert "active_signals" in captured_payload
-    assert "history_records" in captured_payload
-    assert "summary" in captured_payload
+        assert len(written_calls) == 1
+        captured_payload, _ = written_calls[0]
+        assert "active_signals" in captured_payload
+        assert "history_records" in captured_payload
+        assert "summary" in captured_payload
+    finally:
+        con.close()
 
 def test_run_duckdb_signal_engine_writer_failure_propagates(tmp_path, monkeypatch):
     import duckdb
@@ -270,31 +273,31 @@ def test_run_duckdb_signal_engine_writer_failure_propagates(tmp_path, monkeypatc
     dummy_db.touch()
 
     con = duckdb.connect(":memory:")
-    con.execute("""
-        CREATE TABLE daily_ohlcv (
-            symbol VARCHAR, date VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, volume DOUBLE
-        )
-    """)
-
-    dates = pd.date_range("2026-01-01", periods=35, freq="D")
-    for d in dates:
-        con.execute("INSERT INTO daily_ohlcv VALUES (?, ?, 100.0, 105.0, 95.0, 102.0, 5000.0)", ["MOCK", d.strftime("%Y-%m-%d")])
-
-    monkeypatch.setattr(generate_walkforward_signals_duckdb, "duckdb_path", dummy_db)
-
-    def mock_connect(*args, **kwargs):
-        return con
-
-    monkeypatch.setattr("duckdb.connect", mock_connect)
-
-    calls = []
-    def mock_failing_write(payload, output_path=None):
-        calls.append(payload)
-        raise RuntimeError("Simulated export writer failure in orchestration test")
-
-    monkeypatch.setattr(generate_walkforward_signals_duckdb, "write_export_payload", mock_failing_write)
-
     try:
+        con.execute("""
+            CREATE TABLE daily_ohlcv (
+                symbol VARCHAR, date VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, volume DOUBLE
+            )
+        """)
+
+        dates = pd.date_range("2026-01-01", periods=35, freq="D")
+        for d in dates:
+            con.execute("INSERT INTO daily_ohlcv VALUES (?, ?, 100.0, 105.0, 95.0, 102.0, 5000.0)", ["MOCK", d.strftime("%Y-%m-%d")])
+
+        monkeypatch.setattr(generate_walkforward_signals_duckdb, "duckdb_path", dummy_db)
+
+        def mock_connect(*args, **kwargs):
+            return con
+
+        monkeypatch.setattr("duckdb.connect", mock_connect)
+
+        calls = []
+        def mock_failing_write(payload, output_path=None):
+            calls.append(payload)
+            raise RuntimeError("Simulated export writer failure in orchestration test")
+
+        monkeypatch.setattr(generate_walkforward_signals_duckdb, "write_export_payload", mock_failing_write)
+
         with pytest.raises(RuntimeError, match="Simulated export writer failure in orchestration test"):
             generate_walkforward_signals_duckdb.run_duckdb_signal_engine()
 

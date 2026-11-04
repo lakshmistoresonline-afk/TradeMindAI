@@ -1,0 +1,10 @@
+{
+  "audit_type": "INTRADAY_DATA_COVERAGE",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "interval": "5m",
+  "redis_lock_key": "lock:pulse",
+  "timezone": "Asia/Kolkata",
+  "retry_limit": 3,
+  "verification_status": "PASS"
+}

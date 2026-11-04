@@ -3,7 +3,7 @@
 TradeMindAI: Hardened Fail-Closed Release Gate (REL-02 & TM-08)
 ================================================================================
 Centralizes the final release decision so missing, stale, failed, naive-timestamp,
-unhashed, or empty-evidence/empty-policy evaluations cannot produce a READY result.
+unhashed, or unprovenanced evidence cannot produce a READY result.
 Deterministic, collision-safe, and independent.
 ================================================================================
 """
@@ -29,6 +29,8 @@ class Evidence:
     generated_at: str
     artifact_path: Optional[str] = None
     artifact_sha256: Optional[str] = None
+    github_run_id: Optional[str] = None
+    github_run_attempt: Optional[str] = None
     details: str = ""
 
 @dataclass(frozen=True)
@@ -37,11 +39,19 @@ class ReleasePolicy:
     maximum_evidence_age: timedelta = timedelta(hours=24)
     maximum_future_skew: timedelta = timedelta(minutes=2)
     require_matching_git_sha: bool = True
+    require_matching_github_run: bool = False
+    current_github_run_id: Optional[str] = None
+    current_github_run_attempt: Optional[str] = None
     evidence_root: Optional[str] = None
 
     def __post_init__(self):
         if not self.required_evidence:
             raise ValueError("CRITICAL SECURITY AUDIT FAILURE: Release policy cannot have empty required_evidence.")
+        if self.require_matching_github_run:
+            if not self.current_github_run_id or not str(self.current_github_run_id).strip():
+                raise ValueError("CRITICAL SECURITY AUDIT FAILURE: Release policy requires GitHub Run ID in CI mode.")
+            if not self.current_github_run_attempt or not str(self.current_github_run_attempt).strip():
+                raise ValueError("CRITICAL SECURITY AUDIT FAILURE: Release policy requires GitHub Run Attempt in CI mode.")
 
 @dataclass(frozen=True)
 class ReleaseDecision:
@@ -112,6 +122,13 @@ class ReleaseGateEvaluator:
                 elif self.policy.require_matching_git_sha and ev_sha != self.current_git_sha:
                     blockers.append(f"Evidence '{ev.name}' Git SHA mismatch (expected {self.current_git_sha}, got {ev.git_sha})")
 
+                # Validate GitHub Actions Run ID and Attempt match if required
+                if self.policy.require_matching_github_run or self.policy.current_github_run_id:
+                    if not ev.github_run_id or str(ev.github_run_id).strip() != str(self.policy.current_github_run_id).strip():
+                        blockers.append(f"Evidence '{ev.name}' GitHub Run ID mismatch (expected {self.policy.current_github_run_id}, got {ev.github_run_id})")
+                    if not ev.github_run_attempt or str(ev.github_run_attempt).strip() != str(self.policy.current_github_run_attempt).strip():
+                        blockers.append(f"Evidence '{ev.name}' GitHub Run Attempt mismatch (expected {self.policy.current_github_run_attempt}, got {ev.github_run_attempt})")
+
                 # Validate timezone-aware timestamp and age / future skew
                 ev_time = self._normalize_timestamp(ev.generated_at)
                 if not ev_time:
@@ -123,27 +140,28 @@ class ReleaseGateEvaluator:
                         blockers.append(f"Evidence '{ev.name}' has expired (generated at {ev.generated_at})")
 
                 # Validate passed status
-                if not ev.passed:
-                    blockers.append(f"Evidence '{ev.name}' marked failed: {ev.details}")
+                if not isinstance(ev.passed, bool) or not ev.passed:
+                    blockers.append(f"Evidence '{ev.name}' marked failed or non-boolean: {ev.details}")
 
-                # Validate artifact integrity & mandatory hash
-                if ev.artifact_path:
-                    if not ev.artifact_sha256 or not ev.artifact_sha256.strip():
-                        blockers.append(f"Evidence '{ev.name}' specifies artifact_path but lacks mandatory artifact_sha256 hash.")
-                    else:
-                        try:
-                            art_path = Path(ev.artifact_path).resolve()
-                            if not art_path.is_relative_to(root_path):
-                                blockers.append(f"Evidence '{ev.name}' artifact path escapes evidence root: {ev.artifact_path}")
-                            elif not art_path.exists() or not art_path.is_file():
-                                blockers.append(f"Evidence '{ev.name}' artifact missing or unreadable at {ev.artifact_path}")
-                            else:
-                                file_bytes = art_path.read_bytes()
-                                actual_sha = hashlib.sha256(file_bytes).hexdigest()
-                                if actual_sha.lower() != ev.artifact_sha256.strip().lower():
-                                    blockers.append(f"Evidence '{ev.name}' artifact SHA256 hash mismatch")
-                        except Exception as ex:
-                            blockers.append(f"Evidence '{ev.name}' artifact verification error: {ex}")
+                # Validate mandatory artifact path & SHA256 checksum
+                if not ev.artifact_path or not ev.artifact_path.strip():
+                    blockers.append(f"Evidence '{ev.name}' missing mandatory artifact_path.")
+                elif not ev.artifact_sha256 or not ev.artifact_sha256.strip():
+                    blockers.append(f"Evidence '{ev.name}' missing mandatory artifact_sha256 hash.")
+                else:
+                    try:
+                        art_path = Path(ev.artifact_path).resolve()
+                        if not art_path.is_relative_to(root_path):
+                            blockers.append(f"Evidence '{ev.name}' artifact path escapes evidence root: {ev.artifact_path}")
+                        elif not art_path.exists() or not art_path.is_file():
+                            blockers.append(f"Evidence '{ev.name}' artifact missing or unreadable at {ev.artifact_path}")
+                        else:
+                            file_bytes = art_path.read_bytes()
+                            actual_sha = hashlib.sha256(file_bytes).hexdigest()
+                            if actual_sha.lower() != ev.artifact_sha256.strip().lower():
+                                blockers.append(f"Evidence '{ev.name}' artifact SHA256 hash mismatch")
+                    except Exception as ex:
+                        blockers.append(f"Evidence '{ev.name}' artifact verification error: {ex}")
 
             # Check required evidence coverage
             for req in self.policy.required_evidence:

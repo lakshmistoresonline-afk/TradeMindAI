@@ -1,6 +1,6 @@
 """
 ================================================================================
-TradeMindAI: Time-Safe DuckDB Walk-Forward Signal Engine (v3.6-ATOMIC-EXPORT)
+TradeMindAI: Time-Safe DuckDB Walk-Forward Signal Engine (v3.7-MUTATION-GUARDED)
 ================================================================================
 1. Connects to live DuckDB database (`backend/data/analytical.duckdb`).
 2. Iterates chronologically day-by-day across all Nifty 500 equities.
@@ -12,6 +12,7 @@ TradeMindAI: Time-Safe DuckDB Walk-Forward Signal Engine (v3.6-ATOMIC-EXPORT)
    excluded from completed-trade win rate and PnL summary metrics.
 7. Evaluates forward price movement across 5, 10, 20, and 60 session horizons.
 8. Safely builds and writes export payload via atomic file replacement with allow_nan=False.
+9. Enforces validate_mutation_target() before modifying export destination.
 ================================================================================
 """
 
@@ -31,6 +32,7 @@ if str(root_dir) not in sys.path:
 
 from backend.app.services.indicator_service import compute_wilder_rsi
 from backend.app.services.horizon_engine import evaluate_horizon_outcome
+from backend.core.mutation_guard import validate_mutation_target, ProductionDataMutationError
 
 duckdb_path = root_dir / "backend" / "data" / "analytical.duckdb"
 signals_json_path = root_dir / "backend" / "data" / "signals_history.json"
@@ -62,7 +64,7 @@ def build_export_payload(
     active_buy_signals: list,
     all_history_signals: list,
     total_candidates: int,
-    source_tag: str = "DUCKDB_WALKFORWARD_ENGINE_v3.6_ATOMIC_EXPORT"
+    source_tag: str = "DUCKDB_WALKFORWARD_ENGINE_v3.7_MUTATION_GUARDED"
 ) -> dict:
     """
     Builds the production export JSON payload ensuring:
@@ -115,10 +117,15 @@ def build_export_payload(
 def write_export_payload(payload: dict, output_path: Path = None) -> Path:
     """
     Safely writes export payload using atomic temporary-file replacement.
+    Enforces validate_mutation_target() before modifying target destination.
     Ensures serialization with allow_nan=False succeeds before overwriting target.
     Unlinks temporary file if serialization or writing fails.
     """
     target_path = Path(output_path) if output_path else signals_json_path
+
+    # Enforce mutation guard on destination
+    validate_mutation_target(target_path)
+
     target_dir = target_path.parent
     target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -139,13 +146,15 @@ def write_export_payload(payload: dict, output_path: Path = None) -> Path:
                 os.unlink(temp_file)
             except Exception:
                 pass
+        if isinstance(ex, ProductionDataMutationError):
+            raise
         raise RuntimeError(f"Failed atomic write for export payload to '{target_path}': {ex}") from ex
 
     return target_path
 
 def run_duckdb_signal_engine():
     print("================================================================================")
-    print("  TRADEMIND AI: DUCKDB TIME-SAFE WALK-FORWARD SIGNAL ENGINE (v3.6 ATOMIC EXPORT)")
+    print("  TRADEMIND AI: DUCKDB TIME-SAFE WALK-FORWARD SIGNAL ENGINE (v3.7 MUTATION GUARDED)")
     print("================================================================================\n")
 
     if not duckdb_path.exists():

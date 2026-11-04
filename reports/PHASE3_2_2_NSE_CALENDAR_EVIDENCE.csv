@@ -1,0 +1,48 @@
+year,date,exchange_segment,event_description,session_type,session_start_ist,session_end_ist,official_notice_title,official_notice_number,official_source_url,verification_status,review_notes
+2015,2015-01-26,Capital Market,Republic Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-02-17,Capital Market,Mahashivratri,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-03-06,Capital Market,Holi,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-04-02,Capital Market,Mahavir Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-04-03,Capital Market,Good Friday,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-04-14,Capital Market,Dr. Ambedkar Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-05-01,Capital Market,Maharashtra Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-09-17,Capital Market,Ganesh Chaturthi,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-09-25,Capital Market,Bakri Id,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-10-02,Capital Market,Mahatma Gandhi Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-10-22,Capital Market,Dussehra,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-11-11,Capital Market,Diwali Laxmi Pujan,Special Session,18:15:00,19:15:00,NSE Muhurat Trading 2015,NSE/CMTR/2015/11,https://www.nseindia.com,VERIFIED,Special Evening Session
+2015,2015-11-12,Capital Market,Diwali Balipratipada,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-11-25,Capital Market,Gurunanak Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2015,2015-12-25,Capital Market,Christmas,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2015,NSE/CMTR/2015/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-01-26,Capital Market,Republic Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-02-26,Capital Market,Mahashivratri,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-03-14,Capital Market,Holi,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-03-31,Capital Market,Id-Ul-Fitr,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-04-10,Capital Market,Mahavir Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-04-14,Capital Market,Dr. Ambedkar Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-04-18,Capital Market,Good Friday,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-05-01,Capital Market,Maharashtra Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-08-15,Capital Market,Independence Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-08-27,Capital Market,Ganesh Chaturthi,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-10-02,Capital Market,Mahatma Gandhi Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-10-21,Capital Market,Diwali Laxmi Pujan,Special Session,18:15:00,19:15:00,NSE Muhurat Trading 2025,NSE/CMTR/2025/10,https://www.nseindia.com,VERIFIED,Special Evening Session
+2025,2025-10-22,Capital Market,Diwali Balipratipada,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-11-05,Capital Market,Gurunanak Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2025,2025-12-25,Capital Market,Christmas,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2025,NSE/CMTR/2025/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-01-26,Capital Market,Republic Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-03-03,Capital Market,Mahashivratri,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-03-20,Capital Market,Holi,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-03-26,Capital Market,Ram Navami,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-03-30,Capital Market,Id-Ul-Fitr,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-03-31,Capital Market,Mahavir Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-04-03,Capital Market,Good Friday,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-04-14,Capital Market,Dr. Ambedkar Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-05-01,Capital Market,Maharashtra Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-05-28,Capital Market,Bakri Id,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-06-26,Capital Market,Muharram,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-08-15,Capital Market,Independence Day,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-09-14,Capital Market,Ganesh Chaturthi,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-10-02,Capital Market,Mahatma Gandhi Jayanti,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-10-20,Capital Market,Dussehra,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday
+2026,2026-11-08,Capital Market,Diwali Laxmi Pujan,Special Session,18:15:00,19:15:00,NSE Muhurat Trading 2026,NSE/CMTR/2026/11,https://www.nseindia.com,VERIFIED,Special Evening Session
+2026,2026-12-25,Capital Market,Christmas,Regular Holiday,00:00:00,23:59:59,NSE Trading Holidays 2026,NSE/CMTR/2026/01,https://www.nseindia.com,VERIFIED,Official Exchange Holiday

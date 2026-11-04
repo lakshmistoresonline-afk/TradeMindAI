@@ -1,0 +1,65 @@
+year,holiday_date,holiday_description,official_source,verification_status,session_classification
+2015,2015-01-26,Republic Day,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-02-17,Mahashivratri,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-03-06,Holi,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-04-02,Mahavir Jayanti,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-04-03,Good Friday,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-04-14,Dr. Ambedkar Jayanti,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-05-01,Maharashtra Day,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-09-17,Ganesh Chaturthi,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-09-25,Bakri Id,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-10-02,Mahatma Gandhi Jayanti,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-10-22,Dussehra,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-11-11,Diwali Laxmi Pujan,NSE Circular 2015/01,VERIFIED,Special Session
+2015,2015-11-12,Diwali Balipratipada,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-11-25,Gurunanak Jayanti,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2015,2015-12-25,Christmas,NSE Circular 2015/01,VERIFIED,Regular Holiday
+2024,2024-01-22,Ram Mandir Pran Pratishtha,NSE Notice 2024/01,VERIFIED,Special Holiday
+2024,2024-01-26,Republic Day,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-03-08,Mahashivratri,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-03-25,Holi,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-03-29,Good Friday,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-04-11,Id-Ul-Fitr,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-04-17,Ram Navami,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-05-01,Maharashtra Day,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-05-20,General Parliamentary Election,NSE Notice 2024/05,VERIFIED,Special Holiday
+2024,2024-06-17,Bakri Id,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-07-17,Muharram,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-08-15,Independence Day,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-10-02,Mahatma Gandhi Jayanti,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-11-01,Diwali Laxmi Pujan,NSE Notice 2024/01,VERIFIED,Special Session
+2024,2024-11-15,Gurunanak Jayanti,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2024,2024-11-20,Maharashtra Assembly Election,NSE Notice 2024/11,VERIFIED,Special Holiday
+2024,2024-12-25,Christmas,NSE Notice 2024/01,VERIFIED,Regular Holiday
+2025,2025-01-26,Republic Day,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-02-26,Mahashivratri,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-03-14,Holi,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-03-31,Id-Ul-Fitr,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-04-10,Mahavir Jayanti,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-04-14,Dr. Ambedkar Jayanti,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-04-18,Good Friday,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-05-01,Maharashtra Day,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-08-15,Independence Day,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-08-27,Ganesh Chaturthi,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-10-02,Mahatma Gandhi Jayanti,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-10-21,Diwali Laxmi Pujan,NSE Notice 2025/01,VERIFIED,Special Session
+2025,2025-10-22,Diwali Balipratipada,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-11-05,Gurunanak Jayanti,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2025,2025-12-25,Christmas,NSE Notice 2025/01,VERIFIED,Regular Holiday
+2026,2026-01-26,Republic Day,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-03-03,Mahashivratri,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-03-20,Holi,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-03-26,Ram Navami,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-03-30,Id-Ul-Fitr,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-03-31,Mahavir Jayanti,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-04-03,Good Friday,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-04-14,Dr. Ambedkar Jayanti,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-05-01,Maharashtra Day,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-05-28,Bakri Id,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-06-26,Muharram,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-08-15,Independence Day,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-09-14,Ganesh Chaturthi,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-10-02,Mahatma Gandhi Jayanti,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-10-20,Dussehra,NSE Notice 2026/01,VERIFIED,Regular Holiday
+2026,2026-11-08,Diwali Laxmi Pujan,NSE Notice 2026/01,VERIFIED,Special Session
+2026,2026-12-25,Christmas,NSE Notice 2026/01,VERIFIED,Regular Holiday

@@ -13,8 +13,14 @@ def test_ci_release_gate_cli_success(tmp_path):
     out_file = tmp_path / "decision.json"
 
     now = datetime.now(timezone.utc).isoformat()
+    art_file = ev_dir / "backend_tests.log"
+    art_file.write_text("All tests passed")
+    import hashlib
+    art_sha = hashlib.sha256(art_file.read_bytes()).hexdigest()
+
     (ev_dir / "backend_tests.json").write_text(json.dumps({
-        "name": "backend_tests", "passed": True, "git_sha": sha, "generated_at": now
+        "name": "backend_tests", "passed": True, "git_sha": sha, "generated_at": now,
+        "artifact_path": str(art_file), "artifact_sha256": art_sha
     }))
 
     script_path = Path(__file__).resolve().parent.parent.parent.parent / "scripts" / "ci_release_gate.py"
@@ -116,15 +122,21 @@ def test_ci_release_gate_cli_unexpected_evidence_name_fails(tmp_path):
     assert res.returncode == 1
     assert "Unexpected evidence name" in res.stdout or "DENIED" in res.stdout
 
-def test_workflows_contain_full_mandatory_release_gate_policy():
+def test_workflows_structural_integrity_and_fail_closed_contract():
     root = Path(__file__).resolve().parent.parent.parent.parent
     backend_wf = (root / ".github" / "workflows" / "deploy-backend.yml").read_text()
     frontend_wf = (root / ".github" / "workflows" / "deploy-frontend.yml").read_text()
 
+    # 1. Ensure || true pattern is completely removed from lint steps
+    assert "npm run lint || true" not in backend_wf
+    assert "npm run lint || true" not in frontend_wf
+
+    # 2. Ensure both workflows require full mandatory check policy
     expected_req = "backend_tests,frontend_lint,frontend_tests,frontend_build"
     assert f'--required-evidence "{expected_req}"' in backend_wf
     assert f'--required-evidence "{expected_req}"' in frontend_wf
 
+    # 3. Ensure gate step runs BEFORE deployment step
     bg_gate_idx = backend_wf.index("Run Mandatory Full CI Release Gate")
     bg_deploy_idx = backend_wf.index("gcloud run deploy")
     assert bg_gate_idx < bg_deploy_idx
@@ -132,3 +144,7 @@ def test_workflows_contain_full_mandatory_release_gate_policy():
     fe_gate_idx = frontend_wf.index("Run Mandatory Full CI Release Gate")
     fe_deploy_idx = frontend_wf.index("Deploy to Firebase")
     assert fe_gate_idx < fe_deploy_idx
+
+    # 4. Ensure artifact SHA256 logging is configured
+    assert "artifact_sha256" in backend_wf
+    assert "artifact_sha256" in frontend_wf

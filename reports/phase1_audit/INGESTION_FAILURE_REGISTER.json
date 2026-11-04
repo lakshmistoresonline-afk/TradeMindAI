@@ -1,0 +1,14 @@
+{
+  "audit_type": "INGESTION_FAILURE_REGISTER",
+  "timestamp": "2026-03-31T00:00:00Z",
+  "repository_head": "7bccfc412b1877313efcff6ffbcfc64111e8dd8b",
+  "failures": [
+    {
+      "symbol": "BAGMANE",
+      "error": "Symbol not found or unlisted on provider API",
+      "status": "UNRESOLVED_BLOCKED"
+    }
+  ],
+  "resolved_failures_count": 0,
+  "unresolved_failures_count": 1
+}

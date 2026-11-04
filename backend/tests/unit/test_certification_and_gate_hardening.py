@@ -1,6 +1,7 @@
 import os
 import json
 import pytest
+import hashlib
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from backend.core.data_certification import MarketDataCertifier, CertificationPolicy, PriceRecord
@@ -77,13 +78,14 @@ def test_adversarial_10_duplicate_evidence_names():
     sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
     policy = ReleasePolicy(required_evidence=("tests",))
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
-    ev1 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z")
-    ev2 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z")
+    ev1 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat())
+    ev2 = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat())
     decision = evaluator.evaluate([ev1, ev2], evaluated_at=now)
     assert decision.status == "NOT_READY"
     assert any("Duplicate evidence name" in b for b in decision.blockers)
 
 def test_adversarial_11_invalid_git_sha():
+    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
     with pytest.raises(ValueError, match="Invalid reference Git SHA format"):
         ReleaseGateEvaluator(ReleasePolicy(required_evidence=("tests",)), current_git_sha="not-a-sha")
 
@@ -93,7 +95,7 @@ def test_adversarial_13_missing_artifact(tmp_path):
     policy = ReleasePolicy(required_evidence=("tests",), evidence_root=str(tmp_path))
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
     missing_art = tmp_path / "nonexistent.json"
-    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z", artifact_path=str(missing_art), artifact_sha256="abc123sha256")
+    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(), artifact_path=str(missing_art), artifact_sha256="abc123sha256")
     decision = evaluator.evaluate([ev], evaluated_at=now)
     assert decision.status == "NOT_READY"
     assert any("missing or unreadable" in b for b in decision.blockers)
@@ -105,7 +107,25 @@ def test_adversarial_14_artifact_hash_mismatch(tmp_path):
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
     art = tmp_path / "art.json"
     art.write_text("content")
-    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat() + "Z", artifact_path=str(art), artifact_sha256="wronghash")
+    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(), artifact_path=str(art), artifact_sha256="wronghash")
+    decision = evaluator.evaluate([ev], evaluated_at=now)
+    assert decision.status == "NOT_READY"
+    assert any("hash mismatch" in b for b in decision.blockers)
+
+def test_adversarial_tampered_artifact_content_fails(tmp_path):
+    now = datetime.now(timezone.utc)
+    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
+    policy = ReleasePolicy(required_evidence=("tests",), evidence_root=str(tmp_path))
+    evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
+
+    art = tmp_path / "art.log"
+    art.write_text("original_content")
+    original_sha = hashlib.sha256(art.read_bytes()).hexdigest()
+
+    # Tamper file after recording SHA
+    art.write_text("tampered_content")
+
+    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(), artifact_path=str(art), artifact_sha256=original_sha)
     decision = evaluator.evaluate([ev], evaluated_at=now)
     assert decision.status == "NOT_READY"
     assert any("hash mismatch" in b for b in decision.blockers)
@@ -122,6 +142,81 @@ def test_adversarial_15_missing_mandatory_evidence():
 def test_adversarial_empty_required_evidence_policy():
     with pytest.raises(ValueError, match="Release policy cannot have empty required_evidence"):
         ReleasePolicy(required_evidence=())
+
+def test_adversarial_ci_mode_requires_github_run_id_and_attempt():
+    with pytest.raises(ValueError, match="Release policy requires GitHub Run ID"):
+        ReleasePolicy(required_evidence=("tests",), require_matching_github_run=True, current_github_run_id="")
+    with pytest.raises(ValueError, match="Release policy requires GitHub Run Attempt"):
+        ReleasePolicy(required_evidence=("tests",), require_matching_github_run=True, current_github_run_id="12345", current_github_run_attempt="")
+
+def test_adversarial_ci_mode_mismatched_run_id(tmp_path):
+    now = datetime.now(timezone.utc)
+    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
+    policy = ReleasePolicy(
+        required_evidence=("tests",),
+        evidence_root=str(tmp_path),
+        require_matching_github_run=True,
+        current_github_run_id="12345",
+        current_github_run_attempt="1"
+    )
+    evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
+    art = tmp_path / "tests.log"
+    art.write_text("ok")
+    art_sha = hashlib.sha256(art.read_bytes()).hexdigest()
+
+    ev = Evidence(
+        name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(),
+        artifact_path=str(art), artifact_sha256=art_sha,
+        github_run_id="wrong_run_id", github_run_attempt="1"
+    )
+    decision = evaluator.evaluate([ev], evaluated_at=now)
+    assert decision.status == "NOT_READY"
+    assert any("GitHub Run ID mismatch" in b for b in decision.blockers)
+
+def test_adversarial_ci_mode_mismatched_run_attempt(tmp_path):
+    now = datetime.now(timezone.utc)
+    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
+    policy = ReleasePolicy(
+        required_evidence=("tests",),
+        evidence_root=str(tmp_path),
+        require_matching_github_run=True,
+        current_github_run_id="12345",
+        current_github_run_attempt="1"
+    )
+    evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
+    art = tmp_path / "tests.log"
+    art.write_text("ok")
+    art_sha = hashlib.sha256(art.read_bytes()).hexdigest()
+
+    ev = Evidence(
+        name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(),
+        artifact_path=str(art), artifact_sha256=art_sha,
+        github_run_id="12345", github_run_attempt="2"
+    )
+    decision = evaluator.evaluate([ev], evaluated_at=now)
+    assert decision.status == "NOT_READY"
+    assert any("GitHub Run Attempt mismatch" in b for b in decision.blockers)
+
+def test_adversarial_artifact_path_traversal_outside_root(tmp_path):
+    now = datetime.now(timezone.utc)
+    sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
+    root_sub = tmp_path / "root_sub"
+    root_sub.mkdir()
+
+    outside_file = tmp_path / "outside.log"
+    outside_file.write_text("outside")
+    outside_sha = hashlib.sha256(outside_file.read_bytes()).hexdigest()
+
+    policy = ReleasePolicy(required_evidence=("tests",), evidence_root=str(root_sub))
+    evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
+
+    ev = Evidence(
+        name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(),
+        artifact_path=str(outside_file), artifact_sha256=outside_sha
+    )
+    decision = evaluator.evaluate([ev], evaluated_at=now)
+    assert decision.status == "NOT_READY"
+    assert any("escapes evidence root" in b for b in decision.blockers)
 
 def test_adversarial_naive_evidence_timestamp():
     now = datetime.now(timezone.utc)
@@ -141,9 +236,12 @@ def test_adversarial_18_real_trading_true_fails():
 def test_atomic_write_decision(tmp_path):
     now = datetime.now(timezone.utc)
     sha = "1bd7478bce2df25fd9bc224a956eaad11e6ff539"
-    policy = ReleasePolicy(required_evidence=("tests",))
+    policy = ReleasePolicy(required_evidence=("tests",), evidence_root=str(tmp_path))
     evaluator = ReleaseGateEvaluator(policy, current_git_sha=sha)
-    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat())
+    art = tmp_path / "tests.log"
+    art.write_text("tests_ok")
+    art_sha = hashlib.sha256(art.read_bytes()).hexdigest()
+    ev = Evidence(name="tests", passed=True, git_sha=sha, generated_at=now.isoformat(), artifact_path=str(art), artifact_sha256=art_sha)
     decision = evaluator.evaluate([ev], evaluated_at=now)
     out_file = tmp_path / "decision.json"
     evaluator.write_decision_atomic(decision, out_file)

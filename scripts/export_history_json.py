@@ -57,8 +57,8 @@ def export_history():
                 "source": "AUTHORITATIVE_PERSISTED_LEDGER"
             }
 
-            os.makedirs('web/public', exist_ok=True)
-            json_path = os.path.abspath('web/public/signals_history.json')
+            os.makedirs('backend/data', exist_ok=True)
+            json_path = os.path.abspath('backend/data/signals_history.json')
             with open(json_path, 'w') as f:
                 json.dump(payload, f, indent=2)
 

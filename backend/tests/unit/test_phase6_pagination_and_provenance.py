@@ -21,14 +21,15 @@ async def test_pagination_stress_test_over_1201_records():
 
     mock_repo.get_all_stocks = AsyncMock(side_effect=batches)
 
-    with patch('backend.services.equity_signal_generation_service.container') as mock_container:
-        mock_container.repository = mock_repo
-        with patch('backend.services.equity_signal_generation_service.SignalEngine.generate_signal', new_callable=AsyncMock, return_value=None):
-            result = await EquitySignalGenerationService.run_production_scan()
-            assert result["source_symbol_count"] == total_items
-            assert result["status"] == "COMPLETED"
-            # 1250 items with page size 200 = 7 pages (0, 200, 400, 600, 800, 1000, 1200) + 1 termination call = 8 calls
-            assert mock_repo.get_all_stocks.call_count == 7
+    with patch('backend.services.data_quality_service.DataQualityService.evaluate_global_data_gate', return_value={"signal_generation_allowed": True}):
+        with patch('backend.services.equity_signal_generation_service.container') as mock_container:
+            mock_container.repository = mock_repo
+            with patch('backend.services.equity_signal_generation_service.SignalEngine.generate_signal', new_callable=AsyncMock, return_value=None):
+                result = await EquitySignalGenerationService.run_production_scan()
+                assert result["source_symbol_count"] == total_items
+                assert result["status"] == "COMPLETED"
+                # 1250 items with page size 200 = 7 pages (0, 200, 400, 600, 800, 1000, 1200) + 1 termination call = 8 calls
+                assert mock_repo.get_all_stocks.call_count == 7
 
 @pytest.mark.asyncio
 async def test_later_page_failure_fails_scan():
@@ -36,11 +37,12 @@ async def test_later_page_failure_fails_scan():
     batch_1 = [Stock(symbol=f"SYM{i}", name=f"Stock {i}") for i in range(200)]
     mock_repo.get_all_stocks = AsyncMock(side_effect=[batch_1, Exception("Later page DB read failure")])
 
-    with patch('backend.services.equity_signal_generation_service.container') as mock_container:
-        mock_container.repository = mock_repo
-        result = await EquitySignalGenerationService.run_production_scan()
-        assert result["status"] == "FAILED"
-        assert "PAGINATION_FAILED" in result["reason"]
+    with patch('backend.services.data_quality_service.DataQualityService.evaluate_global_data_gate', return_value={"signal_generation_allowed": True}):
+        with patch('backend.services.equity_signal_generation_service.container') as mock_container:
+            mock_container.repository = mock_repo
+            result = await EquitySignalGenerationService.run_production_scan()
+            assert result["status"] == "FAILED"
+            assert "PAGINATION_FAILED" in result["reason"]
 
 @pytest.mark.asyncio
 async def test_lifecycle_worker_pagination_failure_provenance():

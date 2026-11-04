@@ -291,7 +291,7 @@ export default function EquitySignals() {
   }, [signals, history, mode, activeTab, searchQuery, universes]);
 
   const finalDisplaySignals = useMemo(() => {
-    let source = mode === 'ACTIVE' ? [...filteredActiveSignals] : [...history];
+    const source = mode === 'ACTIVE' ? [...filteredActiveSignals] : [...history];
     if (sortBy === 'PROBABILITY') source.sort((a, b) => (b.decision?.conviction || 0) - (a.decision?.conviction || 0));
     if (sortBy === 'EV') source.sort((a, b) => (b.decision?.expectedValue || 0) - (a.decision?.expectedValue || 0));
     if (sortBy === 'NEWEST') source.sort((a, b) => new Date(b.decision?.generatedAt || 0).getTime() - new Date(a.decision?.generatedAt || 0).getTime());

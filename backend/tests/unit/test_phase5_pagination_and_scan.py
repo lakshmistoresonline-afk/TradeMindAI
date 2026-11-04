@@ -15,25 +15,27 @@ async def test_pagination_traversal_without_truncation():
 
     mock_repo.get_all_stocks = AsyncMock(side_effect=[batch_1, batch_2, batch_3])
 
-    with patch('backend.services.equity_signal_generation_service.container') as mock_container:
-        mock_container.repository = mock_repo
-        # Mock signal generation to return None so scan runs through without actual ML calls
-        with patch('backend.services.equity_signal_generation_service.SignalEngine.generate_signal', new_callable=AsyncMock, return_value=None):
-            result = await EquitySignalGenerationService.run_production_scan()
-            assert result["source_symbol_count"] == 400
-            assert result["status"] == "COMPLETED"
-            assert mock_repo.get_all_stocks.call_count == 3
+    with patch('backend.services.data_quality_service.DataQualityService.evaluate_global_data_gate', return_value={"signal_generation_allowed": True}):
+        with patch('backend.services.equity_signal_generation_service.container') as mock_container:
+            mock_container.repository = mock_repo
+            # Mock signal generation to return None so scan runs through without actual ML calls
+            with patch('backend.services.equity_signal_generation_service.SignalEngine.generate_signal', new_callable=AsyncMock, return_value=None):
+                result = await EquitySignalGenerationService.run_production_scan()
+                assert result["source_symbol_count"] == 400
+                assert result["status"] == "COMPLETED"
+                assert mock_repo.get_all_stocks.call_count == 3
 
 @pytest.mark.asyncio
 async def test_pagination_page_failure_handling():
     mock_repo = MagicMock()
     mock_repo.get_all_stocks = AsyncMock(side_effect=Exception("Database read timeout"))
 
-    with patch('backend.services.equity_signal_generation_service.container') as mock_container:
-        mock_container.repository = mock_repo
-        result = await EquitySignalGenerationService.run_production_scan()
-        assert result["status"] == "FAILED"
-        assert "PAGINATION_FAILED" in result["reason"]
+    with patch('backend.services.data_quality_service.DataQualityService.evaluate_global_data_gate', return_value={"signal_generation_allowed": True}):
+        with patch('backend.services.equity_signal_generation_service.container') as mock_container:
+            mock_container.repository = mock_repo
+            result = await EquitySignalGenerationService.run_production_scan()
+            assert result["status"] == "FAILED"
+            assert "PAGINATION_FAILED" in result["reason"]
 
 def test_centralized_buy_eligibility_strict():
     # Valid BUY

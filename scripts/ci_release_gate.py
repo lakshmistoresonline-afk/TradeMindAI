@@ -44,7 +44,9 @@ def main():
     parser.add_argument("--git-sha", type=str, default="", help="Current Git SHA (defaults to GITHUB_SHA or HEAD)")
     parser.add_argument("--evidence-dir", type=str, default="reports/ci_evidence", help="Directory containing evidence JSON files")
     parser.add_argument("--output-path", type=str, default="reports/release_decision.json", help="Path to write ReleaseDecision JSON")
-    parser.add_argument("--required-evidence", type=str, default="backend_tests,frontend_lint,frontend_build", help="Comma-separated required evidence names")
+    parser.add_argument("--required-evidence", type=str, default="backend_tests,frontend_lint,frontend_tests,frontend_build", help="Comma-separated required evidence names")
+    parser.add_argument("--github-run-id", type=str, default="", help="GitHub Actions Run ID")
+    parser.add_argument("--github-run-attempt", type=str, default="", help="GitHub Actions Run Attempt")
 
     args = parser.parse_args()
 
@@ -53,13 +55,28 @@ def main():
         print("[!] FATAL: Current Git SHA could not be determined.")
         sys.exit(1)
 
+    gh_run_id = args.github_run_id or os.getenv("GITHUB_RUN_ID", "")
+    gh_run_attempt = args.github_run_attempt or os.getenv("GITHUB_RUN_ATTEMPT", "")
+
     req_list = [r.strip() for r in args.required_evidence.split(",") if r.strip()]
     if not req_list:
         print("[!] FATAL: At least one required evidence item must be specified.")
         sys.exit(1)
 
+    ev_dir = Path(args.evidence_dir).resolve()
+    if not ev_dir.exists() or not ev_dir.is_dir():
+        print(f"[!] FATAL: Evidence directory missing or invalid at {ev_dir}")
+        sys.exit(1)
+
     try:
-        policy = ReleasePolicy(required_evidence=tuple(req_list), evidence_root=str(root_dir))
+        is_ci = os.getenv("GITHUB_ACTIONS") == "true" or bool(gh_run_id)
+        policy = ReleasePolicy(
+            required_evidence=tuple(req_list),
+            evidence_root=str(ev_dir.parent),
+            require_matching_github_run=is_ci,
+            current_github_run_id=gh_run_id if is_ci else None,
+            current_github_run_attempt=gh_run_attempt if is_ci else None
+        )
         evaluator = ReleaseGateEvaluator(policy, current_git_sha=git_sha)
     except Exception as e:
         print(f"[!] FATAL: Failed to initialize ReleaseGateEvaluator: {e}")
@@ -67,11 +84,6 @@ def main():
 
     evidence_items = []
     parsing_errors = []
-    ev_dir = Path(args.evidence_dir).resolve()
-
-    if not ev_dir.exists() or not ev_dir.is_dir():
-        print(f"[!] FATAL: Evidence directory missing or invalid at {ev_dir}")
-        sys.exit(1)
 
     json_files = list(ev_dir.glob("*.json"))
     if not json_files:
@@ -94,7 +106,7 @@ def main():
                 parsing_errors.append(f"Unexpected evidence name '{name}' in {fpath.name} not in required list.")
                 continue
 
-            # STRICT TYPE VALIDATION: passed MUST be an explicit bool, not string "false" or number
+            # STRICT TYPE VALIDATION: passed MUST be an explicit bool
             passed_val = data.get("passed")
             if not isinstance(passed_val, bool):
                 parsing_errors.append(f"Evidence file {fpath.name} field 'passed' must be a boolean (got {type(passed_val).__name__}: {passed_val}).")
@@ -117,6 +129,8 @@ def main():
                 generated_at=generated_at_val,
                 artifact_path=data.get("artifact_path"),
                 artifact_sha256=data.get("artifact_sha256"),
+                github_run_id=data.get("github_run_id"),
+                github_run_attempt=data.get("github_run_attempt"),
                 details=str(data.get("details", ""))
             ))
         except Exception as e:

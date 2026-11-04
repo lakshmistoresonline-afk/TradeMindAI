@@ -14,7 +14,7 @@ from backend.services.research_metrics_service import ResearchMetricsService
 
 def export_performance():
     print("[Export Performance] Reading authoritative signals history...")
-    history_path = os.path.abspath('web/public/signals_history.json')
+    history_path = os.path.abspath('backend/data/signals_history.json')
     if not os.path.exists(history_path):
         print(f"[!] Error: {history_path} not found. Run export_history_json.py first.")
         raise FileNotFoundError(f"{history_path} not found.")
@@ -53,8 +53,8 @@ def export_performance():
         "source": "AUTHORITATIVE_LEDGER_DERIVED"
     }
 
-    perf_path = os.path.abspath('web/public/performance.json')
-    os.makedirs('web/public', exist_ok=True)
+    perf_path = os.path.abspath('backend/data/performance.json')
+    os.makedirs('backend/data', exist_ok=True)
     with open(perf_path, 'w') as f:
         json.dump(perf_payload, f, indent=2)
 

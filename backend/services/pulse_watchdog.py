@@ -65,8 +65,8 @@ class PulseWatchdog:
             from backend.services.market_calendar import MarketCalendar
             is_open = MarketCalendar.is_market_open()
 
-            threshold_late = 900 if is_open else 7200 # 15m vs 2h
-            threshold_stale = 3600 if is_open else 86400 # 1h vs 24h
+            threshold_late = 300 if is_open else 7200 # 5m vs 2h
+            threshold_stale = 1800 if is_open else 86400 # 30m vs 24h
 
             if age < threshold_late: status = "HEALTHY"
             elif age < threshold_stale: status = "LATE"

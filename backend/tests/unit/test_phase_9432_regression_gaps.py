@@ -11,6 +11,8 @@ import pytest
 import datetime
 import json
 import os
+import sys
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from unittest.mock import patch, MagicMock
@@ -171,11 +173,89 @@ def test_def04_malformed_model_metadata_handling():
 
 
 # --- Static Asset Build Output Containment Test ---
+def assert_dist_dir_containment(dist_path: Path) -> None:
+    resolved_dist = Path(dist_path).resolve()
+    if not resolved_dist.exists() or not resolved_dist.is_dir():
+        raise FileNotFoundError(f"Build output directory missing at {resolved_dist}. Run frontend build first.")
+
+    prohibited_names = {"signals.json", "performance.json", "signals_history.json", "signals_export.json", "signals_archive.json", "history.json"}
+    found_prohibited = []
+
+    for root, dirs, files in os.walk(resolved_dist, followlinks=False):
+        for dname in list(dirs):
+            dpath = Path(root) / dname
+            try:
+                resolved_dir = dpath.resolve()
+                if not resolved_dir.is_relative_to(resolved_dist):
+                    found_prohibited.append(f"Directory {dpath} (symlink escapes build root -> {resolved_dir})")
+            except Exception as e:
+                found_prohibited.append(f"Directory {dpath} (unresolvable symlink: {e})")
+
+        for fname in files:
+            fpath = Path(root) / fname
+            try:
+                resolved_file = fpath.resolve()
+                if not resolved_file.is_relative_to(resolved_dist):
+                    found_prohibited.append(f"File {fpath} (symlink escapes build root -> {resolved_file})")
+            except Exception as e:
+                found_prohibited.append(f"File {fpath} (unresolvable symlink: {e})")
+
+            fname_lower = fname.lower()
+            if fname_lower in prohibited_names or (fname_lower.endswith(".json") and any(p in fname_lower for p in ["signals_", "performance_"])):
+                found_prohibited.append(str(fpath))
+
+    assert not found_prohibited, f"Prohibited static signal assets exposed in build output: {found_prohibited}"
+
 def test_static_asset_containment_in_build_output():
-    """Verify signals.json and performance.json do not exist in web/dist build output."""
-    dist_dir = r"D:\TradeMindAI\web\dist"
-    if os.path.exists(dist_dir):
-        sig_path = os.path.join(dist_dir, "signals.json")
-        perf_path = os.path.join(dist_dir, "performance.json")
-        assert not os.path.exists(sig_path), f"signals.json should be absent from {dist_dir}"
-        assert not os.path.exists(perf_path), f"performance.json should be absent from {dist_dir}"
+    """Verify signals.json, performance.json, and signals_history.json do not exist in web/dist build output."""
+    root_dir = Path(__file__).resolve().parent.parent.parent.parent
+    dist_dir = root_dir / "web" / "dist"
+    assert_dist_dir_containment(dist_dir)
+
+def test_static_asset_containment_negative_control(tmp_path):
+    """Negative control: verify that assert_dist_dir_containment fails when a prohibited file or nested prohibited file is present."""
+    fake_dist = tmp_path / "dist"
+    fake_dist.mkdir()
+    nested_dir = fake_dist / "nested"
+    nested_dir.mkdir()
+    dummy_signal = nested_dir / "signals.json"
+    dummy_signal.write_text('{"status": "EXPOSED"}')
+
+    with pytest.raises(AssertionError, match="Prohibited static signal assets exposed"):
+        assert_dist_dir_containment(fake_dist)
+
+def test_static_asset_containment_symlink_file_escape(tmp_path):
+    """Verify that assert_dist_dir_containment detects file symlink escaping build root."""
+    fake_dist = tmp_path / "dist"
+    fake_dist.mkdir()
+    outside_file = tmp_path / "outside.txt"
+    outside_file.write_text("outside")
+
+    symlink_file = fake_dist / "escape_link.txt"
+    try:
+        symlink_file.symlink_to(outside_file)
+    except (OSError, NotImplementedError):
+        pytest.skip("Symlink creation not permitted in this OS environment.")
+
+    with pytest.raises(AssertionError, match="symlink escapes build root"):
+        assert_dist_dir_containment(fake_dist)
+
+def test_static_asset_containment_symlink_dir_escape(tmp_path):
+    """Verify that assert_dist_dir_containment detects directory symlink/junction escaping build root."""
+    fake_dist = tmp_path / "dist"
+    fake_dist.mkdir()
+    outside_dir = tmp_path / "outside_dir"
+    outside_dir.mkdir()
+
+    symlink_dir = fake_dist / "escape_dir_link"
+    try:
+        symlink_dir.symlink_to(outside_dir, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        if sys.platform == "win32":
+            import _winapi
+            _winapi.CreateJunction(str(outside_dir), str(symlink_dir))
+        else:
+            pytest.skip("Symlink creation not permitted in this OS environment.")
+
+    with pytest.raises(AssertionError, match="symlink escapes build root"):
+        assert_dist_dir_containment(fake_dist)

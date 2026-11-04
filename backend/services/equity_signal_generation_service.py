@@ -5,12 +5,14 @@ from backend.core.container import container
 from backend.services.signal_engine import SignalEngine
 from backend.services.signal_ledger_service import SignalLedgerService
 from backend.services.signal_eligibility import is_eligible_buy
+from backend.app.db.nifty500_symbols import get_nifty_500_universe
 
 class EquitySignalGenerationService:
     """
     Phase 5: Master Equity Signal Generation Service with Complete Universe Pagination.
     Enforces continuous data path from Market Data to Signal Ledger across validated NSE equities.
-    Fails closed immediately if the stock master is empty or unvalidated (no synthetic fallbacks).
+    Fails closed immediately if the stock master is empty, unvalidated, or if the Phase 1G
+    Global Data Quality Gate fails.
     """
 
     @staticmethod
@@ -18,10 +20,27 @@ class EquitySignalGenerationService:
         """
         Executes a full production scan across the validated NSE equity master across all horizons,
         using fully paginated stock retrieval to prevent truncation.
+        Enforces Phase 1G Global Data Validation Gate.
         """
         scan_id = f"scan_{datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%d_%H%M%S')}"
         start_time = datetime.datetime.now(datetime.timezone.utc)
         print(f"=== [EQUITY] Master NSE Production Scan Started ({scan_id}) ===")
+
+        # 0. Enforce Phase 1G Global Data Quality Gate
+        from backend.services.data_quality_service import DataQualityService
+        gate = DataQualityService.evaluate_global_data_gate()
+        if not gate.get("signal_generation_allowed", False):
+            print(f"   [!] BLOCKED by Global Data Quality Gate: status='{gate.get('global_data_status')}'. Signal generation prohibited.")
+            return {
+                "scan_id": scan_id,
+                "timestamp": start_time.isoformat(),
+                "status": "BLOCKED",
+                "reason": f"GLOBAL_DATA_GATE_FAILED: {gate.get('global_data_status')}",
+                "source_symbol_count": 0,
+                "symbols_attempted": 0,
+                "signals_generated": 0,
+                "errors": [{"gate_status": gate.get('global_data_status')}]
+            }
 
         funnel: Dict[str, Any] = {
             "scan_id": scan_id,
@@ -98,33 +117,32 @@ class EquitySignalGenerationService:
                     signal = await SignalEngine.generate_signal(
                         symbol=symbol,
                         asset_class="EQUITY",
-                        timeframe=horizon
+                        horizon=horizon,
+                        as_of_timestamp=start_time
                     )
 
-                    if signal:
-                        # Enforce BUY-only and central eligibility rules (is_eligible_buy)
-                        if is_eligible_buy(signal):
-                            funnel["candidate_buy_count"] += 1
-                            try:
-                                await SignalLedgerService.create_signal(signal)
-                                funnel["signals_persisted"] += 1
-                                print(f"   [+] {symbol} ({horizon}) SIGNAL: {signal.direction} at ₹{signal.entry_price}")
-                            except Exception as persist_err:
-                                funnel["persistence_failures"] += 1
-                                funnel["errors"].append({"symbol": symbol, "horizon": horizon, "error": f"PERSISTENCE_FAILED: {persist_err}"})
-                        else:
-                            funnel["rejected_non_buy"] += 1
-                    else:
+                    if not signal:
                         funnel["feature_model_failures"] += 1
+                        continue
 
-                except Exception as e:
-                    funnel["missing_market_data"] += 1
-                    funnel["errors"].append({"symbol": symbol, "horizon": horizon, "error": str(e)})
+                    # Filter non-buy / non-eligible candidate signals
+                    if not is_eligible_buy(signal):
+                        funnel["rejected_non_buy"] += 1
+                        continue
 
-        end_time = datetime.datetime.now(datetime.timezone.utc)
-        funnel["duration_seconds"] = (end_time - start_time).total_seconds()
-        if funnel["missing_market_data"] > 0 or funnel["persistence_failures"] > 0:
-            funnel["status"] = "PARTIAL"
+                    funnel["candidate_buy_count"] += 1
+
+                    # Persist signal to ledger
+                    ledger_res = await SignalLedgerService.persist_signal(signal)
+                    if ledger_res.get("status") == "PERSISTED":
+                        funnel["signals_persisted"] += 1
+                    elif ledger_res.get("status") == "DUPLICATE_PREVENTED":
+                        funnel["duplicates_prevented"] += 1
+                    else:
+                        funnel["persistence_failures"] += 1
+
+                except Exception as ex:
+                    funnel["errors"].append({"symbol": symbol, "horizon": horizon, "error": str(ex)})
 
         print(f"=== [EQUITY] Master NSE Scan Completed ({scan_id}). Persisted Signals: {funnel['signals_persisted']} ===")
         return funnel
