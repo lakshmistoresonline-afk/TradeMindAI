@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     LIVE_EXECUTION_ENABLED: bool = False
     BROKER_ORDER_EXECUTION_ENABLED: bool = False
     QUARANTINE_ACTIVE: bool = True
+    SIGNALS_ONLY_ARCHITECTURE: bool = True
 
     @field_validator(
         "REAL_TRADING",

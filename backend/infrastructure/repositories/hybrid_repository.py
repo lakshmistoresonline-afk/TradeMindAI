@@ -269,7 +269,8 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
             db_obj = pg.query(ModelMetadataDB).filter(ModelMetadataDB.name == metadata.name).first()
             data = metadata.model_dump()
             for col in ["hyperparameters", "feature_importances", "calibration_metadata"]:
-                if data.get(col): data[col] = json.dumps(data[col])
+                if data.get(col) is not None:
+                    data[col] = json.dumps(data[col]) if isinstance(data[col], (dict, list)) else data[col]
             db_columns = {c.name for c in ModelMetadataDB.__table__.columns}
             filtered_data = {k: v for k, v in data.items() if k in db_columns}
 
@@ -293,11 +294,6 @@ class HybridDataPlatformRepository(IDataPlatformRepository):
                 ModelMetadataDB.is_champion == True,
                 ModelMetadataDB.horizon == horizon
             ).order_by(ModelMetadataDB.last_trained.desc()).first()
-            if not r:
-                r = pg.query(ModelMetadataDB).filter(
-                    ModelMetadataDB.is_champion == True,
-                    ModelMetadataDB.horizon == horizon
-                ).order_by(ModelMetadataDB.last_trained.desc()).first()
             return self._map_db_to_model_metadata(r) if r else None
 
     async def get_model_history(self, symbol: str, limit: int = 10) -> List[ModelMetadata]:
@@ -483,6 +479,10 @@ class HybridIOSRepository(IIOSRepository):
                 data['rating'] = getattr(db_obj, 'rating', 'STRONG_BUY')
             if not data.get('status'):
                 data['status'] = getattr(db_obj, 'status', 'ACTIVE')
+            if not data.get('model_version'):
+                data['model_version'] = getattr(db_obj, 'model_version', 'v2.2') or 'v2.2'
+            if not data.get('quality_class'):
+                data['quality_class'] = getattr(db_obj, 'quality_class', 'PRIMARY') or 'PRIMARY'
 
             valid_fields = set(LiveSignal.model_fields.keys())
             filtered_data = {k: v for k, v in data.items() if k in valid_fields}
@@ -496,7 +496,9 @@ class HybridIOSRepository(IIOSRepository):
                 rating=getattr(db_obj, 'rating', 'STRONG_BUY'),
                 conviction=float(getattr(db_obj, 'conviction', 88.0) or 88.0),
                 entry_price=float(getattr(db_obj, 'entry_price', 1000.0) or 1000.0),
-                status=getattr(db_obj, 'status', 'ACTIVE')
+                status=getattr(db_obj, 'status', 'ACTIVE'),
+                model_version=getattr(db_obj, 'model_version', 'v2.2') or 'v2.2',
+                quality_class=getattr(db_obj, 'quality_class', 'PRIMARY') or 'PRIMARY'
             )
 
     async def get_signal_by_id(self, signal_id: str) -> Optional[LiveSignal]:

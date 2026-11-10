@@ -1,0 +1,501 @@
+symbol,company_name,daily_duckdb_rows,intraday_duckdb_rows,supported_in_duckdb
+360ONE,360 ONE WAM Ltd.,1759,74,True
+ABB,ABB India Ltd.,2920,73,True
+ACC,ACC Ltd.,2920,75,True
+ACMESOLAR,ACME Solar Holdings Ltd.,485,75,True
+AIAENG,AIA Engineering Ltd.,2919,75,True
+APLAPOLLO,APL Apollo Tubes Ltd.,2920,74,True
+AUBANK,AU Small Finance Bank Ltd.,2299,74,True
+AWL,AWL Agri Business Ltd.,1167,75,True
+AADHARHFC,Aadhar Housing Finance Ltd.,610,75,True
+AARTIIND,Aarti Industries Ltd.,2920,75,True
+AAVAS,Aavas Financiers Ltd.,1991,75,True
+ABBOTINDIA,Abbott India Ltd.,2920,75,True
+ACE,Action Construction Equipment Ltd.,2920,75,True
+ACUTAAS,Acutaas Chemicals Ltd.,1268,75,True
+ADANIENSOL,Adani Energy Solutions Ltd.,2776,74,True
+ADANIENT,Adani Enterprises Ltd.,2920,74,True
+ADANIGREEN,Adani Green Energy Ltd.,2066,74,True
+ADANIPORTS,Adani Ports and Special Economic Zone Ltd.,2920,74,True
+ADANIPOWER,Adani Power Ltd.,2920,74,True
+ATGL,Adani Total Gas Ltd.,1972,75,True
+ABCAPITAL,Aditya Birla Capital Ltd.,2263,74,True
+ABREL,Aditya Birla Real Estate Ltd.,2920,75,True
+ABSLAMC,Aditya Birla Sun Life AMC Ltd.,1249,75,True
+CPPLUS,Aditya Infotech Ltd.,305,75,True
+AEGISLOG,Aegis Logistics Ltd.,2918,75,True
+AEGISVOPAK,Aegis Vopak Terminals Ltd.,351,75,True
+AETHER,Aether Industries Ltd.,1089,75,True
+AFCONS,Afcons Infrastructure Ltd.,492,75,True
+AFFLE,Affle 3i Ltd.,1786,75,True
+AJANTPHARM,Ajanta Pharmaceuticals Ltd.,2919,75,True
+ALKEM,Alkem Laboratories Ltd.,2679,73,True
+ABDL,Allied Blenders and Distillers Ltd.,578,75,True
+ARE&M,Amara Raja Energy & Mobility Ltd.,2920,75,True
+AMBER,Amber Enterprises India Ltd.,2160,74,True
+AMBUJACEM,Ambuja Cements Ltd.,2920,74,True
+ANANDRATHI,Anand Rathi Wealth Ltd.,1206,74,True
+ANANTRAJ,Anant Raj Ltd.,2920,75,True
+ANGELONE,Angel One Ltd.,1502,74,True
+ANTHEM,Anthem Biosciences Ltd.,316,75,True
+ANURAS,Anupam Rasayan India Ltd.,1384,75,True
+APARINDS,Apar Industries Ltd.,2920,75,True
+APOLLOHOSP,Apollo Hospitals Enterprise Ltd.,2920,74,True
+APOLLOTYRE,Apollo Tyres Ltd.,2920,75,True
+APTUS,Aptus Value Housing Finance India Ltd.,1282,75,True
+ASAHIINDIA,Asahi India Glass Ltd.,2920,75,True
+ASHOKLEY,Ashok Leyland Ltd.,2920,74,True
+ASIANPAINT,Asian Paints Ltd.,2920,74,True
+ASTERDM,Aster DM Quality Care Ltd.,2142,75,True
+ASTRAL,Astral Ltd.,2920,74,True
+ATHERENERG,Ather Energy Ltd.,370,74,True
+ATUL,Atul Ltd.,2920,75,True
+AUROPHARMA,Aurobindo Pharma Ltd.,2919,74,True
+AIIL,Authum Investment & Infrastructure Ltd.,625,74,True
+AVANTIFEED,Avanti Feeds Ltd.,2919,75,True
+DMART,Avenue Supermarts Ltd.,2375,73,True
+AXISBANK,Axis Bank Ltd.,2920,74,True
+AZAD,Azad Engineering Ltd.,701,75,True
+BEML,BEML Ltd.,2920,75,True
+BLS,BLS International Services Ltd.,2563,75,True
+BSE,BSE Ltd.,2405,74,True
+BAGMANE,Bagmane Prime Office REIT,0,0,False
+BAJAJ-AUTO,Bajaj Auto Ltd.,2920,74,True
+BAJFINANCE,Bajaj Finance Ltd.,2920,74,True
+BAJAJFINSV,Bajaj Finserv Ltd.,2920,74,True
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd.,2920,75,True
+BAJAJHFL,Bajaj Housing Finance Ltd.,526,75,True
+BALKRISIND,Balkrishna Industries Ltd.,2920,75,True
+BALRAMCHIN,Balrampur Chini Mills Ltd.,2920,75,True
+BANDHANBNK,Bandhan Bank Ltd.,2122,74,True
+BANKBARODA,Bank of Baroda,2920,74,True
+BANKINDIA,Bank of India,2920,74,True
+MAHABANK,Bank of Maharashtra,2920,74,True
+BATAINDIA,Bata India Ltd.,2920,75,True
+BELRISE,Belrise Industries Ltd.,354,75,True
+BERGEPAINT,Berger Paints India Ltd.,2920,75,True
+BHARATCOAL,Bharat Coking Coal Ltd.,192,75,True
+BDL,Bharat Dynamics Ltd.,2124,74,True
+BEL,Bharat Electronics Ltd.,2920,74,True
+BHARATFORG,Bharat Forge Ltd.,2919,74,True
+BHEL,Bharat Heavy Electricals Ltd.,2920,74,True
+BPCL,Bharat Petroleum Corporation Ltd.,2920,74,True
+BHARTIARTL,Bharti Airtel Ltd.,2920,74,True
+BHARTIHEXA,Bharti Hexacom Ltd.,631,75,True
+GROWW,Billionbrains Garage Ventures Ltd.,239,75,True
+BIOCON,Biocon Ltd.,2920,74,True
+BSOFT,Birlasoft Ltd.,2920,75,True
+BBOX,Black Box Ltd.,2920,75,True
+BLUESTARCO,Blue Star Ltd.,2920,74,True
+BOSCHLTD,Bosch Ltd.,2920,73,True
+FIRSTCRY,Brainbees Solutions Ltd.,549,75,True
+BRIGADE,Brigade Enterprises Ltd.,2920,75,True
+BRITANNIA,Britannia Industries Ltd.,2920,74,True
+BIRET,Brookfield India Real Estate Trust,1408,75,True
+CCL,CCL Products (I) Ltd.,2920,75,True
+CESC,CESC Ltd.,2920,75,True
+CGPOWER,CG Power and Industrial Solutions Ltd.,2920,74,True
+CIEINDIA,CIE Automotive India Ltd.,2919,75,True
+CRISIL,CRISIL Ltd.,2920,75,True
+CANFINHOME,Can Fin Homes Ltd.,2920,75,True
+CANBK,Canara Bank,2920,74,True
+CANHLIFE,Canara HSBC Life Insurance Company Ltd.,255,73,True
+CAPLIPOINT,Caplin Point Laboratories Ltd.,2920,75,True
+CGCL,Capri Global Capital Ltd.,2920,75,True
+CARBORUNIV,Carborundum Universal Ltd.,2919,75,True
+CARTRADE,Cartrade Tech Ltd.,1284,75,True
+CASTROLIND,Castrol India Ltd.,2920,75,True
+CEATLTD,Ceat Ltd.,2920,75,True
+CEMPRO,Cemindia Projects Ltd.,2920,75,True
+CENTRALBK,Central Bank of India,2920,75,True
+CDSL,Central Depository Services (India) Ltd.,2306,74,True
+CMPDI,Central Mine Planning & Design Institute Ltd.,145,75,True
+CHAMBLFERT,Chambal Fertilizers & Chemicals Ltd.,2920,75,True
+CHENNPETRO,Chennai Petroleum Corporation Ltd.,2920,75,True
+CHOICEIN,Choice International Ltd.,1126,75,True
+CHOLAHLDNG,Cholamandalam Financial Holdings Ltd.,2920,75,True
+CHOLAFIN,Cholamandalam Investment and Finance Company Ltd.,2920,74,True
+CIPLA,Cipla Ltd.,2920,74,True
+CUB,City Union Bank Ltd.,2920,74,True
+CLEANMAX,Clean Max Enviro Energy Solutions Ltd.,163,75,True
+CLEAN,Clean Science and Technology Ltd.,1306,75,True
+COALINDIA,Coal India Ltd.,2920,74,True
+COCHINSHIP,Cochin Shipyard Ltd.,2276,74,True
+COFORGE,Coforge Ltd.,2920,74,True
+COHANCE,Cohance Lifesciences Ltd.,1644,75,True
+COLPAL,Colgate Palmolive (India) Ltd.,2920,74,True
+CAMS,Computer Age Management Services Ltd.,1502,74,True
+CONCORDBIO,Concord Biotech Ltd.,789,75,True
+CONCOR,Container Corporation of India Ltd.,2920,73,True
+COROMANDEL,Coromandel International Ltd.,2920,73,True
+CRAFTSMAN,Craftsman Automation Ltd.,1382,75,True
+CREDITACC,CreditAccess Grameen Ltd.,2020,75,True
+CROMPTON,Crompton Greaves Consumer Electricals Ltd.,2586,74,True
+CUMMINSIND,Cummins India Ltd.,2920,74,True
+CUPID,Cupid Ltd.,2500,75,True
+CYIENT,Cyient Ltd.,2920,75,True
+DLF,DLF Ltd.,2920,74,True
+DOMS,DOMS Industries Ltd.,706,75,True
+DABUR,Dabur India Ltd.,2920,73,True
+DALBHARAT,Dalmia Bharat Ltd.,1940,75,True
+DATAPATTNS,Data Patterns (India) Ltd.,1198,73,True
+DEEPAKFERT,Deepak Fertilisers & Petrochemicals Corp. Ltd.,2920,75,True
+DEEPAKNTR,Deepak Nitrite Ltd.,2920,75,True
+DELHIVERY,Delhivery Ltd.,1097,74,True
+DEVYANI,Devyani International Ltd.,1287,75,True
+DIVISLAB,Divi's Laboratories Ltd.,2920,74,True
+DIXON,Dixon Technologies (India) Ltd.,2252,73,True
+LALPATHLAB,Dr. Lal Path Labs Ltd.,2680,75,True
+DRREDDY,Dr. Reddy's Laboratories Ltd.,2920,73,True
+EIDPARRY,E.I.D. Parry (India) Ltd.,2920,75,True
+EIHOTEL,EIH Ltd.,2920,72,True
+EMBASSY,EMBASSY OFFICE PARKS REIT,1873,75,True
+EICHERMOT,Eicher Motors Ltd.,2920,73,True
+ELECON,Elecon Engineering Co. Ltd.,2920,75,True
+ELGIEQUIP,Elgi Equipments Ltd.,2920,75,True
+EMAMILTD,Emami Ltd.,2920,75,True
+EMCURE,Emcure Pharmaceuticals Ltd.,571,75,True
+EMMVEE,Emmvee Photovoltaic Power Ltd.,235,75,True
+ENDURANCE,Endurance Technologies Ltd.,2479,75,True
+ENGINERSIN,Engineers India Ltd.,2920,75,True
+ESCORTS,Escorts Kubota Ltd.,2920,75,True
+ETERNAL,Eternal Ltd.,1303,73,True
+EXIDEIND,Exide Industries Ltd.,2920,75,True
+NYKAA,FSN E-Commerce Ventures Ltd.,1229,74,True
+FEDERALBNK,Federal Bank Ltd.,2920,74,True
+FACT,Fertilisers and Chemicals Travancore Ltd.,2920,75,True
+FINCABLES,Finolex Cables Ltd.,2920,75,True
+FSL,Firstsource Solutions Ltd.,2920,75,True
+FIVESTAR,Five-Star Business Finance Ltd.,974,75,True
+FORCEMOT,Force Motors Ltd.,1740,74,True
+FORTIS,Fortis Healthcare Ltd.,2920,74,True
+FRACTAL,Fractal Analytics Ltd.,173,75,True
+GAIL,GAIL (India) Ltd.,2920,74,True
+GVT&D,GE Vernova T&D India Ltd.,2920,73,True
+GMRAIRPORT,GMR Airports Ltd.,2920,73,True
+GABRIEL,Gabriel India Ltd.,2920,75,True
+GALLANTT,Gallantt Ispat Ltd.,2919,75,True
+GRSE,Garden Reach Shipbuilders & Engineers Ltd.,1980,75,True
+GICRE,General Insurance Corporation of India,2227,75,True
+GILLETTE,Gillette India Ltd.,2920,75,True
+GLAND,Gland Pharma Ltd.,1467,75,True
+GLAXO,Glaxosmithkline Pharmaceuticals Ltd.,2920,75,True
+GLENMARK,Glenmark Pharmaceuticals Ltd.,2920,74,True
+MEDANTA,Global Health Ltd.,975,75,True
+GPIL,Godawari Power & Ispat Ltd.,2920,75,True
+GODFRYPHLP,Godfrey Phillips India Ltd.,2920,74,True
+GODREJCP,Godrej Consumer Products Ltd.,2920,74,True
+GODREJIND,Godrej Industries Ltd.,2920,75,True
+GODREJPROP,Godrej Properties Ltd.,2920,73,True
+GRANULES,Granules India Ltd.,2919,75,True
+GRAPHITE,Graphite India Ltd.,2919,75,True
+GRASIM,Grasim Industries Ltd.,2920,74,True
+GRAVITA,Gravita India Ltd.,2920,75,True
+GESHIP,Great Eastern Shipping Co. Ltd.,2920,75,True
+FLUOROCHEM,Gujarat Fluorochemicals Ltd.,1743,75,True
+GMDCLTD,Gujarat Mineral Development Corporation Ltd.,2920,75,True
+HBLENGINE,HBL Engineering Ltd.,2920,75,True
+HCLTECH,HCL Technologies Ltd.,2920,74,True
+HDBFS,HDB Financial Services Ltd.,329,75,True
+HDFCAMC,HDFC Asset Management Company Ltd.,2031,73,True
+HDFCBANK,HDFC Bank Ltd.,2920,74,True
+HDFCLIFE,HDFC Life Insurance Company Ltd.,2210,74,True
+HEGAM,HEG Advanced Materials Ltd.,2920,75,True
+HFCL,HFCL Ltd.,2920,75,True
+HAVELLS,Havells India Ltd.,2920,74,True
+HEROMOTOCO,Hero MotoCorp Ltd.,2920,74,True
+HEXT,Hexaware Technologies Ltd.,416,75,True
+HSCL,Himadri Speciality Chemical Ltd.,2920,75,True
+HINDALCO,Hindalco Industries Ltd.,2920,73,True
+HAL,Hindustan Aeronautics Ltd.,2120,74,True
+HINDCOPPER,Hindustan Copper Ltd.,2920,75,True
+HINDPETRO,Hindustan Petroleum Corporation Ltd.,2920,74,True
+HINDUNILVR,Hindustan Unilever Ltd.,2920,74,True
+HINDZINC,Hindustan Zinc Ltd.,2920,74,True
+POWERINDIA,Hitachi Energy India Ltd.,1630,73,True
+HOMEFIRST,Home First Finance Company India Ltd.,1418,75,True
+HONASA,Honasa Consumer Ltd.,734,75,True
+HONAUT,Honeywell Automation India Ltd.,2919,75,True
+HUDCO,Housing & Urban Development Corporation Ltd.,2335,75,True
+HYUNDAI,Hyundai Motor India Ltd.,501,74,True
+ICICIBANK,ICICI Bank Ltd.,2920,74,True
+ICICIGI,ICICI Lombard General Insurance Company Ltd.,2245,74,True
+ICICIAMC,ICICI Prudential Asset Management Company Ltd.,212,75,True
+ICICIPRULI,ICICI Prudential Life Insurance Company Ltd.,2491,0,True
+IDBI,IDBI Bank Ltd.,2920,75,True
+IDFCFIRSTB,IDFC First Bank Ltd.,2710,73,True
+IFCI,IFCI Ltd.,2920,75,True
+IIFL,IIFL Finance Ltd.,2920,75,True
+INOXINDIA,INOX India Ltd.,704,75,True
+IRB,IRB Infrastructure Developers Ltd.,2920,75,True
+IRCON,IRCON International Ltd.,1996,75,True
+ITCHOTELS,ITC Hotels Ltd.,432,75,True
+ITC,ITC Ltd.,2920,74,True
+ITI,ITI Ltd.,2920,75,True
+INDIACEM,India Cements Ltd.,2920,75,True
+INDIAMART,Indiamart Intermesh Ltd.,1811,75,True
+INDIANB,Indian Bank,2920,74,True
+IEX,Indian Energy Exchange Ltd.,2229,73,True
+INDHOTEL,Indian Hotels Co. Ltd.,2920,74,True
+IOC,Indian Oil Corporation Ltd.,2920,74,True
+IOB,Indian Overseas Bank,2920,75,True
+IRCTC,Indian Railway Catering And Tourism Corporation Ltd.,1745,75,True
+IRFC,Indian Railway Finance Corporation Ltd.,1421,74,True
+IREDA,Indian Renewable Energy Development Agency Ltd.,721,73,True
+IGL,Indraprastha Gas Ltd.,2920,75,True
+INDUSTOWER,Indus Towers Ltd.,2920,74,True
+INDUSINDBK,IndusInd Bank Ltd.,2920,74,True
+NAUKRI,Info Edge (India) Ltd.,2920,73,True
+INFY,Infosys Ltd.,2920,74,True
+INOXWIND,Inox Wind Ltd.,2855,74,True
+INTELLECT,Intellect Design Arena Ltd.,2920,75,True
+INDIGO,InterGlobe Aviation Ltd.,2708,74,True
+IGIL,International Gemological Institute Ltd.,454,75,True
+IKS,Inventurus Knowledge Solutions Ltd.,460,75,True
+IPCALAB,Ipca Laboratories Ltd.,2919,75,True
+JKCEMENT,J.K. Cement Ltd.,2920,75,True
+JBMA,JBM Auto Ltd.,2920,75,True
+JKTYRE,JK Tyre & Industries Ltd.,2920,75,True
+JMFINANCIL,JM Financial Ltd.,2920,75,True
+JSWCEMENT,JSW Cement Ltd.,298,75,True
+JSWENERGY,JSW Energy Ltd.,2920,74,True
+JSWINFRA,JSW Infrastructure Ltd.,759,75,True
+JSWSTEEL,JSW Steel Ltd.,2920,74,True
+JAINREC,Jain Resource Recycling Ltd.,264,75,True
+JPPOWER,Jaiprakash Power Ventures Ltd.,2920,75,True
+J&KBANK,Jammu & Kashmir Bank Ltd.,2920,75,True
+JINDALSAW,Jindal Saw Ltd.,2920,75,True
+JSL,Jindal Stainless Ltd.,2920,75,True
+JINDALSTEL,Jindal Steel Ltd.,2920,73,True
+JIOFIN,Jio Financial Services Ltd.,788,74,True
+JUBLFOOD,Jubilant Foodworks Ltd.,2920,74,True
+JUBLINGREA,Jubilant Ingrevia Ltd.,1387,75,True
+JWL,Jupiter Wagons Ltd.,2920,75,True
+JYOTICNC,Jyoti CNC Automation Ltd.,688,75,True
+KPRMILL,K.P.R. Mill Ltd.,2920,75,True
+KEI,KEI Industries Ltd.,2920,73,True
+KPITTECH,KPIT Technologies Ltd.,1861,73,True
+KSB,KSB Ltd.,2920,75,True
+KAJARIACER,Kajaria Ceramics Ltd.,2920,75,True
+KPIL,Kalpataru Projects International Ltd.,2919,75,True
+KALYANKJIL,Kalyan Jewellers India Ltd.,1382,73,True
+KARURVYSYA,Karur Vysya Bank Ltd.,2920,74,True
+KAYNES,Kaynes Technology India Ltd.,973,73,True
+KEC,Kec International Ltd.,2920,75,True
+KFINTECH,Kfin Technologies Ltd.,946,74,True
+KIRLOSBROS,Kirloskar Brothers Ltd.,2920,75,True
+KIRLOSENG,Kirloskar Oil Eng Ltd.,2919,75,True
+KOTAKBANK,Kotak Mahindra Bank Ltd.,2920,74,True
+KIMS,Krishna Institute of Medical Sciences Ltd.,1321,75,True
+LTF,L&T Finance Ltd.,2920,74,True
+LTTS,L&T Technology Services Ltd.,2495,75,True
+LGEINDIA,LG Electronics India Ltd.,258,75,True
+LICHSGFIN,LIC Housing Finance Ltd.,2920,74,True
+LTFOODS,LT Foods Ltd.,2920,75,True
+LTM,LTM Ltd.,2538,73,True
+LT,Larsen & Toubro Ltd.,2920,74,True
+LAURUSLABS,Laurus Labs Ltd.,2438,73,True
+LEMONTREE,Lemon Tree Hotels Ltd.,2115,75,True
+LENSKART,Lenskart Solutions Ltd.,241,75,True
+LICI,Life Insurance Corporation of India,1102,74,True
+LINDEINDIA,Linde India Ltd.,2919,75,True
+LLOYDSME,Lloyds Metals And Energy Ltd.,812,75,True
+LODHA,Lodha Developers Ltd.,1369,73,True
+LUPIN,Lupin Ltd.,2920,73,True
+MMTC,MMTC Ltd.,2920,75,True
+MRF,MRF Ltd.,2919,75,True
+MTARTECH,MTAR Technologies Ltd.,1391,75,True
+MGL,Mahanagar Gas Ltd.,2551,74,True
+M&MFIN,Mahindra & Mahindra Financial Services Ltd.,2920,75,True
+M&M,Mahindra & Mahindra Ltd.,2920,74,True
+MANAPPURAM,Manappuram Finance Ltd.,2920,74,True
+MRPL,Mangalore Refinery & Petrochemicals Ltd.,2920,75,True
+MANKIND,Mankind Pharma Ltd.,860,73,True
+MARICO,Marico Ltd.,2920,73,True
+MARUTI,Maruti Suzuki India Ltd.,2920,73,True
+MFSL,Max Financial Services Ltd.,2920,73,True
+MAXHEALTH,Max Healthcare Institute Ltd.,1532,74,True
+MAZDOCK,Mazagoan Dock Shipbuilders Ltd.,1497,74,True
+MEESHO,Meesho Ltd.,219,75,True
+MINDACORP,Minda Corporation Ltd.,2920,75,True
+MSUMI,Motherson Sumi Wiring India Ltd.,1135,75,True
+MOTILALOFS,Motilal Oswal Financial Services Ltd.,2920,73,True
+MPHASIS,MphasiS Ltd.,2920,74,True
+MCX,Multi Commodity Exchange of India Ltd.,2920,74,True
+MUTHOOTFIN,Muthoot Finance Ltd.,2920,74,True
+NATCOPHARM,NATCO Pharma Ltd.,2920,75,True
+NBCC,NBCC (India) Ltd.,2920,74,True
+NCC,NCC Ltd.,2920,75,True
+NHPC,NHPC Ltd.,2920,74,True
+NLCINDIA,NLC India Ltd.,2920,75,True
+NMDC,NMDC Ltd.,2920,74,True
+NSLNISP,NMDC Steel Ltd.,910,75,True
+NTPCGREEN,NTPC Green Energy Ltd.,477,75,True
+NTPC,NTPC Ltd.,2920,73,True
+NH,Narayana Hrudayalaya Ltd.,2671,75,True
+NATIONALUM,National Aluminium Co. Ltd.,2920,73,True
+NAVA,Nava Ltd.,2920,75,True
+NAVINFLUOR,Navin Fluorine International Ltd.,2919,74,True
+NESTLEIND,Nestle India Ltd.,2920,73,True
+NETWEB,Netweb Technologies India Ltd.,804,75,True
+NEULANDLAB,Neuland Laboratories Ltd.,2920,75,True
+NAM-INDIA,Nippon Life India Asset Management Ltd.,2219,74,True
+NUVAMA,Nuvama Wealth Management Ltd.,763,75,True
+NUVOCO,Nuvoco Vistas Corporation Ltd.,1283,75,True
+OBEROIRLTY,Oberoi Realty Ltd.,2920,73,True
+ONGC,Oil & Natural Gas Corporation Ltd.,2920,74,True
+OIL,Oil India Ltd.,2920,74,True
+OLAELEC,Ola Electric Mobility Ltd.,551,75,True
+OLECTRA,Olectra Greentech Ltd.,2920,75,True
+PAYTM,One 97 Communications Ltd.,1223,73,True
+ONESOURCE,Onesource Specialty Pharma Ltd.,436,75,True
+OFSS,Oracle Financial Services Software Ltd.,2920,73,True
+POLICYBZR,PB Fintech Ltd.,1225,74,True
+PCBL,PCBL Chemical Ltd.,2920,75,True
+PGEL,PG Electroplast Ltd.,2920,73,True
+PIIND,PI Industries Ltd.,2920,74,True
+PNBHOUSING,PNB Housing Finance Ltd.,2467,73,True
+PTCIL,PTC Industries Ltd.,836,75,True
+PVRINOX,PVR INOX Ltd.,2919,75,True
+PAGEIND,Page Industries Ltd.,2919,73,True
+PARADEEP,Paradeep Phosphates Ltd.,1094,75,True
+PATANJALI,Patanjali Foods Ltd.,2920,74,True
+PERSISTENT,Persistent Systems Ltd.,2920,74,True
+PETRONET,Petronet LNG Ltd.,2920,74,True
+PHOENIXLTD,Phoenix Mills Ltd.,2919,74,True
+PWL,Physicswallah Ltd.,235,75,True
+PIDILITIND,Pidilite Industries Ltd.,2920,73,True
+PINELABS,Pine Labs Ltd.,237,75,True
+PIRAMALFIN,Piramal Finance Ltd.,242,75,True
+PPLPHARMA,Piramal Pharma Ltd.,995,75,True
+POLYMED,Poly Medicure Ltd.,2920,73,True
+POLYCAB,Polycab India Ltd.,1863,73,True
+POONAWALLA,Poonawalla Fincorp Ltd.,2920,75,True
+PFC,Power Finance Corporation Ltd.,2920,74,True
+POWERGRID,Power Grid Corporation of India Ltd.,2920,74,True
+PREMIERENE,Premier Energies Ltd.,535,74,True
+PRESTIGE,Prestige Estates Projects Ltd.,2920,73,True
+PFOCUS,Prime Focus Ltd.,2919,75,True
+PRIVISCL,Privi Speciality Chemicals Ltd.,2835,75,True
+PNB,Punjab National Bank,2920,73,True
+RRKABEL,R R Kabel Ltd.,765,75,True
+RBLBANK,RBL Bank Ltd.,2510,74,True
+RECLTD,REC Ltd.,2920,73,True
+RHIM,RHI MAGNESITA INDIA LTD.,2920,75,True
+RITES,RITES Ltd.,2055,75,True
+RADICO,Radico Khaitan Ltd,2919,73,True
+RVNL,Rail Vikas Nigam Ltd.,1866,74,True
+RAILTEL,Railtel Corporation Of India Ltd.,1401,75,True
+RAINBOW,Rainbow Childrens Medicare Ltd.,1106,75,True
+RKFORGE,Ramkrishna Forgings Ltd.,2920,75,True
+REDINGTON,Redington Ltd.,2920,75,True
+RELIANCE,Reliance Industries Ltd.,2920,74,True
+RPOWER,Reliance Power Ltd.,2920,75,True
+RUBICON,Rubicon Research Ltd.,255,75,True
+SBICARD,SBI Cards and Payment Services Ltd.,1640,73,True
+SBILIFE,SBI Life Insurance Company Ltd.,2242,74,True
+SJVN,SJVN Ltd.,2920,75,True
+SHRIPISTON,SPR Auto Technologies Ltd.,2567,75,True
+SRF,SRF Ltd.,2920,73,True
+SAGILITY,Sagility Ltd.,486,74,True
+SAILIFE,Sai Life Sciences Ltd.,462,75,True
+SAMMAANCAP,Sammaan Capital Ltd.,2920,75,True
+MOTHERSON,Samvardhana Motherson International Ltd.,2920,74,True
+SANSERA,Sansera Engineering Ltd.,1260,75,True
+SARDAEN,Sarda Energy and Minerals Ltd.,2920,75,True
+SCHAEFFLER,Schaeffler India Ltd.,2920,75,True
+SCHNEIDER,Schneider Electric Infrastructure Ltd.,2920,75,True
+SCI,Shipping Corporation of India Ltd.,2920,75,True
+SHREECEM,Shree Cement Ltd.,2920,74,True
+SHRIRAMFIN,Shriram Finance Ltd.,2920,74,True
+SHYAMMETL,Shyam Metalics and Energy Ltd.,1323,75,True
+ENRIN,Siemens Energy India Ltd.,338,74,True
+SIEMENS,Siemens Ltd.,2919,74,True
+SIGNATURE,Signatureglobal (India) Ltd.,761,75,True
+SOBHA,Sobha Ltd.,2919,75,True
+SOLARINDS,Solar Industries India Ltd.,2919,74,True
+SONACOMS,Sona BLW Precision Forgings Ltd.,1323,73,True
+STARHEALTH,Star Health and Allied Insurance Company Ltd.,1208,75,True
+SBIN,State Bank of India,2920,74,True
+SAIL,Steel Authority of India Ltd.,2920,74,True
+STLTECH,Sterlite Technologies Ltd.,2920,75,True
+SUMICHEM,Sumitomo Chemical India Ltd.,1673,75,True
+SUNPHARMA,Sun Pharmaceutical Industries Ltd.,2920,73,True
+SUNTV,Sun TV Network Ltd.,2920,75,True
+SUNDARMFIN,Sundaram Finance Ltd.,2920,75,True
+SUPREMEIND,Supreme Industries Ltd.,2920,74,True
+SUZLON,Suzlon Energy Ltd.,2920,74,True
+SWANCORP,Swan Corp Ltd.,2920,75,True
+SWIGGY,Swiggy Ltd.,485,73,True
+SYNGENE,Syngene International Ltd.,2769,75,True
+SYRMA,Syrma SGS Technology Ltd.,1031,74,True
+TBOTEK,TBO Tek Ltd.,610,74,True
+TDPOWERSYS,TD Power Systems Ltd.,2920,75,True
+TVSMOTOR,TVS Motor Company Ltd.,2920,73,True
+TATACAP,Tata Capital Ltd.,259,75,True
+TATACHEM,Tata Chemicals Ltd.,2920,75,True
+TATACOMM,Tata Communications Ltd.,2920,75,True
+TCS,Tata Consultancy Services Ltd.,2920,73,True
+TATACONSUM,Tata Consumer Products Ltd.,2920,74,True
+TATAELXSI,Tata Elxsi Ltd.,2920,73,True
+TATAINVEST,Tata Investment Corporation Ltd.,2920,75,True
+TMCV,Tata Motors Ltd.,239,75,True
+TMPV,Tata Motors Passenger Vehicles Ltd.,2920,74,True
+TATAPOWER,Tata Power Co. Ltd.,2920,74,True
+TATASTEEL,Tata Steel Ltd.,2920,74,True
+TATATECH,Tata Technologies Ltd.,720,75,True
+TTML,Tata Teleservices (Maharashtra) Ltd.,2920,75,True
+TECHM,Tech Mahindra Ltd.,2920,74,True
+TECHNOE,Techno Electric & Engineering Company Ltd.,2920,75,True
+TEGA,Tega Industries Ltd.,1207,75,True
+TEJASNET,Tejas Networks Ltd.,2309,75,True
+TENNIND,Tenneco Clean Air India Ltd.,234,75,True
+THANGAMAYL,Thangamayil Jewellery Ltd.,2920,75,True
+NIACL,The New India Assurance Company Ltd.,2214,75,True
+RAMCOCEM,The Ramco Cements Ltd.,2919,75,True
+THERMAX,Thermax Ltd.,2919,75,True
+TIMKEN,Timken India Ltd.,2919,75,True
+TITAGARH,Titagarh Rail Systems Ltd.,2920,75,True
+TITAN,Titan Company Ltd.,2920,73,True
+TORNTPHARM,Torrent Pharmaceuticals Ltd.,2920,73,True
+TORNTPOWER,Torrent Power Ltd.,2920,75,True
+TARIL,Transformers And Rectifiers (India) Ltd.,2920,75,True
+TRENT,Trent Ltd.,2920,73,True
+TRIDENT,Trident Ltd.,2920,75,True
+TRITURBINE,Triveni Turbine Ltd.,2920,75,True
+TIINDIA,Tube Investments of India Ltd.,2221,73,True
+UCOBANK,UCO Bank,2920,75,True
+UNOMINDA,UNO Minda Ltd.,2920,74,True
+UPL,UPL Ltd.,2920,74,True
+UTIAMC,UTI Asset Management Company Ltd.,1496,75,True
+ULTRACEMCO,UltraTech Cement Ltd.,2920,73,True
+UNIONBANK,Union Bank of India,2920,74,True
+UBL,United Breweries Ltd.,2920,75,True
+UNITDSPR,United Spirits Ltd.,2920,73,True
+URBANCO,Urban Company Ltd.,276,75,True
+USHAMART,Usha Martin Ltd.,2920,75,True
+VTL,Vardhman Textiles Ltd.,2920,75,True
+VBL,Varun Beverages Ltd.,2466,74,True
+VAML,Vedanta Aluminium Metal Ltd.,95,75,True
+VISL,Vedanta Iron and Steel Ltd.,95,75,True
+VEDL,Vedanta Ltd.,2920,74,True
+VOGL,Vedanta Oil and Gas Ltd.,95,75,True
+VEDPOWER,Vedanta Power Ltd.,95,75,True
+VIJAYA,Vijaya Diagnostic Centre Ltd.,1267,75,True
+VMM,Vishal Mega Mart Ltd.,462,73,True
+IDEA,Vodafone Idea Ltd.,2920,74,True
+VOLTAS,Voltas Ltd.,2920,74,True
+WAAREEENER,Waaree Energies Ltd.,497,74,True
+WELCORP,Welspun Corp Ltd.,2920,75,True
+WELSPUNLIV,Welspun Living Ltd.,2920,75,True
+WHIRLPOOL,Whirlpool of India Ltd.,2920,75,True
+WIPRO,Wipro Ltd.,2920,74,True
+WOCKPHARMA,Wockhardt Ltd.,2920,75,True
+YESBANK,Yes Bank Ltd.,2920,74,True
+ZFCVINDIA,ZF Commercial Vehicle Control Systems India Ltd.,2920,75,True
+ZEEL,Zee Entertainment Enterprises Ltd.,2920,75,True
+ZENTEC,Zen Technologies Ltd.,2861,75,True
+ZENSARTECH,Zensar Technolgies Ltd.,2920,75,True
+ZYDUSLIFE,Zydus Lifesciences Ltd.,2920,74,True
+ZYDUSWELL,Zydus Wellness Ltd.,2920,75,True
+ECLERX,eClerx Services Ltd.,2920,75,True

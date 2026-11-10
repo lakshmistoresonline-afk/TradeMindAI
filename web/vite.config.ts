@@ -9,7 +9,12 @@ export default defineConfig({
       output: {
         entryFileNames: `assets/[name]-[hash].js`,
         chunkFileNames: `assets/[name]-[hash].js`,
-        assetFileNames: `assets/[name]-[hash].[ext]`
+        assetFileNames: `assets/[name]-[hash].[ext]`,
+        manualChunks: {
+          vendor_mui: ['@mui/material', '@emotion/react', '@emotion/styled'],
+          vendor_icons: ['lucide-react'],
+          vendor_react: ['react', 'react-dom', 'react-router-dom']
+        }
       }
     }
   },

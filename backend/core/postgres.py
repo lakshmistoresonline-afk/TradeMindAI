@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date, Numeric, BigInteger, JSON, UniqueConstraint, Index
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 import datetime
 import os
 from urllib.parse import urlparse, urlunparse
@@ -58,6 +57,7 @@ else:
     engine_args["connect_args"] = {"connect_timeout": 10}
 
 engine = create_engine(DATABASE_URL, **engine_args)
+postgres_engine = engine
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -256,7 +256,7 @@ class OpportunityDB(Base):
 class LiveSignalDB(Base):
     __tablename__ = "live_signals"
     __table_args__ = (
-        Index('idx_unique_active_signal', 'symbol', 'timeframe', unique=True, sqlite_where=(Column('status') == 'ACTIVE'), postgresql_where=(Column('status') == 'ACTIVE')),
+        Index('idx_unique_active_signal', 'symbol', unique=True, sqlite_where=(Column('status') == 'ACTIVE'), postgresql_where=(Column('status') == 'ACTIVE')),
         UniqueConstraint('symbol', 'strategy_version', 'direction', 'decision_timestamp', name='_symbol_strategy_direction_ts_uc'),
     )
     id = Column(String, primary_key=True, index=True)

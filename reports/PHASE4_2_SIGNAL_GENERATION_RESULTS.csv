@@ -1,0 +1,2 @@
+signal_id,symbol,direction,rating,timeframe,status,created_at,generation_reason
+sig_conc_1,HDFCBANK,LONG,BUY,SWING,ACTIVE,2026-10-17 16:00:08.325453,UNIT_TEST_FIXTURE_PERSISTED

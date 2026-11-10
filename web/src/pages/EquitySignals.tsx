@@ -64,12 +64,11 @@ export default function EquitySignals() {
              fetchData();
           }, 1500);
        } else {
-          setImportStatus("Import completed cleanly in local mode.");
-          setTimeout(() => { setIsImportOpen(false); setImportStatus(null); }, 1500);
+          const errData = await response.json().catch(() => ({}));
+          setImportStatus(`ERROR: ${errData.detail || 'Data import failed.'}`);
        }
-    } catch {
-       setImportStatus("Import completed cleanly in local mode.");
-       setTimeout(() => { setIsImportOpen(false); setImportStatus(null); }, 1500);
+    } catch (err: any) {
+       setImportStatus(`ERROR: Network error. Failed to import data: ${err.message || err}`);
     }
   };
 

@@ -58,7 +58,7 @@ async def test_atomic_idempotency_same_symbol_horizon(test_db_session):
     assert res_2.id == "sig_abc_1" # Returns existing record
 
 @pytest.mark.asyncio
-async def test_distinct_horizons_coexist(test_db_session):
+async def test_global_active_signal_uniqueness_returns_existing_active_record(test_db_session):
     sig_swing = LiveSignal(
         id="sig_swing_1",
         symbol="TCS",

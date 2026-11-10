@@ -1,0 +1,5 @@
+path,status,category
+backend/services/signal_ledger_service.py,modified,service
+backend/services/equity_signal_generation_service.py,modified,service
+backend/tests/unit/test_signal_ledger_transaction_ownership.py,untracked,test
+backend/core/config.py,modified,config

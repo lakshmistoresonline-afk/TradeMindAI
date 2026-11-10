@@ -1,0 +1,4 @@
+rejection_reason,evaluations_count,percentage,explanation
+TREND_CONFLICT_BEARISH,10,66.67%,Price trading below 200 EMA during bearish trend regime
+QUALITY_GATE_FAILED,4,26.67%,Failed hard quality gate threshold
+EXCESSIVE_VOLATILITY,1,6.66%,ATR volatility risk percentage exceeds threshold

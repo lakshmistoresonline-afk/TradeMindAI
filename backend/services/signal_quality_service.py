@@ -1,11 +1,21 @@
+"""
+================================================================================
+TradeMindAI: Strict Fail-Closed Signal Quality & Publication Gate Service (v3.10)
+================================================================================
+Phase 11 & Phase 4.3.2 Remediation: Signal Quality & Publication Gates.
+Enforces strict model metadata registration, test sample size, ROC-AUC thresholds,
+and probability calibration requirements. Unregistered models fail closed.
+================================================================================
+"""
+
 from typing import Dict, Any, Optional, List
 from backend.domain.models.data_platform import ModelMetadata
 from backend.domain.models.ios import LiveSignal
 
 class SignalQualityService:
     """
-    Phase 11: Signal Quality & Publication Gates.
-    Determines Quality Class and enforces sample size requirements.
+    Phase 11 & Phase 4.3.2 Remediation: Signal Quality & Publication Gates.
+    Enforces strict fail-closed quality classification and sample size requirements.
     """
 
     MIN_SAMPLES_PRIMARY = 100
@@ -39,7 +49,8 @@ class SignalQualityService:
     @staticmethod
     def should_publish(horizon: str, model: Optional[ModelMetadata], calibrated_prob: float) -> bool:
         """
-        Hard gate for signal publication.
+        Strict fail-closed hard gate for signal publication.
+        Unregistered model metadata (model is None) unconditionally returns False.
         """
         if not model:
             return False
@@ -58,7 +69,8 @@ class SignalQualityService:
                 return False
             if positives < 5:
                 return False
-            if model.accuracy == 0.5: return False # Failed model
+            if model.accuracy == 0.5:
+                return False # Failed model
 
         # 2. SWING Gate:
         if horizon == "SWING":

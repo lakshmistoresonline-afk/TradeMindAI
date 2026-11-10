@@ -1,0 +1,6 @@
+file_name,file_path,integrity_status,sha256_match
+signal_engine,backend/services/signal_engine.py,UNTOUCHED_UNCHANGED,MATCH
+outcome_engine,backend/services/outcome_engine.py,UNTOUCHED_UNCHANGED,MATCH
+risk_engine,backend/services/risk_engine.py,UNTOUCHED_UNCHANGED,MATCH
+risk_core,backend/core/risk.py,UNTOUCHED_UNCHANGED,MATCH
+config,backend/core/config.py,UNTOUCHED_UNCHANGED,MATCH

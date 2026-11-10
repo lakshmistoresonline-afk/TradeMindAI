@@ -1,0 +1,6 @@
+source_file,line,function,operation,can_modify_data,guard_status
+backend/services/data_quality_service.py,185,evaluate_symbol_quality,duckdb.connect(read_only=True),False,PROTECTED_READ_ONLY
+backend/services/data_quality_service.py,275,evaluate_global_data_gate,DataQualityService.evaluate_symbol_quality(),False,PROTECTED_READ_ONLY
+backend/services/equity_signal_generation_service.py,65,run_production_scan,DataQualityService.evaluate_global_data_gate(),False,PROTECTED_FAIL_CLOSED_GATE
+backend/scripts/local_pulse_worker.py,88,sync_symbol,"redis_client.set(lock_key, ...)",False,PROTECTED_DISTRIBUTED_LOCK
+backend/core/release_gate.py,110,evaluate_release,ReleaseGateEvaluator.verify_certification(),False,PROTECTED_RELEASE_GATE

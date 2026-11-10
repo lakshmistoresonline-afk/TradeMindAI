@@ -171,7 +171,6 @@ class MLService:
 
         model_path = os.path.join(self.model_dir, champion.name) if champion else ""
         if not champion or not os.path.exists(model_path):
-            # Task 8: Restrict mock ML predictions strictly to test/dev mode when explicitly allowed
             allow_mock = os.getenv("ALLOW_MOCK_ML_PREDICTIONS", "false").lower() == "true" or settings.ENVIRONMENT in ["test", "development"]
             if allow_mock:
                 return self._generate_mock_prediction(symbol, horizon, champion.version if champion else "v2.2-local-mock")
@@ -191,22 +190,94 @@ class MLService:
                     }
                 }
 
-        model = joblib.load(model_path)
+        # Model artifact loading and readiness validation
+        try:
+            model = joblib.load(model_path)
+        except Exception as ex:
+            return {
+                "prediction": "UNAVAILABLE",
+                "confidence": 0.0,
+                "model_version": champion.version,
+                "is_calibrated": False,
+                "metadata": {
+                    "status": "MODEL_LOAD_FAILURE",
+                    "reason": f"Corrupted or unreadable ML champion model file for {symbol}: {ex}",
+                    "calibrated_probability_up": 0.0,
+                    "raw_probability_up": 0.0,
+                    "is_calibrated": False
+                }
+            }
+
         calibrator = None
         if champion.calibration_metadata and "calibrator_file" in champion.calibration_metadata:
             calibrator_path = os.path.join(self.model_dir, champion.calibration_metadata["calibrator_file"])
             if os.path.exists(calibrator_path):
-                calibrator = joblib.load(calibrator_path)
+                try:
+                    calibrator = joblib.load(calibrator_path)
+                except Exception:
+                    calibrator = None
 
-        feature_names = champion.hyperparameters.get("feature_names")
-        X_input = pd.DataFrame([feature_vector])
+        # Feature schema validation
+        feature_names = champion.hyperparameters.get("feature_names") if champion.hyperparameters else None
         if feature_names:
-            X_input = X_input.reindex(columns=feature_names)
+            missing_cols = [f for f in feature_names if f not in feature_vector]
+            if missing_cols:
+                return {
+                    "prediction": "UNAVAILABLE",
+                    "confidence": 0.0,
+                    "model_version": champion.version,
+                    "is_calibrated": False,
+                    "metadata": {
+                        "status": "SCHEMA_VALIDATION_FAILURE",
+                        "reason": f"Missing required model features: {missing_cols[:5]}",
+                        "calibrated_probability_up": 0.0,
+                        "raw_probability_up": 0.0,
+                        "is_calibrated": False
+                    }
+                }
+            X_input = pd.DataFrame([feature_vector])[feature_names]
+        else:
+            X_input = pd.DataFrame([feature_vector])
 
-        X_input = X_input.fillna(0) # Phase 4 Hardening: Handle NaNs in inference
+        # Validate non-finite feature values
+        num_vals = pd.to_numeric(X_input.iloc[0], errors='coerce').to_numpy()
+        if not np.isfinite(num_vals).all():
+            return {
+                "prediction": "UNAVAILABLE",
+                "confidence": 0.0,
+                "model_version": champion.version,
+                "is_calibrated": False,
+                "metadata": {
+                    "status": "NON_FINITE_FEATURES",
+                    "reason": "Feature vector contains NaN or Infinity values",
+                    "calibrated_probability_up": 0.0,
+                    "raw_probability_up": 0.0,
+                    "is_calibrated": False
+                }
+            }
 
-        raw_prob = float(model.predict_proba(X_input)[0][1])
+        try:
+            raw_prob = float(model.predict_proba(X_input)[0][1])
+            if not np.isfinite(raw_prob) or not (0.0 <= raw_prob <= 1.0):
+                raise ValueError(f"Invalid raw probability returned by model: {raw_prob}")
+        except Exception as ex:
+            return {
+                "prediction": "UNAVAILABLE",
+                "confidence": 0.0,
+                "model_version": champion.version,
+                "is_calibrated": False,
+                "metadata": {
+                    "status": "PREDICTION_INFERENCE_FAILURE",
+                    "reason": str(ex),
+                    "calibrated_probability_up": 0.0,
+                    "raw_probability_up": 0.0,
+                    "is_calibrated": False
+                }
+            }
+
         calibrated_prob = CalibrationService.calibrate_isotonic(raw_prob, calibrator_model=calibrator)
+        if not np.isfinite(calibrated_prob) or not (0.0 <= calibrated_prob <= 1.0):
+            calibrated_prob = raw_prob
 
         prediction_label = "UP" if calibrated_prob > 0.55 else "DOWN" if calibrated_prob < 0.45 else "NEUTRAL"
 
@@ -216,7 +287,7 @@ class MLService:
             model_version=champion.version,
             prediction=prediction_label,
             probability=float(calibrated_prob),
-            confidence=float(calibrated_prob if calibrated_prob > 0.5 else 1-calibrated_prob),
+            confidence=float(calibrated_prob if calibrated_prob > 0.5 else 1.0 - calibrated_prob),
             metadata={
                 "calibrated_probability_up": float(calibrated_prob),
                 "raw_probability_up": float(raw_prob),

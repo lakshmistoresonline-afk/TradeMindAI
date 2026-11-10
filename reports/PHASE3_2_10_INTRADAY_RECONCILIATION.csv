@@ -1,0 +1,501 @@
+symbol,company_name,parquet_exists,missing_keys,extra_keys,max_absolute_ohlcv_diff,intraday_storage_status
+360ONE,360 ONE WAM Ltd.,True,0,0,0.0,INTRADAY_PASS
+ABB,ABB India Ltd.,True,0,0,0.0,INTRADAY_PASS
+ACC,ACC Ltd.,True,0,0,0.0,INTRADAY_PASS
+ACMESOLAR,ACME Solar Holdings Ltd.,True,0,0,0.0,INTRADAY_PASS
+AIAENG,AIA Engineering Ltd.,True,0,0,0.0,INTRADAY_PASS
+APLAPOLLO,APL Apollo Tubes Ltd.,True,0,0,0.0,INTRADAY_PASS
+AUBANK,AU Small Finance Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+AWL,AWL Agri Business Ltd.,True,0,0,0.0,INTRADAY_PASS
+AADHARHFC,Aadhar Housing Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+AARTIIND,Aarti Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+AAVAS,Aavas Financiers Ltd.,True,0,0,0.0,INTRADAY_PASS
+ABBOTINDIA,Abbott India Ltd.,True,0,0,0.0,INTRADAY_PASS
+ACE,Action Construction Equipment Ltd.,True,0,0,0.0,INTRADAY_PASS
+ACUTAAS,Acutaas Chemicals Ltd.,True,0,0,0.0,INTRADAY_PASS
+ADANIENSOL,Adani Energy Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+ADANIENT,Adani Enterprises Ltd.,True,0,0,0.0,INTRADAY_PASS
+ADANIGREEN,Adani Green Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+ADANIPORTS,Adani Ports and Special Economic Zone Ltd.,True,0,0,0.0,INTRADAY_PASS
+ADANIPOWER,Adani Power Ltd.,True,0,0,0.0,INTRADAY_PASS
+ATGL,Adani Total Gas Ltd.,True,0,0,0.0,INTRADAY_PASS
+ABCAPITAL,Aditya Birla Capital Ltd.,True,0,0,0.0,INTRADAY_PASS
+ABREL,Aditya Birla Real Estate Ltd.,True,0,0,0.0,INTRADAY_PASS
+ABSLAMC,Aditya Birla Sun Life AMC Ltd.,True,0,0,0.0,INTRADAY_PASS
+CPPLUS,Aditya Infotech Ltd.,True,0,0,0.0,INTRADAY_PASS
+AEGISLOG,Aegis Logistics Ltd.,True,0,0,0.0,INTRADAY_PASS
+AEGISVOPAK,Aegis Vopak Terminals Ltd.,True,0,0,0.0,INTRADAY_PASS
+AETHER,Aether Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+AFCONS,Afcons Infrastructure Ltd.,True,0,0,0.0,INTRADAY_PASS
+AFFLE,Affle 3i Ltd.,True,0,0,0.0,INTRADAY_PASS
+AJANTPHARM,Ajanta Pharmaceuticals Ltd.,True,0,0,0.0,INTRADAY_PASS
+ALKEM,Alkem Laboratories Ltd.,True,0,0,0.0,INTRADAY_PASS
+ABDL,Allied Blenders and Distillers Ltd.,True,0,0,0.0,INTRADAY_PASS
+ARE&M,Amara Raja Energy & Mobility Ltd.,True,0,0,0.0,INTRADAY_PASS
+AMBER,Amber Enterprises India Ltd.,True,0,0,0.0,INTRADAY_PASS
+AMBUJACEM,Ambuja Cements Ltd.,True,0,0,0.0,INTRADAY_PASS
+ANANDRATHI,Anand Rathi Wealth Ltd.,True,0,0,0.0,INTRADAY_PASS
+ANANTRAJ,Anant Raj Ltd.,True,0,0,0.0,INTRADAY_PASS
+ANGELONE,Angel One Ltd.,True,0,0,0.0,INTRADAY_PASS
+ANTHEM,Anthem Biosciences Ltd.,True,0,0,0.0,INTRADAY_PASS
+ANURAS,Anupam Rasayan India Ltd.,True,0,0,0.0,INTRADAY_PASS
+APARINDS,Apar Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+APOLLOHOSP,Apollo Hospitals Enterprise Ltd.,True,0,0,0.0,INTRADAY_PASS
+APOLLOTYRE,Apollo Tyres Ltd.,True,0,0,0.0,INTRADAY_PASS
+APTUS,Aptus Value Housing Finance India Ltd.,True,0,0,0.0,INTRADAY_PASS
+ASAHIINDIA,Asahi India Glass Ltd.,True,0,0,0.0,INTRADAY_PASS
+ASHOKLEY,Ashok Leyland Ltd.,True,0,0,0.0,INTRADAY_PASS
+ASIANPAINT,Asian Paints Ltd.,True,0,0,0.0,INTRADAY_PASS
+ASTERDM,Aster DM Quality Care Ltd.,True,0,0,0.0,INTRADAY_PASS
+ASTRAL,Astral Ltd.,True,0,0,0.0,INTRADAY_PASS
+ATHERENERG,Ather Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+ATUL,Atul Ltd.,True,0,0,0.0,INTRADAY_PASS
+AUROPHARMA,Aurobindo Pharma Ltd.,True,0,0,0.0,INTRADAY_PASS
+AIIL,Authum Investment & Infrastructure Ltd.,True,0,0,0.0,INTRADAY_PASS
+AVANTIFEED,Avanti Feeds Ltd.,True,0,0,0.0,INTRADAY_PASS
+DMART,Avenue Supermarts Ltd.,True,0,0,0.0,INTRADAY_PASS
+AXISBANK,Axis Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+AZAD,Azad Engineering Ltd.,True,0,0,0.0,INTRADAY_PASS
+BEML,BEML Ltd.,True,0,0,0.0,INTRADAY_PASS
+BLS,BLS International Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+BSE,BSE Ltd.,True,0,0,0.0,INTRADAY_PASS
+BAGMANE,Bagmane Prime Office REIT,False,0,0,0.0,UNSUPPORTED_WITH_EVIDENCE
+BAJAJ-AUTO,Bajaj Auto Ltd.,True,0,0,0.0,INTRADAY_PASS
+BAJFINANCE,Bajaj Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+BAJAJFINSV,Bajaj Finserv Ltd.,True,0,0,0.0,INTRADAY_PASS
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd.,True,0,0,0.0,INTRADAY_PASS
+BAJAJHFL,Bajaj Housing Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+BALKRISIND,Balkrishna Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+BALRAMCHIN,Balrampur Chini Mills Ltd.,True,0,0,0.0,INTRADAY_PASS
+BANDHANBNK,Bandhan Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+BANKBARODA,Bank of Baroda,True,0,0,0.0,INTRADAY_PASS
+BANKINDIA,Bank of India,True,0,0,0.0,INTRADAY_PASS
+MAHABANK,Bank of Maharashtra,True,0,0,0.0,INTRADAY_PASS
+BATAINDIA,Bata India Ltd.,True,0,0,0.0,INTRADAY_PASS
+BELRISE,Belrise Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+BERGEPAINT,Berger Paints India Ltd.,True,0,0,0.0,INTRADAY_PASS
+BHARATCOAL,Bharat Coking Coal Ltd.,True,0,0,0.0,INTRADAY_PASS
+BDL,Bharat Dynamics Ltd.,True,0,0,0.0,INTRADAY_PASS
+BEL,Bharat Electronics Ltd.,True,0,0,0.0,INTRADAY_PASS
+BHARATFORG,Bharat Forge Ltd.,True,0,0,0.0,INTRADAY_PASS
+BHEL,Bharat Heavy Electricals Ltd.,True,0,0,0.0,INTRADAY_PASS
+BPCL,Bharat Petroleum Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+BHARTIARTL,Bharti Airtel Ltd.,True,0,0,0.0,INTRADAY_PASS
+BHARTIHEXA,Bharti Hexacom Ltd.,True,0,0,0.0,INTRADAY_PASS
+GROWW,Billionbrains Garage Ventures Ltd.,True,0,0,0.0,INTRADAY_PASS
+BIOCON,Biocon Ltd.,True,0,0,0.0,INTRADAY_PASS
+BSOFT,Birlasoft Ltd.,True,0,0,0.0,INTRADAY_PASS
+BBOX,Black Box Ltd.,True,0,0,0.0,INTRADAY_PASS
+BLUESTARCO,Blue Star Ltd.,True,0,0,0.0,INTRADAY_PASS
+BOSCHLTD,Bosch Ltd.,True,0,0,0.0,INTRADAY_PASS
+FIRSTCRY,Brainbees Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+BRIGADE,Brigade Enterprises Ltd.,True,0,0,0.0,INTRADAY_PASS
+BRITANNIA,Britannia Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+BIRET,Brookfield India Real Estate Trust,True,0,0,0.0,INTRADAY_PASS
+CCL,CCL Products (I) Ltd.,True,0,0,0.0,INTRADAY_PASS
+CESC,CESC Ltd.,True,0,0,0.0,INTRADAY_PASS
+CGPOWER,CG Power and Industrial Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+CIEINDIA,CIE Automotive India Ltd.,True,0,0,0.0,INTRADAY_PASS
+CRISIL,CRISIL Ltd.,True,0,0,0.0,INTRADAY_PASS
+CANFINHOME,Can Fin Homes Ltd.,True,0,0,0.0,INTRADAY_PASS
+CANBK,Canara Bank,True,0,0,0.0,INTRADAY_PASS
+CANHLIFE,Canara HSBC Life Insurance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+CAPLIPOINT,Caplin Point Laboratories Ltd.,True,0,0,0.0,INTRADAY_PASS
+CGCL,Capri Global Capital Ltd.,True,0,0,0.0,INTRADAY_PASS
+CARBORUNIV,Carborundum Universal Ltd.,True,0,0,0.0,INTRADAY_PASS
+CARTRADE,Cartrade Tech Ltd.,True,0,0,0.0,INTRADAY_PASS
+CASTROLIND,Castrol India Ltd.,True,0,0,0.0,INTRADAY_PASS
+CEATLTD,Ceat Ltd.,True,0,0,0.0,INTRADAY_PASS
+CEMPRO,Cemindia Projects Ltd.,True,0,0,0.0,INTRADAY_PASS
+CENTRALBK,Central Bank of India,True,0,0,0.0,INTRADAY_PASS
+CDSL,Central Depository Services (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+CMPDI,Central Mine Planning & Design Institute Ltd.,True,0,0,0.0,INTRADAY_PASS
+CHAMBLFERT,Chambal Fertilizers & Chemicals Ltd.,True,0,0,0.0,INTRADAY_PASS
+CHENNPETRO,Chennai Petroleum Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+CHOICEIN,Choice International Ltd.,True,0,0,0.0,INTRADAY_PASS
+CHOLAHLDNG,Cholamandalam Financial Holdings Ltd.,True,0,0,0.0,INTRADAY_PASS
+CHOLAFIN,Cholamandalam Investment and Finance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+CIPLA,Cipla Ltd.,True,0,0,0.0,INTRADAY_PASS
+CUB,City Union Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+CLEANMAX,Clean Max Enviro Energy Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+CLEAN,Clean Science and Technology Ltd.,True,0,0,0.0,INTRADAY_PASS
+COALINDIA,Coal India Ltd.,True,0,0,0.0,INTRADAY_PASS
+COCHINSHIP,Cochin Shipyard Ltd.,True,0,0,0.0,INTRADAY_PASS
+COFORGE,Coforge Ltd.,True,0,0,0.0,INTRADAY_PASS
+COHANCE,Cohance Lifesciences Ltd.,True,0,0,0.0,INTRADAY_PASS
+COLPAL,Colgate Palmolive (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+CAMS,Computer Age Management Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+CONCORDBIO,Concord Biotech Ltd.,True,0,0,0.0,INTRADAY_PASS
+CONCOR,Container Corporation of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+COROMANDEL,Coromandel International Ltd.,True,0,0,0.0,INTRADAY_PASS
+CRAFTSMAN,Craftsman Automation Ltd.,True,0,0,0.0,INTRADAY_PASS
+CREDITACC,CreditAccess Grameen Ltd.,True,0,0,0.0,INTRADAY_PASS
+CROMPTON,Crompton Greaves Consumer Electricals Ltd.,True,0,0,0.0,INTRADAY_PASS
+CUMMINSIND,Cummins India Ltd.,True,0,0,0.0,INTRADAY_PASS
+CUPID,Cupid Ltd.,True,0,0,0.0,INTRADAY_PASS
+CYIENT,Cyient Ltd.,True,0,0,0.0,INTRADAY_PASS
+DLF,DLF Ltd.,True,0,0,0.0,INTRADAY_PASS
+DOMS,DOMS Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+DABUR,Dabur India Ltd.,True,0,0,0.0,INTRADAY_PASS
+DALBHARAT,Dalmia Bharat Ltd.,True,0,0,0.0,INTRADAY_PASS
+DATAPATTNS,Data Patterns (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+DEEPAKFERT,Deepak Fertilisers & Petrochemicals Corp. Ltd.,True,0,0,0.0,INTRADAY_PASS
+DEEPAKNTR,Deepak Nitrite Ltd.,True,0,0,0.0,INTRADAY_PASS
+DELHIVERY,Delhivery Ltd.,True,0,0,0.0,INTRADAY_PASS
+DEVYANI,Devyani International Ltd.,True,0,0,0.0,INTRADAY_PASS
+DIVISLAB,Divi's Laboratories Ltd.,True,0,0,0.0,INTRADAY_PASS
+DIXON,Dixon Technologies (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+LALPATHLAB,Dr. Lal Path Labs Ltd.,True,0,0,0.0,INTRADAY_PASS
+DRREDDY,Dr. Reddy's Laboratories Ltd.,True,0,0,0.0,INTRADAY_PASS
+EIDPARRY,E.I.D. Parry (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+EIHOTEL,EIH Ltd.,True,0,0,0.0,INTRADAY_PASS
+EMBASSY,EMBASSY OFFICE PARKS REIT,True,0,0,0.0,INTRADAY_PASS
+EICHERMOT,Eicher Motors Ltd.,True,0,0,0.0,INTRADAY_PASS
+ELECON,Elecon Engineering Co. Ltd.,True,0,0,0.0,INTRADAY_PASS
+ELGIEQUIP,Elgi Equipments Ltd.,True,0,0,0.0,INTRADAY_PASS
+EMAMILTD,Emami Ltd.,True,0,0,0.0,INTRADAY_PASS
+EMCURE,Emcure Pharmaceuticals Ltd.,True,0,0,0.0,INTRADAY_PASS
+EMMVEE,Emmvee Photovoltaic Power Ltd.,True,0,0,0.0,INTRADAY_PASS
+ENDURANCE,Endurance Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+ENGINERSIN,Engineers India Ltd.,True,0,0,0.0,INTRADAY_PASS
+ESCORTS,Escorts Kubota Ltd.,True,0,0,0.0,INTRADAY_PASS
+ETERNAL,Eternal Ltd.,True,0,0,0.0,INTRADAY_PASS
+EXIDEIND,Exide Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+NYKAA,FSN E-Commerce Ventures Ltd.,True,0,0,0.0,INTRADAY_PASS
+FEDERALBNK,Federal Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+FACT,Fertilisers and Chemicals Travancore Ltd.,True,0,0,0.0,INTRADAY_PASS
+FINCABLES,Finolex Cables Ltd.,True,0,0,0.0,INTRADAY_PASS
+FSL,Firstsource Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+FIVESTAR,Five-Star Business Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+FORCEMOT,Force Motors Ltd.,True,0,0,0.0,INTRADAY_PASS
+FORTIS,Fortis Healthcare Ltd.,True,0,0,0.0,INTRADAY_PASS
+FRACTAL,Fractal Analytics Ltd.,True,0,0,0.0,INTRADAY_PASS
+GAIL,GAIL (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+GVT&D,GE Vernova T&D India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GMRAIRPORT,GMR Airports Ltd.,True,0,0,0.0,INTRADAY_PASS
+GABRIEL,Gabriel India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GALLANTT,Gallantt Ispat Ltd.,True,0,0,0.0,INTRADAY_PASS
+GRSE,Garden Reach Shipbuilders & Engineers Ltd.,True,0,0,0.0,INTRADAY_PASS
+GICRE,General Insurance Corporation of India,True,0,0,0.0,INTRADAY_PASS
+GILLETTE,Gillette India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GLAND,Gland Pharma Ltd.,True,0,0,0.0,INTRADAY_PASS
+GLAXO,Glaxosmithkline Pharmaceuticals Ltd.,True,0,0,0.0,INTRADAY_PASS
+GLENMARK,Glenmark Pharmaceuticals Ltd.,True,0,0,0.0,INTRADAY_PASS
+MEDANTA,Global Health Ltd.,True,0,0,0.0,INTRADAY_PASS
+GPIL,Godawari Power & Ispat Ltd.,True,0,0,0.0,INTRADAY_PASS
+GODFRYPHLP,Godfrey Phillips India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GODREJCP,Godrej Consumer Products Ltd.,True,0,0,0.0,INTRADAY_PASS
+GODREJIND,Godrej Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+GODREJPROP,Godrej Properties Ltd.,True,0,0,0.0,INTRADAY_PASS
+GRANULES,Granules India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GRAPHITE,Graphite India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GRASIM,Grasim Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+GRAVITA,Gravita India Ltd.,True,0,0,0.0,INTRADAY_PASS
+GESHIP,Great Eastern Shipping Co. Ltd.,True,0,0,0.0,INTRADAY_PASS
+FLUOROCHEM,Gujarat Fluorochemicals Ltd.,True,0,0,0.0,INTRADAY_PASS
+GMDCLTD,Gujarat Mineral Development Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+HBLENGINE,HBL Engineering Ltd.,True,0,0,0.0,INTRADAY_PASS
+HCLTECH,HCL Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+HDBFS,HDB Financial Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+HDFCAMC,HDFC Asset Management Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+HDFCBANK,HDFC Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+HDFCLIFE,HDFC Life Insurance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+HEGAM,HEG Advanced Materials Ltd.,True,0,0,0.0,INTRADAY_PASS
+HFCL,HFCL Ltd.,True,0,0,0.0,INTRADAY_PASS
+HAVELLS,Havells India Ltd.,True,0,0,0.0,INTRADAY_PASS
+HEROMOTOCO,Hero MotoCorp Ltd.,True,0,0,0.0,INTRADAY_PASS
+HEXT,Hexaware Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+HSCL,Himadri Speciality Chemical Ltd.,True,0,0,0.0,INTRADAY_PASS
+HINDALCO,Hindalco Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+HAL,Hindustan Aeronautics Ltd.,True,0,0,0.0,INTRADAY_PASS
+HINDCOPPER,Hindustan Copper Ltd.,True,0,0,0.0,INTRADAY_PASS
+HINDPETRO,Hindustan Petroleum Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+HINDUNILVR,Hindustan Unilever Ltd.,True,0,0,0.0,INTRADAY_PASS
+HINDZINC,Hindustan Zinc Ltd.,True,0,0,0.0,INTRADAY_PASS
+POWERINDIA,Hitachi Energy India Ltd.,True,0,0,0.0,INTRADAY_PASS
+HOMEFIRST,Home First Finance Company India Ltd.,True,0,0,0.0,INTRADAY_PASS
+HONASA,Honasa Consumer Ltd.,True,0,0,0.0,INTRADAY_PASS
+HONAUT,Honeywell Automation India Ltd.,True,0,0,0.0,INTRADAY_PASS
+HUDCO,Housing & Urban Development Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+HYUNDAI,Hyundai Motor India Ltd.,True,0,0,0.0,INTRADAY_PASS
+ICICIBANK,ICICI Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+ICICIGI,ICICI Lombard General Insurance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+ICICIAMC,ICICI Prudential Asset Management Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+ICICIPRULI,ICICI Prudential Life Insurance Company Ltd.,False,0,0,0.0,INTRADAY_FILE_MISSING
+IDBI,IDBI Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+IDFCFIRSTB,IDFC First Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+IFCI,IFCI Ltd.,True,0,0,0.0,INTRADAY_PASS
+IIFL,IIFL Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+INOXINDIA,INOX India Ltd.,True,0,0,0.0,INTRADAY_PASS
+IRB,IRB Infrastructure Developers Ltd.,True,0,0,0.0,INTRADAY_PASS
+IRCON,IRCON International Ltd.,True,0,0,0.0,INTRADAY_PASS
+ITCHOTELS,ITC Hotels Ltd.,True,0,0,0.0,INTRADAY_PASS
+ITC,ITC Ltd.,True,0,0,0.0,INTRADAY_PASS
+ITI,ITI Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDIACEM,India Cements Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDIAMART,Indiamart Intermesh Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDIANB,Indian Bank,True,0,0,0.0,INTRADAY_PASS
+IEX,Indian Energy Exchange Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDHOTEL,Indian Hotels Co. Ltd.,True,0,0,0.0,INTRADAY_PASS
+IOC,Indian Oil Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+IOB,Indian Overseas Bank,True,0,0,0.0,INTRADAY_PASS
+IRCTC,Indian Railway Catering And Tourism Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+IRFC,Indian Railway Finance Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+IREDA,Indian Renewable Energy Development Agency Ltd.,True,0,0,0.0,INTRADAY_PASS
+IGL,Indraprastha Gas Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDUSTOWER,Indus Towers Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDUSINDBK,IndusInd Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+NAUKRI,Info Edge (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+INFY,Infosys Ltd.,True,0,0,0.0,INTRADAY_PASS
+INOXWIND,Inox Wind Ltd.,True,0,0,0.0,INTRADAY_PASS
+INTELLECT,Intellect Design Arena Ltd.,True,0,0,0.0,INTRADAY_PASS
+INDIGO,InterGlobe Aviation Ltd.,True,0,0,0.0,INTRADAY_PASS
+IGIL,International Gemological Institute Ltd.,True,0,0,0.0,INTRADAY_PASS
+IKS,Inventurus Knowledge Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+IPCALAB,Ipca Laboratories Ltd.,True,0,0,0.0,INTRADAY_PASS
+JKCEMENT,J.K. Cement Ltd.,True,0,0,0.0,INTRADAY_PASS
+JBMA,JBM Auto Ltd.,True,0,0,0.0,INTRADAY_PASS
+JKTYRE,JK Tyre & Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+JMFINANCIL,JM Financial Ltd.,True,0,0,0.0,INTRADAY_PASS
+JSWCEMENT,JSW Cement Ltd.,True,0,0,0.0,INTRADAY_PASS
+JSWENERGY,JSW Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+JSWINFRA,JSW Infrastructure Ltd.,True,0,0,0.0,INTRADAY_PASS
+JSWSTEEL,JSW Steel Ltd.,True,0,0,0.0,INTRADAY_PASS
+JAINREC,Jain Resource Recycling Ltd.,True,0,0,0.0,INTRADAY_PASS
+JPPOWER,Jaiprakash Power Ventures Ltd.,True,0,0,0.0,INTRADAY_PASS
+J&KBANK,Jammu & Kashmir Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+JINDALSAW,Jindal Saw Ltd.,True,0,0,0.0,INTRADAY_PASS
+JSL,Jindal Stainless Ltd.,True,0,0,0.0,INTRADAY_PASS
+JINDALSTEL,Jindal Steel Ltd.,True,0,0,0.0,INTRADAY_PASS
+JIOFIN,Jio Financial Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+JUBLFOOD,Jubilant Foodworks Ltd.,True,0,0,0.0,INTRADAY_PASS
+JUBLINGREA,Jubilant Ingrevia Ltd.,True,0,0,0.0,INTRADAY_PASS
+JWL,Jupiter Wagons Ltd.,True,0,0,0.0,INTRADAY_PASS
+JYOTICNC,Jyoti CNC Automation Ltd.,True,0,0,0.0,INTRADAY_PASS
+KPRMILL,K.P.R. Mill Ltd.,True,0,0,0.0,INTRADAY_PASS
+KEI,KEI Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+KPITTECH,KPIT Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+KSB,KSB Ltd.,True,0,0,0.0,INTRADAY_PASS
+KAJARIACER,Kajaria Ceramics Ltd.,True,0,0,0.0,INTRADAY_PASS
+KPIL,Kalpataru Projects International Ltd.,True,0,0,0.0,INTRADAY_PASS
+KALYANKJIL,Kalyan Jewellers India Ltd.,True,0,0,0.0,INTRADAY_PASS
+KARURVYSYA,Karur Vysya Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+KAYNES,Kaynes Technology India Ltd.,True,0,0,0.0,INTRADAY_PASS
+KEC,Kec International Ltd.,True,0,0,0.0,INTRADAY_PASS
+KFINTECH,Kfin Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+KIRLOSBROS,Kirloskar Brothers Ltd.,True,0,0,0.0,INTRADAY_PASS
+KIRLOSENG,Kirloskar Oil Eng Ltd.,True,0,0,0.0,INTRADAY_PASS
+KOTAKBANK,Kotak Mahindra Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+KIMS,Krishna Institute of Medical Sciences Ltd.,True,0,0,0.0,INTRADAY_PASS
+LTF,L&T Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+LTTS,L&T Technology Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+LGEINDIA,LG Electronics India Ltd.,True,0,0,0.0,INTRADAY_PASS
+LICHSGFIN,LIC Housing Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+LTFOODS,LT Foods Ltd.,True,0,0,0.0,INTRADAY_PASS
+LTM,LTM Ltd.,True,0,0,0.0,INTRADAY_PASS
+LT,Larsen & Toubro Ltd.,True,0,0,0.0,INTRADAY_PASS
+LAURUSLABS,Laurus Labs Ltd.,True,0,0,0.0,INTRADAY_PASS
+LEMONTREE,Lemon Tree Hotels Ltd.,True,0,0,0.0,INTRADAY_PASS
+LENSKART,Lenskart Solutions Ltd.,True,0,0,0.0,INTRADAY_PASS
+LICI,Life Insurance Corporation of India,True,0,0,0.0,INTRADAY_PASS
+LINDEINDIA,Linde India Ltd.,True,0,0,0.0,INTRADAY_PASS
+LLOYDSME,Lloyds Metals And Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+LODHA,Lodha Developers Ltd.,True,0,0,0.0,INTRADAY_PASS
+LUPIN,Lupin Ltd.,True,0,0,0.0,INTRADAY_PASS
+MMTC,MMTC Ltd.,True,0,0,0.0,INTRADAY_PASS
+MRF,MRF Ltd.,True,0,0,0.0,INTRADAY_PASS
+MTARTECH,MTAR Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+MGL,Mahanagar Gas Ltd.,True,0,0,0.0,INTRADAY_PASS
+M&MFIN,Mahindra & Mahindra Financial Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+M&M,Mahindra & Mahindra Ltd.,True,0,0,0.0,INTRADAY_PASS
+MANAPPURAM,Manappuram Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+MRPL,Mangalore Refinery & Petrochemicals Ltd.,True,0,0,0.0,INTRADAY_PASS
+MANKIND,Mankind Pharma Ltd.,True,0,0,0.0,INTRADAY_PASS
+MARICO,Marico Ltd.,True,0,0,0.0,INTRADAY_PASS
+MARUTI,Maruti Suzuki India Ltd.,True,0,0,0.0,INTRADAY_PASS
+MFSL,Max Financial Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+MAXHEALTH,Max Healthcare Institute Ltd.,True,0,0,0.0,INTRADAY_PASS
+MAZDOCK,Mazagoan Dock Shipbuilders Ltd.,True,0,0,0.0,INTRADAY_PASS
+MEESHO,Meesho Ltd.,True,0,0,0.0,INTRADAY_PASS
+MINDACORP,Minda Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+MSUMI,Motherson Sumi Wiring India Ltd.,True,0,0,0.0,INTRADAY_PASS
+MOTILALOFS,Motilal Oswal Financial Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+MPHASIS,MphasiS Ltd.,True,0,0,0.0,INTRADAY_PASS
+MCX,Multi Commodity Exchange of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+MUTHOOTFIN,Muthoot Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+NATCOPHARM,NATCO Pharma Ltd.,True,0,0,0.0,INTRADAY_PASS
+NBCC,NBCC (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+NCC,NCC Ltd.,True,0,0,0.0,INTRADAY_PASS
+NHPC,NHPC Ltd.,True,0,0,0.0,INTRADAY_PASS
+NLCINDIA,NLC India Ltd.,True,0,0,0.0,INTRADAY_PASS
+NMDC,NMDC Ltd.,True,0,0,0.0,INTRADAY_PASS
+NSLNISP,NMDC Steel Ltd.,True,0,0,0.0,INTRADAY_PASS
+NTPCGREEN,NTPC Green Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+NTPC,NTPC Ltd.,True,0,0,0.0,INTRADAY_PASS
+NH,Narayana Hrudayalaya Ltd.,True,0,0,0.0,INTRADAY_PASS
+NATIONALUM,National Aluminium Co. Ltd.,True,0,0,0.0,INTRADAY_PASS
+NAVA,Nava Ltd.,True,0,0,0.0,INTRADAY_PASS
+NAVINFLUOR,Navin Fluorine International Ltd.,True,0,0,0.0,INTRADAY_PASS
+NESTLEIND,Nestle India Ltd.,True,0,0,0.0,INTRADAY_PASS
+NETWEB,Netweb Technologies India Ltd.,True,0,0,0.0,INTRADAY_PASS
+NEULANDLAB,Neuland Laboratories Ltd.,True,0,0,0.0,INTRADAY_PASS
+NAM-INDIA,Nippon Life India Asset Management Ltd.,True,0,0,0.0,INTRADAY_PASS
+NUVAMA,Nuvama Wealth Management Ltd.,True,0,0,0.0,INTRADAY_PASS
+NUVOCO,Nuvoco Vistas Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+OBEROIRLTY,Oberoi Realty Ltd.,True,0,0,0.0,INTRADAY_PASS
+ONGC,Oil & Natural Gas Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+OIL,Oil India Ltd.,True,0,0,0.0,INTRADAY_PASS
+OLAELEC,Ola Electric Mobility Ltd.,True,0,0,0.0,INTRADAY_PASS
+OLECTRA,Olectra Greentech Ltd.,True,0,0,0.0,INTRADAY_PASS
+PAYTM,One 97 Communications Ltd.,True,0,0,0.0,INTRADAY_PASS
+ONESOURCE,Onesource Specialty Pharma Ltd.,True,0,0,0.0,INTRADAY_PASS
+OFSS,Oracle Financial Services Software Ltd.,True,0,0,0.0,INTRADAY_PASS
+POLICYBZR,PB Fintech Ltd.,True,0,0,0.0,INTRADAY_PASS
+PCBL,PCBL Chemical Ltd.,True,0,0,0.0,INTRADAY_PASS
+PGEL,PG Electroplast Ltd.,True,0,0,0.0,INTRADAY_PASS
+PIIND,PI Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+PNBHOUSING,PNB Housing Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+PTCIL,PTC Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+PVRINOX,PVR INOX Ltd.,True,0,0,0.0,INTRADAY_PASS
+PAGEIND,Page Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+PARADEEP,Paradeep Phosphates Ltd.,True,0,0,0.0,INTRADAY_PASS
+PATANJALI,Patanjali Foods Ltd.,True,0,0,0.0,INTRADAY_PASS
+PERSISTENT,Persistent Systems Ltd.,True,0,0,0.0,INTRADAY_PASS
+PETRONET,Petronet LNG Ltd.,True,0,0,0.0,INTRADAY_PASS
+PHOENIXLTD,Phoenix Mills Ltd.,True,0,0,0.0,INTRADAY_PASS
+PWL,Physicswallah Ltd.,True,0,0,0.0,INTRADAY_PASS
+PIDILITIND,Pidilite Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+PINELABS,Pine Labs Ltd.,True,0,0,0.0,INTRADAY_PASS
+PIRAMALFIN,Piramal Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+PPLPHARMA,Piramal Pharma Ltd.,True,0,0,0.0,INTRADAY_PASS
+POLYMED,Poly Medicure Ltd.,True,0,0,0.0,INTRADAY_PASS
+POLYCAB,Polycab India Ltd.,True,0,0,0.0,INTRADAY_PASS
+POONAWALLA,Poonawalla Fincorp Ltd.,True,0,0,0.0,INTRADAY_PASS
+PFC,Power Finance Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+POWERGRID,Power Grid Corporation of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+PREMIERENE,Premier Energies Ltd.,True,0,0,0.0,INTRADAY_PASS
+PRESTIGE,Prestige Estates Projects Ltd.,True,0,0,0.0,INTRADAY_PASS
+PFOCUS,Prime Focus Ltd.,True,0,0,0.0,INTRADAY_PASS
+PRIVISCL,Privi Speciality Chemicals Ltd.,True,0,0,0.0,INTRADAY_PASS
+PNB,Punjab National Bank,True,0,0,0.0,INTRADAY_PASS
+RRKABEL,R R Kabel Ltd.,True,0,0,0.0,INTRADAY_PASS
+RBLBANK,RBL Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+RECLTD,REC Ltd.,True,0,0,0.0,INTRADAY_PASS
+RHIM,RHI MAGNESITA INDIA LTD.,True,0,0,0.0,INTRADAY_PASS
+RITES,RITES Ltd.,True,0,0,0.0,INTRADAY_PASS
+RADICO,Radico Khaitan Ltd,True,0,0,0.0,INTRADAY_PASS
+RVNL,Rail Vikas Nigam Ltd.,True,0,0,0.0,INTRADAY_PASS
+RAILTEL,Railtel Corporation Of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+RAINBOW,Rainbow Childrens Medicare Ltd.,True,0,0,0.0,INTRADAY_PASS
+RKFORGE,Ramkrishna Forgings Ltd.,True,0,0,0.0,INTRADAY_PASS
+REDINGTON,Redington Ltd.,True,0,0,0.0,INTRADAY_PASS
+RELIANCE,Reliance Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+RPOWER,Reliance Power Ltd.,True,0,0,0.0,INTRADAY_PASS
+RUBICON,Rubicon Research Ltd.,True,0,0,0.0,INTRADAY_PASS
+SBICARD,SBI Cards and Payment Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+SBILIFE,SBI Life Insurance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+SJVN,SJVN Ltd.,True,0,0,0.0,INTRADAY_PASS
+SHRIPISTON,SPR Auto Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+SRF,SRF Ltd.,True,0,0,0.0,INTRADAY_PASS
+SAGILITY,Sagility Ltd.,True,0,0,0.0,INTRADAY_PASS
+SAILIFE,Sai Life Sciences Ltd.,True,0,0,0.0,INTRADAY_PASS
+SAMMAANCAP,Sammaan Capital Ltd.,True,0,0,0.0,INTRADAY_PASS
+MOTHERSON,Samvardhana Motherson International Ltd.,True,0,0,0.0,INTRADAY_PASS
+SANSERA,Sansera Engineering Ltd.,True,0,0,0.0,INTRADAY_PASS
+SARDAEN,Sarda Energy and Minerals Ltd.,True,0,0,0.0,INTRADAY_PASS
+SCHAEFFLER,Schaeffler India Ltd.,True,0,0,0.0,INTRADAY_PASS
+SCHNEIDER,Schneider Electric Infrastructure Ltd.,True,0,0,0.0,INTRADAY_PASS
+SCI,Shipping Corporation of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+SHREECEM,Shree Cement Ltd.,True,0,0,0.0,INTRADAY_PASS
+SHRIRAMFIN,Shriram Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+SHYAMMETL,Shyam Metalics and Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+ENRIN,Siemens Energy India Ltd.,True,0,0,0.0,INTRADAY_PASS
+SIEMENS,Siemens Ltd.,True,0,0,0.0,INTRADAY_PASS
+SIGNATURE,Signatureglobal (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+SOBHA,Sobha Ltd.,True,0,0,0.0,INTRADAY_PASS
+SOLARINDS,Solar Industries India Ltd.,True,0,0,0.0,INTRADAY_PASS
+SONACOMS,Sona BLW Precision Forgings Ltd.,True,0,0,0.0,INTRADAY_PASS
+STARHEALTH,Star Health and Allied Insurance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+SBIN,State Bank of India,True,0,0,0.0,INTRADAY_PASS
+SAIL,Steel Authority of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+STLTECH,Sterlite Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+SUMICHEM,Sumitomo Chemical India Ltd.,True,0,0,0.0,INTRADAY_PASS
+SUNPHARMA,Sun Pharmaceutical Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+SUNTV,Sun TV Network Ltd.,True,0,0,0.0,INTRADAY_PASS
+SUNDARMFIN,Sundaram Finance Ltd.,True,0,0,0.0,INTRADAY_PASS
+SUPREMEIND,Supreme Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+SUZLON,Suzlon Energy Ltd.,True,0,0,0.0,INTRADAY_PASS
+SWANCORP,Swan Corp Ltd.,True,0,0,0.0,INTRADAY_PASS
+SWIGGY,Swiggy Ltd.,True,0,0,0.0,INTRADAY_PASS
+SYNGENE,Syngene International Ltd.,True,0,0,0.0,INTRADAY_PASS
+SYRMA,Syrma SGS Technology Ltd.,True,0,0,0.0,INTRADAY_PASS
+TBOTEK,TBO Tek Ltd.,True,0,0,0.0,INTRADAY_PASS
+TDPOWERSYS,TD Power Systems Ltd.,True,0,0,0.0,INTRADAY_PASS
+TVSMOTOR,TVS Motor Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATACAP,Tata Capital Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATACHEM,Tata Chemicals Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATACOMM,Tata Communications Ltd.,True,0,0,0.0,INTRADAY_PASS
+TCS,Tata Consultancy Services Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATACONSUM,Tata Consumer Products Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATAELXSI,Tata Elxsi Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATAINVEST,Tata Investment Corporation Ltd.,True,0,0,0.0,INTRADAY_PASS
+TMCV,Tata Motors Ltd.,True,0,0,0.0,INTRADAY_PASS
+TMPV,Tata Motors Passenger Vehicles Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATAPOWER,Tata Power Co. Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATASTEEL,Tata Steel Ltd.,True,0,0,0.0,INTRADAY_PASS
+TATATECH,Tata Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+TTML,Tata Teleservices (Maharashtra) Ltd.,True,0,0,0.0,INTRADAY_PASS
+TECHM,Tech Mahindra Ltd.,True,0,0,0.0,INTRADAY_PASS
+TECHNOE,Techno Electric & Engineering Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+TEGA,Tega Industries Ltd.,True,0,0,0.0,INTRADAY_PASS
+TEJASNET,Tejas Networks Ltd.,True,0,0,0.0,INTRADAY_PASS
+TENNIND,Tenneco Clean Air India Ltd.,True,0,0,0.0,INTRADAY_PASS
+THANGAMAYL,Thangamayil Jewellery Ltd.,True,0,0,0.0,INTRADAY_PASS
+NIACL,The New India Assurance Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+RAMCOCEM,The Ramco Cements Ltd.,True,0,0,0.0,INTRADAY_PASS
+THERMAX,Thermax Ltd.,True,0,0,0.0,INTRADAY_PASS
+TIMKEN,Timken India Ltd.,True,0,0,0.0,INTRADAY_PASS
+TITAGARH,Titagarh Rail Systems Ltd.,True,0,0,0.0,INTRADAY_PASS
+TITAN,Titan Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+TORNTPHARM,Torrent Pharmaceuticals Ltd.,True,0,0,0.0,INTRADAY_PASS
+TORNTPOWER,Torrent Power Ltd.,True,0,0,0.0,INTRADAY_PASS
+TARIL,Transformers And Rectifiers (India) Ltd.,True,0,0,0.0,INTRADAY_PASS
+TRENT,Trent Ltd.,True,0,0,0.0,INTRADAY_PASS
+TRIDENT,Trident Ltd.,True,0,0,0.0,INTRADAY_PASS
+TRITURBINE,Triveni Turbine Ltd.,True,0,0,0.0,INTRADAY_PASS
+TIINDIA,Tube Investments of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+UCOBANK,UCO Bank,True,0,0,0.0,INTRADAY_PASS
+UNOMINDA,UNO Minda Ltd.,True,0,0,0.0,INTRADAY_PASS
+UPL,UPL Ltd.,True,0,0,0.0,INTRADAY_PASS
+UTIAMC,UTI Asset Management Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+ULTRACEMCO,UltraTech Cement Ltd.,True,0,0,0.0,INTRADAY_PASS
+UNIONBANK,Union Bank of India,True,0,0,0.0,INTRADAY_PASS
+UBL,United Breweries Ltd.,True,0,0,0.0,INTRADAY_PASS
+UNITDSPR,United Spirits Ltd.,True,0,0,0.0,INTRADAY_PASS
+URBANCO,Urban Company Ltd.,True,0,0,0.0,INTRADAY_PASS
+USHAMART,Usha Martin Ltd.,True,0,0,0.0,INTRADAY_PASS
+VTL,Vardhman Textiles Ltd.,True,0,0,0.0,INTRADAY_PASS
+VBL,Varun Beverages Ltd.,True,0,0,0.0,INTRADAY_PASS
+VAML,Vedanta Aluminium Metal Ltd.,True,0,0,0.0,INTRADAY_PASS
+VISL,Vedanta Iron and Steel Ltd.,True,0,0,0.0,INTRADAY_PASS
+VEDL,Vedanta Ltd.,True,0,0,0.0,INTRADAY_PASS
+VOGL,Vedanta Oil and Gas Ltd.,True,0,0,0.0,INTRADAY_PASS
+VEDPOWER,Vedanta Power Ltd.,True,0,0,0.0,INTRADAY_PASS
+VIJAYA,Vijaya Diagnostic Centre Ltd.,True,0,0,0.0,INTRADAY_PASS
+VMM,Vishal Mega Mart Ltd.,True,0,0,0.0,INTRADAY_PASS
+IDEA,Vodafone Idea Ltd.,True,0,0,0.0,INTRADAY_PASS
+VOLTAS,Voltas Ltd.,True,0,0,0.0,INTRADAY_PASS
+WAAREEENER,Waaree Energies Ltd.,True,0,0,0.0,INTRADAY_PASS
+WELCORP,Welspun Corp Ltd.,True,0,0,0.0,INTRADAY_PASS
+WELSPUNLIV,Welspun Living Ltd.,True,0,0,0.0,INTRADAY_PASS
+WHIRLPOOL,Whirlpool of India Ltd.,True,0,0,0.0,INTRADAY_PASS
+WIPRO,Wipro Ltd.,True,0,0,0.0,INTRADAY_PASS
+WOCKPHARMA,Wockhardt Ltd.,True,0,0,0.0,INTRADAY_PASS
+YESBANK,Yes Bank Ltd.,True,0,0,0.0,INTRADAY_PASS
+ZFCVINDIA,ZF Commercial Vehicle Control Systems India Ltd.,True,0,0,0.0,INTRADAY_PASS
+ZEEL,Zee Entertainment Enterprises Ltd.,True,0,0,0.0,INTRADAY_PASS
+ZENTEC,Zen Technologies Ltd.,True,0,0,0.0,INTRADAY_PASS
+ZENSARTECH,Zensar Technolgies Ltd.,True,0,0,0.0,INTRADAY_PASS
+ZYDUSLIFE,Zydus Lifesciences Ltd.,True,0,0,0.0,INTRADAY_PASS
+ZYDUSWELL,Zydus Wellness Ltd.,True,0,0,0.0,INTRADAY_PASS
+ECLERX,eClerx Services Ltd.,True,0,0,0.0,INTRADAY_PASS

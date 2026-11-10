@@ -1,0 +1,5 @@
+rejection_reason,evaluations_count,percentage,explanation
+TREND_CONFLICT_BEARISH,1210,80.67%,Close price is currently trading below 200-day EMA during bearish trend regime
+EXCESSIVE_VOLATILITY,35,2.33%,ATR risk percentage exceeds maximum 12% volatility tolerance
+INSIGNIFICANT_MOMENTUM,8,0.53%,Price consolidation within 0.5 ATR of 20-day SMA
+INSUFFICIENT_HISTORICAL_DATA,3,0.20%,Unlisted ticker BAGMANE.NS on Yahoo Finance API

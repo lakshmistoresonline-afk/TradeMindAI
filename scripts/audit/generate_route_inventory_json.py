@@ -44,7 +44,8 @@ def classify_route(path: str) -> tuple[str, str, str]:
         "/api/v1/ios/regime",
         "/api/v1/universes",
         "/api/v1/data",
-        "/api/v1/market-data/ingest"
+        "/api/v1/market-data/ingest",
+        "/api/v1/market-data/providers"
     ]
     if any(p == pr or p.startswith(pr + "/") for pr in unrelated_prefixes) or p in ["/", "/docs", "/redoc", "/openapi.json"]:
         return "VERIFIED_UNRELATED_ENDPOINT", "UNRESTRICTED_METADATA_OR_AUTH", "PASS_NOT_SENSITIVE"

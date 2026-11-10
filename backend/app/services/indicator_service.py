@@ -1,16 +1,19 @@
 """
 ================================================================================
-TradeMindAI: Local Indicator Service (v2.8-HARDENED-PERIOD-POLICY)
+TradeMindAI: Local Indicator Service (v3.0-CANONICAL-PERIOD-POLICY)
 ================================================================================
 Computes technical analysis metrics locally across historical price candles:
-RSI (14 Wilder Exponential Smoothing), MACD (12, 26, 9), EMA (20, 50, 200),
-Bollinger Bands (20, 2), ATR (14), and Shifted Donchian Channels (20).
+RSI (14 Wilder Exponential Smoothing), MACD (12, 26, 9), EMA (20, 50, 100, 200),
+SMA (20, 50, 200), Bollinger Bands (20, 2), ATR (14), and Shifted Donchian Channels (20).
+Enforces case-insensitive column normalization, strict warm-up policies,
+and point-in-time causality without fabricated constant fallbacks.
 ================================================================================
 """
 
 import logging
 import numpy as np
 import pandas as pd
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -92,50 +95,86 @@ def compute_wilder_rsi(series: pd.Series, period: int = 14) -> pd.Series:
 class LocalIndicatorService:
     """
     Computes technical analysis metrics locally in memory with strict point-in-time causality.
+    Canonical Authoritative Indicator Module.
     """
 
-    @staticmethod
-    def calculate_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    INDICATOR_COLUMNS = [
+        "ema_20", "ema_50", "ema_100", "ema_200",
+        "sma_20", "sma_50", "sma_200",
+        "rsi_14", "macd", "macd_signal", "macd_hist",
+        "bb_upper", "bb_middle", "bb_lower",
+        "atr_14", "donchian_high_20", "donchian_low_20"
+    ]
+
+    @classmethod
+    def calculate_indicators(cls, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Calculates RSI, MACD, EMAs, Bollinger Bands, ATR, and 1-bar shifted Donchian Channels.
+        Calculates RSI, MACD, EMAs, SMAs, Bollinger Bands, ATR, and 1-bar shifted Donchian Channels.
+        Normalizes column names case-insensitively and initializes all indicator columns with NaN.
         """
-        if df.empty or len(df) < 14:
-            logger.warning("[Indicators] Insufficient candles for indicator calculation.")
-            return df
+        if df is None or df.empty:
+            logger.warning("[Indicators] Empty input DataFrame provided.")
+            return pd.DataFrame(columns=cls.INDICATOR_COLUMNS)
 
         df = df.copy()
-        close = df["close"]
 
-        # 1. Exponential Moving Averages (EMA 20, 50, 200)
-        df["ema_20"] = close.ewm(span=20, adjust=False).mean()
-        df["ema_50"] = close.ewm(span=50, adjust=False).mean()
+        # Normalize column names to lowercase
+        col_map = {c: str(c).strip().lower() for c in df.columns}
+        df = df.rename(columns=col_map)
+
+        # Initialize all indicator columns with NaN
+        for col in cls.INDICATOR_COLUMNS:
+            if col not in df.columns:
+                df[col] = np.nan
+
+        if "close" not in df.columns or len(df) < 2:
+            logger.warning("[Indicators] Insufficient candles or missing close price.")
+            return df
+
+        close = pd.to_numeric(df["close"], errors="coerce").astype(float)
+
+        # 1. Exponential Moving Averages
+        if len(df) >= 20:
+            df["ema_20"] = close.ewm(span=20, adjust=False).mean()
+        if len(df) >= 50:
+            df["ema_50"] = close.ewm(span=50, adjust=False).mean()
+        if len(df) >= 100:
+            df["ema_100"] = close.ewm(span=100, adjust=False).mean()
         if len(df) >= 200:
             df["ema_200"] = close.ewm(span=200, adjust=False).mean()
-        else:
-            df["ema_200"] = np.nan
 
-        # 2. Wilder's Relative Strength Index (RSI 14)
-        df["rsi_14"] = compute_wilder_rsi(close, period=14)
+        # 2. Simple Moving Averages
+        if len(df) >= 20:
+            df["sma_20"] = close.rolling(window=20).mean()
+        if len(df) >= 50:
+            df["sma_50"] = close.rolling(window=50).mean()
+        if len(df) >= 200:
+            df["sma_200"] = close.rolling(window=200).mean()
 
-        # 3. MACD (12, 26, 9)
-        ema_12 = close.ewm(span=12, adjust=False).mean()
-        ema_26 = close.ewm(span=26, adjust=False).mean()
-        df["macd"] = ema_12 - ema_26
-        df["macd_signal"] = df["macd"].ewm(span=9, adjust=False).mean()
-        df["macd_hist"] = df["macd"] - df["macd_signal"]
+        # 3. Wilder's Relative Strength Index (RSI 14)
+        if len(df) >= 14:
+            df["rsi_14"] = compute_wilder_rsi(close, period=14)
 
-        # 4. Bollinger Bands (20, 2) and SMA 20
-        sma_20 = close.rolling(window=20).mean()
-        std_20 = close.rolling(window=20).std()
-        df["bb_upper"] = sma_20 + (std_20 * 2.0)
-        df["bb_lower"] = sma_20 - (std_20 * 2.0)
-        df["bb_middle"] = sma_20
-        df["sma_20"] = sma_20
+        # 4. MACD (12, 26, 9)
+        if len(df) >= 26:
+            ema_12 = close.ewm(span=12, adjust=False).mean()
+            ema_26 = close.ewm(span=26, adjust=False).mean()
+            df["macd"] = ema_12 - ema_26
+            df["macd_signal"] = df["macd"].ewm(span=9, adjust=False).mean()
+            df["macd_hist"] = df["macd"] - df["macd_signal"]
 
-        # 5. Average True Range (ATR 14)
-        if "high" in df.columns and "low" in df.columns:
-            high = df["high"]
-            low = df["low"]
+        # 5. Bollinger Bands (20, 2)
+        if len(df) >= 20:
+            sma_20 = df["sma_20"]
+            std_20 = close.rolling(window=20).std()
+            df["bb_upper"] = sma_20 + (std_20 * 2.0)
+            df["bb_lower"] = sma_20 - (std_20 * 2.0)
+            df["bb_middle"] = sma_20
+
+        # 6. Average True Range (ATR 14)
+        if "high" in df.columns and "low" in df.columns and len(df) >= 14:
+            high = pd.to_numeric(df["high"], errors="coerce").astype(float)
+            low = pd.to_numeric(df["low"], errors="coerce").astype(float)
             prev_close = close.shift(1)
             tr = pd.concat([
                 high - low,
@@ -143,41 +182,39 @@ class LocalIndicatorService:
                 (low - prev_close).abs()
             ], axis=1).max(axis=1)
             df["atr_14"] = tr.rolling(window=14).mean()
-        else:
-            df["atr_14"] = np.nan
 
-        # 6. Donchian Channels (20) Shifted 1-bar for zero look-ahead point-in-time causality
+        # 7. Donchian Channels (20) Shifted 1-bar for zero look-ahead point-in-time causality
         if "high" in df.columns and "low" in df.columns and len(df) >= 21:
-            df["donchian_high_20"] = df["high"].rolling(window=20).max().shift(1)
-            df["donchian_low_20"] = df["low"].rolling(window=20).min().shift(1)
-        else:
-            df["donchian_high_20"] = np.nan
-            df["donchian_low_20"] = np.nan
+            high = pd.to_numeric(df["high"], errors="coerce").astype(float)
+            low = pd.to_numeric(df["low"], errors="coerce").astype(float)
+            df["donchian_high_20"] = high.rolling(window=20).max().shift(1)
+            df["donchian_low_20"] = low.rolling(window=20).min().shift(1)
 
         return df
 
-    @staticmethod
-    def get_latest_metrics(df: pd.DataFrame) -> dict:
+    @classmethod
+    def get_latest_metrics(cls, df: pd.DataFrame) -> dict:
         """
         Returns latest computed metric values as a dictionary.
         Returns None for any indicator that is unavailable or in warm-up/NaN state.
         """
-        df_ind = LocalIndicatorService.calculate_indicators(df)
-        if df_ind.empty:
+        df_ind = cls.calculate_indicators(df)
+        if df_ind is None or df_ind.empty:
             return {}
         latest = df_ind.iloc[-1]
-        return {
-            "close": float(latest["close"]) if "close" in latest and not pd.isna(latest.get("close")) else None,
-            "rsi_14": float(latest["rsi_14"]) if not pd.isna(latest.get("rsi_14")) else None,
-            "ema_20": float(latest["ema_20"]) if not pd.isna(latest.get("ema_20")) else None,
-            "ema_50": float(latest["ema_50"]) if not pd.isna(latest.get("ema_50")) else None,
-            "ema_200": float(latest["ema_200"]) if not pd.isna(latest.get("ema_200")) else None,
-            "macd": float(latest["macd"]) if not pd.isna(latest.get("macd")) else None,
-            "macd_hist": float(latest["macd_hist"]) if not pd.isna(latest.get("macd_hist")) else None,
-            "bb_upper": float(latest["bb_upper"]) if not pd.isna(latest.get("bb_upper")) else None,
-            "bb_lower": float(latest["bb_lower"]) if not pd.isna(latest.get("bb_lower")) else None,
-            "sma_20": float(latest["sma_20"]) if not pd.isna(latest.get("sma_20")) else None,
-            "atr_14": float(latest["atr_14"]) if not pd.isna(latest.get("atr_14")) else None,
-            "donchian_high_20": float(latest["donchian_high_20"]) if not pd.isna(latest.get("donchian_high_20")) else None,
-            "donchian_low_20": float(latest["donchian_low_20"]) if not pd.isna(latest.get("donchian_low_20")) else None,
-        }
+
+        def get_clean_float(col_name: str) -> Optional[float]:
+            if col_name in latest:
+                val = latest.get(col_name)
+                if val is not None and not pd.isna(val) and np.isfinite(float(val)):
+                    return float(val)
+            return None
+
+        # Resolve close price key
+        c_val = get_clean_float("close")
+
+        res = {"close": c_val}
+        for col in cls.INDICATOR_COLUMNS:
+            res[col] = get_clean_float(col)
+
+        return res

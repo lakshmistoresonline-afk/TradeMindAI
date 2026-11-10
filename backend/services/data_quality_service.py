@@ -70,9 +70,14 @@ VERSIONED_NSE_TRADING_CALENDAR_V1 = {
 }
 
 def generate_expected_5m_slots(date_str: str) -> list[str]:
-    """Generates the 75 expected 5-minute slot timestamps for an NSE session (09:15 to 15:25 IST)."""
-    start_dt = pd.to_datetime(f"{date_str} 09:15:00")
-    end_dt = pd.to_datetime(f"{date_str} 15:25:00")
+    """Generates expected 5-minute slot timestamps for an NSE session (09:15 to 15:25 IST for regular days; 18:15 to 19:15 IST for special Muhurat sessions)."""
+    is_special = any(k.startswith(date_str) for k in VERSIONED_NSE_TRADING_CALENDAR_V1.get("special_sessions", {}).keys())
+    if is_special:
+        start_dt = pd.to_datetime(f"{date_str} 18:15:00")
+        end_dt = pd.to_datetime(f"{date_str} 19:15:00")
+    else:
+        start_dt = pd.to_datetime(f"{date_str} 09:15:00")
+        end_dt = pd.to_datetime(f"{date_str} 15:25:00")
     return list(pd.date_range(start_dt, end_dt, freq="5min").strftime("%Y-%m-%d %H:%M:%S"))
 
 def validate_freshness(latest_date_str: str, current_date_str: str, max_days_behind: int = 7) -> str:
@@ -286,15 +291,35 @@ class DataQualityService:
 
                     result["intraday"]["invalid_records"] = int(nan_5m + bad_geom_5m)
 
-                    # Off-session records check (outside 09:15:00 to 15:25:00 IST)
-                    ts_times = pd.to_datetime(df_5m["timestamp"]).dt.time
-                    off_session = (ts_times < pd.to_datetime("09:15:00").time()) | (ts_times > pd.to_datetime("15:25:00").time())
-                    result["intraday"]["off_session_records"] = int(off_session.sum())
+                    # Off-session records check (accounting for regular 09:15-15:25 vs special session Muhurat times)
+                    ts_dts = pd.to_datetime(df_5m["timestamp"])
+                    off_session_count = 0
+                    for ts_val in ts_dts:
+                        date_s = ts_val.strftime("%Y-%m-%d")
+                        t_val = ts_val.time()
+                        is_special = any(k.startswith(date_s) for k in VERSIONED_NSE_TRADING_CALENDAR_V1.get("special_sessions", {}).keys())
+                        if is_special:
+                            if not (pd.to_datetime("18:15:00").time() <= t_val <= pd.to_datetime("19:15:00").time()):
+                                off_session_count += 1
+                        else:
+                            if not (pd.to_datetime("09:15:00").time() <= t_val <= pd.to_datetime("15:25:00").time()):
+                                off_session_count += 1
+                    result["intraday"]["off_session_records"] = off_session_count
 
-                    # Missing 5m interval calculation against expected 75 slots per session
-                    observed_days = set(pd.to_datetime(df_5m["timestamp"]).dt.strftime("%Y-%m-%d"))
+                    # Missing 5m interval calculation against expected slots (independently generated from versioned calendar)
+                    p_5m_earliest = pd.to_datetime(df_5m["timestamp"]).dt.strftime("%Y-%m-%d").min()
+                    p_5m_latest = pd.to_datetime(df_5m["timestamp"]).dt.strftime("%Y-%m-%d").max()
+                    start_5m_boundary = POST_2015_LISTING_DATES.get(symbol, p_5m_earliest)
+
+                    raw_5m_b_days = pd.date_range(start_5m_boundary, p_5m_latest, freq="B").strftime("%Y-%m-%d")
+                    expected_5m_trading_days = set(d for d in raw_5m_b_days if d not in VERSIONED_NSE_TRADING_CALENDAR_V1["holidays"])
+                    for spec_k in VERSIONED_NSE_TRADING_CALENDAR_V1.get("special_sessions", {}).keys():
+                        spec_d = spec_k[:10]
+                        if start_5m_boundary <= spec_d <= p_5m_latest:
+                            expected_5m_trading_days.add(spec_d)
+
                     expected_5m_set = set()
-                    for d in observed_days:
+                    for d in expected_5m_trading_days:
                         expected_5m_set.update(generate_expected_5m_slots(d))
 
                     observed_5m_set = set(df_5m["timestamp"])

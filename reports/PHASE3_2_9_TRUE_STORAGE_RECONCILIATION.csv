@@ -1,0 +1,501 @@
+symbol,company_name,daily_parquet_exists,intraday_parquet_exists,daily_exact_match,intraday_exact_match,missing_keys_total,extra_keys_total,val_mismatches_total,mandatory_storage_status
+360ONE,360 ONE WAM Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ABB,ABB India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ACC,ACC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ACMESOLAR,ACME Solar Holdings Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AIAENG,AIA Engineering Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+APLAPOLLO,APL Apollo Tubes Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AUBANK,AU Small Finance Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AWL,AWL Agri Business Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AADHARHFC,Aadhar Housing Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AARTIIND,Aarti Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AAVAS,Aavas Financiers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ABBOTINDIA,Abbott India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ACE,Action Construction Equipment Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ACUTAAS,Acutaas Chemicals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ADANIENSOL,Adani Energy Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ADANIENT,Adani Enterprises Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ADANIGREEN,Adani Green Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ADANIPORTS,Adani Ports and Special Economic Zone Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ADANIPOWER,Adani Power Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ATGL,Adani Total Gas Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ABCAPITAL,Aditya Birla Capital Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ABREL,Aditya Birla Real Estate Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ABSLAMC,Aditya Birla Sun Life AMC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CPPLUS,Aditya Infotech Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AEGISLOG,Aegis Logistics Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AEGISVOPAK,Aegis Vopak Terminals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AETHER,Aether Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AFCONS,Afcons Infrastructure Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AFFLE,Affle 3i Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AJANTPHARM,Ajanta Pharmaceuticals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ALKEM,Alkem Laboratories Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ABDL,Allied Blenders and Distillers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ARE&M,Amara Raja Energy & Mobility Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AMBER,Amber Enterprises India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AMBUJACEM,Ambuja Cements Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ANANDRATHI,Anand Rathi Wealth Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ANANTRAJ,Anant Raj Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ANGELONE,Angel One Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ANTHEM,Anthem Biosciences Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ANURAS,Anupam Rasayan India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+APARINDS,Apar Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+APOLLOHOSP,Apollo Hospitals Enterprise Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+APOLLOTYRE,Apollo Tyres Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+APTUS,Aptus Value Housing Finance India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ASAHIINDIA,Asahi India Glass Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ASHOKLEY,Ashok Leyland Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ASIANPAINT,Asian Paints Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ASTERDM,Aster DM Quality Care Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ASTRAL,Astral Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ATHERENERG,Ather Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ATUL,Atul Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AUROPHARMA,Aurobindo Pharma Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AIIL,Authum Investment & Infrastructure Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AVANTIFEED,Avanti Feeds Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DMART,Avenue Supermarts Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AXISBANK,Axis Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+AZAD,Azad Engineering Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BEML,BEML Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BLS,BLS International Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BSE,BSE Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BAGMANE,Bagmane Prime Office REIT,False,False,False,False,0,0,0,UNSUPPORTED_PROVIDER_SYMBOL
+BAJAJ-AUTO,Bajaj Auto Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BAJFINANCE,Bajaj Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BAJAJFINSV,Bajaj Finserv Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BAJAJHLDNG,Bajaj Holdings & Investment Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BAJAJHFL,Bajaj Housing Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BALKRISIND,Balkrishna Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BALRAMCHIN,Balrampur Chini Mills Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BANDHANBNK,Bandhan Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BANKBARODA,Bank of Baroda,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BANKINDIA,Bank of India,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MAHABANK,Bank of Maharashtra,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BATAINDIA,Bata India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BELRISE,Belrise Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BERGEPAINT,Berger Paints India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BHARATCOAL,Bharat Coking Coal Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BDL,Bharat Dynamics Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BEL,Bharat Electronics Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BHARATFORG,Bharat Forge Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BHEL,Bharat Heavy Electricals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BPCL,Bharat Petroleum Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BHARTIARTL,Bharti Airtel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BHARTIHEXA,Bharti Hexacom Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GROWW,Billionbrains Garage Ventures Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BIOCON,Biocon Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BSOFT,Birlasoft Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BBOX,Black Box Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BLUESTARCO,Blue Star Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BOSCHLTD,Bosch Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FIRSTCRY,Brainbees Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BRIGADE,Brigade Enterprises Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BRITANNIA,Britannia Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+BIRET,Brookfield India Real Estate Trust,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CCL,CCL Products (I) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CESC,CESC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CGPOWER,CG Power and Industrial Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CIEINDIA,CIE Automotive India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CRISIL,CRISIL Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CANFINHOME,Can Fin Homes Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CANBK,Canara Bank,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CANHLIFE,Canara HSBC Life Insurance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CAPLIPOINT,Caplin Point Laboratories Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CGCL,Capri Global Capital Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CARBORUNIV,Carborundum Universal Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CARTRADE,Cartrade Tech Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CASTROLIND,Castrol India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CEATLTD,Ceat Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CEMPRO,Cemindia Projects Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CENTRALBK,Central Bank of India,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CDSL,Central Depository Services (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CMPDI,Central Mine Planning & Design Institute Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CHAMBLFERT,Chambal Fertilizers & Chemicals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CHENNPETRO,Chennai Petroleum Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CHOICEIN,Choice International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CHOLAHLDNG,Cholamandalam Financial Holdings Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CHOLAFIN,Cholamandalam Investment and Finance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CIPLA,Cipla Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CUB,City Union Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CLEANMAX,Clean Max Enviro Energy Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CLEAN,Clean Science and Technology Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+COALINDIA,Coal India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+COCHINSHIP,Cochin Shipyard Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+COFORGE,Coforge Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+COHANCE,Cohance Lifesciences Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+COLPAL,Colgate Palmolive (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CAMS,Computer Age Management Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CONCORDBIO,Concord Biotech Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CONCOR,Container Corporation of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+COROMANDEL,Coromandel International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CRAFTSMAN,Craftsman Automation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CREDITACC,CreditAccess Grameen Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CROMPTON,Crompton Greaves Consumer Electricals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CUMMINSIND,Cummins India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CUPID,Cupid Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+CYIENT,Cyient Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DLF,DLF Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DOMS,DOMS Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DABUR,Dabur India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DALBHARAT,Dalmia Bharat Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DATAPATTNS,Data Patterns (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DEEPAKFERT,Deepak Fertilisers & Petrochemicals Corp. Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DEEPAKNTR,Deepak Nitrite Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DELHIVERY,Delhivery Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DEVYANI,Devyani International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DIVISLAB,Divi's Laboratories Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DIXON,Dixon Technologies (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LALPATHLAB,Dr. Lal Path Labs Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+DRREDDY,Dr. Reddy's Laboratories Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EIDPARRY,E.I.D. Parry (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EIHOTEL,EIH Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EMBASSY,EMBASSY OFFICE PARKS REIT,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EICHERMOT,Eicher Motors Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ELECON,Elecon Engineering Co. Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ELGIEQUIP,Elgi Equipments Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EMAMILTD,Emami Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EMCURE,Emcure Pharmaceuticals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EMMVEE,Emmvee Photovoltaic Power Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ENDURANCE,Endurance Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ENGINERSIN,Engineers India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ESCORTS,Escorts Kubota Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ETERNAL,Eternal Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+EXIDEIND,Exide Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NYKAA,FSN E-Commerce Ventures Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FEDERALBNK,Federal Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FACT,Fertilisers and Chemicals Travancore Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FINCABLES,Finolex Cables Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FSL,Firstsource Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FIVESTAR,Five-Star Business Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FORCEMOT,Force Motors Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FORTIS,Fortis Healthcare Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FRACTAL,Fractal Analytics Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GAIL,GAIL (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GVT&D,GE Vernova T&D India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GMRAIRPORT,GMR Airports Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GABRIEL,Gabriel India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GALLANTT,Gallantt Ispat Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GRSE,Garden Reach Shipbuilders & Engineers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GICRE,General Insurance Corporation of India,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GILLETTE,Gillette India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GLAND,Gland Pharma Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GLAXO,Glaxosmithkline Pharmaceuticals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GLENMARK,Glenmark Pharmaceuticals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MEDANTA,Global Health Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GPIL,Godawari Power & Ispat Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GODFRYPHLP,Godfrey Phillips India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GODREJCP,Godrej Consumer Products Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GODREJIND,Godrej Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GODREJPROP,Godrej Properties Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GRANULES,Granules India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GRAPHITE,Graphite India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GRASIM,Grasim Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GRAVITA,Gravita India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GESHIP,Great Eastern Shipping Co. Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+FLUOROCHEM,Gujarat Fluorochemicals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+GMDCLTD,Gujarat Mineral Development Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HBLENGINE,HBL Engineering Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HCLTECH,HCL Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HDBFS,HDB Financial Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HDFCAMC,HDFC Asset Management Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HDFCBANK,HDFC Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HDFCLIFE,HDFC Life Insurance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HEGAM,HEG Advanced Materials Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HFCL,HFCL Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HAVELLS,Havells India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HEROMOTOCO,Hero MotoCorp Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HEXT,Hexaware Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HSCL,Himadri Speciality Chemical Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HINDALCO,Hindalco Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HAL,Hindustan Aeronautics Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HINDCOPPER,Hindustan Copper Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HINDPETRO,Hindustan Petroleum Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HINDUNILVR,Hindustan Unilever Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HINDZINC,Hindustan Zinc Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+POWERINDIA,Hitachi Energy India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HOMEFIRST,Home First Finance Company India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HONASA,Honasa Consumer Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HONAUT,Honeywell Automation India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HUDCO,Housing & Urban Development Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+HYUNDAI,Hyundai Motor India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ICICIBANK,ICICI Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ICICIGI,ICICI Lombard General Insurance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ICICIAMC,ICICI Prudential Asset Management Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ICICIPRULI,ICICI Prudential Life Insurance Company Ltd.,True,False,True,False,0,0,0,DAILY_MATCH_INTRADAY_FILE_MISSING
+IDBI,IDBI Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IDFCFIRSTB,IDFC First Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IFCI,IFCI Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IIFL,IIFL Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INOXINDIA,INOX India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IRB,IRB Infrastructure Developers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IRCON,IRCON International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ITCHOTELS,ITC Hotels Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ITC,ITC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ITI,ITI Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDIACEM,India Cements Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDIAMART,Indiamart Intermesh Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDIANB,Indian Bank,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IEX,Indian Energy Exchange Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDHOTEL,Indian Hotels Co. Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IOC,Indian Oil Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IOB,Indian Overseas Bank,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IRCTC,Indian Railway Catering And Tourism Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IRFC,Indian Railway Finance Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IREDA,Indian Renewable Energy Development Agency Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IGL,Indraprastha Gas Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDUSTOWER,Indus Towers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDUSINDBK,IndusInd Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NAUKRI,Info Edge (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INFY,Infosys Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INOXWIND,Inox Wind Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INTELLECT,Intellect Design Arena Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+INDIGO,InterGlobe Aviation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IGIL,International Gemological Institute Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IKS,Inventurus Knowledge Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IPCALAB,Ipca Laboratories Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JKCEMENT,J.K. Cement Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JBMA,JBM Auto Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JKTYRE,JK Tyre & Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JMFINANCIL,JM Financial Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JSWCEMENT,JSW Cement Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JSWENERGY,JSW Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JSWINFRA,JSW Infrastructure Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JSWSTEEL,JSW Steel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JAINREC,Jain Resource Recycling Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JPPOWER,Jaiprakash Power Ventures Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+J&KBANK,Jammu & Kashmir Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JINDALSAW,Jindal Saw Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JSL,Jindal Stainless Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JINDALSTEL,Jindal Steel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JIOFIN,Jio Financial Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JUBLFOOD,Jubilant Foodworks Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JUBLINGREA,Jubilant Ingrevia Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JWL,Jupiter Wagons Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+JYOTICNC,Jyoti CNC Automation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KPRMILL,K.P.R. Mill Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KEI,KEI Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KPITTECH,KPIT Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KSB,KSB Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KAJARIACER,Kajaria Ceramics Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KPIL,Kalpataru Projects International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KALYANKJIL,Kalyan Jewellers India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KARURVYSYA,Karur Vysya Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KAYNES,Kaynes Technology India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KEC,Kec International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KFINTECH,Kfin Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KIRLOSBROS,Kirloskar Brothers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KIRLOSENG,Kirloskar Oil Eng Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KOTAKBANK,Kotak Mahindra Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+KIMS,Krishna Institute of Medical Sciences Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LTF,L&T Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LTTS,L&T Technology Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LGEINDIA,LG Electronics India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LICHSGFIN,LIC Housing Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LTFOODS,LT Foods Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LTM,LTM Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LT,Larsen & Toubro Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LAURUSLABS,Laurus Labs Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LEMONTREE,Lemon Tree Hotels Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LENSKART,Lenskart Solutions Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LICI,Life Insurance Corporation of India,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LINDEINDIA,Linde India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LLOYDSME,Lloyds Metals And Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LODHA,Lodha Developers Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+LUPIN,Lupin Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MMTC,MMTC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MRF,MRF Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MTARTECH,MTAR Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MGL,Mahanagar Gas Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+M&MFIN,Mahindra & Mahindra Financial Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+M&M,Mahindra & Mahindra Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MANAPPURAM,Manappuram Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MRPL,Mangalore Refinery & Petrochemicals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MANKIND,Mankind Pharma Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MARICO,Marico Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MARUTI,Maruti Suzuki India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MFSL,Max Financial Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MAXHEALTH,Max Healthcare Institute Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MAZDOCK,Mazagoan Dock Shipbuilders Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MEESHO,Meesho Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MINDACORP,Minda Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MSUMI,Motherson Sumi Wiring India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MOTILALOFS,Motilal Oswal Financial Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MPHASIS,MphasiS Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MCX,Multi Commodity Exchange of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MUTHOOTFIN,Muthoot Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NATCOPHARM,NATCO Pharma Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NBCC,NBCC (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NCC,NCC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NHPC,NHPC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NLCINDIA,NLC India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NMDC,NMDC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NSLNISP,NMDC Steel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NTPCGREEN,NTPC Green Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NTPC,NTPC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NH,Narayana Hrudayalaya Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NATIONALUM,National Aluminium Co. Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NAVA,Nava Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NAVINFLUOR,Navin Fluorine International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NESTLEIND,Nestle India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NETWEB,Netweb Technologies India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NEULANDLAB,Neuland Laboratories Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NAM-INDIA,Nippon Life India Asset Management Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NUVAMA,Nuvama Wealth Management Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NUVOCO,Nuvoco Vistas Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+OBEROIRLTY,Oberoi Realty Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ONGC,Oil & Natural Gas Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+OIL,Oil India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+OLAELEC,Ola Electric Mobility Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+OLECTRA,Olectra Greentech Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PAYTM,One 97 Communications Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ONESOURCE,Onesource Specialty Pharma Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+OFSS,Oracle Financial Services Software Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+POLICYBZR,PB Fintech Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PCBL,PCBL Chemical Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PGEL,PG Electroplast Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PIIND,PI Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PNBHOUSING,PNB Housing Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PTCIL,PTC Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PVRINOX,PVR INOX Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PAGEIND,Page Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PARADEEP,Paradeep Phosphates Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PATANJALI,Patanjali Foods Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PERSISTENT,Persistent Systems Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PETRONET,Petronet LNG Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PHOENIXLTD,Phoenix Mills Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PWL,Physicswallah Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PIDILITIND,Pidilite Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PINELABS,Pine Labs Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PIRAMALFIN,Piramal Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PPLPHARMA,Piramal Pharma Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+POLYMED,Poly Medicure Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+POLYCAB,Polycab India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+POONAWALLA,Poonawalla Fincorp Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PFC,Power Finance Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+POWERGRID,Power Grid Corporation of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PREMIERENE,Premier Energies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PRESTIGE,Prestige Estates Projects Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PFOCUS,Prime Focus Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PRIVISCL,Privi Speciality Chemicals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+PNB,Punjab National Bank,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RRKABEL,R R Kabel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RBLBANK,RBL Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RECLTD,REC Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RHIM,RHI MAGNESITA INDIA LTD.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RITES,RITES Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RADICO,Radico Khaitan Ltd,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RVNL,Rail Vikas Nigam Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RAILTEL,Railtel Corporation Of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RAINBOW,Rainbow Childrens Medicare Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RKFORGE,Ramkrishna Forgings Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+REDINGTON,Redington Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RELIANCE,Reliance Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RPOWER,Reliance Power Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RUBICON,Rubicon Research Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SBICARD,SBI Cards and Payment Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SBILIFE,SBI Life Insurance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SJVN,SJVN Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SHRIPISTON,SPR Auto Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SRF,SRF Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SAGILITY,Sagility Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SAILIFE,Sai Life Sciences Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SAMMAANCAP,Sammaan Capital Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+MOTHERSON,Samvardhana Motherson International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SANSERA,Sansera Engineering Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SARDAEN,Sarda Energy and Minerals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SCHAEFFLER,Schaeffler India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SCHNEIDER,Schneider Electric Infrastructure Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SCI,Shipping Corporation of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SHREECEM,Shree Cement Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SHRIRAMFIN,Shriram Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SHYAMMETL,Shyam Metalics and Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ENRIN,Siemens Energy India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SIEMENS,Siemens Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SIGNATURE,Signatureglobal (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SOBHA,Sobha Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SOLARINDS,Solar Industries India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SONACOMS,Sona BLW Precision Forgings Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+STARHEALTH,Star Health and Allied Insurance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SBIN,State Bank of India,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SAIL,Steel Authority of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+STLTECH,Sterlite Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SUMICHEM,Sumitomo Chemical India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SUNPHARMA,Sun Pharmaceutical Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SUNTV,Sun TV Network Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SUNDARMFIN,Sundaram Finance Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SUPREMEIND,Supreme Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SUZLON,Suzlon Energy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SWANCORP,Swan Corp Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SWIGGY,Swiggy Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SYNGENE,Syngene International Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+SYRMA,Syrma SGS Technology Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TBOTEK,TBO Tek Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TDPOWERSYS,TD Power Systems Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TVSMOTOR,TVS Motor Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATACAP,Tata Capital Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATACHEM,Tata Chemicals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATACOMM,Tata Communications Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TCS,Tata Consultancy Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATACONSUM,Tata Consumer Products Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATAELXSI,Tata Elxsi Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATAINVEST,Tata Investment Corporation Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TMCV,Tata Motors Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TMPV,Tata Motors Passenger Vehicles Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATAPOWER,Tata Power Co. Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATASTEEL,Tata Steel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TATATECH,Tata Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TTML,Tata Teleservices (Maharashtra) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TECHM,Tech Mahindra Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TECHNOE,Techno Electric & Engineering Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TEGA,Tega Industries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TEJASNET,Tejas Networks Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TENNIND,Tenneco Clean Air India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+THANGAMAYL,Thangamayil Jewellery Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+NIACL,The New India Assurance Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+RAMCOCEM,The Ramco Cements Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+THERMAX,Thermax Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TIMKEN,Timken India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TITAGARH,Titagarh Rail Systems Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TITAN,Titan Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TORNTPHARM,Torrent Pharmaceuticals Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TORNTPOWER,Torrent Power Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TARIL,Transformers And Rectifiers (India) Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TRENT,Trent Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TRIDENT,Trident Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TRITURBINE,Triveni Turbine Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+TIINDIA,Tube Investments of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UCOBANK,UCO Bank,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UNOMINDA,UNO Minda Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UPL,UPL Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UTIAMC,UTI Asset Management Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ULTRACEMCO,UltraTech Cement Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UNIONBANK,Union Bank of India,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UBL,United Breweries Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+UNITDSPR,United Spirits Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+URBANCO,Urban Company Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+USHAMART,Usha Martin Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VTL,Vardhman Textiles Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VBL,Varun Beverages Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VAML,Vedanta Aluminium Metal Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VISL,Vedanta Iron and Steel Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VEDL,Vedanta Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VOGL,Vedanta Oil and Gas Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VEDPOWER,Vedanta Power Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VIJAYA,Vijaya Diagnostic Centre Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VMM,Vishal Mega Mart Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+IDEA,Vodafone Idea Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+VOLTAS,Voltas Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+WAAREEENER,Waaree Energies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+WELCORP,Welspun Corp Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+WELSPUNLIV,Welspun Living Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+WHIRLPOOL,Whirlpool of India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+WIPRO,Wipro Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+WOCKPHARMA,Wockhardt Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+YESBANK,Yes Bank Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ZFCVINDIA,ZF Commercial Vehicle Control Systems India Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ZEEL,Zee Entertainment Enterprises Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ZENTEC,Zen Technologies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ZENSARTECH,Zensar Technolgies Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ZYDUSLIFE,Zydus Lifesciences Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ZYDUSWELL,Zydus Wellness Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH
+ECLERX,eClerx Services Ltd.,True,True,True,True,0,0,0,DAILY_AND_INTRADAY_EXACT_MATCH

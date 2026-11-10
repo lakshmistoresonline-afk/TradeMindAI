@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends
 from backend.core.container import get_stock_service, container
 from backend.services.stock_service import StockService

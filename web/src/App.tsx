@@ -1,39 +1,47 @@
+import React, { lazy, Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+import { ThemeProvider, createTheme, CssBaseline, Box, CircularProgress } from '@mui/material'
 import Layout from './components/Layout'
-// v1.5_SIGNAL_ONLY_LOCKED
-import EquitySignals from './pages/EquitySignals'
-import SignalDetail from './pages/SignalDetail'
-import Performance from './pages/Performance'
-import SystemStatus from './pages/SystemStatus'
-import Login from './pages/Login'
-import Landing from './pages/Landing'
-import Methodology from './pages/Methodology'
-import Trust from './pages/Trust'
-import Evidence from './pages/Evidence'
-import Pricing from './pages/Pricing'
-import RiskDisclosure from './pages/RiskDisclosure'
-import Terms from './pages/Terms'
-import Privacy from './pages/Privacy'
-import Checkout from './pages/Checkout'
-import Account from './pages/Account'
-import UserDashboard from './pages/UserDashboard'
-import AdminDashboard from './pages/AdminDashboard'
-import AdminSignals from './pages/AdminSignals'
-import AdminDataFeeds from './pages/AdminDataFeeds'
 import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 
+// Lazy-loaded Route Components for Optimal Code Splitting
+const Landing = lazy(() => import('./pages/Landing'))
+const Login = lazy(() => import('./pages/Login'))
+const EquitySignals = lazy(() => import('./pages/EquitySignals'))
+const SignalDetail = lazy(() => import('./pages/SignalDetail'))
+const Performance = lazy(() => import('./pages/Performance'))
+const SystemStatus = lazy(() => import('./pages/SystemStatus'))
+const Methodology = lazy(() => import('./pages/Methodology'))
+const Trust = lazy(() => import('./pages/Trust'))
+const Evidence = lazy(() => import('./pages/Evidence'))
+const Pricing = lazy(() => import('./pages/Pricing'))
+const RiskDisclosure = lazy(() => import('./pages/RiskDisclosure'))
+const Terms = lazy(() => import('./pages/Terms'))
+const Privacy = lazy(() => import('./pages/Privacy'))
+const Checkout = lazy(() => import('./pages/Checkout'))
+const Account = lazy(() => import('./pages/Account'))
+const UserDashboard = lazy(() => import('./pages/UserDashboard'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const AdminSignals = lazy(() => import('./pages/AdminSignals'))
+const AdminDataFeeds = lazy(() => import('./pages/AdminDataFeeds'))
+
+const PageFallback = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+    <CircularProgress size={32} sx={{ color: '#00D1FF' }} />
+  </Box>
+)
+
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageFallback />;
   if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
 const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAdmin, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageFallback />;
   if (!user || !isAdmin) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 };
@@ -121,58 +129,60 @@ function App() {
       <AuthProvider>
         <Router>
           <ScrollToTop />
-          <Routes>
-            {/* PUBLIC MARKETING & LANDING ROUTES */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
+              {/* PUBLIC MARKETING & LANDING ROUTES */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
 
-            {/* PUBLIC RESEARCH & PERFORMANCE PAGES (Accessible without signing in) */}
-            <Route path="/performance" element={<Layout><Performance /></Layout>} />
-            <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
-            <Route path="/trust" element={<Layout><Trust /></Layout>} />
-            <Route path="/methodology" element={<Layout><Methodology /></Layout>} />
-            <Route path="/how-it-works" element={<Layout><Methodology /></Layout>} />
-            <Route path="/evidence" element={<Layout><Evidence /></Layout>} />
-            <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
-            <Route path="/faq" element={<Layout><Pricing /></Layout>} />
-            <Route path="/risk-disclosure" element={<RiskDisclosure />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
+              {/* PUBLIC RESEARCH & PERFORMANCE PAGES */}
+              <Route path="/performance" element={<Layout><Performance /></Layout>} />
+              <Route path="/accuracy" element={<Navigate to="/performance" replace />} />
+              <Route path="/trust" element={<Layout><Trust /></Layout>} />
+              <Route path="/methodology" element={<Layout><Methodology /></Layout>} />
+              <Route path="/how-it-works" element={<Layout><Methodology /></Layout>} />
+              <Route path="/evidence" element={<Layout><Evidence /></Layout>} />
+              <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
+              <Route path="/faq" element={<Layout><Pricing /></Layout>} />
+              <Route path="/risk-disclosure" element={<RiskDisclosure />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
 
-            {/* PROTECTED APPLICATION ROUTES (Wrapped inside AuthGuard) */}
-            <Route path="/*" element={
-              <AuthGuard>
-                <Layout>
-                  <Routes>
-                    {/* User Experience (Consumer Signals & Application Pages) */}
-                    <Route path="/dashboard" element={<UserDashboard />} />
-                    <Route path="/signals" element={<EquitySignals />} />
-                    <Route path="/signals/:id" element={<SignalDetail />} />
-                    <Route path="/account" element={<Account />} />
-                    <Route path="/checkout/:planId" element={<Checkout />} />
+              {/* PROTECTED APPLICATION ROUTES (Wrapped inside AuthGuard) */}
+              <Route path="/*" element={
+                <AuthGuard>
+                  <Layout>
+                    <Routes>
+                      {/* User Experience (Consumer Signals & Application Pages) */}
+                      <Route path="/dashboard" element={<UserDashboard />} />
+                      <Route path="/signals" element={<EquitySignals />} />
+                      <Route path="/signals/:id" element={<SignalDetail />} />
+                      <Route path="/account" element={<Account />} />
+                      <Route path="/checkout/:planId" element={<Checkout />} />
 
-                    {/* Admin Experience (Guarded) */}
-                    <Route path="/admin/*" element={
-                      <AdminGuard>
-                        <Routes>
-                          <Route path="dashboard" element={<AdminDashboard />} />
-                          <Route path="signals" element={<AdminSignals />} />
-                          <Route path="data" element={<AdminDataFeeds />} />
-                          <Route path="status" element={<SystemStatus />} />
-                          <Route path="*" element={<Navigate to="dashboard" replace />} />
-                        </Routes>
-                      </AdminGuard>
-                    } />
+                      {/* Admin Experience (Guarded) */}
+                      <Route path="/admin/*" element={
+                        <AdminGuard>
+                          <Routes>
+                            <Route path="dashboard" element={<AdminDashboard />} />
+                            <Route path="signals" element={<AdminSignals />} />
+                            <Route path="data" element={<AdminDataFeeds />} />
+                            <Route path="status" element={<SystemStatus />} />
+                            <Route path="*" element={<Navigate to="dashboard" replace />} />
+                          </Routes>
+                        </AdminGuard>
+                      } />
 
-                    <Route path="/status" element={<Navigate to="/admin/status" replace />} />
+                      <Route path="/status" element={<Navigate to="/admin/status" replace />} />
 
-                    {/* Fallback to Dashboard */}
-                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                  </Routes>
-                </Layout>
-              </AuthGuard>
-            } />
-          </Routes>
+                      {/* Fallback to Dashboard */}
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    </Routes>
+                  </Layout>
+                </AuthGuard>
+              } />
+            </Routes>
+          </Suspense>
         </Router>
       </AuthProvider>
     </ThemeProvider>

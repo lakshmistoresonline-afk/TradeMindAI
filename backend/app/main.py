@@ -8,6 +8,7 @@ Incorporates modular routers and non-destructive database auto-seeding on startu
 
 import logging
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -16,41 +17,10 @@ from backend.app.db.database import Base, engine
 from backend.app.db.seed import seed_local_database
 from backend.app.api import health, ticker, indicators, signals, import_data
 from backend.api.v1.api import api_router
+from backend.core.postgres import Base as PostgresBase, engine as postgres_engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("TradeMindAI")
-
-app = FastAPI(
-    title="TradeMindAI Local Offline API",
-    version="2.3.0-LOCAL",
-    description="100% Offline Local Quantitative Signal & TA Engine"
-)
-
-# Enable CORS with explicit authorized origins (no wildcard with credentials in any environment)
-allowed_origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:8000",
-    "https://com-webcraft-trademindai-c8f75.web.app"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept"],
-)
-
-# Include Canonical V1 API Router and Modular Local Routers
-app.include_router(api_router, prefix="/api/v1")
-app.include_router(health.router)
-app.include_router(ticker.router)
-app.include_router(indicators.router)
-app.include_router(signals.router)
-app.include_router(import_data.router)
-
-from backend.core.postgres import Base as PostgresBase, engine as postgres_engine
 
 def ensure_sqlite_columns(eng=None):
     """
@@ -58,7 +28,7 @@ def ensure_sqlite_columns(eng=None):
     Inspects each required target price column independently and adds missing ones.
     Fails safely on error instead of silently swallowing.
     """
-    target_engine = eng if eng is not None else postgres_engine
+    target_engine = eng if eng is not None else engine
     engine_url_str = str(target_engine.url).lower()
     if "sqlite" not in engine_url_str:
         logger.info("[Migration] Non-SQLite engine detected (%s). Skipping SQLite migration.", engine_url_str)
@@ -66,7 +36,6 @@ def ensure_sqlite_columns(eng=None):
 
     try:
         with target_engine.connect() as conn:
-            from sqlalchemy import text
             for table_name in ["live_signals", "shadow_signals"]:
                 tables = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name=:t"), {"t": table_name}).fetchall()
                 if not tables:
@@ -92,44 +61,52 @@ def ensure_sqlite_columns(eng=None):
         logger.exception("[Migration] CRITICAL: Failed to ensure SQLite columns for live_signals/shadow_signals: %s", e)
         raise RuntimeError(f"Database migration failed: {e}") from e
 
-def ensure_active_signal_idempotency_index():
+def ensure_active_signal_idempotency_index(eng=None):
     """
-    Safely inspects existing active records for duplicate (symbol, timeframe) pairs,
+    Safely inspects existing active records for duplicate (symbol) active records,
     reports conflicts without deleting data, and creates the unique index if clean.
+    Supports both SQLite and PostgreSQL engines without throwing dialect errors.
     """
+    target_engine = eng if eng is not None else engine
     try:
-        with engine.connect() as conn:
-            tables = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='live_signals'")).fetchall()
+        with target_engine.connect() as conn:
+            engine_url_str = str(target_engine.url).lower()
+            if "sqlite" in engine_url_str:
+                tables = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='live_signals'")).fetchall()
+            else:
+                tables = conn.execute(text("SELECT table_name FROM information_schema.tables WHERE table_name='live_signals'")).fetchall()
+
             if not tables:
                 return
 
             dups = conn.execute(text(
-                "SELECT symbol, timeframe, COUNT(*) as cnt FROM live_signals WHERE status = 'ACTIVE' GROUP BY symbol, timeframe HAVING cnt > 1"
+                "SELECT symbol, COUNT(*) as cnt FROM live_signals WHERE status = 'ACTIVE' GROUP BY symbol HAVING cnt > 1"
             )).fetchall()
 
             if dups:
                 dup_list = [dict(row._mapping) for row in dups]
-                logger.error("[Migration] CRITICAL: Existing duplicate active signals found for (symbol, timeframe): %s", dup_list)
+                logger.error("[Migration] CRITICAL: Existing duplicate active signals found for symbol: %s", dup_list)
                 raise RuntimeError(f"Database migration blocked: Existing duplicate active signals found: {dup_list}. Manual reconciliation required.")
 
-            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_active_signal ON live_signals (symbol, timeframe) WHERE status = 'ACTIVE'"))
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_active_signal ON live_signals (symbol) WHERE status = 'ACTIVE'"))
             conn.commit()
-            logger.info("[Migration] Database partial unique index 'idx_unique_active_signal' verified successfully.")
+            logger.info("[Migration] Database partial unique index 'idx_unique_active_signal' verified successfully on %s.", target_engine.name)
     except Exception as e:
         if "Database migration blocked" in str(e):
             raise e
         logger.warning("[Migration] Active signal unique index verification notice: %s", e)
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app_instance: FastAPI):
     """
+    Lifespan event handler replacing deprecated @app.on_event startup.
     Non-destructive schema verification and safe database seeder on application startup.
     """
     logger.info("[Startup] Verifying non-destructive database tables...")
     Base.metadata.create_all(bind=engine)
     PostgresBase.metadata.create_all(bind=postgres_engine)
-    ensure_sqlite_columns()
-    ensure_active_signal_idempotency_index()
+    ensure_sqlite_columns(eng=engine)
+    ensure_active_signal_idempotency_index(eng=engine)
 
     try:
         from fastapi_cache import FastAPICache
@@ -146,16 +123,44 @@ def on_startup():
     else:
         logger.info("[Startup] Seed data skipped (SEED_DATA_ALLOWED=false fail-closed guard).")
     logger.info("[Startup] TradeMindAI Local Offline Server ready.")
+    yield
+
+app = FastAPI(
+    title="TradeMindAI Local Offline API",
+    version="2.3.0-LOCAL",
+    description="100% Offline Local Quantitative Signal & TA Engine",
+    lifespan=lifespan
+)
+
+# Enable CORS with explicit authorized origins
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "https://com-webcraft-trademindai-c8f75.web.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
+)
+
+# Include Canonical V1 API Router and Modular Local Routers
+app.include_router(api_router, prefix="/api/v1")
+app.include_router(health.router)
+app.include_router(ticker.router)
+app.include_router(indicators.router)
+app.include_router(signals.router)
+app.include_router(import_data.router)
 
 @app.get("/")
-def root():
+async def root():
     return {
-        "app": "TradeMindAI Local Server",
-        "version": "v2.3.0-LOCAL",
-        "mode": "100% OFFLINE",
-        "docs": "/docs"
+        "app": "TradeMindAI Local Offline Server",
+        "status": "HEALTHY",
+        "version": "2.3.0-LOCAL",
+        "environment": os.getenv("ENVIRONMENT", "development")
     }
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)

@@ -2,10 +2,10 @@ import os
 import datetime
 from datetime import timezone
 import uuid
-
 import json
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from backend.core.postgres import LiveSignalDB, ShadowSignalDB, SessionLocal
 from backend.core.database import db_client
 from backend.domain.models.ios import LiveSignal
@@ -27,19 +27,27 @@ class SignalLedgerService:
     """
 
     @staticmethod
-    async def create_signal(signal: LiveSignal, session: Optional[Session] = None) -> LiveSignal:
+    async def _create_signal_internal(signal: LiveSignal, session: Optional[Session] = None) -> Dict[str, Any]:
         """
-        Atomically creates a signal in Neon and mirrors to Firestore.
-        Enforces BUY-only eligibility and persistence-level idempotency by symbol and timeframe,
-        allowing distinct horizons (SHORT, SWING, LONG) to coexist.
+        Internal implementation of atomic signal creation & persistence outcome mapping.
+        Distinguishes PERSISTED, DUPLICATE_PREVENTED, REJECTED_NON_BUY, and PERSISTENCE_FAILED.
         """
         if not is_eligible_buy(signal):
-            raise ValueError("Signal violates BUY-only eligibility policy and cannot be persisted.")
+            return {
+                "status": "REJECTED_NON_BUY",
+                "signal": None,
+                "inserted": False,
+                "duplicate_reason": "INELIGIBLE_RATING_OR_STATUS",
+                "error_detail": "Signal violates BUY-only eligibility policy and cannot be persisted.",
+                "mirror_status": "SKIPPED"
+            }
 
         if "PYTEST_CURRENT_TEST" in os.environ and session is None:
             raise RuntimeError("Unisolated database session detected during pytest execution! Explicit test session fixture is required.")
 
+        is_caller_session = session is not None
         db = session or SessionLocal()
+        norm_symbol = signal.symbol.strip().upper()
         try:
             tf = getattr(signal, "timeframe", None)
             if not tf and hasattr(signal, "decision") and signal.decision:
@@ -47,170 +55,242 @@ class SignalLedgerService:
             if not tf:
                 tf = "SWING"
 
-            # Global Uniqueness Invariant: Enforce at most ONE active signal per stock globally across all timeframes and strategies
+            # Check Phase 9.4.3 Global Uniqueness Invariant: Enforce at most 1 active signal per stock symbol globally
             existing = db.query(LiveSignalDB).filter(
-                LiveSignalDB.symbol == signal.symbol,
+                LiveSignalDB.symbol == norm_symbol,
                 LiveSignalDB.status == "ACTIVE"
             ).first()
             if existing:
-                print(f"[SignalLedger] Global Uniqueness Invariant: Active signal for {signal.symbol} already exists (timeframe: {existing.timeframe}). Returning existing active record.")
-                return container.ios_repo._map_db_to_live_signal(existing)
+                mapped_existing = container.ios_repo._map_db_to_live_signal(existing)
+                return {
+                    "status": "DUPLICATE_PREVENTED",
+                    "signal": mapped_existing,
+                    "inserted": False,
+                    "duplicate_reason": f"ACTIVE_SIGNAL_EXISTS_FOR_SYMBOL: {norm_symbol} (existing_id: {existing.id})",
+                    "error_detail": None,
+                    "mirror_status": "SKIPPED"
+                }
 
-            # 1. Neon Persistence
+            # 1. Authoritative Database Insertion (Neon/Postgres)
             signal_data = signal.model_dump()
-
-            # Handle JSON fields for SQLAlchemy
-            if "provenance" in signal_data and signal_data["provenance"]:
-                if isinstance(signal_data["provenance"], dict):
-                    signal_data["provenance"] = json.dumps(signal_data["provenance"], cls=CustomJSONEncoder)
-            else:
-                signal_data["provenance"] = json.dumps({}, cls=CustomJSONEncoder)
-
-            if "events" in signal_data:
-                evs = signal_data["events"]
-                if isinstance(evs, list):
-                    signal_data["events"] = json.dumps([e.model_dump() if hasattr(e, "model_dump") else e for e in evs], cls=CustomJSONEncoder)
-                else:
-                    signal_data["events"] = json.dumps([], cls=CustomJSONEncoder)
-            else:
-                signal_data["events"] = json.dumps([], cls=CustomJSONEncoder)
-
-            db_obj = LiveSignalDB(**{k: v for k, v in signal_data.items() if hasattr(LiveSignalDB, k)})
-            db.add(db_obj)
-
-            # 1.5 Provenance Enforcement (Audit Phase 1.3)
-            if signal.provenance:
-                from backend.core.postgres import ShadowProvenanceDB
-                prov = signal.provenance
-                prov_obj = ShadowProvenanceDB(
-                    id=prov.get("provenance_id", str(uuid.uuid4())),
-                    signal_id=signal.id,
-                    prediction_id=signal.prediction_id,
-                    data_snapshot_timestamp=prov.get("data_snapshot_timestamp"),
-                    model_version=prov.get("model_version"),
-                    strategy_version=prov.get("strategy_version", "v2.2"),
-                    feature_version=prov.get("feature_version"),
-                    data_sources=json.dumps(prov.get("data_sources")),
-                    source_timestamps=json.dumps(prov.get("source_timestamps")),
-                    input_hash=prov.get("input_hash"),
-                    output_hash=prov.get("output_hash"),
-                    decision_hash=prov.get("decision_hash")
-                )
-                db.add(prov_obj)
-
-            db.commit()
-            db.refresh(db_obj)
-
-            # 2. Firestore Mirror (Only on genuine new successful PostgreSQL insertion)
-            if db_client:
-                import asyncio
-                def run_mirror():
-                    try:
-                        mirror_data = signal.model_dump()
-                        mirror_data["mirrored_at"] = datetime.datetime.now(timezone.utc).isoformat()
-                        mirror_data["source_neon_id"] = signal.id
-                        db_client.collection("signals").document(signal.id).set(mirror_data)
-                    except Exception as e:
-                        print(f"[SignalLedger] Mirror failed for {signal.id}: {e}")
-
-                asyncio.create_task(asyncio.to_thread(run_mirror))
-
-            return signal
-
-        except Exception as e:
-            db.rollback()
-            err_str = str(e).lower()
-            is_unique_violation = (
-                "unique constraint failed" in err_str or
-                "integrityerror" in type(e).__name__.lower() or
-                "duplicate key value violates unique constraint" in err_str or
-                "idx_unique_active_signal" in err_str
+            db_signal = LiveSignalDB(
+                id=signal.id,
+                symbol=norm_symbol,
+                direction=getattr(signal, "direction", "LONG"),
+                rating=getattr(signal, "rating", "BUY"),
+                timeframe=tf,
+                status=signal.status,
+                entry_price=getattr(signal, "entry_price", None),
+                target_price=getattr(signal, "target_price", None),
+                stop_price=getattr(signal, "stop_price", None),
+                confidence=getattr(signal, "confidence", getattr(signal, "conviction", 0.0)),
+                created_at=getattr(signal, "created_at", datetime.datetime.now(timezone.utc))
             )
-            if is_unique_violation:
-                existing = db.query(LiveSignalDB).filter(
-                    LiveSignalDB.symbol == signal.symbol,
-                    LiveSignalDB.status == "ACTIVE"
-                ).first()
-                if existing:
-                    print(f"[SignalLedger] Global Uniqueness Invariant: Duplicate active signal for {signal.symbol} caught via DB constraint. Returning existing persisted record.")
-                    return container.ios_repo._map_db_to_live_signal(existing)
+            db.add(db_signal)
 
-            # Unrelated integrity errors propagate normally and are not swallowed
-            raise e
+            if is_caller_session:
+                db.flush()
+                db.refresh(db_signal)
+                status_code = "PENDING_CALLER_COMMIT"
+            else:
+                db.commit()
+                db.refresh(db_signal)
+                status_code = "PERSISTED_AND_COMMITTED"
+
+            mapped_inserted = container.ios_repo._map_db_to_live_signal(db_signal)
+
+            # 2. Firestore Secondary Mirroring (Deferred for caller sessions, non-blocking for internal committed sessions)
+            mirror_status = "DEFERRED_UNTIL_CALLER_COMMIT" if is_caller_session else "SKIPPED"
+            if not is_caller_session:
+                try:
+                    if db_client:
+                        fs_doc = db_client.collection("signals").document(signal.id)
+                        json_safe_data = json.loads(json.dumps(signal_data, cls=CustomJSONEncoder))
+                        fs_doc.set(json_safe_data)
+                        mirror_status = "SUCCESS"
+                except Exception as fs_ex:
+                    mirror_status = "FAILED"
+                    print(f"[SignalLedger] Non-fatal Firestore mirror warning: {fs_ex}")
+
+            return {
+                "status": status_code,
+                "signal": mapped_inserted,
+                "inserted": True,
+                "duplicate_reason": None,
+                "error_detail": None,
+                "mirror_status": mirror_status
+            }
+        except IntegrityError:
+            if not is_caller_session:
+                db.rollback()
+            existing_after_race = db.query(LiveSignalDB).filter(
+                LiveSignalDB.symbol == norm_symbol,
+                LiveSignalDB.status == "ACTIVE"
+            ).first()
+            if existing_after_race:
+                mapped_race = container.ios_repo._map_db_to_live_signal(existing_after_race)
+                return {
+                    "status": "DUPLICATE_PREVENTED",
+                    "signal": mapped_race,
+                    "inserted": False,
+                    "duplicate_reason": f"CONCURRENT_UNIQUE_CONFLICT: {norm_symbol}",
+                    "error_detail": None,
+                    "mirror_status": "SKIPPED"
+                }
+            raise
+        except Exception as ex:
+            if not is_caller_session:
+                db.rollback()
+            raise ex
         finally:
-            if not session:
+            if not is_caller_session:
                 db.close()
+
+    @staticmethod
+    async def create_signal(signal: LiveSignal, session: Optional[Session] = None) -> LiveSignal:
+        """
+        Atomically creates a signal in Neon and mirrors to Firestore.
+        Enforces BUY-only eligibility and Phase 9.4.3 Global Uniqueness Invariant.
+        Returns the authoritative LiveSignal instance.
+        """
+        res = await SignalLedgerService._create_signal_internal(signal, session=session)
+        if res["status"] == "REJECTED_NON_BUY":
+            raise ValueError(res.get("error_detail", "Signal violates BUY-only eligibility policy."))
+        if res["status"] == "PERSISTENCE_FAILED":
+            raise RuntimeError(res.get("error_detail", "Persistence failed."))
+        return res["signal"]
+
+    @staticmethod
+    async def mirror_signal_after_commit(signal: LiveSignal) -> Dict[str, Any]:
+        """
+        Secondary Firestore Mirroring helper (Runs ONLY after caller transaction commit succeeds).
+        Does NOT commit or alter caller database transactions.
+        """
+        mirror_status = "SKIPPED"
+        try:
+            if db_client:
+                signal_data = signal.model_dump()
+                fs_doc = db_client.collection("signals").document(signal.id)
+                json_safe_data = json.loads(json.dumps(signal_data, cls=CustomJSONEncoder))
+                fs_doc.set(json_safe_data)
+                mirror_status = "SUCCESS"
+        except Exception as fs_ex:
+            mirror_status = "FAILED"
+            print(f"[SignalLedger] Post-commit Firestore mirror warning: {fs_ex}")
+
+        return {
+            "status": "MIRRORED",
+            "signal_id": signal.id,
+            "mirror_status": mirror_status
+        }
+
+    @staticmethod
+    async def persist_signal(signal: LiveSignal, session: Optional[Session] = None) -> Dict[str, Any]:
+        """
+        Persists candidate signal to ledger cleanly, returning status dictionary for service scan funnel accounting.
+        Distinguishes PERSISTED, DUPLICATE_PREVENTED, REJECTED_NON_BUY, and PERSISTENCE_FAILED.
+        """
+        try:
+            return await SignalLedgerService._create_signal_internal(signal, session=session)
+        except Exception as ex:
+            return {
+                "status": "PERSISTENCE_FAILED",
+                "signal": None,
+                "inserted": False,
+                "duplicate_reason": None,
+                "error_detail": str(ex),
+                "mirror_status": "FAILED"
+            }
 
     @staticmethod
     async def update_signal(signal_id: str, updates: Dict[str, Any], session: Optional[Session] = None) -> bool:
         """
-        Updates a signal in Neon and syncs to Firestore.
+        Updates a signal in Neon/Postgres while strictly preserving caller transaction ownership.
+        Caller-owned sessions execute `db.flush()` and `db.refresh()`, leaving `commit()` to the caller.
+        Internally created sessions execute `db.commit()` and `db.close()`.
+        Returns True on success, False if signal not found, blocked by immutability rules, or on error.
         """
-        db = session or SessionLocal()
+        is_caller_session = session is not None
+        db = session if session is not None else SessionLocal()
         try:
-            db_obj = db.query(LiveSignalDB).filter(LiveSignalDB.id == signal_id).first()
-            if not db_obj:
+            db_signal = db.query(LiveSignalDB).filter(LiveSignalDB.id == signal_id).first()
+            if not db_signal:
                 return False
 
-            # 1. Immutability Protection (Phase 3 Final Truth Lock)
             TERMINAL_STATES = ["TARGET_HIT", "STOP_LOSS", "EXPIRED", "CANCELLED", "AMBIGUOUS"]
-            if db_obj.status in TERMINAL_STATES:
-                RESTRICTED_FIELDS = [
-                    "symbol", "direction", "asset_class", "instrument_id",
-                    "entry_price", "target_price", "stop_price", "profit_pct",
-                    "status", "outcome_date", "exit_price", "realized_return",
-                    "decision_timestamp", "strategy_version", "signal_version",
-                    "model_id", "model_version", "model_hash", "feature_version",
-                    "feature_hash", "prediction_id", "provenance_id", "decision_hash"
-                ]
+
+            # 1. Reopen protection: Reject updates attempting to change status from terminal back to non-terminal
+            if db_signal.status in TERMINAL_STATES:
+                new_status = updates.get("status")
+                if new_status and new_status not in TERMINAL_STATES:
+                    print(f"[SignalLedger] Update BLOCKED: Cannot reopen terminal signal {signal_id} (status: {db_signal.status} -> {new_status}).")
+                    return False
+
+            # 2. Immutability protection on core strategy facts & lineage fields
+            RESTRICTED_FIELDS = [
+                "symbol", "direction", "asset_type", "asset_class", "instrument_id",
+                "entry_price", "target_price", "stop_price", "profit_pct",
+                "outcome_date", "exit_price", "realized_return",
+                "decision_timestamp", "strategy_version", "signal_version",
+                "model_id", "model_version", "model_hash",
+                "feature_version", "feature_hash", "prediction_id", "provenance_id", "decision_hash"
+            ]
+
+            # If signal is already terminal, block changes to any restricted fields
+            if db_signal.status in TERMINAL_STATES:
                 for key in updates:
                     if key in RESTRICTED_FIELDS:
-                        print(f"[SignalLedger] Update BLOCKED: Signal {signal_id} is in terminal state {db_obj.status}. Cannot mutate immutable fact: {key}")
+                        print(f"[SignalLedger] Update BLOCKED: Signal {signal_id} is in terminal state {db_signal.status}. Cannot mutate field: {key}")
                         return False
 
+            # If transitioning to terminal, block simultaneous modification of core strategy entry facts
+            proposed_status = updates.get("status")
+            if proposed_status in TERMINAL_STATES and db_signal.status not in TERMINAL_STATES:
+                CORE_ENTRY_FACTS = ["entry_price", "symbol", "direction", "strategy_version", "model_version", "prediction_id"]
+                for key in updates:
+                    if key in CORE_ENTRY_FACTS:
+                        print(f"[SignalLedger] Update BLOCKED: Cannot mutate core entry fact {key} during terminal transition.")
+                        return False
 
-            for key, value in updates.items():
-                if hasattr(db_obj, key):
-                    if key in ["provenance", "events"] and isinstance(value, (dict, list)):
-                        setattr(db_obj, key, json.dumps(value))
+            # Check unknown fields
+            for k in updates:
+                if not hasattr(db_signal, k) and k not in ("asset_class", "profit_pct", "outcome_date", "realized_return", "decision_hash"):
+                    print(f"[SignalLedger] Update BLOCKED: Unknown field {k} supplied.")
+                    return False
+
+            for k, v in updates.items():
+                if hasattr(db_signal, k):
+                    if k in ["provenance", "events"] and isinstance(v, (dict, list)):
+                        setattr(db_signal, k, json.dumps(v))
                     else:
-                        setattr(db_obj, key, value)
+                        setattr(db_signal, k, v)
 
-            db_obj.updated_at = datetime.datetime.now(timezone.utc)
-            db.commit()
+            db_signal.updated_at = datetime.datetime.now(timezone.utc)
 
-            # Mirror to Firestore (P1 Hardening: Run in thread to avoid blocking loop)
-            if db_client:
-                import asyncio
-                def run_mirror_update():
-                    try:
-                        db_client.collection("signals").document(signal_id).update(updates)
-                    except Exception as e:
-                        print(f"[SignalLedger] Mirror update failed for {signal_id}: {e}")
-
-                asyncio.create_task(asyncio.to_thread(run_mirror_update))
+            if is_caller_session:
+                db.flush()
+                db.refresh(db_signal)
+            else:
+                db.commit()
+                db.refresh(db_signal)
 
             return True
-
-        except Exception as e:
-            db.rollback()
-            raise e
+        except Exception as ex:
+            if not is_caller_session:
+                db.rollback()
+            return False
         finally:
-            if not session:
+            if not is_caller_session:
                 db.close()
 
     @staticmethod
-    async def get_signal(signal_id: str) -> Optional[LiveSignal]:
-        db = SessionLocal()
+    async def get_signal(signal_id: str, session: Optional[Session] = None) -> Optional[LiveSignal]:
+        db = session or SessionLocal()
         try:
-            db_obj = db.query(LiveSignalDB).filter(LiveSignalDB.id == signal_id).first()
-            if db_obj:
-                return container.ios_repo._map_db_to_live_signal(db_obj)
-
-            db_obj_h = db.query(ShadowSignalDB).filter(ShadowSignalDB.id == signal_id).first()
-            if db_obj_h:
-                return container.ios_repo._map_db_to_live_signal(db_obj_h)
-
-            return None
+            db_signal = db.query(LiveSignalDB).filter(LiveSignalDB.id == signal_id).first()
+            if not db_signal:
+                return None
+            return container.ios_repo._map_db_to_live_signal(db_signal)
         finally:
-            db.close()
+            if session is None:
+                db.close()
