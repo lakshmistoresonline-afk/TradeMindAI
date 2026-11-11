@@ -47,13 +47,19 @@ class SignalQualityService:
         return "EXPERIMENTAL"
 
     @staticmethod
-    def should_publish(horizon: str, model: Optional[ModelMetadata], calibrated_prob: float) -> bool:
+    def should_publish(horizon: str, model: Optional[ModelMetadata], calibrated_prob: float, is_calibrated: bool = True) -> bool:
         """
         Strict fail-closed hard gate for signal publication.
         Unregistered model metadata (model is None) unconditionally returns False.
+        Uncalibrated predictions (is_calibrated=False) unconditionally return False.
         """
-        if not model:
+        if not model or not is_calibrated:
             return False
+
+        # If model explicitly specifies calibration_metadata, verify it is not marked uncalibrated
+        if model.calibration_metadata is not None and isinstance(model.calibration_metadata, dict):
+            if model.calibration_metadata.get("is_calibrated") is False:
+                return False
 
         hp = model.hyperparameters or {}
         test_size = hp.get("test_size", 0)

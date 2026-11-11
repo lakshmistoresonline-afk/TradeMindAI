@@ -45,7 +45,8 @@ def create_test_model_metadata(**kwargs) -> ModelMetadata:
         "is_champion": True,
         "status": "CHAMPION",
         "last_trained": datetime.now(timezone.utc),
-        "hyperparameters": {"test_size": 100, "positives_test": 30, "feature_names": ["f1", "f2"]}
+        "hyperparameters": {"test_size": 100, "positives_test": 30, "feature_names": ["f1", "f2"]},
+        "calibration_metadata": {"method": "isotonic", "calibrator_file": "INFY_SWING_calib.joblib"}
     }
     defaults.update(kwargs)
     return ModelMetadata(**defaults)
@@ -164,3 +165,16 @@ def test_phase_c_signal_quality_service_fails_closed_on_unregistered_or_weak_mod
         hyperparameters={"test_size": 100, "positives_test": 30}
     )
     assert SignalQualityService.should_publish("SWING", good_model, 0.60) is True
+
+def test_phase_c_signal_quality_service_fails_closed_on_uncalibrated_prediction():
+    good_model = create_test_model_metadata(
+        accuracy=0.65,
+        roc_auc=0.62,
+        hyperparameters={"test_size": 100, "positives_test": 30}
+    )
+    # Uncalibrated prediction (is_calibrated=False) -> should_publish must return False!
+    assert SignalQualityService.should_publish("SWING", good_model, 0.60, is_calibrated=False) is False
+
+    # Model explicitly marked uncalibrated (is_calibrated=False in metadata) -> should_publish must return False!
+    uncalibrated_model = create_test_model_metadata(calibration_metadata={"is_calibrated": False})
+    assert SignalQualityService.should_publish("SWING", uncalibrated_model, 0.60, is_calibrated=True) is False
