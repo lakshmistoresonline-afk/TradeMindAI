@@ -122,10 +122,15 @@ class SignalEngine:
             save=save_prediction
         )
 
-        # 3.5 Extract Probabilities with Forensic Safety
+        # 3.5 Extract Probabilities & Calibration with Forensic Safety
         ml_metadata = ml_res.get("metadata", {})
         if "calibrated_probability_up" not in ml_metadata or "raw_probability_up" not in ml_metadata:
             print(f"   [FORENSIC_FAIL] {symbol} Aborting: Missing ML metadata (Probabilities).")
+            return None
+
+        is_calibrated = ml_res.get("is_calibrated", False) and ml_metadata.get("is_calibrated", False)
+        if not is_calibrated:
+            print(f"   [QUALITY_GATE] {symbol} Aborting: Prediction is uncalibrated.")
             return None
 
         prob_up = ml_metadata["calibrated_probability_up"]
@@ -242,7 +247,7 @@ class SignalEngine:
 
         # 8.5 QUALITY GATE (V2.2)
         champion_model = champion or await container.data_platform_repo.get_champion_model(symbol, horizon=timeframe)
-        if not SignalQualityService.should_publish(timeframe, champion_model, calibrated_prob):
+        if not SignalQualityService.should_publish(timeframe, champion_model, calibrated_prob, is_calibrated=is_calibrated):
             print(f"   [QUALITY_GATE] {symbol} ({timeframe}) failed hard gate.")
             return None
 
