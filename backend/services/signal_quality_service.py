@@ -1,10 +1,11 @@
 """
 ================================================================================
-TradeMindAI: Strict Fail-Closed Signal Quality & Publication Gate Service (v3.10)
+TradeMindAI: Strict Fail-Closed Signal Quality & Publication Gate Service (v3.12)
 ================================================================================
 Phase 11 & Phase 4.3.2 Remediation: Signal Quality & Publication Gates.
 Enforces strict model metadata registration, test sample size, ROC-AUC thresholds,
-and probability calibration requirements. Unregistered models fail closed.
+and mandatory probability calibration requirements. Unregistered or uncalibrated
+models fail closed unconditionally.
 ================================================================================
 """
 
@@ -15,7 +16,7 @@ from backend.domain.models.ios import LiveSignal
 class SignalQualityService:
     """
     Phase 11 & Phase 4.3.2 Remediation: Signal Quality & Publication Gates.
-    Enforces strict fail-closed quality classification and sample size requirements.
+    Enforces strict fail-closed quality classification, sample size, and mandatory calibration rules.
     """
 
     MIN_SAMPLES_PRIMARY = 100
@@ -50,16 +51,17 @@ class SignalQualityService:
     def should_publish(horizon: str, model: Optional[ModelMetadata], calibrated_prob: float, is_calibrated: bool = True) -> bool:
         """
         Strict fail-closed hard gate for signal publication.
-        Unregistered model metadata (model is None) unconditionally returns False.
-        Uncalibrated predictions (is_calibrated=False) unconditionally return False.
+        1. Unregistered model metadata (model is None) unconditionally returns False.
+        2. Uncalibrated predictions (is_calibrated is False) unconditionally return False.
+        3. Calibration metadata explicitly marked is_calibrated=False returns False.
         """
-        if not model or not is_calibrated:
+        if not model or is_calibrated is not True:
             return False
 
-        # If model explicitly specifies calibration_metadata, verify it is not marked uncalibrated
-        if model.calibration_metadata is not None and isinstance(model.calibration_metadata, dict):
-            if model.calibration_metadata.get("is_calibrated") is False:
-                return False
+        # Reject if calibration metadata is explicitly marked uncalibrated
+        calib_meta = getattr(model, "calibration_metadata", None)
+        if calib_meta and isinstance(calib_meta, dict) and calib_meta.get("is_calibrated") is False:
+            return False
 
         hp = model.hyperparameters or {}
         test_size = hp.get("test_size", 0)

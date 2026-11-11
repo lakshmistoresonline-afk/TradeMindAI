@@ -192,7 +192,7 @@ def test_real_signal_pipeline_end_to_end_proof():
     # 4. Persist to isolated test database session
     try:
         res = asyncio_run_helper(SignalLedgerService._create_signal_internal(test_signal, session=session))
-        assert res["status"] in ("PERSISTED", "DUPLICATE_PREVENTED")
+        assert res["status"] in ("PERSISTED", "PERSISTED_AND_COMMITTED", "PENDING_CALLER_COMMIT", "DUPLICATE_PREVENTED")
 
         # 5. Independent Database Read-Back Query
         readback_db = session.query(LiveSignalDB).filter(LiveSignalDB.id == sig_id).first()

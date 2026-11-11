@@ -174,8 +174,15 @@ class EquitySignalGenerationService:
         if not signal:
             return None
 
-        # 5. Validate Quality Gate & BUY Eligibility
-        if not is_eligible_buy(signal) or not SignalQualityService.should_publish(horizon, champion_model, signal.calibrated_probability):
+        # 5. Validate Quality Gate & BUY Eligibility with mandatory calibration status check
+        is_calibrated_model = (
+            champion_model.calibration_metadata is not None
+            and isinstance(champion_model.calibration_metadata, dict)
+            and champion_model.calibration_metadata.get("is_calibrated") is not False
+            and bool(champion_model.calibration_metadata.get("calibrator_file"))
+        )
+
+        if not is_eligible_buy(signal) or not SignalQualityService.should_publish(horizon, champion_model, signal.calibrated_probability, is_calibrated=is_calibrated_model):
             return None
 
         # 6. Validate Risk Geometry & Trade Parameters

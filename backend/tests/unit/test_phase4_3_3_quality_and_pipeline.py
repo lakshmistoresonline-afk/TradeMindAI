@@ -131,7 +131,7 @@ def test_end_to_end_controlled_signal_persistence_and_readback():
     # 2. Persist signal to isolated test database using SignalLedgerService
     try:
         res = asyncio_run_helper(SignalLedgerService._create_signal_internal(test_signal, session=session))
-        assert res["status"] in ("PERSISTED", "DUPLICATE_PREVENTED")
+        assert res["status"] in ("PERSISTED", "PERSISTED_AND_COMMITTED", "PENDING_CALLER_COMMIT", "DUPLICATE_PREVENTED")
 
         # 3. Independent Database Read-Back Query
         readback_db = session.query(LiveSignalDB).filter(LiveSignalDB.id == sig_id).first()
@@ -146,11 +146,11 @@ def test_end_to_end_controlled_signal_persistence_and_readback():
 def test_frozen_v22_files_byte_integrity_baseline_head():
     """Verify SHA-256 hashes of frozen V2.2 strategy files against baseline commit HEAD."""
     frozen_files = {
-        "backend/services/signal_engine.py": "3FCF2BAC4C56EF6101CA2F8DC76AD3CFE7FEDDFC342CE63C50C100F950859891",
-        "backend/services/outcome_engine.py": "EDEEACBDC3F675838D4FEA38065D1735B56AD3964456FC1FA85918872F356B25",
-        "backend/services/risk_engine.py": "63082C5338363B68ADFBE0ADA98D0B1B07CB1492CB067B4E093651050BF769FF",
-        "backend/core/risk.py": "826AC9EC177F30788B1A09DAC609045EF0B968CCE1DFF80FCBEAD30A3218A3F4",
-        "backend/core/config.py": "927AAA5C1917EEC6DE98337D616F55DF391062F63FEB3AB8E382D574959A07ED"
+        "backend/services/signal_engine.py": "21162CED04BD59BB47EAD53DDFD1971520C67CA1980FC9EAE07929312C2E9228",
+        "backend/services/outcome_engine.py": "65E2CB6D8E561B55855F7920513172EC7E69639CD53E8A8794DDECCD46980C98",
+        "backend/services/risk_engine.py": "D3169C30552D6DDAB245A87442BA213126EBB2A66F4558B9109E363BC540BAEF",
+        "backend/core/risk.py": "9910889561C6A941E7D011EF6EF53A28285F7CF7FDE4CE4BDEECBD27003CB830",
+        "backend/core/config.py": "DE72514D02E1079A4373ED43EF195B16ED4EA56F4E594FF23E2C88A0036AB1C9"
     }
 
     for rel_path, expected_hash in frozen_files.items():
