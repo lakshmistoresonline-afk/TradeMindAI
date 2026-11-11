@@ -279,7 +279,8 @@ def test_phase5_genuine_signal_pipeline_end_to_end_proof():
             is_champion=True,
             status="CHAMPION",
             last_trained=now_utc,
-            hyperparameters={"test_size": 100, "positives_test": 40}
+            hyperparameters={"test_size": 100, "positives_test": 40},
+            calibration_metadata={"method": "isotonic", "calibrator_file": "INFY_SWING_p515.joblib", "is_calibrated": True}
         )
 
         async def mock_get_champ(symbol, horizon="SWING"):

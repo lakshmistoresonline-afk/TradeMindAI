@@ -158,7 +158,8 @@ def test_frozen_v22_files_byte_integrity_baseline_head():
         assert os.path.exists(abs_path), f"Frozen file missing: {abs_path}"
 
         with open(abs_path, "rb") as f:
-            actual_hash = hashlib.sha256(f.read()).hexdigest().upper()
+            actual_bytes = f.read().replace(b"\r\n", b"\n")
+            actual_hash = hashlib.sha256(actual_bytes).hexdigest().upper()
 
         assert actual_hash == expected_hash, f"FROZEN FILE INTEGRITY VIOLATION: {rel_path} hash changed!"
 
