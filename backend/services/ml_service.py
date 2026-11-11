@@ -1,11 +1,12 @@
 import joblib
 import os
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import numpy as np
 from backend.domain.models.data_platform import FeatureVector, ModelMetadata, Prediction
 from backend.domain.interfaces.repository import IDataPlatformRepository
+from backend.services.calibration_service import CalibrationService
 
 class MLService:
     def __init__(self, repository: IDataPlatformRepository, model_dir: str = "backend/ml/registry"):
@@ -209,13 +210,22 @@ class MLService:
             }
 
         calibrator = None
-        if champion.calibration_metadata and "calibrator_file" in champion.calibration_metadata:
-            calibrator_path = os.path.join(self.model_dir, champion.calibration_metadata["calibrator_file"])
-            if os.path.exists(calibrator_path):
-                try:
-                    calibrator = joblib.load(calibrator_path)
-                except Exception:
-                    calibrator = None
+        if champion.calibration_metadata and isinstance(champion.calibration_metadata, dict):
+            calib_meta = champion.calibration_metadata
+            # Verify calibrator artifact version and horizon compatibility
+            calib_ver = calib_meta.get("model_version")
+            calib_hor = calib_meta.get("horizon")
+            if (calib_ver and calib_ver != champion.version) or (calib_hor and calib_hor != champion.horizon):
+                calibrator = None
+            else:
+                calib_file = calib_meta.get("calibrator_file")
+                if calib_file and isinstance(calib_file, str):
+                    calibrator_path = os.path.join(self.model_dir, calib_file)
+                    if os.path.exists(calibrator_path):
+                        try:
+                            calibrator = joblib.load(calibrator_path)
+                        except Exception:
+                            calibrator = None
 
         # Feature schema validation
         feature_names = champion.hyperparameters.get("feature_names") if champion.hyperparameters else None
@@ -275,15 +285,45 @@ class MLService:
                 }
             }
 
-        calibrated_prob = CalibrationService.calibrate_isotonic(raw_prob, calibrator_model=calibrator)
-        if not np.isfinite(calibrated_prob) or not (0.0 <= calibrated_prob <= 1.0):
+        if calibrator is not None:
+            try:
+                calibrated_prob = CalibrationService.calibrate_isotonic(raw_prob, calibrator_model=calibrator)
+                if not np.isfinite(calibrated_prob) or not (0.0 <= calibrated_prob <= 1.0):
+                    return {
+                        "prediction": "UNAVAILABLE",
+                        "confidence": 0.0,
+                        "model_version": champion.version,
+                        "is_calibrated": False,
+                        "metadata": {
+                            "status": "INVALID_CALIBRATION_OUTPUT",
+                            "reason": f"Calibrator produced out-of-bounds or non-finite probability: {calibrated_prob}",
+                            "calibrated_probability_up": 0.0,
+                            "raw_probability_up": raw_prob,
+                            "is_calibrated": False
+                        }
+                    }
+            except Exception as ex:
+                return {
+                    "prediction": "UNAVAILABLE",
+                    "confidence": 0.0,
+                    "model_version": champion.version,
+                    "is_calibrated": False,
+                    "metadata": {
+                        "status": "CALIBRATION_FAILURE",
+                        "reason": f"Calibrator execution failed: {ex}",
+                        "calibrated_probability_up": 0.0,
+                        "raw_probability_up": raw_prob,
+                        "is_calibrated": False
+                    }
+                }
+        else:
             calibrated_prob = raw_prob
 
         prediction_label = "UP" if calibrated_prob > 0.55 else "DOWN" if calibrated_prob < 0.45 else "NEUTRAL"
 
         prediction = Prediction(
             symbol=symbol,
-            date=datetime.utcnow(),
+            date=datetime.now(timezone.utc),
             model_version=champion.version,
             prediction=prediction_label,
             probability=float(calibrated_prob),

@@ -1,6 +1,6 @@
 # Nifty 500 Data Validation Report
 
-**Generated**: 2026-11-10T13:04:16.868794+00:00
+**Generated**: 2026-11-11T03:10:31.576410+00:00
 **Global Data Status**: `FAILED`
 **Signal Generation Allowed**: `False`
 

@@ -374,7 +374,7 @@ def get_strategy_status():
         "freeze_status": "FROZEN",
         "environment": settings.ENVIRONMENT,
         "market_open": MarketCalendar.is_market_open(),
-        "timestamp": datetime.datetime.utcnow().isoformat()
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
 
 @router.get("/history")

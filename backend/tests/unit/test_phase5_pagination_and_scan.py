@@ -18,8 +18,8 @@ async def test_pagination_traversal_without_truncation():
     with patch('backend.services.data_quality_service.DataQualityService.evaluate_global_data_gate', return_value={"signal_generation_allowed": True}):
         with patch('backend.services.equity_signal_generation_service.container') as mock_container:
             mock_container.repository = mock_repo
-            # Mock signal generation to return None so scan runs through without actual ML calls
-            with patch('backend.services.equity_signal_generation_service.SignalEngine.generate_signal', new_callable=AsyncMock, return_value=None):
+            # Mock generate_signal_for_symbol to return None so pagination scan runs quickly without DuckDB calls
+            with patch('backend.services.equity_signal_generation_service.EquitySignalGenerationService.generate_signal_for_symbol', new_callable=AsyncMock, return_value=None):
                 result = await EquitySignalGenerationService.run_production_scan()
                 assert result["source_symbol_count"] == 400
                 assert result["status"] == "COMPLETED"
@@ -33,6 +33,9 @@ async def test_pagination_page_failure_handling():
     with patch('backend.services.data_quality_service.DataQualityService.evaluate_global_data_gate', return_value={"signal_generation_allowed": True}):
         with patch('backend.services.equity_signal_generation_service.container') as mock_container:
             mock_container.repository = mock_repo
+            result = await EquitySignalGenerationService.run_production_scan()
+            assert result["status"] == "FAILED"
+            assert "PAGINATION_FAILED" in result["reason"]
             result = await EquitySignalGenerationService.run_production_scan()
             assert result["status"] == "FAILED"
             assert "PAGINATION_FAILED" in result["reason"]

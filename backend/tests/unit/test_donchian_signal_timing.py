@@ -38,12 +38,26 @@ def test_donchian_shift_zero_lookahead_causality():
     assert latest_donchian < 500.0, "Causality failure: current bar high contaminated Donchian boundary!"
 
 def test_donchian_breakout_signal_generation():
-    df = make_sample_ohlcv(25, 100.0)
-    # Ensure prior completed bars 4..23 max high is around 112.5
+    dates = pd.date_range("2026-01-01", periods=60, freq="D")
+    data = []
+    for i, d in enumerate(dates):
+        p = 100.0 + (i % 3) * 0.5
+        data.append({
+            "timestamp": d,
+            "open": p - 1.0,
+            "high": p + 2.0,
+            "low": p - 2.0,
+            "close": p,
+            "volume": 10000.0
+        })
+    df = pd.DataFrame(data)
+    df.set_index("timestamp", inplace=True)
+
     prior_max_high = df["high"].iloc[-21:-1].max()
 
-    # Set last bar close to 150.0 (well above prior max high)
-    df.iloc[-1, df.columns.get_loc("close")] = prior_max_high + 10.0
+    # Set last bar high and close breaking out above prior max high
+    df.iloc[-1, df.columns.get_loc("high")] = prior_max_high + 10.0
+    df.iloc[-1, df.columns.get_loc("close")] = prior_max_high + 5.0
 
     signal = SignalEngine.generate_signal(df)
     assert signal["signal_type"] in ["BUY", "STRONG_BUY"]

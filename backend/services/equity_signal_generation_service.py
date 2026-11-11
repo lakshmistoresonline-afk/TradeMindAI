@@ -30,7 +30,7 @@ from backend.app.services.indicator_service import compute_wilder_rsi
 from backend.core.postgres import SessionLocal
 from sqlalchemy.orm import sessionmaker
 from backend.app.db.nifty500_symbols import get_nifty_500_universe
-from backend.services.data_quality_service import duckdb_path
+from backend.services.data_quality_service import DataQualityService, duckdb_path
 
 class DynamicFeatureVector:
     """Helper feature container matching SignalEngine interface."""
@@ -307,7 +307,6 @@ class EquitySignalGenerationService:
         print(f"=== [EQUITY] Master NSE Production Scan Started ({scan_id}) ===")
 
         # 0. Enforce Phase 1G Global Data Quality Gate
-        from backend.services.data_quality_service import DataQualityService
         gate = DataQualityService.evaluate_global_data_gate()
         if not gate.get("signal_generation_allowed", False):
             print(f"   [!] BLOCKED by Global Data Quality Gate: status='{gate.get('global_data_status')}'. Signal generation prohibited.")
