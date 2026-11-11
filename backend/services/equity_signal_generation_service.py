@@ -26,6 +26,7 @@ from backend.services.security_master_service import SecurityMasterService
 from backend.services.signal_quality_service import SignalQualityService
 from backend.services.signal_validator_service import SignalValidatorService
 from backend.services.signal_eligibility import is_eligible_buy
+from backend.app.services.indicator_service import compute_wilder_rsi
 from backend.core.postgres import SessionLocal
 from sqlalchemy.orm import sessionmaker
 from backend.app.db.nifty500_symbols import get_nifty_500_universe
@@ -85,26 +86,8 @@ class EquitySignalGenerationService:
             tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
             df['ATR'] = tr.rolling(window=14).mean()
 
-            delta = df['Close'].diff()
-            gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-            loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-
-            rsi = pd.Series(index=df.index, dtype=float)
-            for idx in df.index:
-                g = gain.loc[idx]
-                l = loss.loc[idx]
-                if pd.isna(g) or pd.isna(l):
-                    rsi.loc[idx] = np.nan
-                elif l == 0 and g == 0:
-                    rsi.loc[idx] = 50.0
-                elif l == 0 and g > 0:
-                    rsi.loc[idx] = 100.0
-                elif g == 0 and l > 0:
-                    rsi.loc[idx] = 0.0
-                else:
-                    rs = g / l
-                    rsi.loc[idx] = 100.0 - (100.0 / (1.0 + rs))
-            df['RSI'] = rsi
+            # Use canonical Wilder's Exponentially Smoothed RSI (14)
+            df['RSI'] = compute_wilder_rsi(df['Close'], period=14)
 
             last_row = df.iloc[-1]
             feats = {

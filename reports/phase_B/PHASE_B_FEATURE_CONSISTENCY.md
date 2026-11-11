@@ -6,13 +6,13 @@
 
 ## 1. Feature Consistency Evaluation Across Pipelines
 
-| Feature | `LocalIndicatorService` | `FeatureCalculationService` | `ResearchFeatures` | `FeatureStoreService` | Consistency Status |
-| :--- | :--- | :--- | :--- | :--- | :---: |
-| **RSI (14)** | Wilder Exponential Smoothing | Wilder via `pta.rsi` / `compute_wilder_rsi` | Wilder via `pta.rsi` | Wilder via `momentum_rsi` | **CONSISTENT** |
-| **EMA (20, 50, 200)** | Warm-up guarded (`ema_200 = NaN` if `< 200` bars) | Warm-up guarded | Warm-up guarded | Warm-up guarded | **CONSISTENT** |
-| **ATR (14)** | Rolling TR (returns `NaN` if `< 14` bars) | `pta.atr` / `talib` ATR | `pta.atr` | `ATR` | **CONSISTENT** |
-| **Bollinger Bands (20, 2)** | SMA 20 $\pm$ 2 std dev | `bb_upper`, `bb_lower` | `bbands` | `volatility_bb_width` | **CONSISTENT** |
-| **Donchian Channels (20)** | Shifted 1-bar (`shift(1)`) | Shifted 1-bar | Shifted 1-bar (`shift(1)`) | Shifted 1-bar | **CONSISTENT** |
+| Feature | `LocalIndicatorService` | `EquitySignalGenerationService` | `FeatureCalculationService` | `ResearchFeatures` | `FeatureStoreService` | Consistency Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :---: |
+| **RSI (14)** | Wilder Exponential Smoothing | Wilder via `compute_wilder_rsi` | Wilder via `pta.rsi` / `compute_wilder_rsi` | Wilder via `pta.rsi` | Wilder via `momentum_rsi` | **CONSISTENT** |
+| **EMA (20, 50, 200)** | Warm-up guarded (`ema_200 = NaN` if `< 200` bars) | Warm-up guarded (`len >= 200`) | Warm-up guarded | Warm-up guarded | Warm-up guarded | **CONSISTENT** |
+| **ATR (14)** | Rolling TR (returns `NaN` if `< 14` bars) | Rolling TR | `pta.atr` / `talib` ATR | `pta.atr` | `ATR` | **CONSISTENT** |
+| **Bollinger Bands (20, 2)** | SMA 20 $\pm$ 2 std dev | SMA 20 | `bb_upper`, `bb_lower` | `bbands` | `volatility_bb_width` | **CONSISTENT** |
+| **Donchian Channels (20)** | Shifted 1-bar (`shift(1)`) | Shifted 1-bar | Shifted 1-bar | Shifted 1-bar (`shift(1)`) | Shifted 1-bar | **CONSISTENT** |
 
 ---
 
