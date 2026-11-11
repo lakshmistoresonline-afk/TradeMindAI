@@ -115,6 +115,12 @@ def test_phase_a_historical_incomplete_session_filtered():
     assert is_valid is False
     assert "INCOMPLETE_SESSION" in reason
 
+def test_phase_a_historical_get_as_of_end_date_timedelta_runtime():
+    # Verifies get_as_of_end_date executes cleanly without NameError: timedelta
+    as_of_dt = HistoricalBackfillService.get_as_of_end_date()
+    assert isinstance(as_of_dt, datetime)
+    assert as_of_dt.year >= 2026
+
 def test_phase_a_expected_5m_slots_regular_vs_muhurat():
     # Regular trading session -> 75 slots (09:15 to 15:25)
     slots_reg = generate_expected_5m_slots("2026-03-10")
